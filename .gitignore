@@ -80,7 +80,6 @@ frontends/php/locale/vi/LC_MESSAGES/frontend.mo
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.mo
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.mo
 frontends/php/tests/bootstrap.php
-frontends/php/tmp
 include/config.h
 include/config.h.in
 include/stamp-h1
