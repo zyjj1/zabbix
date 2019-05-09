@@ -21,7 +21,7 @@ EXTRA_DIST = \
 dist-hook:
 	@branch=`(git rev-parse --abbrev-ref HEAD| sed -e '/release/b' -e '/master/b' -e d| grep -q "" && echo 2) || echo 1`; \
 	type_name=`cat $(top_distdir)/include/version.h| sed -n -e '/ZABBIX_VERSION_RC/s/.*"\([a-z]*\)[0-9]*"/\1/p'`; \
-	type_num=`test "x$$type_name" = "xalpha" && echo "1"`; \
+	type_num=`(test "x$$type_name" = "xalpha" && echo "1") || echo ""`; \
 	type_num=`(test -z $$type_num && test "x$$type_name" = "xbeta" && echo "2") || echo "$$type_num"`; \
 	type_num=`(test -z $$type_num && test "x$$type_name" = "xrc" && echo "3") || echo "$$type_num"`; \
 	type_num=`(test -z $$type_num && test -z $$type_name && echo "4") || echo "$$type_num"`; \
