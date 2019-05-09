@@ -27,7 +27,7 @@ dist-hook:
 	type_num=`(test -z $$type_num && test -z $$type_name && echo "4") || echo "$$type_num"`; \
 	type_num=`(test -z $$type_num && echo "0") || echo "$$type_num"`; \
 	type_count=`cat $(top_distdir)/include/version.h|sed -n -e '/ZABBIX_VERSION_RC/s/.*"[a-z]*\([0-9]*\)"/\1/p'`; \
-	printf -v type_count '%02d' $$type_count; \
+	type_count=`printf '%02d' $$type_count`; \
 	zabbix_revision=`git -C $(top_srcdir) rev-parse --short HEAD`; \
 	cat $(top_distdir)/include/version.h|sed "s/{ZABBIX_RC_NUM}/$$branch$$type_num$$type_count/g"| \
 	sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/include/version.h.new; \
