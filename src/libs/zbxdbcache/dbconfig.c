@@ -1649,7 +1649,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			DCstrpool_replace(1, &interface->ip, addr);
+			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+				DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
 
@@ -1658,7 +1659,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->dns);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			DCstrpool_replace(1, &interface->dns, addr);
+			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+				DCstrpool_replace(1, &interface->dns, addr);
 			zbx_free(addr);
 		}
 	}
@@ -2884,6 +2886,21 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		/* process function information */
 
 		function = DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION), &found);
+
+		if (1 == found && function->itemid != itemid)
+		{
+			ZBX_DC_ITEM	*item_last;
+
+			if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
+			{
+				item_last->update_triggers = 1;
+				if (NULL != item_last->triggers)
+				{
+					config->items.mem_free_func(item_last->triggers);
+					item_last->triggers = NULL;
+				}
+			}
+		}
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
@@ -5940,7 +5957,7 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char		*__function_name = "DCconfig_get_snmp_items_by_interface";
+	const char		*__function_name = "DCconfig_get_snmp_items_by_interfaceid";
 
 	size_t			items_num = 0, items_alloc = 8;
 	int			i;
