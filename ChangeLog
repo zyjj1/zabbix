@@ -3,6 +3,7 @@ Changes for 3.0.28rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.27
