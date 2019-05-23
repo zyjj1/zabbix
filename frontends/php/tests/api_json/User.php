@@ -104,7 +104,7 @@ class API_JSON_User extends CZabbixTest {
 					'url' => '',
 					'autologin' => 0,
 					'autologout' => 600,
-					'lang' => 'en_gb',
+					'lang' => 'en_GB',
 					'refresh' => 90,
 					'type' => 1,
 					'theme' => 'blue-theme',
