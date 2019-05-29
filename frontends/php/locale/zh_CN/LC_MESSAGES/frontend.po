@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:42+0300\n"
+"POT-Creation-Date: 2019-05-29 09:32+0300\n"
 "PO-Revision-Date: 2018-12-30 12:07+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -222,7 +222,7 @@ msgstr "访问拒绝"
 msgid "Access denied!"
 msgstr "访问拒绝!"
 
-#: include/classes/api/services/CUser.php:1077
+#: include/classes/api/services/CUser.php:1084
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "帐号被锁定%s秒"
@@ -351,7 +351,7 @@ msgstr[0] "激活 禁用激活 禁用"
 msgid "Action disabled due to deletion of user group."
 msgstr "已经禁用了用户组的删除操作。"
 
-#: include/classes/api/services/CUser.php:1442
+#: include/classes/api/services/CUser.php:1449
 msgid "Action disabled due to deletion of user."
 msgstr "已经禁用了用户的删除操作。"
 
@@ -424,7 +424,7 @@ msgstr "启用直到"
 #: include/views/administration.general.regularexpressions.edit.php:88
 #: include/views/administration.general.regularexpressions.edit.php:146
 #: include/views/administration.general.valuemapping.edit.php:65
-#: include/views/administration.general.valuemapping.edit.php:107
+#: include/views/administration.general.valuemapping.edit.php:104
 #: include/views/administration.usergroups.edit.php:118
 #: include/views/administration.usergroups.edit.php:128
 #: include/views/administration.usergroups.edit.php:138
@@ -1453,7 +1453,7 @@ msgstr "无法创建新的模板"
 msgid "Cannot create the configuration file."
 msgstr "无法创建配置文件。"
 
-#: include/classes/api/services/CUser.php:1406
+#: include/classes/api/services/CUser.php:1413
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "无法删除Zabbix内部用户 \"%1$s\", 试试停用这个用户."
@@ -1684,7 +1684,7 @@ msgstr "无法删除触发器"
 msgid "Cannot delete user"
 msgstr "无法删除用户"
 
-#: include/classes/api/services/CUser.php:975
+#: include/classes/api/services/CUser.php:982
 msgid "Cannot delete user media."
 msgstr "无法删除用户报警媒介."
 
@@ -2005,7 +2005,7 @@ msgstr "不能包含视图文件 \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "不能插入触发器表达式"
 
-#: include/classes/api/services/CUser.php:764
+#: include/classes/api/services/CUser.php:771
 msgid "Cannot insert user media."
 msgstr "不能插入用户报警媒介"
 
@@ -2018,11 +2018,11 @@ msgstr "无法链接模板"
 msgid "Cannot link template."
 msgstr "无法链接到模板。"
 
-#: include/classes/api/services/CUser.php:1118
+#: include/classes/api/services/CUser.php:1125
 msgid "Cannot login."
 msgstr "无法登陆"
 
-#: include/classes/api/services/CUser.php:1043
+#: include/classes/api/services/CUser.php:1050
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -2086,7 +2086,7 @@ msgstr "不能读取响应, 检查与Zabbix服务器 \"%1$s\" 的连接."
 msgid "Cannot remove all items, at least one item should remain."
 msgstr "无法删除所有的监控项，至少一个监控项应该保留."
 
-#: include/classes/api/services/CUser.php:277
+#: include/classes/api/services/CUser.php:284
 msgid "Cannot rename guest user."
 msgstr "无法重新命名访客用户."
 
@@ -2459,11 +2459,11 @@ msgstr "无法更新触发器模板"
 msgid "Cannot update trigger prototypes"
 msgstr "无法更新触发器模板"
 
-#: profile.php:179 users.php:229
+#: profile.php:176 users.php:229
 msgid "Cannot update user"
 msgstr "无法更新用户"
 
-#: include/classes/api/services/CUser.php:844
+#: include/classes/api/services/CUser.php:851
 msgid "Cannot update user media."
 msgstr "无法更新用户媒介."
 
@@ -3691,7 +3691,6 @@ msgstr "被延迟由于"
 #: include/classes/html/CButtonDelete.php:25 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:41
 #: include/views/administration.general.regularexpressions.list.php:76
-#: include/views/administration.general.valuemapping.edit.php:97
 #: include/views/administration.general.valuemapping.list.php:69
 #: include/views/administration.usergroups.list.php:151
 #: include/views/administration.users.list.php:157
@@ -4567,7 +4566,7 @@ msgstr "\"%2$s\" 与 \"%1$s\" 的mapping 值冲突"
 msgid "Duplicate severity name \"%s\"."
 msgstr "重复的严重性名称\"%s\"."
 
-#: include/classes/api/services/CUser.php:285
+#: include/classes/api/services/CUser.php:292
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "重复的用户别名\"%s\"."
@@ -4763,7 +4762,7 @@ msgstr "空主机"
 #: include/classes/api/services/CUserGroup.php:597
 #: include/classes/api/services/CUserMacro.php:365
 #: include/classes/api/services/CUserMacro.php:533
-#: include/classes/api/services/CUser.php:525
+#: include/classes/api/services/CUser.php:532
 #: include/classes/api/services/CValueMap.php:271
 #: include/classes/api/services/CValueMap.php:324
 #: include/classes/api/services/CValueMap.php:391
@@ -7581,7 +7580,7 @@ msgstr "模板的聚合图形ID错误。"
 msgid "Incorrect templated web scenario step count."
 msgstr "模板Web场景步数不正确。"
 
-#: include/classes/api/services/CUser.php:318
+#: include/classes/api/services/CUser.php:325
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "用户\"%1$s\"的主题错误"
@@ -8125,10 +8124,10 @@ msgstr "无效的维护周期."
 #: include/classes/api/services/CService.php:206
 #: include/classes/api/services/CService.php:381
 #: include/classes/api/services/CService.php:1266
-#: include/classes/api/services/CUser.php:699
-#: include/classes/api/services/CUser.php:719
-#: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:922
+#: include/classes/api/services/CUser.php:706
+#: include/classes/api/services/CUser.php:726
+#: include/classes/api/services/CUser.php:884
+#: include/classes/api/services/CUser.php:929
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid method parameters."
 msgstr "无效的方法参数."
@@ -8611,6 +8610,11 @@ msgstr "标签位置"
 msgid "Language"
 msgstr "语言"
 
+#: include/classes/api/services/CUser.php:277
+#, c-format
+msgid "Language \"%1$s\" is not supported."
+msgstr ""
+
 #: include/forms.inc.php:1889 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "末"
@@ -8888,12 +8892,12 @@ msgstr "登录为"
 msgid "Login"
 msgstr "登录"
 
-#: include/classes/api/services/CUser.php:1156
+#: include/classes/api/services/CUser.php:1163
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "登录失败\"%s\"."
 
-#: include/classes/api/services/CUser.php:1123
+#: include/classes/api/services/CUser.php:1130
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr "登陆名\"%1$s\"未能匹配HTTP认证所使用的用户名 \"%2$s\""
@@ -8902,9 +8906,9 @@ msgstr "登陆名\"%1$s\"未能匹配HTTP认证所使用的用户名 \"%2$s\""
 msgid "Login name or password is incorrect!"
 msgstr "登陆名或密码错误!"
 
-#: include/classes/api/services/CUser.php:1012
-#: include/classes/api/services/CUser.php:1028
-#: include/classes/api/services/CUser.php:1071
+#: include/classes/api/services/CUser.php:1019
+#: include/classes/api/services/CUser.php:1035
+#: include/classes/api/services/CUser.php:1078
 msgid "Login name or password is incorrect."
 msgstr "登录名称或密码是错误的."
 
@@ -10043,8 +10047,8 @@ msgstr "未添加拓扑图."
 msgid "No matches found"
 msgstr "没有找到匹配"
 
-#: include/classes/api/services/CUser.php:1085
-#: include/classes/api/services/CUser.php:1214
+#: include/classes/api/services/CUser.php:1092
+#: include/classes/api/services/CUser.php:1221
 msgid "No permissions for system access."
 msgstr "没有系统访问权限。"
 
@@ -10143,11 +10147,11 @@ msgstr "没有系统访问权限。"
 #: include/classes/api/services/CTriggerPrototype.php:995
 #: include/classes/api/services/CTriggerPrototype.php:1453
 #: include/classes/api/services/CUserMacro.php:679
-#: include/classes/api/services/CUser.php:706
-#: include/classes/api/services/CUser.php:885
-#: include/classes/api/services/CUser.php:905
-#: include/classes/api/services/CUser.php:964
-#: include/classes/api/services/CUser.php:1371
+#: include/classes/api/services/CUser.php:713
+#: include/classes/api/services/CUser.php:892
+#: include/classes/api/services/CUser.php:912
+#: include/classes/api/services/CUser.php:971
+#: include/classes/api/services/CUser.php:1378
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:414
 #: include/classes/screens/CScreenHistory.php:113
@@ -10259,7 +10263,7 @@ msgstr "非模板监控项"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "并非所有的模板都连接到\"%s\"."
 
-#: include/classes/api/services/CUser.php:340
+#: include/classes/api/services/CUser.php:347
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "不允许设定用户\"guest\"的密码."
 
@@ -10609,15 +10613,15 @@ msgstr "只有超级管理员可以更新全局宏."
 msgid "Only Super Admins can update icon maps."
 msgstr "只有超级管理员可以更新图标映射."
 
-#: include/classes/api/services/CUser.php:695
+#: include/classes/api/services/CUser.php:702
 msgid "Only Zabbix Admins can add user media."
 msgstr "只有超级管理员可以添加用户报警媒介."
 
-#: include/classes/api/services/CUser.php:873
+#: include/classes/api/services/CUser.php:880
 msgid "Only Zabbix Admins can change user media."
 msgstr "只有超级管理员可以用改变户报警媒介."
 
-#: include/classes/api/services/CUser.php:954
+#: include/classes/api/services/CUser.php:961
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超级管理员可以移除用户报警媒介."
 
@@ -12672,7 +12676,7 @@ msgstr "服务"
 msgid "Services form a circular dependency."
 msgstr "服务形成了一个环."
 
-#: include/classes/api/services/CUser.php:1208
+#: include/classes/api/services/CUser.php:1215
 msgid "Session terminated, re-login, please."
 msgstr "会话已中断, 请重新登录."
 
@@ -14686,22 +14690,22 @@ msgstr "用户"
 
 #: include/classes/api/services/CUserGroup.php:462
 #: include/classes/api/services/CUserGroup.php:651
-#: include/classes/api/services/CUser.php:293
+#: include/classes/api/services/CUser.php:300
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "用户 \"%1$s\" 不能没有用户组。"
 
-#: include/classes/api/services/CUser.php:552
+#: include/classes/api/services/CUser.php:559
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "拓扑图\"%2$s\"的所有者为\"%1$s\"。"
 
-#: include/classes/api/services/CUser.php:576
+#: include/classes/api/services/CUser.php:583
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "聚合图  \"%2$s\"形的所有者为\"%1$s\""
 
-#: include/classes/api/services/CUser.php:598
+#: include/classes/api/services/CUser.php:605
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "幻灯片 \"%2$s\"的所有者为\"%1$s\"。"
@@ -14806,7 +14810,7 @@ msgstr "聚合图形 \"%2$s\" 用户组共享找不到参数 %1$s"
 msgid "User groups"
 msgstr "用户群组"
 
-#: include/classes/api/services/CUser.php:1384
+#: include/classes/api/services/CUser.php:1391
 msgid "User is not allowed to delete himself."
 msgstr "用户是不允许删除自己"
 
@@ -14817,12 +14821,12 @@ msgstr "用户是不允许删除自己"
 msgid "User macro missing parameters: %1$s"
 msgstr "用户宏缺少参数： %1$s"
 
-#: include/classes/api/services/CUser.php:307
+#: include/classes/api/services/CUser.php:314
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "用户不能因为成为用户群组 \"%s\"的成员而帮自己修改GUI存取."
 
-#: include/classes/api/services/CUser.php:311
+#: include/classes/api/services/CUser.php:318
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "用户不能因为成为用户群组 \"%s\"的成员而帮自己修改系统状态."
@@ -14881,11 +14885,11 @@ msgstr "聚合图形 \"%2$s\" 用户共享缺少参数 %1$s 。"
 msgid "User type"
 msgstr "用户类型"
 
-#: profile.php:179 users.php:228
+#: profile.php:176 users.php:228
 msgid "User updated"
 msgstr "用户已更新"
 
-#: include/classes/api/services/CUser.php:355
+#: include/classes/api/services/CUser.php:362
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "使用别名\"%s\"的用户已存在."
@@ -15669,7 +15673,7 @@ msgstr "\"%1$s\" 欢迎登入."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语言并未安装在web服务器上。"
 
-#: include/classes/api/services/CUser.php:323
+#: include/classes/api/services/CUser.php:330
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允许来帮用户\"%s\"转换优先权."
