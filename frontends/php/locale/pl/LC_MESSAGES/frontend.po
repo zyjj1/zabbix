@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:42+0300\n"
+"POT-Creation-Date: 2019-05-29 09:32+0300\n"
 "PO-Revision-Date: 2017-05-08 13:09+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -241,7 +241,7 @@ msgstr "Dostęp zabroniony"
 msgid "Access denied!"
 msgstr "Dostęp zabroniony!"
 
-#: include/classes/api/services/CUser.php:1077
+#: include/classes/api/services/CUser.php:1084
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "Konto zostało zablokowane na %s sekund"
@@ -372,7 +372,7 @@ msgstr[2] "Wyłączono akcje"
 msgid "Action disabled due to deletion of user group."
 msgstr "Wyłączono akcję ze względu na usunięcie grupy użytkownika."
 
-#: include/classes/api/services/CUser.php:1442
+#: include/classes/api/services/CUser.php:1449
 msgid "Action disabled due to deletion of user."
 msgstr "Wyłączono akcję ze względu na usunięcie użytkownika."
 
@@ -447,7 +447,7 @@ msgstr "Aktywne do"
 #: include/views/administration.general.regularexpressions.edit.php:88
 #: include/views/administration.general.regularexpressions.edit.php:146
 #: include/views/administration.general.valuemapping.edit.php:65
-#: include/views/administration.general.valuemapping.edit.php:107
+#: include/views/administration.general.valuemapping.edit.php:104
 #: include/views/administration.usergroups.edit.php:118
 #: include/views/administration.usergroups.edit.php:128
 #: include/views/administration.usergroups.edit.php:138
@@ -1490,7 +1490,7 @@ msgstr "Nie można utworzyć szablonu."
 msgid "Cannot create the configuration file."
 msgstr "Nie można utworzyć pliku konfiguracyjnego."
 
-#: include/classes/api/services/CUser.php:1406
+#: include/classes/api/services/CUser.php:1413
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Nie można usunąć wewnętrznego użytkownika Zabbix \"%1$s\", proszę spróbować wyłączyć tego użytkownika."
@@ -1733,7 +1733,7 @@ msgstr "Nie można usunąć wyzwalaczy"
 msgid "Cannot delete user"
 msgstr "Nie można usunąć użytkownika"
 
-#: include/classes/api/services/CUser.php:975
+#: include/classes/api/services/CUser.php:982
 msgid "Cannot delete user media."
 msgstr "Nie można usunąć mediów użytkownika."
 
@@ -2104,7 +2104,7 @@ msgstr "Nie można zawrzeć pliku widoku \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "Nie można dodać wyrażenia wyzwalacza"
 
-#: include/classes/api/services/CUser.php:764
+#: include/classes/api/services/CUser.php:771
 msgid "Cannot insert user media."
 msgstr "Nie można dodać mediów użytkownika."
 
@@ -2117,11 +2117,11 @@ msgstr "Nie można połączyć szablonu"
 msgid "Cannot link template."
 msgstr "Nie można połączyć szablonu."
 
-#: include/classes/api/services/CUser.php:1118
+#: include/classes/api/services/CUser.php:1125
 msgid "Cannot login."
 msgstr "Nie można zalogować."
 
-#: include/classes/api/services/CUser.php:1043
+#: include/classes/api/services/CUser.php:1050
 msgid "Cannot logout."
 msgstr "Nie można się wylogować."
 
@@ -2185,7 +2185,7 @@ msgstr "Nie można odczytać odpowiedzi, sprawdź połączenie z serwerem Zabbix
 msgid "Cannot remove all items, at least one item should remain."
 msgstr "Nie można usunąć wszystkich pozycji, co najmniej jedna powinna pozostać."
 
-#: include/classes/api/services/CUser.php:277
+#: include/classes/api/services/CUser.php:284
 msgid "Cannot rename guest user."
 msgstr "Nie można zmienić nazwy użytkownikowi - gościowi."
 
@@ -2558,11 +2558,11 @@ msgstr "Nie można zaktualizować prototypu wyzwalacza"
 msgid "Cannot update trigger prototypes"
 msgstr "Nie można zaktualizować prototypów wyzwalaczy"
 
-#: profile.php:179 users.php:229
+#: profile.php:176 users.php:229
 msgid "Cannot update user"
 msgstr "Nie można zaktualizować użytkownika"
 
-#: include/classes/api/services/CUser.php:844
+#: include/classes/api/services/CUser.php:851
 msgid "Cannot update user media."
 msgstr "Nie można zaktualizować mediów użytkownika."
 
@@ -3792,7 +3792,6 @@ msgstr "Opóźniony o"
 #: include/classes/html/CButtonDelete.php:25 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:41
 #: include/views/administration.general.regularexpressions.list.php:76
-#: include/views/administration.general.valuemapping.edit.php:97
 #: include/views/administration.general.valuemapping.list.php:69
 #: include/views/administration.usergroups.list.php:151
 #: include/views/administration.users.list.php:157
@@ -4674,7 +4673,7 @@ msgstr "Powtórzona wartość mapowania \"%1$s\" dla mapy wartości \"%2$s\"."
 msgid "Duplicate severity name \"%s\"."
 msgstr "Powielona nazwa poziomu \"%s\"."
 
-#: include/classes/api/services/CUser.php:285
+#: include/classes/api/services/CUser.php:292
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "Powielony alias użytkownika \"%s\"."
@@ -4870,7 +4869,7 @@ msgstr "Pusty host."
 #: include/classes/api/services/CUserGroup.php:597
 #: include/classes/api/services/CUserMacro.php:365
 #: include/classes/api/services/CUserMacro.php:533
-#: include/classes/api/services/CUser.php:525
+#: include/classes/api/services/CUser.php:532
 #: include/classes/api/services/CValueMap.php:271
 #: include/classes/api/services/CValueMap.php:324
 #: include/classes/api/services/CValueMap.php:391
@@ -7703,7 +7702,7 @@ msgstr "Błędny ID ekranu szablonu."
 msgid "Incorrect templated web scenario step count."
 msgstr "Błędna liczba kroków szablonowego scenariusza sieci www."
 
-#: include/classes/api/services/CUser.php:318
+#: include/classes/api/services/CUser.php:325
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "Błędny motyw dla użytkownika \"%1$s\"."
@@ -8247,10 +8246,10 @@ msgstr "Nieprawidłowy okres utrzymania"
 #: include/classes/api/services/CService.php:206
 #: include/classes/api/services/CService.php:381
 #: include/classes/api/services/CService.php:1266
-#: include/classes/api/services/CUser.php:699
-#: include/classes/api/services/CUser.php:719
-#: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:922
+#: include/classes/api/services/CUser.php:706
+#: include/classes/api/services/CUser.php:726
+#: include/classes/api/services/CUser.php:884
+#: include/classes/api/services/CUser.php:929
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid method parameters."
 msgstr "Nieprawidłowe parametry metody."
@@ -8743,6 +8742,11 @@ msgstr "Położenie etykiety"
 msgid "Language"
 msgstr "Język"
 
+#: include/classes/api/services/CUser.php:277
+#, c-format
+msgid "Language \"%1$s\" is not supported."
+msgstr ""
+
 #: include/forms.inc.php:1889 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Ostatnia"
@@ -9022,12 +9026,12 @@ msgstr "Zalogowano jako"
 msgid "Login"
 msgstr "Logowanie"
 
-#: include/classes/api/services/CUser.php:1156
+#: include/classes/api/services/CUser.php:1163
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Logowanie się nie powiodło \"%s\"."
 
-#: include/classes/api/services/CUser.php:1123
+#: include/classes/api/services/CUser.php:1130
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr "Nazwa logowania \"%1$s\" nie jest zgodna z nazwą \"%2$s\" użytą do uwierzytelniania HTTP."
@@ -9036,9 +9040,9 @@ msgstr "Nazwa logowania \"%1$s\" nie jest zgodna z nazwą \"%2$s\" użytą do uw
 msgid "Login name or password is incorrect!"
 msgstr "Podany login i/lub hasło są niepoprawne!"
 
-#: include/classes/api/services/CUser.php:1012
-#: include/classes/api/services/CUser.php:1028
-#: include/classes/api/services/CUser.php:1071
+#: include/classes/api/services/CUser.php:1019
+#: include/classes/api/services/CUser.php:1035
+#: include/classes/api/services/CUser.php:1078
 msgid "Login name or password is incorrect."
 msgstr "Podany login i/lub hasło są niepoprawne."
 
@@ -10187,8 +10191,8 @@ msgstr "Nie dodano map."
 msgid "No matches found"
 msgstr "Nie znaleziono"
 
-#: include/classes/api/services/CUser.php:1085
-#: include/classes/api/services/CUser.php:1214
+#: include/classes/api/services/CUser.php:1092
+#: include/classes/api/services/CUser.php:1221
 msgid "No permissions for system access."
 msgstr "Brak uprawnień dla dostępu do systemu."
 
@@ -10287,11 +10291,11 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: include/classes/api/services/CTriggerPrototype.php:995
 #: include/classes/api/services/CTriggerPrototype.php:1453
 #: include/classes/api/services/CUserMacro.php:679
-#: include/classes/api/services/CUser.php:706
-#: include/classes/api/services/CUser.php:885
-#: include/classes/api/services/CUser.php:905
-#: include/classes/api/services/CUser.php:964
-#: include/classes/api/services/CUser.php:1371
+#: include/classes/api/services/CUser.php:713
+#: include/classes/api/services/CUser.php:892
+#: include/classes/api/services/CUser.php:912
+#: include/classes/api/services/CUser.php:971
+#: include/classes/api/services/CUser.php:1378
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:414
 #: include/classes/screens/CScreenHistory.php:113
@@ -10403,7 +10407,7 @@ msgstr "Brak pozycji szablonowych"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nie wszystkie szablony są połączone z \"%s\"."
 
-#: include/classes/api/services/CUser.php:340
+#: include/classes/api/services/CUser.php:347
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Nie można ustawić hasła dla użytkownika \"guest\"."
 
@@ -10753,15 +10757,15 @@ msgstr "Tylko Super Administratorzy mogą aktualizować makra globalne."
 msgid "Only Super Admins can update icon maps."
 msgstr "Tylko Super Administratorzy mogą aktualizować mapy ikon."
 
-#: include/classes/api/services/CUser.php:695
+#: include/classes/api/services/CUser.php:702
 msgid "Only Zabbix Admins can add user media."
 msgstr "Tylko administrator Zabbixa może dodawać media użytkownika."
 
-#: include/classes/api/services/CUser.php:873
+#: include/classes/api/services/CUser.php:880
 msgid "Only Zabbix Admins can change user media."
 msgstr "Tylko administrator Zabbixa może zmieniać media użytkownika."
 
-#: include/classes/api/services/CUser.php:954
+#: include/classes/api/services/CUser.php:961
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Tylko administrator Zabbixa może usuwać media użytkownika."
 
@@ -12824,7 +12828,7 @@ msgstr "Usługi"
 msgid "Services form a circular dependency."
 msgstr "Usługi tworzą cykliczną zależność."
 
-#: include/classes/api/services/CUser.php:1208
+#: include/classes/api/services/CUser.php:1215
 msgid "Session terminated, re-login, please."
 msgstr "Sesja zakończona, proszę zalogować się ponownie."
 
@@ -14859,22 +14863,22 @@ msgstr "Użytkownik"
 
 #: include/classes/api/services/CUserGroup.php:462
 #: include/classes/api/services/CUserGroup.php:651
-#: include/classes/api/services/CUser.php:293
+#: include/classes/api/services/CUser.php:300
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Użytkownik \"%1$s\" nie może istnieć bez grupy użytkowników."
 
-#: include/classes/api/services/CUser.php:552
+#: include/classes/api/services/CUser.php:559
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Użytkownik \"%1$s\" jest właścicielem mapy \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:576
+#: include/classes/api/services/CUser.php:583
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Użytkownik \"%1$s\" jest właścicielem ekranu \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:598
+#: include/classes/api/services/CUser.php:605
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Użytkownik \"%1$s\" jest właścicielem pokazu slajdów \"%2$s\"."
@@ -14983,7 +14987,7 @@ msgstr "Brak parametrów współdzielenia grupy użytkowników: %1$s dla ekranu 
 msgid "User groups"
 msgstr "Grupy użytkowników"
 
-#: include/classes/api/services/CUser.php:1384
+#: include/classes/api/services/CUser.php:1391
 msgid "User is not allowed to delete himself."
 msgstr "Użytkownik nie może siebie usunąć."
 
@@ -14994,12 +14998,12 @@ msgstr "Użytkownik nie może siebie usunąć."
 msgid "User macro missing parameters: %1$s"
 msgstr "Brak parametrów makra użytkownika: %1$s"
 
-#: include/classes/api/services/CUser.php:307
+#: include/classes/api/services/CUser.php:314
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "Użytkownik nie może modyfikować dostępu GUI dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
 
-#: include/classes/api/services/CUser.php:311
+#: include/classes/api/services/CUser.php:318
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Użytkownik nie może modyfikować stanu systemu dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
@@ -15058,11 +15062,11 @@ msgstr "Brak parametrów współdzielenia użytkownika: %1$s dla ekranu \"%2$s\"
 msgid "User type"
 msgstr "Typ użytkownika"
 
-#: profile.php:179 users.php:228
+#: profile.php:176 users.php:228
 msgid "User updated"
 msgstr "Zaktualizowano użytkownika"
 
-#: include/classes/api/services/CUser.php:355
+#: include/classes/api/services/CUser.php:362
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Użytkownik o aliasie \"%s\" już istnieje."
@@ -15852,7 +15856,7 @@ msgstr "Jesteś zalogowany jako \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Nie można wybrać niektórych języków, ponieważ nie zostały one zainstalowane na serwerze."
 
-#: include/classes/api/services/CUser.php:323
+#: include/classes/api/services/CUser.php:330
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Brak praw do zmiany uprawnień użytkownika \"%s\"."
