@@ -3,6 +3,7 @@ Changes for 3.0.29rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.28
