@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,14 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CCheckboxElement extends CElement {
 
 	/**
+	 * Alias for isSelected.
+	 * @see self::isSelected
+	 */
+	public function isChecked($checked = true) {
+		return $this->isSelected($checked);
+	}
+
+	/**
 	 * Set checkbox state.
 	 *
 	 * @param boolean $checked    checked or not
@@ -36,7 +44,7 @@ class CCheckboxElement extends CElement {
 	 */
 	public function set($checked) {
 		if ($checked !== $this->isSelected()) {
-			$this->click();
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 		}
 
 		return $this;
@@ -58,5 +66,39 @@ class CCheckboxElement extends CElement {
 	 */
 	public function uncheck() {
 		return $this->set(false);
+	}
+
+	/**
+	 * Get label element.
+	 *
+	 * @return CElement|null
+	 */
+	public function getLabel() {
+		return $this->query('xpath:../label')->one(false);
+	}
+
+	/**
+	 * Get label text.
+	 *
+	 * @return string|null
+	 */
+	public function getText() {
+		if (($label = $this->getLabel()) !== null) {
+			return $label->getText();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Alias for set.
+	 * @see self::set
+	 *
+	 * @param boolean $checked    checked or not
+	 *
+	 * @return $this
+	 */
+	public function fill($checked) {
+		return $this->set($checked);
 	}
 }

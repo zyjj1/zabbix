@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,7 +201,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 
 				return ZBX_POLLER_TYPE_PINGER;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -319,7 +319,7 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, char **error)
 {
 	zbx_uint64_t	seed;
 
@@ -329,7 +329,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 			(ITEM_STATE_NOTSUPPORTED == new_state && 0 == (flags & (0 == item->schedulable ?
 					ZBX_ITEM_DELAY_CHANGED : ZBX_REFRESH_UNSUPPORTED_CHANGED)))))
 	{
-		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
+		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
@@ -340,20 +340,9 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 	{
 		int			simple_interval;
 		zbx_custom_interval_t	*custom_intervals;
-		char			*error = NULL;
 
-		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, &error))
+		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, error))
 		{
-			zbx_timespec_t	ts = {now, 0};
-
-			/* Usual way for an item to become not supported is to receive an error instead of value. */
-			/* Item state and error will be updated by history syncer during history sync following a */
-			/* regular procedure with item update in database and config cache, logging etc. There is */
-			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
-
-			dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
-			zbx_free(error);
-
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
 			/* can only be healed by editing configuration (either update interval or macros involved) */
 			/* and such changes will be detected during configuration synchronization. DCsync_items()  */
@@ -361,7 +350,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 
 			item->nextcheck = ZBX_JAN_2038;
 			item->schedulable = 0;
-			return;
+			return FAIL;
 		}
 
 		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
@@ -388,6 +377,8 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 	}
 
 	item->schedulable = 1;
+
+	return SUCCEED;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -1325,6 +1316,10 @@ done:
 			if (HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status)
 				host->data_expected_from = now;
 
+			/* reset host status if host status has been changed (e.g., if host has been disabled) */
+			if (status != host->status)
+				host->reset_availability = 1;
+
 			/* reset host status if host proxy assignment has been changed */
 			if (proxy_hostid != host->proxy_hostid)
 				host->reset_availability = 1;
@@ -1406,6 +1401,7 @@ done:
 				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
+			proxy->last_version_error_time = time(NULL);
 		}
 		else if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
 		{
@@ -1897,7 +1893,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			DCstrpool_replace(1, &interface->ip, addr);
+			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+				DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
 
@@ -1906,7 +1903,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->dns);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			DCstrpool_replace(1, &interface->dns, addr);
+			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+				DCstrpool_replace(1, &interface->dns, addr);
 			zbx_free(addr);
 		}
 	}
@@ -1961,6 +1959,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
+	ZBX_DC_HOST		*host;
 
 	int			found, update_index, ret, i;
 	zbx_uint64_t		interfaceid, hostid;
@@ -1984,6 +1983,11 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(main_, row[3]);
 		ZBX_STR2UCHAR(useip, row[4]);
 		ZBX_STR2UCHAR(bulk, row[8]);
+
+		/* If there is no host for this interface, skip it. */
+		/* This may be possible if the host was added after we synced config for hosts. */
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			continue;
 
 		interface = (ZBX_DC_INTERFACE *)DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
 		zbx_vector_ptr_append(&interfaces, interface);
@@ -2089,28 +2093,21 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		{
 			/* new interface - add it to a list of host interfaces in 'config->hosts' hashset */
 
-			ZBX_DC_HOST	*host;
+			int	exists = 0;
 
-			if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
+			/* It is an error if the pointer is already in the list. Detect it. */
+
+			for (i = 0; i < host->interfaces_v.values_num; i++)
 			{
-				int	exists = 0;
-
-				/* It is an error if the pointer is already in the list. Detect it. */
-
-				for (i = 0; i < host->interfaces_v.values_num; i++)
+				if (interface == host->interfaces_v.values[i])
 				{
-					if (interface == host->interfaces_v.values[i])
-					{
-						exists = 1;
-						break;
-					}
+					exists = 1;
+					break;
 				}
-
-				if (0 == exists)
-					zbx_vector_ptr_append(&host->interfaces_v, interface);
-				else
-					THIS_SHOULD_NEVER_HAPPEN;
 			}
+
+			if (0 == exists)
+				zbx_vector_ptr_append(&host->interfaces_v, interface);
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -2127,10 +2124,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	}
 
 	/* remove deleted interfaces from buffer */
+
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_HOST	*host;
-
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
@@ -2772,7 +2768,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, item->state, flags, now);
+			{
+				char	*error = NULL;
+
+				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
+				{
+					zbx_timespec_t	ts = {now, 0};
+
+					/* Usual way for an item to become not supported is to receive an error     */
+					/* instead of value. Item state and error will be updated by history syncer */
+					/* during history sync following a regular procedure with item update in    */
+					/* database and config cache, logging etc. There is no need to set          */
+					/* ITEM_STATE_NOTSUPPORTED here.                                            */
+
+					if (0 == host->proxy_hostid)
+					{
+						dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED, error);
+					}
+					zbx_free(error);
+				}
+			}
 		}
 		else
 		{
@@ -3300,6 +3316,21 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 		function = (ZBX_DC_FUNCTION *)DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION), &found);
 
+		if (1 == found && function->itemid != itemid)
+		{
+			ZBX_DC_ITEM	*item_last;
+
+			if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
+			{
+				item_last->update_triggers = 1;
+				if (NULL != item_last->triggers)
+				{
+					config->items.mem_free_func(item_last->triggers);
+					item_last->triggers = NULL;
+				}
+			}
+		}
+
 		function->triggerid = triggerid;
 		function->itemid = itemid;
 		DCstrpool_replace(found, &function->function, row[2]);
@@ -3541,7 +3572,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_action_ops(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_action_opss";
+	const char	*__function_name = "DCsync_action_ops";
 
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -4148,7 +4179,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 		if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &rowid)))
 			continue;
 
-		if (FAIL != (index = zbx_vector_ptr_search(&config->hostgroups_name, group, dc_compare_hgroups)))
+		if (FAIL != (index = zbx_vector_ptr_search(&config->hostgroups_name, group, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove_noorder(&config->hostgroups_name, index);
 
 		if (ZBX_DC_HOSTGROUP_FLAGS_NONE != group->flags)
@@ -4353,14 +4384,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				zbx_vector_ptr_remove_noorder(&preprocitem->preproc_ops, index);
-
-				if (0 == preprocitem->preproc_ops.values_num)
-				{
-					zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
-					zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
-				}
-				else
-					zbx_vector_ptr_append(&items, preprocitem);
+				zbx_vector_ptr_append(&items, preprocitem);
 			}
 		}
 
@@ -4368,7 +4392,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
-	/* sort item  preprocessing operations by step */
+	/* sort item preprocessing operations by step */
 
 	zbx_vector_ptr_sort(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 	zbx_vector_ptr_uniq(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
@@ -4376,7 +4400,14 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	for (i = 0; i < items.values_num; i++)
 	{
 		preprocitem = (ZBX_DC_PREPROCITEM *)items.values[i];
-		zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
+
+		if (0 == preprocitem->preproc_ops.values_num)
+		{
+			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
+			zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
+		}
+		else
+			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
 	}
 
 	zbx_vector_ptr_destroy(&items);
@@ -4860,6 +4891,8 @@ void	DCsync_configuration(unsigned char mode)
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
 
+	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
+
 	/* sync function data to support function lookups when resolving macros during configuration sync */
 
 	sec = zbx_time();
@@ -5000,7 +5033,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	update_sec = zbx_time() - sec;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
@@ -5145,6 +5178,10 @@ void	DCsync_configuration(unsigned char mode)
 				config->items_hk.num_data, config->items_hk.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __function_name,
 				config->numitems.num_data, config->numitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __function_name,
+				config->preprocitems.num_data, config->preprocitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __function_name,
+				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __function_name,
 				config->snmpitems.num_data, config->snmpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __function_name,
@@ -5259,7 +5296,7 @@ out:
 
 	zbx_dbsync_free_env();
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -5960,6 +5997,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -5969,6 +6007,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -6019,6 +6058,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (NULL != dc_host->tls_dc_psk)
@@ -6040,6 +6080,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	*hostid = dc_host->hostid;
 
@@ -7530,7 +7571,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock);
+	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -7864,7 +7905,7 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char			*__function_name = "DCconfig_get_snmp_items_by_interface";
+	const char			*__function_name = "DCconfig_get_snmp_items_by_interfaceid";
 
 	size_t				items_num = 0, items_alloc = 8;
 	int				i;
@@ -8776,51 +8817,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_set_maintenance                                         *
- *                                                                            *
- * Purpose: set host maintenance status                                       *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
-		int maintenance_type, int maintenance_from)
-{
-	int		i, now;
-	ZBX_DC_HOST	*dc_host;
-
-	now = time(NULL);
-
-	WRLOCK_CACHE;
-
-	for (i = 0; i < hostids_num; i++)
-	{
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids[i])))
-			continue;
-
-		if (HOST_STATUS_MONITORED != dc_host->status && HOST_STATUS_NOT_MONITORED != dc_host->status)
-			continue;
-
-		if (dc_host->maintenance_status != maintenance_status)
-			dc_host->maintenance_from = maintenance_from;
-
-		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
-		{
-			/* Store time at which no-data maintenance ended for the host (either */
-			/* because no-data maintenance ended or because maintenance type was */
-			/* changed to normal), this is needed for nodata() trigger function. */
-			dc_host->data_expected_from = now;
-		}
-
-		dc_host->maintenance_status = maintenance_status;
-		dc_host->maintenance_type = maintenance_type;
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCconfig_get_stats                                               *
  *                                                                            *
  * Purpose: get statistics of the database cache                              *
@@ -8869,6 +8865,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->version = src_proxy->version;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->auto_compress = src_proxy->auto_compress;
+	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
 
 	if (NULL != (host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
@@ -9720,7 +9717,7 @@ static void	dc_status_update(void)
 
 					break;
 				}
-				/* break; is not missing here, item on disabled host counts as disabled */
+				ZBX_FALLTHROUGH;
 			case ITEM_STATUS_DISABLED:
 				config->status->items_disabled++;
 				if (NULL != dc_proxy_host)
@@ -9758,7 +9755,7 @@ static void	dc_status_update(void)
 
 					break;
 				}
-				/* break; is not missing here, trigger with disabled items/hosts counts as disabled */
+				ZBX_FALLTHROUGH;
 			case TRIGGER_STATUS_DISABLED:
 				config->status->triggers_disabled++;
 				break;
@@ -9900,6 +9897,29 @@ double	DCget_required_performance(void)
 	UNLOCK_CACHE;
 
 	return nvps;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_count_stats_all                                            *
+ *                                                                            *
+ * Purpose: retrieves all internal metrics of the configuration cache         *
+ *                                                                            *
+ * Parameters: stats - [OUT] the configuration cache statistics               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_count_stats_all(zbx_config_cache_info_t *stats)
+{
+	WRLOCK_CACHE;
+
+	dc_status_update();
+
+	stats->hosts = config->status->hosts_monitored;
+	stats->items = config->status->items_active_normal + config->status->items_active_notsupported;
+	stats->items_unsupported = config->status->items_active_notsupported;
+	stats->requiredperformance = config->status->required_performance;
+
+	UNLOCK_CACHE;
 }
 
 static void	proxy_counter_ui64_push(zbx_vector_ptr_t *vector, zbx_uint64_t proxyid, zbx_uint64_t counter)
@@ -11292,7 +11312,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
+			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
 	}
 
 	UNLOCK_CACHE;
@@ -11643,6 +11663,12 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			else
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
 		}
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR))
+		{
+			if (proxy-> last_version_error_time != diff->last_version_error_time)
+				proxy->last_version_error_time = diff->last_version_error_time;
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR);
+		}
 	}
 
 	UNLOCK_CACHE;
@@ -11783,3 +11809,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 
 	UNLOCK_CACHE;
 }
+
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
+#endif

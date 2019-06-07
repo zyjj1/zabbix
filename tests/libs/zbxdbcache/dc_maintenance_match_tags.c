@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
+#include "dbconfig_maintenance_test.h"
 
 static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
 {
@@ -51,24 +52,24 @@ static void	get_maintenance_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tag
 	zbx_mock_error_t		mock_err;
 	zbx_mock_handle_t		htag;
 	zbx_dc_maintenance_tag_t	*tag;
-	const char			*key, *value, *operator;
+	const char			*key, *value, *op;
 
 	while (ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(handle, &htag))))
 	{
 		key = zbx_mock_get_object_member_string(htag, "tag");
 		value = zbx_mock_get_object_member_string(htag, "value");
-		operator = zbx_mock_get_object_member_string(htag, "operator");
+		op = zbx_mock_get_object_member_string(htag, "operator");
 
 		tag = (zbx_dc_maintenance_tag_t *)zbx_malloc(NULL, sizeof(zbx_dc_maintenance_tag_t));
 		tag->tag = key;
 		tag->value = value;
 
-		if (0 == strcmp(operator, "like"))
-			tag->operator = ZBX_MAINTENANCE_TAG_OPERATOR_LIKE;
-		else if (0 == strcmp(operator, "equal"))
-			tag->operator = ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL;
+		if (0 == strcmp(op, "like"))
+			tag->op = ZBX_MAINTENANCE_TAG_OPERATOR_LIKE;
+		else if (0 == strcmp(op, "equal"))
+			tag->op = ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL;
 		else
-			fail_msg("unknown maintenance tag operator '%s'", operator);
+			fail_msg("unknown maintenance tag operator '%s'", op);
 
 		zbx_vector_ptr_append(tags, tag);
 	}
@@ -113,8 +114,6 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 
 	get_maintenance_tags(zbx_mock_get_parameter_handle("in.maintenance.tags"), &maintenance->tags);
 }
-
-int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags);
 
 /******************************************************************************
  *                                                                            *

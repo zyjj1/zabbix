@@ -18,6 +18,10 @@ $lighter-green: #00cc00;
 
 $blue: #111;
 
+$disabled-bg-color: #f0f0f0;
+$disabled-item-color: #fff;
+$disabled-item-bg-color: #9f9f9f;
+
 // MAIN
 $main-nav-bg-color: #fff;
 $main-subnav-bg-color: #000;
@@ -126,6 +130,35 @@ $ok-ack-fg-color: #009900;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
+// DASHBOARD
+.dashbrd-grid-new-widget-placeholder {
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		box-shadow: none;
+		border-color: $font-color;
+		background-color: transparent;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+	}
+
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -213px -888px;
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -401px -888px;
+		}
+	}
+}
 
 // ICONS
 $var-icons: (
@@ -241,13 +274,13 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu {
+.menu-popup {
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		color: $form-disabled-font-color;
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		&:hover,
 		&:focus,
 		&:active,
@@ -315,7 +348,7 @@ button {
 	}
 }
 
-.radio-segmented {
+.radio-list-control {
 
 	.average-bg,
 	.disaster-bg,
@@ -456,9 +489,19 @@ ul.top-nav-icons {
 }
 
 .filter-breadcrumb {
-	a {
-		&:focus {
-			margin-bottom: -1px;
+
+	li,
+	> li:first-child {
+
+		> span a:focus {
+			margin-bottom: -2px;
+		}
+	}
+
+	> li {
+
+		> span a:focus {
+			line-height: 12px;
 		}
 	}
 }
@@ -514,21 +557,16 @@ ul.top-nav-icons {
 }
 
 .multiselect {
+
 	.multiselect-list {
-		padding-left: 2px;
-		padding-bottom: 2px;
 
 		li {
 
 			&.selected {
 
-				.subfilter-enabled {
-					background-color: #777 !important;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
-
+				.subfilter-enabled,
 				.subfilter-disable-btn {
-					background-color: #777 !important;
+					background-color: #777;
 					@include box-shadow(0 0 0 1px rgba($blue, 1));
 				}
 			}
@@ -1174,7 +1212,7 @@ td.inactive-bg {
 	background-position: -323px -285px;
 }
 .icon-invisible::before {
-	background-position: -249px -803px,
+	background-position: -249px -803px;
 }
 .icon-problem-generated::before {
 	background-position: -449px -285px;

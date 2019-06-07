@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class CTableRowElement extends CElement {
 	 */
 	public function normalize() {
 		if ($this->parent === null) {
-			$this->parent = $this->parents('tag:table')->one();
+			$this->parent = $this->parents('tag:table')->asTable()->one();
 		}
 	}
 
@@ -73,11 +73,9 @@ class CTableRowElement extends CElement {
 			if ($column === false) {
 				return null;
 			}
-
-			$column++;
 		}
 
-		return $this->query('xpath:./td['.$column.']')->one();
+		return $this->query('xpath:./td['.((int)$column + 1).']')->one();
 	}
 
 	/**
@@ -96,9 +94,11 @@ class CTableRowElement extends CElement {
 	 * Check if table row is selected.
 	 * For tables with checkboxes.
 	 *
-	 * @return $this
+	 * @param boolean $selected    if it is expected for row to be selected or not
+	 *
+	 * @return boolean
 	 */
-	public function isSelected() {
-		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected();
+	public function isSelected($selected = true) {
+		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected($selected);
 	}
 }

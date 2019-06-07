@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,6 +219,15 @@ elseif ($config == QUEUE_DETAILS) {
 		'webitems' => true,
 		'preservekeys' => true
 	]);
+
+	if (count($queueData) != count($items)) {
+		$items += API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'selectHosts' => ['name'],
+			'itemids' => array_diff(array_keys($queueData), array_keys($items)),
+			'preservekeys' => true
+		]);
+	}
 
 	$items = CMacrosResolverHelper::resolveItemNames($items);
 

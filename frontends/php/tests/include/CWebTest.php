@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/CTest.php';
 require_once dirname(__FILE__).'/web/CPage.php';
 require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
+
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
+define('TEST_ERROR', 2);
 
 /**
  * Base class for Selenium tests.
@@ -54,9 +58,12 @@ class CWebTest extends CTest {
 			$screenshot_name = md5(microtime(true)).'.png';
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
+				$runtime_errors = @file_get_contents(PHPUNIT_ERROR_LOG);
+				$runtime_errors = $runtime_errors ? "\n\nRuntime errors:\n".$runtime_errors : '';
+
 				CExceptionHelper::setMessage($exception, 'URL: '.$this->current_url."\n".
 						'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
-						$exception->getMessage()
+						$exception->getMessage().$runtime_errors
 				);
 
 				$this->screenshot = null;
@@ -76,15 +83,15 @@ class CWebTest extends CTest {
 	 */
 	protected function tearDown() {
 		// Check for JS errors.
-		if (!$this->hasFailed()) {
-			if (!$this->supress_case_errors && self::$shared_page !== null) {
+		if (!$this->hasFailed() && $this->getStatus() !== null) {
+			if (self::$shared_page !== null) {
 				$errors = [];
 
 				foreach (self::$shared_page->getBrowserLog() as $log) {
 					$errors[] = $log['message'];
 				}
 
-				if ($errors) {
+				if (!$this->supress_case_errors && $errors) {
 					$this->captureScreenshot();
 					$this->fail("Severe browser errors:\n" . implode("\n", array_unique($errors)));
 				}

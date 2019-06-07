@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class CTableElement extends CElement {
 	 */
 	protected function normalize() {
 		if ($this->getTagName() !== 'table') {
-			$this->setElement($this->query('xpath:.//table')->one());
+			$this->setElement($this->query('xpath:.//table')->waitUntilPresent()->one());
 		}
 	}
 
@@ -96,6 +96,17 @@ class CTableElement extends CElement {
 	}
 
 	/**
+	 * Get table row by index.
+	 *
+	 * @param $index    row index
+	 *
+	 * @return CTableRow
+	 */
+	public function getRow($index) {
+		return $this->query('xpath:./tbody/tr['.((int)$index + 1).']')->asTableRow(['parent' => $this])->one();
+	}
+
+	/**
 	 * Get indexed collections of table columns.
 	 *
 	 * @return array
@@ -107,8 +118,8 @@ class CTableElement extends CElement {
 		foreach ($this->getRows() as $row) {
 			$data = [];
 
-			foreach ($row->query('xpath:./*')->all() as $i => $column) {
-				$data[$headers[$i]] = $column;
+			foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
+				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
 			}
 
 			$table[] = new CElementCollection($data);

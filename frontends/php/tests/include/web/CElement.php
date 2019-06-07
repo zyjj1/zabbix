@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,13 @@ class CElement extends CBaseElement implements IWaitable {
 	protected $parent;
 
 	/**
+	 * Flag that allows to disable normalizing.
+	 *
+	 * @var boolean
+	 */
+	protected $normalized = false;
+
+	/**
 	 * Initialize element.
 	 *
 	 * @param RemoteWebElement $element
@@ -65,10 +72,13 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function __construct(RemoteWebElement $element, $options = []) {
 		$this->setElement($element);
-		$this->normalize();
 
 		foreach ($options as $key => $value) {
 			$this->$key = $value;
+		}
+
+		if (!$this->normalized) {
+			$this->normalize();
 		}
 	}
 
@@ -111,8 +121,10 @@ class CElement extends CBaseElement implements IWaitable {
 			$query->setContext($this->parent);
 		}
 
-		$this->setElement($query->one());
-		$this->normalize();
+		$this->setElement($query->waitUntilPresent()->one());
+		if (!$this->normalized) {
+			$this->normalize();
+		}
 
 		return $this;
 	}
@@ -144,8 +156,30 @@ class CElement extends CBaseElement implements IWaitable {
 	 *
 	 * @return CElementQuery
 	 */
-	public function parents($type, $locator = null) {
-		return $this->query('xpath:./ancestor::'.CXPathHelper::fromSelector($type, $locator));
+	public function parents($type = null, $locator = null) {
+		$selector = 'xpath:./ancestor';
+		if ($type !== null) {
+			$selector .= '::'.CXPathHelper::fromSelector($type, $locator);
+		}
+
+		return $this->query($selector);
+	}
+
+	/**
+	 * Get children selection query.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return CElementQuery
+	 */
+	public function children($type = null, $locator = null) {
+		$selector = 'xpath:./*';
+		if ($type !== null) {
+			$selector = 'xpath:./'.CXPathHelper::fromSelector($type, $locator);
+		}
+
+		return $this->query($selector);
 	}
 
 	/**
@@ -203,6 +237,80 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getText() {
+		if (!$this->isVisible()) {
+			return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+		}
+
+		return parent::getText();
+	}
+
+	/**
+	 * Get element value.
+	 *
+	 * @return type
+	 */
+	public function getValue() {
+		return CElementQuery::getDriver()->executeScript('return arguments[0].value;', [$this]);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function sendKeys($value) {
+		if (is_string($value) && strpos($value, '"') === false) {
+			parent::sendKeys($value);
+		}
+		else {
+			CElementQuery::getDriver()->executeScript('arguments[0].value=arguments[1];arguments[0].focus();',
+					[$this, $value]
+			);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Highlight the value in the field.
+	 *
+	 * @return $this
+	 */
+	public function selectValue() {
+		CElementQuery::getDriver()->executeScript('arguments[0].focus();arguments[0].select();', [$this]);
+
+		return $this;
+	}
+
+	/**
+	 * Overwrite value in field.
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function overwrite($text) {
+		if ($text === '' || $text === null) {
+			$text = WebDriverKeys::DELETE;
+		}
+
+		return $this->selectValue()->type($text);
+	}
+
+	/**
+	 * Alias for overwrite.
+	 * @see self::overwrite
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->overwrite($text);
+	}
+
+	/**
 	 * Check if element is clickable.
 	 *
 	 * @return boolean
@@ -223,13 +331,22 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Check if element is present.
+	 *
+	 * @return boolean
+	 */
+	public function isPresent() {
+		return !$this->isStalled();
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getPresentCondition() {
 		$target = $this;
 
 		return function () use ($target) {
-			return !$target->isStalled();
+			return $target->isPresent();
 		};
 	}
 
@@ -245,14 +362,49 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Check if text is present.
+	 *
+	 * @param string $text    text to be present
+	 *
+	 * @return boolean
+	 */
+	public function isTextPresent($text) {
+		return (strpos($this->getText(), $text) !== false);
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getTextPresentCondition($text) {
 		$target = $this;
 
 		return function () use ($target, $text) {
-			return (strpos($target->getText(), $text) !== false);
+			return $target->isTextPresent($text);
 		};
+	}
+
+	/**
+	 * Check presence of the attribute(s).
+	 *
+	 * @param string|array    $attributes attribute or attributes to be present.
+	 *
+	 * @return boolean
+	 */
+	public function isAttributePresent($attributes) {
+		if (!is_array($attributes)) {
+			$attributes = [$attributes];
+		}
+
+		foreach ($attributes as $key => $value) {
+			if (is_numeric($key) && $this->getAttribute($value) === null) {
+				return false;
+			}
+			elseif ($this->getAttribute($key) !== $value) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -262,17 +414,17 @@ class CElement extends CBaseElement implements IWaitable {
 		$target = $this;
 
 		return function () use ($target, $attributes) {
-			foreach ($attributes as $key => $value) {
-				if (is_numeric($key) && $target->getAttribute($value) === null) {
-					return false;
-				}
-				elseif ($target->getAttribute($key) !== $value) {
-					return false;
-				}
-			}
-
-			return true;
+			return $target->isAttributePresent($attributes);
 		};
+	}
+
+	/**
+	 * Check if element is ready.
+	 *
+	 * @return boolean
+	 */
+	public function isReady() {
+		return $this->isClickable();
 	}
 
 	/**
@@ -317,5 +469,72 @@ class CElement extends CBaseElement implements IWaitable {
 		CElementQuery::wait()->until(WebDriverExpectedCondition::elementToBeSelected($this));
 
 		return $this;
+	}
+
+	/**
+	 * Detect element by its tag or class.
+	 *
+	 * @param type $options
+	 */
+	public function detect($options = []) {
+
+		$tag = $this->getTagName();
+		if ($tag === 'textarea' ) {
+			return $this->asElement($options);
+		}
+
+		if ($tag === 'select') {
+			return $this->asDropdown($options);
+		}
+
+		if ($tag === 'table') {
+			return $this->asTable($options);
+		}
+
+		if ($tag === 'input') {
+			$type = $this->getAttribute('type');
+			if ($type === 'checkbox' || $type === 'radio') {
+				return $this->asCheckbox($options);
+			}
+			else {
+				return $this->asElement($options);
+			}
+		}
+
+		$class = explode(' ', $this->getAttribute('class'));
+		if (in_array('multiselect-control', $class)) {
+			return $this->asMultiselect($options);
+		}
+
+		if (in_array('radio-list-control', $class)) {
+			return $this->asSegmentedRadio($options);
+		}
+
+		if (in_array('checkbox-list', $class)) {
+			return $this->asCheckboxList($options);
+		}
+
+		if (in_array('range-control', $class)) {
+			return $this->asRangeControl($options);
+		}
+
+		if (in_array('multilineinput-control', $class)) {
+			return $this->asMultiline($options);
+		}
+
+		self::addWarning('No specific element was detected');
+
+		return $this;
+	}
+
+	/**
+	 * Throw error for not supported method invocation.
+	 *
+	 * @param string $method    method name
+	 *
+	 * @throws Exception
+	 */
+	public static function onNotSupportedMethod($method) {
+		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
 	}
 }

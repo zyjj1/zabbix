@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -472,6 +472,23 @@ function stripslashes(str) {
 }
 
 /**
+ * Function to remove preloader and moves focus to IU element that was clicked to open it.
+ *
+ * @param string   id			Preloader identifier.
+ * @param {object} xhr			(optional) XHR request that must be aborted.
+ */
+function overlayPreloaderDestroy(id, xhr) {
+	if (typeof id !== 'undefined') {
+		if (typeof xhr !== 'undefined') {
+			xhr.abort();
+		}
+
+		jQuery('#' + id).remove();
+		removeFromOverlaysStack(id);
+	}
+}
+
+/**
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
@@ -496,6 +513,7 @@ function overlayDialogueDestroy(dialogueid, xhr) {
 		}
 
 		removeFromOverlaysStack(dialogueid);
+		jQuery.publish('overlay.close', {dialogueid: dialogueid});
 	}
 }
 
@@ -630,7 +648,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		}
 
 		if ('enabled' in obj && obj.enabled === false) {
-			button.attr('disabled', 'disabled');
+			button.prop('disabled', true);
 		}
 
 		if ('focused' in obj && obj.focused === true) {

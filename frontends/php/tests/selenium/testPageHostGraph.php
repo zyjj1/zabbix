@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -432,30 +432,38 @@ class testPageHostGraph extends CLegacyWebTest {
 	public function testPageHostGraph_CopySelected($data) {
 		$this->selectGraph($data);
 		$this->zbxTestClickButtonText('Copy');
-		$this->zbxTestDropdownSelectWait('copy_type', $data['target_type']);
 
-		if (array_key_exists('group', $data)) {
-			$this->zbxTestDropdownSelectWait('copy_groupid', $data['group']);
-		}
+		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Host groups', 'Hosts', 'Templates']);
+		$this->zbxTestClickXpathWait('//label[@for="'.$copy_type.'"][text()="'.$data['target_type'].'"]');
 
 		// Select check boxes of defined targets.
 		if (array_key_exists('targets', $data)) {
-			foreach ($data['targets'] as $target) {
-				// Select host or template id.
-				if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
+			$this->zbxTestClickButtonMultiselect('copy_targetids');
+			$this->zbxTestLaunchOverlayDialog($data['target_type']);
+
+			// Select hosts or templates.
+			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
+				// Select host group.
+				$this->zbxTestDropdownSelectWait('groupid', $data['group']);
+
+				foreach ($data['targets'] as $target) {
 					$result = DBselect('SELECT hostid FROM hosts WHERE host='. zbx_dbstr($target));
 					while ($row = DBfetch($result)) {
-						$this->zbxTestCheckboxSelect('copy_targetid_'.$row['hostid']);
-					}
-				}
-				// Select host group id.
-				else {
-					$result = DBselect('SELECT groupid FROM hstgrp WHERE name='. zbx_dbstr($target));
-					while ($row = DBfetch($result)) {
-						$this->zbxTestCheckboxSelect('copy_targetid_'.$row['groupid']);
+						$this->zbxTestCheckboxSelect('item_'.$row['hostid']);
 					}
 				}
 			}
+			// Select host groups.
+			else {
+				foreach ($data['targets'] as $target) {
+					$result = DBselect('SELECT groupid FROM hstgrp WHERE name='. zbx_dbstr($target));
+					while ($row = DBfetch($result)) {
+						$this->zbxTestCheckboxSelect('item_'.$row['groupid']);
+					}
+				}
+			}
+
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 		}
 
 		$this->zbxTestClick('copy');
@@ -501,8 +509,6 @@ class testPageHostGraph extends CLegacyWebTest {
 				}
 			}
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -603,7 +609,6 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

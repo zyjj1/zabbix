@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@
 #define SHORT_DATETIME_LENGTH	19	/* Length of datetime like "2017-12-18,14:06:09" */
 
 static zbx_timespec_t	timespec;
+
+time_t	__wrap_time(time_t *seconds);
+int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz);
 
 static void	zbx_mock_time(void)
 {

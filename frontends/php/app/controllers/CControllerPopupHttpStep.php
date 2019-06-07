@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,15 +26,13 @@ class CControllerPopupHttpStep extends CController {
 	}
 
 	protected function checkInput() {
+
 		$fields = [
-			'dstfrm' =>				'string|fatal',
-			'stepid' =>				'int32',
-			'list_name' =>			'string',
+			'httpstepid' =>			'int32',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
 			'post_type' =>			'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_FORM]),
 			'posts' =>				'string',
-			'pairs' =>				'array',
 			'retrieve_mode' =>		'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]),
 			'follow_redirects' =>	'in '.implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_ON, HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF]),
 			'timeout' =>			'string|not_empty',
@@ -68,9 +66,7 @@ class CControllerPopupHttpStep extends CController {
 
 	protected function doAction() {
 		$page_options = [
-			'dstfrm' => $this->getInput('dstfrm'),
-			'list_name' => $this->getInput('list_name', ''),
-			'name' => $this->getInput('name'),
+			'name' => $this->getInput('name', ''),
 			'templated' => $this->getInput('templated', 0),
 			'post_type' => $this->getInput('post_type', ZBX_POSTTYPE_FORM),
 			'posts' => $this->getInput('posts', ''),
@@ -79,32 +75,24 @@ class CControllerPopupHttpStep extends CController {
 			'required' => $this->getInput('required', ''),
 			'status_codes' => $this->getInput('status_codes', ''),
 			'old_name' => $this->getInput('old_name', ''),
-			'pairs' => $this->getInput('pairs', []),
-			'stepid' => $this->getInput('stepid', -1),
+			'httpstepid' => $this->getInput('httpstepid', -1),
 			'steps_names' => $this->getInput('steps_names', [])
 		];
 
-		if ($page_options['stepid'] >= 0 || $this->hasInput('validate')) {
-			$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
-			$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
-		}
-		else {
-			$page_options['follow_redirects'] = HTTPTEST_STEP_FOLLOW_REDIRECTS_ON;
-			$page_options['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
-		}
+		$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
+		$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
 
 		if ($this->hasInput('validate')) {
 			$output = [];
 
 			// Validate "Timeout" field manually, since it cannot be properly added into MVC validation rules.
 			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-			$timeout = $this->getInput('timeout');
 
-			if ($simple_interval_parser->parse($timeout) != CParser::PARSE_SUCCESS) {
+			if ($simple_interval_parser->parse($page_options['timeout']) != CParser::PARSE_SUCCESS) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
 			}
-			elseif ($timeout[0] !== '{') {
-				$seconds = timeUnitToSeconds($timeout);
+			elseif ($page_options['timeout'][0] !== '{') {
+				$seconds = timeUnitToSeconds($page_options['timeout']);
 
 				if (bccomp($seconds, SEC_PER_HOUR) > 0) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a number is too large')));
@@ -112,8 +100,7 @@ class CControllerPopupHttpStep extends CController {
 			}
 
 			// Validate if step names are unique.
-			if (($page_options['stepid'] >= 0 && $page_options['name'] !== $page_options['old_name'])
-					|| $page_options['stepid'] < 0) {
+			if ($page_options['name'] !== $page_options['old_name']) {
 				foreach ($page_options['steps_names'] as $name) {
 					if ($name === $page_options['name']) {
 						error(_s('Step with name "%1$s" already exists.', $name));
@@ -133,20 +120,15 @@ class CControllerPopupHttpStep extends CController {
 					'url' => $page_options['url'],
 					'post_type' => $page_options['post_type'],
 					'posts' => $page_options['posts'],
-					'pairs' => $page_options['pairs'],
 					'required' => $page_options['required'],
 					'status_codes' => $page_options['status_codes'],
 					'follow_redirects' => $page_options['follow_redirects'],
 					'retrieve_mode' => $page_options['retrieve_mode']
 				];
 
-				if ($page_options['stepid'] >= 0) {
-					$params['stepid'] = $page_options['stepid'];
-				}
+				$params['httpstepid'] = $page_options['httpstepid'];
 
 				$output = [
-					'dstfrm' => $page_options['dstfrm'],
-					'list_name' => $page_options['list_name'],
 					'params' => $params
 				];
 			}

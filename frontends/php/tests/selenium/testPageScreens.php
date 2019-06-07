@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,9 @@ class testPageScreens extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allScreens
-	*/
+	 * @dataProvider allScreens
+	 * @ignore-browser-errors
+	 */
 	public function testPageScreens_SimpleEdit($screen) {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -59,8 +60,9 @@ class testPageScreens extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allScreens
-	*/
+	 * @dataProvider allScreens
+	 * @ignore-browser-errors
+	 */
 	public function testPageScreens_SimpleUpdate($screen) {
 		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
 		$oldHashScreen = CDBHelper::getHash($sqlScreen);

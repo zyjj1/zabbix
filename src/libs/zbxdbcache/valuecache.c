@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2399,7 +2399,7 @@ void	zbx_vc_destroy(void)
  ******************************************************************************/
 void	zbx_vc_reset(void)
 {
-	const char	*__function_name = "zbx_vc_clean";
+	const char	*__function_name = "zbx_vc_reset";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

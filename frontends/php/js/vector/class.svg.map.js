@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -445,7 +445,7 @@ SVGMap.prototype.update = function (options, incremental) {
 		}
 	}, this);
 
-	if (options.background) {
+	if (options.background && options.background !== '0') {
 		images[options.background] = this.getImageUrl(options.background);
 	}
 

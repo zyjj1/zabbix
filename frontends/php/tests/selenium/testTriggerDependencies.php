@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
 		return [
-			['10001', 'Cannot add dependency from a host to a template.'],
+			['10001', 'Not all templates are linked to'],
 			['10081', 'Trigger updated']
 		];
 	}

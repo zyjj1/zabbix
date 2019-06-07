@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ jQuery(function ($) {
 							item.data = data.data;
 
 							item.clickCallback = function(e) {
-								$(this).closest('.action-menu-top').menuPopup('close', null, true);
+								$(this).closest('.menu-popup-top').menuPopup('close', null, true);
 
 								var args = [$obj];
 								$(this).data('args').each(function(a) {args.push(a)});

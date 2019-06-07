@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -781,7 +781,9 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value is too long.'
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of en_GB, en_US, bg_BG, ca_ES, zh_CN, '
+				. 'zh_TW, cs_CZ, nl_NL, fi_FI, fr_FR, ka_GE, de_DE, el_GR, he_IL, hu_HU, id_ID, it_IT, ko_KR, ja_JP, lv_LV, '
+				. 'lt_LT, nb_NO, fa_IR, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, es_ES, sv_SE, tr_TR, uk_UA, vi_VN.'
 			],
 			// Check user properties, theme.
 			[
@@ -1706,7 +1708,7 @@ class testUsers extends CAPITest {
 			'jsonrpc' => '2.0',
 			'method' => 'user.logout',
 			'params' => [],
-			'auth' => $this->session,
+			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
 		$this->checkResult($this->callRaw($logout));
@@ -1719,7 +1721,7 @@ class testUsers extends CAPITest {
 					'userid' => '9',
 					'alias' => 'check authentication',
 				],
-			'auth' => $this->session,
+			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
 		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');

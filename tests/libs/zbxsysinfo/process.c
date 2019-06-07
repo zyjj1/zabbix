@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,24 @@
 #include "sysinfo.h"
 
 static char	*called_key = NULL;
+
+int	__wrap_SYSTEM_LOCALTIME(const char *command, AGENT_RESULT *result);
+int	__wrap_WEB_PAGE_GET(const char *command, AGENT_RESULT *result);
+int	__wrap_WEB_PAGE_PERF(const char *command, AGENT_RESULT *result);
+int	__wrap_WEB_PAGE_REGEXP(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_SIZE(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_TIME(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_EXISTS(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_CONTENTS(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_REGEXP(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_REGMATCH(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_MD5SUM(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_FILE_CKSUM(const char *command, AGENT_RESULT *result);
+int	__wrap_VFS_DIR_SIZE(const char *command, AGENT_RESULT *result);
+int	__wrap_NET_DNS(const char *command, AGENT_RESULT *result);
+int	__wrap_NET_DNS_RECORD(const char *command, AGENT_RESULT *result);
+int	__wrap_NET_TCP_PORT(const char *command, AGENT_RESULT *result);
+int	__wrap_SYSTEM_USERS_NUM(const char *command, AGENT_RESULT *result);
 
 void	zbx_mock_test_entry(void **state)
 {

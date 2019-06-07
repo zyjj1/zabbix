@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@
 
 struct zbx_regexp
 {
-	pcre	*pcre_regexp;
+	pcre			*pcre_regexp;
+	struct pcre_extra	*extra;
 };
 
 /* maps to ovector of pcre_exec() */
@@ -59,8 +60,9 @@ zbx_regmatch_t;
  ******************************************************************************/
 static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg_static)
 {
-	int	error_offset = -1;
-	pcre	*pcre_regexp;
+	int			error_offset = -1;
+	pcre			*pcre_regexp;
+	struct pcre_extra	*extra;
 
 #ifdef PCRE_NO_AUTO_CAPTURE
 	/* If PCRE_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
@@ -92,8 +94,15 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 	if (NULL != regexp)
 	{
+		if (NULL == (extra = pcre_study(pcre_regexp, 0, err_msg_static)) && NULL != *err_msg_static)
+		{
+			pcre_free(pcre_regexp);
+			return FAIL;
+		}
+
 		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
 		(*regexp)->pcre_regexp = pcre_regexp;
+		(*regexp)->extra = extra;
 	}
 	else
 		pcre_free(pcre_regexp);
@@ -198,26 +207,27 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
 	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
-#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
-	struct pcre_extra		pextra;
-#endif
+	struct pcre_extra		extra, *pextra;
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
 		ovector = (int *)zbx_malloc(NULL, (size_t)ovecsize * sizeof(int));
 	else
 		ovector = matches_buff;
 
+	if (NULL == regexp->extra)
+	{
+		pextra = &extra;
+		pextra->flags = 0;
+	}
+	else
+		pextra = regexp->extra;
 #if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
-	pextra.flags = PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
-	pextra.match_limit = 1000000;
-	pextra.match_limit_recursion = 1000000;
-
-	r = pcre_exec(regexp->pcre_regexp, &pextra, string, strlen(string), flags, 0, ovector, ovecsize);
-#else
-	r = pcre_exec(regexp->pcre_regexp, NULL, string, strlen(string), flags, 0, ovector, ovecsize);
+	pextra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+	pextra->match_limit = 1000000;
+	pextra->match_limit_recursion = 1000000;
 #endif
-
-	if (0 <= r)	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
+	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
+	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, strlen(string), flags, 0, ovector, ovecsize)))
 	{
 		if (NULL != matches)
 			memcpy(matches, ovector, (size_t)((0 < r) ? MIN(r, count) : count) * sizeof(zbx_regmatch_t));
@@ -252,6 +262,12 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
  ******************************************************************************/
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
+	/* pcre_free_study() was added to the API for release 8.20 while extra was available before */
+#ifdef PCRE_CONFIG_JIT
+	pcre_free_study(regexp->extra);
+#else
+	pcre_free(regexp->extra);
+#endif
 	pcre_free(regexp->pcre_regexp);
 	zbx_free(regexp);
 }
@@ -331,6 +347,28 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	return zbx_regexp(string, pattern, PCRE_MULTILINE, len);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: strncpy_alloc                                                    *
+ *                                                                            *
+ * Purpose: zbx_strncpy_alloc with maximum allocated memory limit.            *
+ *                                                                            *
+ * Parameters: str       - [IN/OUT] destination buffer pointer                *
+ *             alloc_len - [IN/OUT] already allocated memory                  *
+ *             offset    - [IN/OUT] offset for writing                        *
+ *             src       - [IN] copied string                                 *
+ *             n         - [IN] maximum number of bytes to copy               *
+ *             limit     - [IN] maximum number of bytes to be allocated       *
+ *                                                                            *
+ ******************************************************************************/
+static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n, size_t limit)
+{
+	if (0 != limit && *offset + n > limit)
+		n = (limit > *offset) ? (limit - *offset) : 0;
+
+	zbx_strncpy_alloc(str, alloc_len, offset, src, n);
+}
+
 /*********************************************************************************
  *                                                                               *
  * Function: regexp_sub_replace                                                  *
@@ -347,11 +385,14 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
  *                                    input string is returned.                  *
  *             match           - [IN] the captured group data                    *
  *             nmatch          - [IN] the number of items in captured group data *
+ *             limit           - [IN] size limit for memory allocation           *
+ *                                    0 means no limit                           *
  *                                                                               *
  * Return value: Allocated string containing output value                        *
  *                                                                               *
  *********************************************************************************/
-static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, int nmatch)
+static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, int nmatch,
+		size_t limit)
 {
 	char		*ptr = NULL;
 	const char	*pstart = output_template, *pgroup;
@@ -366,7 +407,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 		switch (*(++pgroup))
 		{
 			case '\\':
-				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart);
+				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
 				pstart = pgroup + 1;
 				continue;
 
@@ -380,12 +421,12 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 			case '7':
 			case '8':
 			case '9':
-				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1);
+				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1, limit);
 				group_index = *pgroup - '0';
 				if (group_index < nmatch && -1 != match[group_index].rm_so)
 				{
-					zbx_strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
-							match[group_index].rm_eo - match[group_index].rm_so);
+					strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
+							match[group_index].rm_eo - match[group_index].rm_so, limit);
 				}
 				pstart = pgroup + 1;
 				continue;
@@ -399,21 +440,52 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 					goto out;
 				}
 
-				zbx_strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
-						match[1].rm_eo - match[1].rm_so);
+				strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
+						match[1].rm_eo - match[1].rm_so, limit);
 
 				pstart = pgroup + 1;
 				continue;
 
 			default:
-				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart);
+				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
 				pstart = pgroup;
 		}
+
+		if (0 != limit && offset >= limit)
+			break;
 	}
 
 	if ('\0' != *pstart)
-		zbx_strcpy_alloc(&ptr, &size, &offset, pstart);
+		strncpy_alloc(&ptr, &size, &offset, pstart, strlen(pstart), limit);
 out:
+	if (NULL != ptr)
+	{
+		if (0 != limit && offset >= limit)
+		{
+			size = offset;
+			offset--;
+
+			/* ensure that the string is not cut in the middle of UTF-8 sequence */
+			if (0x80 <= (0xc0 & ptr[offset]))
+			{
+				while (0x80 == (0xc0 & ptr[offset]) && 0 < offset)
+					offset--;
+
+				if (zbx_utf8_char_len(&ptr[offset]) != size - offset)
+					ptr[offset] = '\0';
+			}
+		}
+
+		/* Some regexp and output template combinations can produce invalid UTF-8 sequences. */
+		/* For example, regexp "(.)(.)" and output template "\1 \2" produce a valid UTF-8 sequence */
+		/* for single-byte UTF-8 characters and invalid sequence for multi-byte characters. */
+		/* Using (*UTF) modifier (e.g. "(*UTF)(.)(.)") solves the problem for multi-byte characters */
+		/* but it is up to user to add the modifier. To prevent producing invalid UTF-8 sequences do */
+		/* output sanitization. */
+
+		zbx_replace_invalid_utf8(ptr);
+	}
+
 	return ptr;
 }
 
@@ -473,7 +545,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		match[i].rm_so = match[i].rm_eo = -1;
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 
 	return SUCCEED;
 #undef MATCH_SIZE
@@ -496,6 +568,8 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                                    If output template is NULL or contains     *
  *                                    empty string then the whole input string   *
  *                                    is used as output value.                   *
+ *             limit           - [IN] size limit for memory allocation           *
+ *                                    0 means no limit                           *
  *             out             - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
@@ -507,7 +581,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                                                                               *
  *********************************************************************************/
 int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
-		char **out)
+		size_t limit, char **out)
 {
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
 	unsigned int	i;
@@ -520,7 +594,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
 	{
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, limit);
 		return SUCCEED;
 	}
 
@@ -936,7 +1010,7 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
 	size_t		len = 0;
 	const char	*sptr;
 
-	if (NULL == string )
+	if (NULL == string)
 		return 0;
 
 	for (sptr = string; '\0' != *sptr; sptr++)
@@ -976,7 +1050,7 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Function: zbx_regexp_escape_insstring                                          *
+ * Function: zbx_regexp_escape_string                                             *
  *                                                                                *
  * Purpose: replace . \ + * ? [ ^ ] $ ( ) { } = ! < > | : - symbols in string     *
  *          with combination of \ and escaped symbol                              *
@@ -985,7 +1059,7 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
  *             string - [IN] the string to update                                 *
  *                                                                                *
  **********************************************************************************/
-static void zbx_regexp_escape_string(char *p, const char *string)
+static void	zbx_regexp_escape_string(char *p, const char *string)
 {
 	const char	*sptr;
 
@@ -1034,7 +1108,7 @@ static void zbx_regexp_escape_string(char *p, const char *string)
  * Parameters: string - [IN/OUT] the string to update                             *
  *                                                                                *
  **********************************************************************************/
-void zbx_regexp_escape(char **string)
+void	zbx_regexp_escape(char **string)
 {
 	size_t	size;
 	char	*buffer;

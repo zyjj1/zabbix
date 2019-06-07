@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 
 var cookie = {
 	cookies: [],
-	prefix:	null,
 	/*
 	 * Encoding values separated by a comma (%2C), makes the cookie very large in size. A dot, however, remains a dot.
 	 * Must be synced with class.ctree.js for consistency.

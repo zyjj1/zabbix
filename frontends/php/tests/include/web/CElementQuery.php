@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,10 @@ require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
 require_once dirname(__FILE__).'/elements/CMessageElement.php';
 require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
+require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
+require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
+require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
+require_once dirname(__FILE__).'/elements/CMultilineElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -137,7 +141,12 @@ class CElementQuery implements IWaitable {
 		}
 
 		if ($locator === null) {
-			list($type, $locator) = explode(':', $type, 2);
+			$parts = explode(':', $type, 2);
+			if (count($parts) !== 2) {
+				throw new Exception('Element selector "'.$type.'" is not well formatted.');
+			}
+
+			list($type, $locator) = $parts;
 		}
 
 		$mapping = [
@@ -146,7 +155,7 @@ class CElementQuery implements IWaitable {
 			'tag' => 'tagName',
 			'link' => 'linkText',
 			'button' => function () use ($locator) {
-				return WebDriverBy::xpath('//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
+				return WebDriverBy::xpath('.//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
 			}
 		];
 
@@ -199,6 +208,22 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * Apply chained element query.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return $this
+	 */
+	public function query($type, $locator = null) {
+		$prefix = CXPathHelper::fromWebDriverBy($this->by);
+		$suffix = CXPathHelper::fromSelector($type, $locator);
+		$this->by = static::getSelector('xpath', './'.$prefix.'/'.$suffix);
+
+		return $this;
+	}
+
+	/**
 	 * Get wait instance.
 	 *
 	 * @return WebDriverWait
@@ -208,13 +233,13 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
-	 * Wait until condition is met for target.
+	 * Get element condition callable name.
 	 *
-	 * @param IWaitable $target       target for wait operation
-	 * @param string    $condition    condition to be waited for
-	 * @param array     $params       condition params
+	 * @param string $condition    condition name
+	 *
+	 * @return array
 	 */
-	public static function waitUntil($target, $condition, $params = []) {
+	public static function getConditionCallable($condition) {
 		$conditions = [
 			static::READY => 'getReadyCondition',
 			static::PRESENT => 'getPresentCondition',
@@ -229,12 +254,27 @@ class CElementQuery implements IWaitable {
 			static::NOT_CLICKABLE => 'getNotClickableCondition'
 		];
 
+		if (!array_key_exists($condition, $conditions)) {
+			throw new Exception('Cannot get element condition callable by name "'.$condition.'"!');
+		}
+
+		return $conditions[$condition];
+	}
+
+	/**
+	 * Wait until condition is met for target.
+	 *
+	 * @param IWaitable $target       target for wait operation
+	 * @param string    $condition    condition to be waited for
+	 * @param array     $params       condition params
+	 */
+	public static function waitUntil($target, $condition, $params = []) {
 		$selector = $target->getSelectorAsText();
 		if ($selector !== null) {
 			$selector = ' located by '.$selector;
 		}
 
-		$callable = call_user_func_array([$target, $conditions[$condition]], $params);
+		$callable = call_user_func_array([$target, self::getConditionCallable($condition)], $params);
 		self::wait()->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 
@@ -382,5 +422,69 @@ class CElementQuery implements IWaitable {
 		return function () use ($target) {
 			return $target->one()->isVisible();
 		};
+	}
+
+	/**
+	 * Get input element from container.
+	 *
+	 * @param CElement     $target    container element
+	 * @param string       $prefix    xpath prefix
+	 * @param array|string $class     element classes to look for
+	 *
+	 * @return CElement|null
+	 */
+	public static function getInputElement($target, $prefix = './', $class = null) {
+		$classes = [
+			'CElement'					=> [
+				'/input[@name][not(@type) or @type="text" or @type="password"]',
+				'/textarea[@name]'
+			],
+			'CDropdownElement'			=> '/select[@name]',
+			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
+			'CMultiselectElement'		=> [
+				'/div[@class="multiselect-control"]',
+				'/div/div[@class="multiselect-control"]' // TODO: remove after fix DEV-1071.
+			],
+			'CSegmentedRadioElement'	=> [
+				'/ul[@class="radio-list-control"]',
+				'/div/ul[@class="radio-list-control"]' // TODO: remove after fix DEV-1071.
+			],
+			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
+			'CTableElement'				=> [
+				'/table',
+				'/*[@class="table-forms-separator"]/table'
+			],
+			'CRangeControlElement'		=> '/div[@class="range-control"]',
+			'CMultilineElement'			=> '/div[@class="multilineinput-control"]'
+		];
+
+		if ($class !== null) {
+			if (!is_array($class)) {
+				$class = [$class];
+			}
+
+			foreach (array_keys($classes) as $name) {
+				if (!in_array($name, $class)) {
+					unset($classes[$name]);
+				}
+			}
+		}
+
+		foreach ($classes as $class => $selectors) {
+			if (!is_array($selectors)) {
+				$selectors = [$selectors];
+			}
+
+			$xpaths = [];
+			foreach ($selectors as $selector) {
+				$xpaths[] = $prefix.$selector;
+			}
+
+			if (($element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false)) !== null) {
+				return $element;
+			}
+		}
+
+		return null;
 	}
 }

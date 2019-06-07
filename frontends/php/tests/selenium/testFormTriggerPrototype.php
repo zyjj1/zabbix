@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -792,11 +792,11 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['comments'])) {
-			$this->zbxTestInputType('comments', $data['comments']);;
+			$this->zbxTestInputType('comments', $data['comments']);
 		}
 
 		if (isset($data['url'])) {
-			$this->zbxTestInputType('url', $data['url']);;
+			$this->zbxTestInputType('url', $data['url']);
 		}
 
 		if (isset($data['severity'])) {

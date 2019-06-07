@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,41 +22,11 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CWebTest.php';
 
-define('TEST_GOOD', 0);
-define('TEST_BAD', 1);
-define('TEST_ERROR', 2);
-
 /**
  * Base class for legacy Selenium tests.
  */
 class CLegacyWebTest extends CWebTest {
 	const WAIT_ITERATION = 50;
-
-	// List of strings that should NOT appear on any page.
-	public $failIfExists = [
-		'pg_query',
-		'Error in',
-		'expects parameter',
-		'Undefined index',
-		'Undefined variable',
-		'Undefined offset',
-		'Fatal error',
-		'Call to undefined method',
-		'Invalid argument supplied',
-		'Missing argument',
-		'Warning:',
-		'PHP notice',
-		'PHP warning',
-		'Use of undefined',
-		'You must login',
-		'DEBUG INFO',
-		'Cannot modify header',
-		'Parse error',
-		'syntax error',
-		'Try to read inaccessible property',
-		'Illegal string offset',
-		'must be an array'
-	];
 
 	// List of strings that SHOULD appear on every page.
 	public $failIfNotExists = [
@@ -100,10 +70,6 @@ class CLegacyWebTest extends CWebTest {
 
 	public function zbxTestLogout() {
 		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
-	}
-
-	public function zbxTestCheckFatalErrors() {
-		$this->zbxTestTextNotPresent($this->failIfExists);
 	}
 
 	public function zbxTestCheckMandatoryStrings() {
@@ -222,7 +188,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->query('id:'.$id)->waitUntilPresent()->one()->click();
+		$this->query('id:'.$id)->waitUntilClickable()->one()->click();
 	}
 
 	public function zbxTestDoubleClick($click_id, $id) {
@@ -260,10 +226,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestCheckboxSelect($id, $select = true) {
-		$checkbox = $this->query('id:'.$id)->waitUntilPresent()->one();
-		if ($select != $checkbox->isSelected()) {
-			$checkbox->click();
-		}
+		$this->query('id:'.$id)->waitUntilPresent()->asCheckbox()->one()->set($select);
 	}
 
 	public function zbxTestCheckboxSelected($id) {
@@ -280,14 +243,14 @@ class CLegacyWebTest extends CWebTest {
 	 * @param string $id  ID of the multiselect.
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
-		$this->zbxTestClickXpath(
+		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
 		);
 	}
 
 	public function zbxTestMultiselectNew($id, $string) {
 		$xpath = 'xpath://div[contains(@class, "multiselect") and @id="'.$id.'"]/input';
-		$this->query($xpath)->one()->clear()->sendKeys($string);
+		$this->query($xpath)->one()->overwrite($string);
 		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
 			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
@@ -465,7 +428,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestAssertAttribute($xpath, $attribute, $value = 'true') {
-		$this->assertEquals($this->query('xpath:'.$xpath)->one()->getAttribute($attribute), $value);
+		$this->assertEquals($value, $this->query('xpath:'.$xpath)->one()->getAttribute($attribute));
 	}
 
 	public function zbxTestAssertElementNotPresentId($id) {
@@ -508,7 +471,7 @@ class CLegacyWebTest extends CWebTest {
 		$caller = $trace[2];
 
 		if ($caller['class'] !== __CLASS__) {
-			$this->addWarning('Web driver selector should not be used in test cases.');
+			self::addWarning('Web driver selector should not be used in test cases.');
 		}
 
 		return $this->query($type, $locator);
@@ -541,7 +504,6 @@ class CLegacyWebTest extends CWebTest {
 	public function zbxTestTabSwitch($tab) {
 		$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestTabSwitchById($id, $tab) {
@@ -550,12 +512,10 @@ class CLegacyWebTest extends CWebTest {
 			$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestLaunchOverlayDialog($header) {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestClickAndAcceptAlert($id) {
@@ -741,6 +701,7 @@ class CLegacyWebTest extends CWebTest {
 							"/option[@value='{$value}']";
 
 		$this->zbxTestClickXpathWait($xpath);
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	/**
@@ -775,7 +736,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function __get($attribute) {
 		if ($attribute === 'webDriver') {
-			$this->addWarning('Web driver should not be accessed directly from test cases.');
+			self::addWarning('Web driver should not be accessed directly from test cases.');
 			return CElementQuery::getDriver();
 		}
 

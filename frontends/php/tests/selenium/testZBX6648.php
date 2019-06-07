@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,11 +68,15 @@ class testZBX6648 extends CLegacyWebTest {
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
+				$this->zbxTestLaunchOverlayDialog('Triggers');
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
+				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'enabled' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
+				$this->zbxTestLaunchOverlayDialog('Triggers');
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
+				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
 				$hostgroup = $zbx_data['hostgroup'];
