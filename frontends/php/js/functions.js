@@ -492,9 +492,8 @@ function overlayPreloaderDestroy(id, xhr) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
- * @param {object} xhr  (optional) XHR request that must be aborted.
  */
-function overlayDialogueDestroy(dialogueid, xhr) {
+function overlayDialogueDestroy(dialogueid) {
 	if (typeof dialogueid !== 'undefined') {
 		var overlay = overlays_stack.getById(dialogueid)
 		if (!overlay) {
