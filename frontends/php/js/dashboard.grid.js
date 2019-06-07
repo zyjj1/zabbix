@@ -1275,6 +1275,13 @@
 		updateWidgetContent($obj, data, widget);
 	}
 
+	/**
+	 * @param {object} $obj
+	 * @param {object} data
+	 * @param {object} widget
+	 *
+	 * @return {jqXHR}
+	 */
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
 			fields = $('form', data.dialogue['body']).serializeJSON(),
@@ -1407,6 +1414,8 @@
 					$placeholder.remove();
 				}
 			});
+
+		return overlays_stack.getById('widgetConfg').xhr;
 	}
 
 	function findEmptyPosition($obj, data, type) {
@@ -1460,7 +1469,13 @@
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
 					'action': function() {
-						updateWidgetConfig($obj, data, widget);
+						var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
+						$save_btn.prop('disabled', true);
+
+						updateWidgetConfig($obj, data, widget)
+							.always(function() {
+								$save_btn.prop('disabled', false);
+							});
 					}
 				},
 				{
