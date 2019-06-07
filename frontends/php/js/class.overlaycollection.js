@@ -17,11 +17,87 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * A stack implementation for identified overlay objects.
+ *
+ * @prop {int} length   Overlay collection size.
+ * @prop {array} stack  Array of overlay identifiers.
+ * @prop {object} map   Overlay objects keyed by their identifiers.
+ */
 function OverlayCollection() {
 	this.stack = [];
-	this.map = {}
+	this.map = {};
 }
 
+Object.defineProperty(OverlayCollection.prototype, 'length', {
+	get: function () {
+		return this.stack.length;
+	},
+	writeable: false
+});
+
+/**
+ * Fetches overlay object positioned at top of stack.
+ *
+ * @return {object|undefined}  Overlay object currently in top of stack.
+ */
+OverlayCollection.prototype.end = function() {
+	return this.getById(this.stack[this.length - 1]);
+};
+
+/**
+ * Retrieve overlay by it's ID.
+ *
+ * @param {string} id  Overlay identifier.
+ *
+ * @return {object|undefined}
+ */
+OverlayCollection.prototype.getById = function(id) {
+	return this.map[id];
+};
+
+/**
+ * Adds or moves an overlay to the top of stack.
+ *
+ * @param {object} Overlay object.
+ */
+OverlayCollection.prototype.pushUnique = function(overlay) {
+	if (this.map[overlay.dialogueid]) {
+		this._restackEnd(overlay.dialogueid);
+	}
+	else {
+		this._write(overlay, this.length);
+	}
+};
+
+/**
+ * Removes an overlay object, returns a reference.
+ *
+ * @param {string} id  An overlay identifier.
+ *
+ * @return {object|undefined}  Overlay object that is no longer in this stack.
+ */
+OverlayCollection.prototype.removeById = function(id) {
+	var overlay = this.getById(id);
+
+	if (overlay) {
+		delete this.map[id];
+		this.stack.splice(this._fetchIndex(id), 1);
+	}
+
+	return overlay;
+};
+
+/**
+ * Retrieves overlay Z-index by ID.
+ *
+ * @param {string} id  Overlay object identifier.
+ *
+ * @throws Error
+ *
+ * @return {int}  Position in stack.
+ */
 OverlayCollection.prototype._fetchIndex = function(id) {
 	for (var i = this.length - 1; i >= 0; i--) {
 		if (this.stack[i] == id) {
@@ -30,71 +106,25 @@ OverlayCollection.prototype._fetchIndex = function(id) {
 	}
 
 	throw new Error('Fetching unexistent overlay: ' + id);
-}
+};
 
+/**
+ * Moves an overlay to the top of stack.
+ *
+ * @throws Error
+ *
+ * @param {string} id  An overlay identifier.
+ */
+OverlayCollection.prototype._restackEnd = function(id) {
+	this.stack.splice(this._fetchIndex(id), 1);
+	this.stack.push(id);
+};
+
+/**
+ * @param {object} overlay  Overlay object.
+ * @param {int} position  Z-index for overlay object.
+ */
 OverlayCollection.prototype._write = function(overlay, position) {
 	this.stack[position] = overlay.dialogueid;
 	this.map[overlay.dialogueid] = overlay;
-}
-
-/**
- * before push it is checked if existing id is in stack
- *
- * @param overlay Overlay object
- */
-OverlayCollection.prototype.pushUnique = function(overlay) {
-	if (this.map[overlay.dialogueid]) {
-		this.restackEnd(overlay.dialogueid);
-	}
-	else {
-		this._write(overlay, this.length)
-	}
-}
-
-/**
- * stack control,
- * reorders given overlay address onto the top of stack (end of queue)
- *
- * @param id Overlay id
- */
-OverlayCollection.prototype.restackEnd = function(id) {
-	this.stack.splice(this._fetchIndex(id), 1);
-	this.stack.push(id)
-}
-
-/**
- * Removes overlay object, returns reference, that will be garbage collected if not used.
- *
- * @param id Overlay id
- */
-OverlayCollection.prototype.removeById = function(id) {
-	var overlay = this.getById(id);
-
-	if (overlay) {
-		delete this.map[id];
-		this.stack.splice(this._fetchIndex(id), 1)
-	}
-
-	return overlay;
-}
-
-/**
- * @return Overlay  Most recent Overlay in stack or undefined
- */
-OverlayCollection.prototype.end = function() {
-	return this.getById(this.stack[this.length - 1]);
-}
-
-OverlayCollection.prototype.getById = function(id) {
-	return this.map[id];
-}
-
-/**
- * creates read-only dynamic property
- */
-Object.defineProperty(OverlayCollection.prototype, 'length', {
-	get: function () {
-		return this.stack.length;
-	},
-	writeable: false
-})
+};
