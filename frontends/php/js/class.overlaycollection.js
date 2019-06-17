@@ -51,14 +51,14 @@ OverlayCollection.prototype.end = function() {
  *
  * @param {string} id  Overlay identifier.
  *
- * @return {object|undefined}
+ * @return {object|undefined}  Overlay object.
  */
 OverlayCollection.prototype.getById = function(id) {
 	return this.map[id];
 };
 
 /**
- * Adds or moves an overlay to the top of stack.
+ * Adds new overlay to the stack or, if it already exists, moves it to the top of the stack.
  *
  * @param {object} Overlay object.
  */
@@ -110,8 +110,6 @@ OverlayCollection.prototype._fetchIndex = function(id) {
 
 /**
  * Moves an overlay to the top of stack.
- *
- * @throws Error
  *
  * @param {string} id  An overlay identifier.
  */
