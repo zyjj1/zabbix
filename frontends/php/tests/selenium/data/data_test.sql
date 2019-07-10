@@ -2084,3 +2084,7 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, description, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
+
+-- testFormUserMedia
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (6,3,1,'zabbix@zabbix.com',0,60,'1-5,09:00-18:00');
+
