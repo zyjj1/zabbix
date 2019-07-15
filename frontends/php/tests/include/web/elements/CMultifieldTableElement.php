@@ -92,6 +92,8 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	public function setFieldMapping($mapping) {
 		$this->mapping = $mapping;
+
+		return $this;
 	}
 
 	/**

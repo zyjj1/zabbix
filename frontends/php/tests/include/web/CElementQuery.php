@@ -452,7 +452,7 @@ class CElementQuery implements IWaitable {
 			'CCheckboxListElement'		=> [
 				'/ul[@class="checkbox-list col-3"]',
 				'/ul[@class="list-check-radio"]'],
-			'CMultifieldTableElement'				=> [
+			'CTableElement'				=> [
 				'/table',
 				'/*[@class="table-forms-separator"]/table'
 			],
