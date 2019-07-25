@@ -15,6 +15,7 @@
 # Range: 1024-32767
 # Default:
 # LISTEN_PORT=10052
+LISTEN_PORT=10052
 
 ### Option: zabbix.pidFile
 #	Name of PID file.
@@ -33,6 +34,7 @@ PID_FILE="/tmp/zabbix_java.pid"
 # Range: 1-1000
 # Default:
 # START_POLLERS=5
+START_POLLERS=1
 
 ### Option: zabbix.timeout
 #	How long to wait for network operations.

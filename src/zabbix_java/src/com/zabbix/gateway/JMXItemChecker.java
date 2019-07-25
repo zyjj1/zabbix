@@ -22,6 +22,7 @@ package com.zabbix.gateway;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
+import javax.management.AttributeList;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
@@ -276,7 +277,23 @@ class JMXItemChecker extends ItemChecker
 
 	private void discoverAttributes(JSONArray counters, ObjectName name) throws Exception
 	{
-		for (MBeanAttributeInfo attrInfo : mbsc.getMBeanInfo(name).getAttributes())
+		Map<String, Object> values = new HashMap<String, Object>();
+
+		MBeanAttributeInfo[] attributeArray = mbsc.getMBeanInfo(name).getAttributes();
+		int i = 0;
+		String[] attributeNames = new String[attributeArray.length];
+
+		for (MBeanAttributeInfo attrInfo : attributeArray)
+			attributeNames[i++] = attrInfo.getName();
+
+		AttributeList attributes = mbsc.getAttributes(name, attributeNames);
+
+		for (javax.management.Attribute attribute : attributes.asList()) {
+			Object value = attribute.getValue();
+			values.put(attribute.getName(), value);
+		}
+
+		for (MBeanAttributeInfo attrInfo : attributeArray)
 		{
 			logger.trace("discovered attribute '{}'", attrInfo.getName());
 
@@ -290,7 +307,7 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("looking for attributes of primitive types");
 				String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-				findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), mbsc.getAttribute(name, attrInfo.getName()));
+				findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), values.get(attrInfo.getName()));
 			}
 			catch (Exception e)
 			{
