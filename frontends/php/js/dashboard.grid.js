@@ -1353,6 +1353,7 @@
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
+					$save_btn.prop('disabled', false);
 				}
 				else {
 					// No errors, proceed with update.
@@ -1412,8 +1413,10 @@
 				}
 			}
 		})
-			.always(function() {
+			.fail(function() {
 				$save_btn.prop('disabled', false);
+			})
+			.always(function() {
 				if ($placeholder) {
 					$placeholder.remove();
 				}
