@@ -2409,7 +2409,14 @@
 						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
-							updateWidgetConfig($this, data, widget);
+
+							var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
+							$save_btn.prop('disabled', true);
+
+							updateWidgetConfig($this, data, widget)
+								.always(function() {
+									$save_btn.prop('disabled', false);
+								});
 						});
 
 						// Enable save button after successful form update.
