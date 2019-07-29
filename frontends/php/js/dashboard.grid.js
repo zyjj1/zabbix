@@ -1340,6 +1340,9 @@
 				.appendTo($obj);
 		}
 
+		var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
+		$save_btn.prop('disabled', true);
+
 		overlays_stack.getById('widgetConfg').xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1410,6 +1413,7 @@
 			}
 		})
 			.always(function() {
+				$save_btn.prop('disabled', false);
 				if ($placeholder) {
 					$placeholder.remove();
 				}
@@ -1469,13 +1473,7 @@
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
 					'action': function() {
-						var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
-						$save_btn.prop('disabled', true);
-
-						updateWidgetConfig($obj, data, widget)
-							.always(function() {
-								$save_btn.prop('disabled', false);
-							});
+						updateWidgetConfig($obj, data, widget);
 					}
 				},
 				{
@@ -2409,14 +2407,7 @@
 						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {
 							e.preventDefault();
-
-							var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
-							$save_btn.prop('disabled', true);
-
-							updateWidgetConfig($this, data, widget)
-								.always(function() {
-									$save_btn.prop('disabled', false);
-								});
+							updateWidgetConfig($this, data, widget);
 						});
 
 						// Enable save button after successful form update.
