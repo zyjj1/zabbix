@@ -1421,8 +1421,6 @@
 					$placeholder.remove();
 				}
 			});
-
-		return overlays_stack.getById('widgetConfg').xhr;
 	}
 
 	function findEmptyPosition($obj, data, type) {
