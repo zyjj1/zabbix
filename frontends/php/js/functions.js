@@ -501,7 +501,7 @@ function overlayDialogueDestroy(dialogueid) {
 		}
 		if (typeof overlay.xhr !== 'undefined') {
 			overlay.xhr.abort();
-			delete overlay.xhr
+			delete overlay.xhr;
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
