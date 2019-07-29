@@ -701,7 +701,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			}
 
 			setTimeout(function() {
-				overlayDialogueDestroy(params.dialogueid, xhr);
+				overlayDialogueDestroy(params.dialogueid);
 			});
 
 			return false;

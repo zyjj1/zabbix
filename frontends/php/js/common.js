@@ -522,7 +522,7 @@ function closeDialogHandler(event) {
 			switch (dialog.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+					overlayDialogueDestroy(dialog.dialogueid);
 					break;
 
 				// Close overlay hintbox.
