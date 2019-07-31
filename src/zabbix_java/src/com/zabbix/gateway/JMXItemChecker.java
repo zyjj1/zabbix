@@ -305,7 +305,10 @@ class JMXItemChecker extends ItemChecker
 			}
 
 			if (null == values.get(attrInfo.getName()))
+			{
+				logger.trace("attribute has no value, skipping");
 				continue;
+			}
 
 			try
 			{
