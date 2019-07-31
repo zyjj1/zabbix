@@ -288,7 +288,8 @@ class JMXItemChecker extends ItemChecker
 
 		AttributeList attributes = mbsc.getAttributes(name, attributeNames);
 
-		for (javax.management.Attribute attribute : attributes.asList()) {
+		for (javax.management.Attribute attribute : attributes.asList())
+		{
 			Object value = attribute.getValue();
 			values.put(attribute.getName(), value);
 		}
@@ -302,6 +303,9 @@ class JMXItemChecker extends ItemChecker
 				logger.trace("attribute not readable, skipping");
 				continue;
 			}
+
+			if (null == values.get(attrInfo.getName()))
+				continue;
 
 			try
 			{
