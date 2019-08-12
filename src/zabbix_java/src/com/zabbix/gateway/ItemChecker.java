@@ -67,49 +67,10 @@ abstract class ItemChecker
 		}
 	}
 
-	JSONArray getValues() throws ZabbixException
-	{
-		JSONArray values = new JSONArray();
-
-		for (String key : keys)
-			values.put(getJSONValue(key));
-
-		return values;
-	}
-
 	String getFirstKey()
 	{
 		return 0 == keys.size() ? null : keys.get(0);
 	}
 
-	protected final JSONObject getJSONValue(String key)
-	{
-		JSONObject value = new JSONObject();
-
-		try
-		{
-			logger.debug("getting value for item '{}'", key);
-			String text = getStringValue(key);
-			logger.debug("received value '{}' for item '{}'", text, key);
-			value.put(JSON_TAG_VALUE, text);
-		}
-		catch (Exception e1)
-		{
-			try
-			{
-				logger.debug("caught exception for item '{}'", key, e1);
-				value.put(JSON_TAG_ERROR, ZabbixException.getRootCauseMessage(e1));
-			}
-			catch (JSONException e2)
-			{
-				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(), ZabbixException.getRootCauseMessage(e2)};
-				logger.warn("cannot add JSON attribute '{}' with message '{}': {}", logInfo);
-				logger.debug("error caused by", e2);
-			}
-		}
-
-		return value;
-	}
-
-	protected abstract String getStringValue(String key) throws Exception;
+	protected abstract JSONArray getValues() throws ZabbixException;
 }
