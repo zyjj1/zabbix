@@ -2090,3 +2090,7 @@ INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES 
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
 
+--testProblemsBySeverityWidget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (102, 'Dashboard for Problems by severity', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (103, 102, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (104, 102, 'problemsbysv', 'Reference widget to delete', 0, 5, 12, 5);
