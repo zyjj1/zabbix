@@ -114,7 +114,6 @@ class JMXItemChecker extends ItemChecker
 						throw new ZabbixException("required key format: jmx[<object name>,<attribute name>]");
 
 					String objectName = item.getArgument(1);
-					String attributeName = item.getArgument(2);
 
 					// keep track of keys that have been already processed
 					if (!processedKeys.contains(objectName))
