@@ -215,7 +215,7 @@ class JMXItemChecker extends ItemChecker
 	private String[] getAttributeValues(String objectNameStr, String[] attributeArray) throws Exception
 	{
 		String realAttributeName;
-		String fieldNames = "";
+		String fieldNames;
 		ArrayList<String> attributeValues = new ArrayList<String>();
 		ArrayList<String> attributeListSimple = new ArrayList<String>();
 		AttributeList attributes;
