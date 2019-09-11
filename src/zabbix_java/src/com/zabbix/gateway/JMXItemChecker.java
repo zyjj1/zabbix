@@ -19,6 +19,7 @@
 
 package com.zabbix.gateway;
 
+import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
@@ -93,7 +94,7 @@ class JMXItemChecker extends ItemChecker
 		{
 			HashMap<String, String[]> env = null;
 			Map<String, String> dataObjectMap = new HashMap<String, String>();
-			ArrayList<String> processedKeys = new ArrayList<String>();
+			Set<String> processedKeys = new HashSet<String>();
 
 			if (null != username && null != password)
 			{
@@ -116,10 +117,10 @@ class JMXItemChecker extends ItemChecker
 					String objectName = item.getArgument(1);
 
 					// keep track of keys that have been already processed
-					if (!processedKeys.contains(objectName))
-						processedKeys.add(objectName);
-					else
+					if (processedKeys.contains(objectName))
 						continue;
+
+					processedKeys.add(objectName);
 
 					ArrayList<String> attrbuteList = new ArrayList<String>();
 
