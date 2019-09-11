@@ -135,7 +135,12 @@ class JMXItemChecker extends ItemChecker
 							attrbuteList.add(item2.getArgument(2));
 					}
 
-					ArrayList<String> attributeValues = new ArrayList<String>(getAttributeValues(objectName, attrbuteList));
+					String[] attributeValuesArray = (getAttributeValues(objectName, attrbuteList.toArray(new String[0])));
+
+					ArrayList<String> attributeValues = new ArrayList<String>();
+
+					for (String attributeValue : attributeValuesArray)
+						attributeValues.add(attributeValue);
 
 					for (int i = 0; i < attrbuteList.size(); i++)
 					{
@@ -207,12 +212,12 @@ class JMXItemChecker extends ItemChecker
 		return values;
 	}
 
-	private ArrayList<String> getAttributeValues(String objectNameStr, ArrayList<String> attrbuteList) throws Exception
+	private String[] getAttributeValues(String objectNameStr, String[] attributeArray) throws Exception
 	{
 		String realAttributeName;
 		String fieldNames = "";
-		ArrayList<String> attrbuteValues = new ArrayList<String>();
-		ArrayList<String> attrbuteListSimple = new ArrayList<String>();
+		ArrayList<String> attributeValues = new ArrayList<String>();
+		ArrayList<String> attributeListSimple = new ArrayList<String>();
 		AttributeList attributes;
 
 		// Attribute name and composite data field names are separated by dots. On the other hand the
@@ -220,47 +225,47 @@ class JMXItemChecker extends ItemChecker
 		// backslash symbols in the name must be escaped. So a real separator is unescaped dot and
 		// separatorIndex() is used to locate it.
 
-		for (int i = 0; i < attrbuteList.size(); i++)
+		for (int i = 0; i < attributeArray.length; i++)
 		{
-			int sep = HelperFunctionChest.separatorIndex(attrbuteList.get(i));
+			int sep = HelperFunctionChest.separatorIndex(attributeArray[i]);
 
 			if (-1 != sep)
-				realAttributeName = attrbuteList.get(i).substring(0, sep);
+				realAttributeName = attributeArray[i].substring(0, sep);
 			else
-				realAttributeName = attrbuteList.get(i);
+				realAttributeName = attributeArray[i];
 
 			// Create a list of atributes without composite data. Method getAttributes() retrievs all
 			// composite data values for an attribute.
 
-			if (!attrbuteListSimple.contains(realAttributeName))
-				attrbuteListSimple.add(realAttributeName);
+			if (!attributeListSimple.contains(realAttributeName))
+				attributeListSimple.add(realAttributeName);
 		}
 
 		try
 		{
 			ObjectName objectName = new ObjectName(objectNameStr);
-			String[] attrbuteListSimpleStr = new String[attrbuteListSimple.size()];
+			String[] attributeListSimpleStr = new String[attributeListSimple.size()];
 
-			attrbuteListSimple.toArray(attrbuteListSimpleStr);
-			attributes = mbsc.getAttributes(objectName, attrbuteListSimpleStr);
+			attributeListSimple.toArray(attributeListSimpleStr);
+			attributes = mbsc.getAttributes(objectName, attributeListSimpleStr);
 		}
 		catch (InstanceNotFoundException e)
 		{
 			throw new ZabbixException("Attribute not found.");
 		}
 
-		for (int i = 0; i < attrbuteList.size(); i++)
+		for (int i = 0; i < attributeArray.length; i++)
 		{
-			int sep = HelperFunctionChest.separatorIndex(attrbuteList.get(i));
+			int sep = HelperFunctionChest.separatorIndex(attributeArray[i]);
 
 			if (-1 != sep)
 			{
-				realAttributeName = attrbuteList.get(i).substring(0, sep);
-				fieldNames = attrbuteList.get(i).substring(sep + 1);
+				realAttributeName = attributeArray[i].substring(0, sep);
+				fieldNames = attributeArray[i].substring(sep + 1);
 			}
 			else
 			{
-				realAttributeName = attrbuteList.get(i);
+				realAttributeName = attributeArray[i];
 				fieldNames = "";
 			}
 
@@ -270,7 +275,7 @@ class JMXItemChecker extends ItemChecker
 				{
 					try
 					{
-						attrbuteValues.add(getPrimitiveAttributeValue(attribute.getValue(), fieldNames));
+						attributeValues.add(getPrimitiveAttributeValue(attribute.getValue(), fieldNames));
 						break;
 					}
 					catch (InstanceNotFoundException e)
@@ -281,7 +286,7 @@ class JMXItemChecker extends ItemChecker
 			}
 		}
 
-		return attrbuteValues;
+		return attributeValues.toArray(new String[0]);
 	}
 
 	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws Exception
