@@ -122,7 +122,7 @@ class JMXItemChecker extends ItemChecker
 
 					processedKeys.add(objectName);
 
-					ArrayList<String> attrbuteList = new ArrayList<String>();
+					ArrayList<String> attributeList = new ArrayList<String>();
 
 					for (String key2 : keys)
 					{
@@ -132,17 +132,17 @@ class JMXItemChecker extends ItemChecker
 							continue;
 
 						if (objectName.equals(item2.getArgument(1)))
-							attrbuteList.add(item2.getArgument(2));
+							attributeList.add(item2.getArgument(2));
 					}
 
-					String[] attributeValuesArray = (getAttributeValues(objectName, attrbuteList.toArray(new String[0])));
+					String[] attributeValuesArray = (getAttributeValues(objectName, attributeList.toArray(new String[0])));
 
 					ArrayList<String> attributeValues = new ArrayList<String>();
 
 					for (String attributeValue : attributeValuesArray)
 						attributeValues.add(attributeValue);
 
-					for (int i = 0; i < attrbuteList.size(); i++)
+					for (int i = 0; i < attributeList.size(); i++)
 					{
 						for (String key2 : keys)
 						{
@@ -151,7 +151,7 @@ class JMXItemChecker extends ItemChecker
 							if (!item2.getKeyId().equals("jmx"))
 								continue;
 
-							if (objectName.equals(item2.getArgument(1)) && item2.getArgument(2).equals(attrbuteList.get(i)))
+							if (objectName.equals(item2.getArgument(1)) && item2.getArgument(2).equals(attributeList.get(i)))
 							{
 								dataObjectMap.put(key2, attributeValues.get(i));
 								break;
@@ -227,12 +227,11 @@ class JMXItemChecker extends ItemChecker
 
 		for (int i = 0; i < attributeArray.length; i++)
 		{
-			int sep = HelperFunctionChest.separatorIndex(attributeArray[i]);
+			realAttributeName = attributeArray[i];
+			int sep = HelperFunctionChest.separatorIndex(realAttributeName);
 
 			if (-1 != sep)
-				realAttributeName = attributeArray[i].substring(0, sep);
-			else
-				realAttributeName = attributeArray[i];
+				realAttributeName = realAttributeName.substring(0, sep);
 
 			// Create a list of atributes without composite data. Method getAttributes() retrievs all
 			// composite data values for an attribute.
