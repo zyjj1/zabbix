@@ -243,9 +243,7 @@ class JMXItemChecker extends ItemChecker
 		try
 		{
 			ObjectName objectName = new ObjectName(objectNameStr);
-			String[] attributeListSimpleStr = new String[attributeListSimple.size()];
-
-			attributeListSimple.toArray(attributeListSimpleStr);
+			String[] attributeListSimpleStr = attributeListSimple.toArray(new String[0]);
 			attributes = mbsc.getAttributes(objectName, attributeListSimpleStr);
 		}
 		catch (InstanceNotFoundException e)
