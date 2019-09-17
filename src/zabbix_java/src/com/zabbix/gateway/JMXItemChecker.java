@@ -248,7 +248,7 @@ class JMXItemChecker extends ItemChecker
 		}
 		catch (InstanceNotFoundException e)
 		{
-			throw new ZabbixException("Attribute not found.");
+			throw new ZabbixException("the MBean '%s' is not registered in the MBean server", objectNameStr);
 		}
 
 		for (int i = 0; i < attributeArray.length; i++)
