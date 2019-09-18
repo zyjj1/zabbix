@@ -253,17 +253,14 @@ class JMXItemChecker extends ItemChecker
 
 		for (int i = 0; i < attributeArray.length; i++)
 		{
+			realAttributeName = attributeArray[i];
+			fieldNames = "";
 			int sep = HelperFunctionChest.separatorIndex(attributeArray[i]);
 
 			if (-1 != sep)
 			{
 				realAttributeName = attributeArray[i].substring(0, sep);
 				fieldNames = attributeArray[i].substring(sep + 1);
-			}
-			else
-			{
-				realAttributeName = attributeArray[i];
-				fieldNames = "";
 			}
 
 			for (javax.management.Attribute attribute : attributes.asList())
