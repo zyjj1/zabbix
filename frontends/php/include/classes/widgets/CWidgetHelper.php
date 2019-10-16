@@ -1181,7 +1181,7 @@ class CWidgetHelper {
 					'}'.
 				'});',
 
-			// Intialize vertical accordion.
+			// Initialize vertical accordion.
 			'jQuery("#data_sets").zbx_vertical_accordion({'.
 				'handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
 			'});',

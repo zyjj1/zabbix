@@ -1574,7 +1574,7 @@ class CApiInputValidator {
 		}
 
 		if ($data !== '' && CHtmlUrlValidator::validate($data, ($flags & API_ALLOW_USER_MACRO)) === false) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptible URL'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));
 			return false;
 		}
 

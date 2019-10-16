@@ -767,7 +767,7 @@ class testFormWebStep extends CLegacyWebTest {
 	/**
 	 * Add name-value pairs to specific context.
 	 *
-	 * @param string $context	xpath containg context of name-pairs.
+	 * @param string $context	xpath containing context of name-pairs.
 	 * @param array  $items		name-value pairs to be added.
 	 */
 	protected function addPairs($context, $items) {
@@ -800,7 +800,7 @@ class testFormWebStep extends CLegacyWebTest {
 	/**
 	 * Get name-value pairs from specific context.
 	 *
-	 * @param string $context	xpath containg context of name-pairs.
+	 * @param string $context	xpath containing context of name-pairs.
 	 */
 	protected function getPairs($context) {
 		$pairs = [];
