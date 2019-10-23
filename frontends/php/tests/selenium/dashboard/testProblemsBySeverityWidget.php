@@ -78,12 +78,8 @@ class testProblemsBySeverityWidget extends CWebTest {
 						'Type' => 'Problems by severity',
 						'Name' => 'Show only hosts with problems filtered by severity',
 						'Refresh interval' => '1 minute',
-						'Hide groups without problems' => true
-					],
-					'Severity' => [
-						'Information',
-						'Warning',
-						'Disaster'
+						'Hide groups without problems' => true,
+						'Severity' => ['Disaster', 'Warning', 'Information']
 					],
 					'expected' => [
 						'Group to check Overview' => [
@@ -186,19 +182,12 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Display only "1_Host_to_check_Monitoring_Overview"',
-						'Problem display' => 'Separated'
-					],
-					'select host' => [
-						'Host group' => 'Group to check Overview',
-						'Host' => '1_Host_to_check_Monitoring_Overview',
-					],
-					'Severity' => [
-						'Not classified',
-						'Information',
-						'Warning',
-						'Average',
-						'High',
-						'Disaster'
+						'Problem display' => 'Separated',
+						'Severity' => ['Disaster', 'High',	'Average', 'Warning', 'Information', 'Not classified'],
+						'Hosts' => [
+							'values' => ['1_Host_to_check_Monitoring_Overview'],
+							'context' => 'Group to check Overview'
+						]
 					],
 					'expected' => [
 						'Group to check Overview' => [
@@ -289,11 +278,11 @@ class testProblemsBySeverityWidget extends CWebTest {
 
 		$this->checkDashboardUpdateMessage();
 		$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
-		$this->verifyWidgetContent($data, $widget);
+		$this->checkWidgetContent($data, $widget);
 
 		// Check the content of the overlay pop-up if needed.
 		if (CTestArrayHelper::get($data, 'check pop-up', false)) {
-			$this->verifyPopupContent($data,$widget);
+			$this->verifyPopupContent($data, $widget);
 		}
 	}
 
@@ -338,10 +327,8 @@ class testProblemsBySeverityWidget extends CWebTest {
 						'Name' => 'Show only average problems including suppressed ones',
 						'Hide groups without problems' => true,
 						'Show suppressed problems' => true,
-						'Problem display' => 'Separated'
-					],
-					'Severity' => [
-						'Average'
+						'Problem display' => 'Separated',
+						'Severity' => ['Average']
 					],
 					'expected' => [
 						'Another group to check Overview' => [
@@ -410,15 +397,12 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Return "Zabbix servers" and "Another group to check Overview" problems',
-						'Host groups' => [
-							'Zabbix servers'
+						'Host groups' => ['Zabbix servers'],
+						'Hosts' => [
+							'values' => ['Empty host'],
+							'context' => 'Empty group'
 						]
 					],
-					'select host' => [
-						'Host group' => 'Empty group',
-						'Host' => 'Empty host'
-					],
-					'expected' => [],
 					'empty output' => true
 				]
 			],
@@ -449,11 +433,11 @@ class testProblemsBySeverityWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Return "ЗАББИКС Сервер" problems'
-					],
-					'select host' => [
-						'Host group' => 'Zabbix servers',
-						'Host' => 'ЗАББИКС Сервер'
+						'Name' => 'Return "ЗАББИКС Сервер" problems',
+						'Hosts' => [
+							'values' => ['ЗАББИКС Сервер'],
+							'context' => 'Zabbix servers'
+						]
 					],
 					'expected' => [
 						'Zabbix servers' => [
@@ -468,23 +452,13 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Display ЗАББИКС Сервер problems with excluded "Zabbix servers"',
-						'Exclude host groups' => [
-							'Zabbix servers'
+						'Exclude host groups' => ['Zabbix servers'],
+						'Severity' => ['Disaster', 'High',	'Average', 'Warning', 'Information', 'Not classified'],
+						'Hosts' => [
+							'values' => ['ЗАББИКС Сервер'],
+							'context' => 'Zabbix servers'
 						]
 					],
-					'select host' => [
-						'Host group' => 'Zabbix servers',
-						'Host' => 'ЗАББИКС Сервер'
-					],
-					'Severity' => [
-						'Not classified',
-						'Information',
-						'Warning',
-						'Average',
-						'High',
-						'Disaster'
-					],
-					'expected' => [],
 					'empty output' => true
 				]
 			],
@@ -503,11 +477,8 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Display only warning and information problems containing "_trigger_',
-						'Problem' => '_trigger_'
-					],
-					'Severity' => [
-						'Information',
-						'Warning'
+						'Problem' => '_trigger_',
+						'Severity' => ['Warning', 'Information']
 					],
 					'expected' => [
 						'Group to check Overview' => [
@@ -537,17 +508,16 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$widget = $dashboard->getWidget(CTestArrayHelper::get($data['fields'], 'Name', 'Problems by severity'));
 
 		$this->checkDashboardUpdateMessage();
-		$this->verifyWidgetContent($data, $widget);
+		$this->checkWidgetContent($data, $widget);
 
 		// Check the content of the overlay pop-up if needed.
 		if (CTestArrayHelper::get($data, 'check pop-up', false)) {
-			$this->verifyPopupContent($data,$widget);
+			$this->verifyPopupContent($data, $widget);
 		}
-
 	}
 
 	public function testProblemsBySeverityWidget_SimpleUpdate() {
-		$initial_values = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
@@ -562,7 +532,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->checkDashboardUpdateMessage();
-		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	public function getCancelActionsData() {
@@ -579,14 +549,14 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'existing_widget' => 'Reference widget',
 					'save_widget' => false,
-					'save dashboard' => true
+					'save_dashboard' => true
 				]
 			],
 			// Cancel create widget.
 			[
 				[
 					'save_widget' => true,
-					'save dashboard' => false
+					'save_dashboard' => false
 				]
 			],
 			[
@@ -605,16 +575,15 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->edit();
 
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'existing_widget', false)) {
-			$dashboard->edit();
 			$widget = $dashboard->getWidget($data['existing_widget']);
 			$form = $widget->edit();
 		}
 		else {
-			$overlay = $dashboard->edit()->addWidget();
+			$overlay = $dashboard->addWidget();
 			$form = $overlay->asForm();
 			$form->getField('Type')->fill('Problems by severity');
 			$widget = $dashboard->getWidgets()->last();
@@ -659,7 +628,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget($name);
-		$widget->query("xpath:.//button[@title='Delete']")->one()->click();
+		$widget->delete();
 		$this->page->waitUntilReady();
 
 		$dashboard->save();
@@ -668,28 +637,22 @@ class testProblemsBySeverityWidget extends CWebTest {
 		// Confirm that widget is not present on dashboard.
 		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class,"dashbrd-grid-widget-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']')->count() === 0);
+		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
+				' WHERE w.name = '.zbx_dbstr($name);
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	private function fillFormAndSaveDashboard($dashboard, $form, $data, $header) {
 		$form->fill($data['fields']);
-		if (array_key_exists('Severity', $data)) {
-			$severities = $form->getField('Severity')->waitUntilVisible();
-			$severities->fill($data['Severity']);
-		}
-		if (array_key_exists('select host', $data)) {
-			$hosts = $form->getField('Hosts')->asMultiselect();
-			$hosts->select($data['select host']['Host'], $data['select host']['Host group']);
-		}
 		$form->submit();
 		$this->page->waitUntilReady();
 		$dashboard->getWidget($header);
 		$dashboard->save();
 	}
 
-	private function verifyWidgetContent($data, $widget) {
-		$dashboard = CDashboardElement::find()->one();
+	private function checkWidgetContent($data, $widget) {
 		$table = $widget->getContent()->asTable();
-		// Defining expected results in case if no filterint is applied.
+		// Defining expected results in case if no filtering is applied.
 		$default_values = [
 			'values' => [
 				'Another group to check Overview' => [
@@ -714,33 +677,19 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'Average' => 1
 				]
 			],
-			'table_headers' => [
-				'Host group',
-				'Disaster',
-				'High',
-				'Average',
-				'Warning',
-				'Information',
-				'Not classified'
-			]
+			'Severity' => ['Disaster', 'High', 'Average', 'Warning', 'Information', 'Not classified']
 		];
 
 		// Check that only chosen severities are returned in the output if 'Severity' filter is used.
-		if (!array_key_exists('Severity', $data)) {
-			$this->assertSame($default_values['table_headers'], $table->getHeadersText());
-		}
-		else {
-			foreach ($data['Severity'] as $used_severity) {
-				$this->assertContains($used_severity, $table->getHeadersText());
-			}
-			$unused_severities = array_diff($default_values['table_headers'], $data['Severity']);
+		$table_headers = CTestArrayHelper::get($data, 'fields.Severity', false) ? $data['fields']['Severity'] : $default_values['Severity'];
+		array_unshift($table_headers, 'Host group');
+		$this->assertEquals($table_headers, $table->getHeadersText());
 
-			foreach ($unused_severities as $unused_severity) {
-				if ($unused_severity === 'Host group') {
-					continue;
-				}
-				$this->assertNotContains($unused_severity,$table->getHeadersText());
-			}
+		// Check that nothing is returned in the widget if such outcome is expected.
+		if (CTestArrayHelper::get($data, 'empty output', false)) {
+			$this->assertTrue($widget->query('class:nothing-to-show')->one()->isTextPresent('No data found.'));
+
+			return;
 		}
 
 		$content = $table->index('Host group');
@@ -758,13 +707,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 
-		// Check that nothing is returned in the widget if such outcome is expected.
-		if (CTestArrayHelper::get($data, 'empty output', false)) {
-			$this->assertTrue($widget->query("xpath:.//td[text()='No data found.']")->count() === 1);
-		}
 		// Check that only selected host groups are returned when 'Hide groups without values', 'Host groups' or 'Hosts' are specified.
-		elseif (CTestArrayHelper::get($data['fields'], 'Hide groups without problems', false) ||
-				array_key_exists ('Host groups', $data['fields']) || array_key_exists('select host', $data)) {
+		if (CTestArrayHelper::get($data['fields'], 'Hide groups without problems', false) ||
+				array_key_exists('Host groups', $data['fields']) || array_key_exists('Hosts', $data['fields'])) {
 			$this->assertEquals(count($expected), count($content));
 		}
 
@@ -784,38 +729,40 @@ class testProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	private function verifyPopupContent($data,$widget){
-			$expected_popup = [
-				"fields" => [
-					"Time" => "2017-10-23 12:33:48",
-					"Host" => "ЗАББИКС Сервер",
-					"Problem" => "Test trigger to check tag filter on problem page",
-					"Ack" => 'No'
-				],
-				"Tags" => [
-					'Database',
-					'Service: abc',
-					'service: abcdef'
-				]
-			];
+	private function verifyPopupContent($data, $widget){
+		$expected_popup = [
+			'fields' => [
+				'Time' => '2017-10-23 12:33:48',
+				'Host' => 'ЗАББИКС Сервер',
+				'Problem' => 'Test trigger to check tag filter on problem page',
+				'Ack' => 'No'
+			],
+			'Tags' => [
+				'Database',
+				'Service: abc',
+				'service: abcdef'
+			]
+		];
 
-			$widget->query("xpath:.//div[@class='dashbrd-grid-widget-content']//a[text()='Zabbix servers']/../../td[@class='average-bg']/a")->one()->click();
-			$popup = $this->query("xpath://div[@class='overlay-dialogue']//table")->asTable()->one();
-			$this->assertTrue($popup->getRows()->count() === 1);
+		$table = $widget->getContent()->asTable();
+		$row = $table->findRow('Host group', 'Zabbix servers');
+		$row->query('xpath:.//td[@class="average-bg"]/a')->one()->click();
+		$popup = $this->query('xpath://div[@class="overlay-dialogue"]//table')->asTable()->one();
+		$this->assertTrue($popup->getRows()->count() === 1);
 
-			foreach ($expected_popup['fields'] as $name => $value) {
-				$this->assertEquals($value,$popup->getRow(0)->getColumn($name)->getText());
-			}
-			foreach ($expected_popup['Tags'] as $tag) {
-				$tag_array = $popup->getRow(0)->getColumn('Tags')->getText();
-				$this->assertContains($tag, $tag_array);
-			}
-			if (CTestArrayHelper::get($data['fields'], 'Show latest values', false)) {
-				$this->assertEquals('*UNKNOWN*',$popup->getRow(0)->getColumn('Latest values')->getText());
-			}
-			if (CTestArrayHelper::get($data['fields'], 'Show timeline', true)) {
-				$this->assertEquals(1,$popup->query("xpath:.//td[@class='timeline-date']")->all()->count());
-			}
+		foreach ($expected_popup['fields'] as $name => $value) {
+			$this->assertEquals($value, $popup->getRow(0)->getColumn($name)->getText());
+		}
+		foreach ($expected_popup['Tags'] as $tag) {
+			$tag_array = $popup->getRow(0)->getColumn('Tags')->getText();
+			$this->assertContains($tag, $tag_array);
+		}
+		if (CTestArrayHelper::get($data['fields'], 'Show latest values', false)) {
+			$this->assertEquals('*UNKNOWN*', $popup->getRow(0)->getColumn('Latest values')->getText());
+		}
+		if (CTestArrayHelper::get($data['fields'], 'Show timeline', true)) {
+			$this->assertEquals(1, $popup->query('xpath:.//td[@class="timeline-date"]')->all()->count());
+		}
 	}
 
 	private function checkDashboardUpdateMessage() {
