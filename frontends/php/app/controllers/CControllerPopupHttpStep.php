@@ -28,7 +28,8 @@ class CControllerPopupHttpStep extends CController {
 	protected function checkInput() {
 
 		$fields = [
-			'httpstepid' =>			'int32',
+			'no' =>					'int32',
+			'httpstepid' =>			'id',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
 			'post_type' =>			'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_FORM]),
@@ -75,7 +76,8 @@ class CControllerPopupHttpStep extends CController {
 			'required' => $this->getInput('required', ''),
 			'status_codes' => $this->getInput('status_codes', ''),
 			'old_name' => $this->getInput('old_name', ''),
-			'httpstepid' => $this->getInput('httpstepid', -1),
+			'httpstepid' => $this->getInput('httpstepid', 0),
+			'no' => $this->getInput('no', -1),
 			'steps_names' => $this->getInput('steps_names', [])
 		];
 
@@ -126,7 +128,7 @@ class CControllerPopupHttpStep extends CController {
 					'retrieve_mode' => $page_options['retrieve_mode']
 				];
 
-				$params['httpstepid'] = $page_options['httpstepid'];
+				$params['no'] = $page_options['no'];
 
 				$output = [
 					'params' => $params
