@@ -2092,5 +2092,5 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 
 -- testProblemsBySeverityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (102, 'Dashboard for Problems by severity', 1, 1);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (103, 102, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (104, 102, 'problemsbysv', 'Reference widget to delete', 0, 5, 12, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (103, 102, 'problemsbysv', 'Reference widget', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (104, 102, 'problemsbysv', 'Reference PBS widget to delete', 6, 0, 6, 5);
