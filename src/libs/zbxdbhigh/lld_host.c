@@ -1958,6 +1958,13 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	DBbegin();
 
+	if (SUCCEED != DBlock_record("hosts", parent_hostid, NULL, 0))
+	{
+		/* the host prototype was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
+
 	if (0 != new_hosts)
 	{
 		hostid = DBget_maxid_num("hosts", new_hosts);
