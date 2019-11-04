@@ -1,1 +1,1 @@
-..F....... [ZBX-16751] fixed notice: "Array and string offset access syntax with curly braces is deprecated" (talbergs)
+..F....... [ZBX-16751] fixed support for php 7.4 (talbergs)
