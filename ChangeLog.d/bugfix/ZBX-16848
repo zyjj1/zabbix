@@ -1,0 +1,1 @@
+..F....... [ZBX-16848] fixed setup to check for loaded module php_fileinfo.dll on Windows machines (vasilijs)

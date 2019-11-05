@@ -87,6 +87,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpLdapModule();
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
+		$result[] = $this->checkPhpFileinfo();
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
@@ -602,6 +603,23 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('PHP session extension missing (PHP configuration parameter --enable-session).')
+		];
+	}
+
+	/**
+	 * Checks for PHP fileinfo extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpFileinfo() {
+		$current = function_exists('mime_content_type');
+
+		return [
+			'name' => _('PHP fileinfo'),
+			'current' => $current ? _('on') : _('off'),
+			'required' => null,
+			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
+			'error' => _('PHP fileinfo extension missing.')
 		];
 	}
 
