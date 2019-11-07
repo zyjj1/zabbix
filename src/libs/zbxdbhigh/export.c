@@ -34,7 +34,7 @@ static char	*problems_file_name;
 static FILE	*problems_file;
 static char	*export_dir;
 
-#define ZBX_EXPORT_WAIT_FAIL 10
+#define LOGS_SUSPEND_TIME	(SEC_PER_MIN * 10)
 
 int	zbx_is_export_enabled(void)
 {
@@ -111,9 +111,20 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 	}
 }
 
-static	void	file_write(const char *buf, size_t count, FILE **file, const char *name)
+static void	file_write(const char *buf, size_t count, FILE **file, const char *name)
 {
-	size_t	ret;
+	static time_t	last_log_time = 0;
+	time_t		now;
+	char		log_str[MAX_STRING_LEN];
+
+	if (NULL == *file)
+		*file = fopen(name, "a");
+
+	if (NULL == *file)
+	{
+		zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s", name, zbx_strerror(errno));
+		goto error;
+	}
 
 	if (CONFIG_EXPORT_FILE_SIZE <= count + ftell(*file) + 1)
 	{
@@ -121,42 +132,61 @@ static	void	file_write(const char *buf, size_t count, FILE **file, const char *n
 
 		strscpy(filename_old, name);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
-		remove(filename_old);
-		zbx_fclose(*file);
 
-		while (0 != rename(name, filename_old))
+		if( 0 == access( filename_old, F_OK ) && 0 != remove(filename_old))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot rename export file '%s': %s: retrying in %d seconds",
-					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-			sleep(ZBX_EXPORT_WAIT_FAIL);
+			zbx_snprintf(log_str, sizeof(log_str), "error while removing export file '%s': %s",
+					name, zbx_strerror(errno));
+			goto error;
 		}
 
-		while (NULL == (*file = fopen(name, "a")))
+		if (NULL != *file && 0 != fclose(*file))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot open export file '%s': %s: retrying in %d seconds",
-					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-			sleep(ZBX_EXPORT_WAIT_FAIL);
+			zbx_snprintf(log_str, sizeof(log_str), "closing file stream failed': %s", zbx_strerror(errno));
+			goto error;
 		}
+		*file = NULL;
+
+		if (0 != rename(name, filename_old))
+		{
+			zbx_snprintf(log_str, sizeof(log_str), "cannot rename export file '%s': %s",
+					name, zbx_strerror(errno));
+			goto error;
+		}
+
+		if (NULL == (*file = fopen(name, "a")))
+		{
+			zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+					name, zbx_strerror(errno));
+			goto error;
+		}
+
 	}
 
-	while (0 < count)
+	if (count != fwrite(buf, 1, count, *file))
 	{
-		if (count != (ret = (fwrite(buf, 1, count, *file))))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot write to export file '%s': %s: retrying in %d seconds",
-					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-			sleep(ZBX_EXPORT_WAIT_FAIL);
-		}
-
-		buf += ret;
-		count -= ret;
+		zbx_snprintf(log_str, sizeof(log_str), "cannot write to export file '%s': %s",
+				name, zbx_strerror(errno));
+		goto error;
 	}
 
-	while ('\n' != fputc('\n', *file))
+	if ('\n' != fputc('\n', *file))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot write to export file '%s': %s: retrying in %d seconds",
-				name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-		sleep(ZBX_EXPORT_WAIT_FAIL);
+		zbx_snprintf(log_str, sizeof(log_str), "cannot write to export file '%s': %s",
+				name, zbx_strerror(errno));
+		goto error;
+	}
+	return;
+error:
+	if (NULL != *file)
+		fclose(*file);
+	*file = NULL;
+	now = time(NULL);
+
+	if (LOGS_SUSPEND_TIME < now - last_log_time)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s", log_str);
+		last_log_time = now;
 	}
 }
 
@@ -177,6 +207,8 @@ void	zbx_trends_export_write(const char *buf, size_t count)
 
 void	zbx_problems_export_flush(void)
 {
+	if (NULL == problems_file)
+		return;
 	if (0 != fflush(problems_file))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot flush export file '%s': %s", problems_file_name,
@@ -186,6 +218,8 @@ void	zbx_problems_export_flush(void)
 
 void	zbx_history_export_flush(void)
 {
+	if (NULL == history_file)
+		return;
 	if (0 != fflush(history_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", history_file_name,
@@ -195,6 +229,8 @@ void	zbx_history_export_flush(void)
 
 void	zbx_trends_export_flush(void)
 {
+	if (NULL == trends_file)
+		return;
 	if (0 != fflush(trends_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", trends_file_name,
