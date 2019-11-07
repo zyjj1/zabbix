@@ -629,6 +629,11 @@ class CMaintenance extends CApiService {
 						}
 					}
 
+					if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect maintenance period: every='
+							.$timeperiod['every'].' should be > 0'));
+					}
+
 					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
 					if ($timeperiod_type === null) {
 						$timeperiod_type = DB::getDefault('timeperiods', 'timeperiod_type');
