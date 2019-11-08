@@ -372,18 +372,25 @@ class JMXItemChecker extends ItemChecker
 	private void getDiscoveryValue(String key) throws Exception
 	{
 		ZabbixItem item = new ZabbixItem(key);
-		Map<String, JSONObject> attributeMap = new HashMap<String, JSONObject>();
-
 		int argumentCount = item.getArgumentCount();
 
 		if (2 < argumentCount)
 		{
-			storeValue(key, null, "Incorrect key, required key format: jmx.discovery[<discovery mode>,<object name>].", FAIL);
+			storeValue(key, null, "Invalid key, required key format: jmx.discovery[<discovery mode>,<object name>].", FAIL);
 			return;
 		}
 
-		JSONArray counters = new JSONArray();
-		ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+		ObjectName filter;
+
+		try
+		{
+			filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+		}
+		catch (MalformedObjectNameException e)
+		{
+			storeValue(key, null, "Invalid object name format: " + item.getArgument(2) + ".", FAIL);
+			return;
+		}
 
 		int mode = DISCOVERY_MODE_ATTRIBUTES;
 		if (0 != argumentCount)
@@ -391,10 +398,17 @@ class JMXItemChecker extends ItemChecker
 			String modeName = item.getArgument(1);
 
 			if (modeName.equals("beans"))
+			{
 				mode = DISCOVERY_MODE_BEANS;
+			}
 			else if (!modeName.equals("attributes"))
-				storeValue(key, null, "invalid discovery mode: " + modeName, FAIL);
+			{
+				storeValue(key, null, "Invalid discovery mode: " + modeName + ".", FAIL);
+				return;
+			}
 		}
+
+		JSONArray counters = new JSONArray();
 
 		for (ObjectName name : mbsc.queryNames(filter, null))
 		{
@@ -452,13 +466,38 @@ class JMXItemChecker extends ItemChecker
 		for (MBeanAttributeInfo attrInfo : attributeArray)
 			attributeNames[i++] = attrInfo.getName();
 
-		AttributeList attributes = mbsc.getAttributes(name, attributeNames);
+		AttributeList attributes = new AttributeList();
+
+		try
+		{
+			attributes = mbsc.getAttributes(name, attributeNames);
+		}
+		catch (Exception e1)
+		{
+			for (MBeanAttributeInfo attrInfo : attributeArray)
+			{
+				try
+				{
+					Object attr = mbsc.getAttribute(name, attrInfo.getName());
+					attributes.add(new javax.management.Attribute(attrInfo.getName(), attr));
+				}
+				catch (Exception e2)
+				{
+					Object[] logInfo = {name, attrInfo.getName(), ZabbixException.getRootCauseMessage(e2)};
+					logger.warn("attribute processing '{},{}' failed: {}", logInfo);
+					logger.debug("error caused by", e2);
+				}
+			}
+		}
+
+		if (attributes.isEmpty())
+		{
+			logger.warn("cannot process any attribute for object '{}'", name);
+			return;
+		}
 
 		for (javax.management.Attribute attribute : attributes.asList())
-		{
-			Object value = attribute.getValue();
-			values.put(attribute.getName(), value);
-		}
+			values.put(attribute.getName(), attribute.getValue());
 
 		for (MBeanAttributeInfo attrInfo : attributeArray)
 		{
