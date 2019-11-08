@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.ArrayList;
 
 import javax.lang.model.type.ErrorType;
@@ -151,16 +152,9 @@ class JMXItemChecker extends ItemChecker
 
 					dataObjectMap.put(objectName, attributeMap);
 
-					try
-					{
-						getAttributeData(objectName);
-						processAttributeValues(objectName);
-					}
-					catch (Exception e)
-					{
-						for (Map.Entry<String, JSONObject> attribute : attributeMap.entrySet())
-							storeValue(objectName, attribute.getKey(), "Cannot get attribute data: " + e.getMessage() + ".", FAIL);
-					}
+					attributData = new AttributeList();
+					getAttributeData(objectName);
+					processAttributeValues(objectName);
 				}
 				else
 					storeValue(key, null, "Cannot process key: ID '" + item.getKeyId() + "' is not supported.", FAIL);
@@ -219,15 +213,12 @@ class JMXItemChecker extends ItemChecker
 		return values;
 	}
 
-	private void getAttributeData(String objectNameStr) throws Exception
+	private void getAttributeData(String objectNameStr)
 	{
 		String realAttributeName;
-		ObjectName objectName;
+		ObjectName objectName = null;
 		Map<String, JSONObject> attributes = new HashMap<String, JSONObject>();
 		ArrayList<String> attributeList = new ArrayList<String>();
-
-		if (objectNameStr.equals(""))
-			throw new Exception("data object is empty");
 
 		attributes = dataObjectMap.get(objectNameStr);
 
@@ -249,30 +240,50 @@ class JMXItemChecker extends ItemChecker
 			attributeList.add(realAttributeName);
 		}
 
-		try
-		{
-			objectName = new ObjectName(objectNameStr);
-		}
-		catch (MalformedObjectNameException e)
-		{
-			throw new Exception("the format of the object '" + objectNameStr + "' does not correspond to a valid ObjectName");
-		}
+		Iterator itr = attributeList.iterator();
 
 		try
 		{
+			objectName = new ObjectName(objectNameStr);
 			attributData = mbsc.getAttributes(objectName, attributeList.toArray(new String[0]));
 		}
-		catch (Exception e)
+		catch (MalformedObjectNameException e)
 		{
-			throw new Exception("the data object '" + objectNameStr + "' is not registered in the MBean server");
+			logger.debug("!!!!! 1st catch()");
+			while(itr.hasNext())
+			{
+				storeValue(objectNameStr, itr.next().toString(), "Cannot get attribute data: the format of the object '"
+					+ objectNameStr + "' does not correspond to a valid ObjectName.", FAIL);
+			}
+		}
+		catch (Exception e1)
+		{
+			while(itr.hasNext())
+			{
+				String attrName = itr.next().toString();
+
+				try
+				{
+					Object attrValue = mbsc.getAttribute(objectName, attrName);
+					attributData.add(new javax.management.Attribute(attrName, attrValue));
+				}
+				catch (Exception e2)
+				{
+					storeValue(objectNameStr, attrName,
+						"Cannot get attribute data: invalid attribute registered on the MBean server.", FAIL);
+
+				}
+			}
 		}
 	}
 
 	private void processAttributeValues(String objectNameStr)
 	{
+		if (attributData.isEmpty())
+			return;
+
 		String realAttributeName;
 		Map<String, JSONObject> attributes = new HashMap<String, JSONObject>();
-		ArrayList<String> attributeList = new ArrayList<String>();
 
 		attributes = dataObjectMap.get(objectNameStr);
 
@@ -478,8 +489,8 @@ class JMXItemChecker extends ItemChecker
 			{
 				try
 				{
-					Object attr = mbsc.getAttribute(name, attrInfo.getName());
-					attributes.add(new javax.management.Attribute(attrInfo.getName(), attr));
+					Object attrValue = mbsc.getAttribute(name, attrInfo.getName());
+					attributes.add(new javax.management.Attribute(attrInfo.getName(), attrValue));
 				}
 				catch (Exception e2)
 				{
