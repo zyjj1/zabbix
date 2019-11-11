@@ -125,8 +125,6 @@ class JMXItemChecker extends ItemChecker
 				}
 				else if (item.getKeyId().equals("jmx"))
 				{
-					Map<String, JSONObject> attributeMap = new HashMap<String, JSONObject>();
-
 					if (2 != item.getArgumentCount())
 					{
 						storeValue(key, null, "Incorrect item key, required key format: jmx[<object name>,<attribute name>].", FAIL);
@@ -138,6 +136,8 @@ class JMXItemChecker extends ItemChecker
 					// keep track of keys that have been already processed
 					if (dataObjectMap.containsKey(objectName))
 						continue;
+
+					Map<String, JSONObject> attributeMap = new HashMap<String, JSONObject>();
 
 					for (String key2 : keys)
 					{
@@ -305,15 +305,13 @@ class JMXItemChecker extends ItemChecker
 					try
 					{
 						getPrimitiveAttributeValue(objectNameStr, attribute.getKey(), a.getValue(), fieldName);
-						break;
 					}
 					catch (Exception e)
 					{
 						storeValue(objectNameStr, attribute.getKey(),
 							"Cannot process object or attribute: " + e.getMessage() + ".", FAIL);
-
-						break;
 					}
+					break;
 				}
 			}
 		}
