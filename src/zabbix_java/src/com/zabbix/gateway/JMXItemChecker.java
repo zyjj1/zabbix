@@ -249,7 +249,6 @@ class JMXItemChecker extends ItemChecker
 		}
 		catch (MalformedObjectNameException e)
 		{
-			logger.debug("!!!!! 1st catch()");
 			while(itr.hasNext())
 			{
 				storeValue(objectNameStr, itr.next().toString(), "Cannot get attribute data: the format of the object '"
