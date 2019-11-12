@@ -323,7 +323,7 @@ class CScreenBase {
 		// Get page file.
 		if ($this->required_parameters['pageFile'] && $this->pageFile === null) {
 			global $page;
-			$this->pageFile = $page !== null ? $page['file'] : null;
+			$this->pageFile = ($page === null) ? null : $page['file'];
 		}
 
 		// Calculate timeline.
