@@ -29,7 +29,7 @@ class CControllerPopupHttpStep extends CController {
 
 		$fields = [
 			'no' =>					'int32',
-			'httpstepid' =>			'id',
+			'httpstepid' =>			'db httpstep.httpstepid',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
 			'post_type' =>			'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_FORM]),
@@ -125,10 +125,9 @@ class CControllerPopupHttpStep extends CController {
 					'required' => $page_options['required'],
 					'status_codes' => $page_options['status_codes'],
 					'follow_redirects' => $page_options['follow_redirects'],
-					'retrieve_mode' => $page_options['retrieve_mode']
+					'retrieve_mode' => $page_options['retrieve_mode'],
+					'no' => $page_options['no']
 				];
-
-				$params['no'] = $page_options['no'];
 
 				$output = [
 					'params' => $params

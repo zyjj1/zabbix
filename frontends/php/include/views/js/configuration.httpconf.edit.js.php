@@ -657,8 +657,8 @@
 	Steps.prototype.getStepNames = function() {
 		var names = [];
 
-		for (var httpstepid in this.data) {
-			names.push(this.data[httpstepid].data.name);
+		for (var no in this.data) {
+			names.push(this.data[no].data.name);
 		}
 
 		return names;
@@ -667,10 +667,10 @@
 	/**
 	 * This method hydrates the parsed html PopUp form with data from specific step.
 	 *
-	 * @param {integer} httpstepid
+	 * @param {int} no  Step index.
 	 */
-	Steps.prototype.onStepOverlayReadyCb = function(httpstepid) {
-		var step_ref = this.data[httpstepid] ? this.data[httpstepid] : this.new_step;
+	Steps.prototype.onStepOverlayReadyCb = function(no) {
+		var step_ref = this.data[no] ? this.data[no] : this.new_step;
 		this.edit_form = new StepEditForm(jQuery('#http_step'), step_ref);
 	};
 
