@@ -38,7 +38,8 @@ class CTemplateImporter extends CImporter {
 
 		$this->checkCircularTemplateReferences($templates);
 
-		if (!$this->options['templateLinkage']['createMissing']) {
+		if (!$this->options['templateLinkage']['createMissing']
+				&& !$this->options['templateLinkage']['deleteMissing']) {
 			foreach ($templates as $name => $template) {
 				unset($templates[$name]['templates']);
 			}
@@ -50,6 +51,7 @@ class CTemplateImporter extends CImporter {
 			$templatesToCreate = [];
 			$templatesToUpdate = [];
 			$templateLinkage = [];
+			$tmpls_to_clear = [];
 
 			foreach ($independentTemplates as $name) {
 				$template = $templates[$name];
@@ -95,6 +97,34 @@ class CTemplateImporter extends CImporter {
 			}
 
 			if ($templatesToUpdate) {
+
+				// Get template linkages to unlink and clear.
+				if ($this->options['templateLinkage']['deleteMissing']) {
+					// Get already linked templates.
+					$db_template_links = API::Template()->get([
+						'output' => ['templateid'],
+						'selectParentTemplates' => ['templateid'],
+						'templateids' => zbx_objectValues($templatesToUpdate, 'templateid'),
+						'preservekeys' => true
+					]);
+
+					foreach ($db_template_links as &$db_template_link) {
+						$db_template_link = zbx_objectValues($db_template_link['parentTemplates'], 'templateid');
+					}
+					unset($db_template_link);
+
+					foreach ($templatesToUpdate as $tmpl) {
+						if (array_key_exists($tmpl['host'], $templateLinkage)) {
+							$tmpls_to_clear[$tmpl['templateid']] = array_diff($db_template_links[$tmpl['templateid']],
+								zbx_objectValues($templateLinkage[$tmpl['host']], 'templateid')
+							);
+						}
+						else {
+							$tmpls_to_clear[$tmpl['templateid']] = $db_template_links[$tmpl['templateid']];
+						}
+					}
+				}
+
 				if ($this->options['templates']['updateExisting']) {
 					API::Template()->update($templatesToUpdate);
 				}
@@ -102,6 +132,16 @@ class CTemplateImporter extends CImporter {
 				foreach ($templatesToUpdate as $updatedTemplate) {
 					$this->processedTemplateIds[$updatedTemplate['templateid']] = $updatedTemplate['templateid'];
 
+					// Drop existing template linkages if 'delete missing' selected.
+					if (array_key_exists($updatedTemplate['templateid'], $tmpls_to_clear)
+							&& $tmpls_to_clear[$updatedTemplate['templateid']]) {
+						API::Template()->massRemove([
+							'templateids' => [$updatedTemplate['templateid']],
+							'templateids_clear' => $tmpls_to_clear[$updatedTemplate['templateid']]
+						]);
+					}
+
+					// Make new template linkages.
 					if (!empty($templateLinkage[$updatedTemplate['host']])) {
 						API::Template()->massAdd([
 							'templates' => $updatedTemplate,

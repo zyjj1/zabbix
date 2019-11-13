@@ -37,6 +37,7 @@ class CHostImporter extends CImporter {
 		$hostsToCreate = [];
 		$hostsToUpdate = [];
 		$templateLinkage = [];
+		$tmpls_to_clear = [];
 
 		foreach ($hosts as $host) {
 			// preserve host related templates to massAdd them later
@@ -63,6 +64,33 @@ class CHostImporter extends CImporter {
 				}
 
 				$hostsToCreate[] = $host;
+			}
+		}
+
+		// Get template linkages to unlink and clear.
+		if ($hostsToUpdate && $this->options['templateLinkage']['deleteMissing']) {
+			// Get already linked templates.
+			$db_template_links = API::Host()->get([
+				'output' => ['hostids'],
+				'selectParentTemplates' => ['hostid'],
+				'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_template_links as &$db_template_link) {
+				$db_template_link = zbx_objectValues($db_template_link['parentTemplates'], 'templateid');
+			}
+			unset($db_template_link);
+
+			foreach ($hostsToUpdate as $host) {
+				if (array_key_exists($host['host'], $templateLinkage)) {
+					$tmpls_to_clear[$host['hostid']] = array_diff($db_template_links[$host['hostid']],
+						zbx_objectValues($templateLinkage[$host['host']], 'templateid')
+					);
+				}
+				else {
+					$tmpls_to_clear[$host['hostid']] = $db_template_links[$host['hostid']];
+				}
 			}
 		}
 
@@ -94,6 +122,15 @@ class CHostImporter extends CImporter {
 			foreach ($hostsToUpdate as $host) {
 				$this->processedHostIds[$host['host']] = $host['hostid'];
 
+				// Drop existing template linkages if 'delete missing' selected.
+				if (array_key_exists($host['hostid'], $tmpls_to_clear) && $tmpls_to_clear[$host['hostid']]) {
+					API::Host()->massRemove([
+						'hostids' => [$host['hostid']],
+						'templateids_clear' => $tmpls_to_clear[$host['hostid']]
+					]);
+				}
+
+				// Make new template linkages.
 				if (!empty($templateLinkage[$host['host']])) {
 					API::Template()->massAdd([
 						'hosts' => $host,
