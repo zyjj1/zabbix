@@ -34,7 +34,7 @@ static char	*problems_file_name;
 static FILE	*problems_file;
 static char	*export_dir;
 
-#define LOGS_SUSPEND_TIME	(SEC_PER_MIN * 10)
+#define LOGGING_SUSPEND_TIME	(SEC_PER_MIN * 10)
 
 int	zbx_is_export_enabled(void)
 {
@@ -117,10 +117,7 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 	time_t		now;
 	char		log_str[MAX_STRING_LEN];
 
-	if (NULL == *file)
-		*file = fopen(name, "a");
-
-	if (NULL == *file)
+	if (NULL == *file && (NULL == (*file = fopen(name, "a"))))
 	{
 		zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s", name, zbx_strerror(errno));
 		goto error;
@@ -183,7 +180,7 @@ error:
 	*file = NULL;
 	now = time(NULL);
 
-	if (LOGS_SUSPEND_TIME < now - last_log_time)
+	if (LOGGING_SUSPEND_TIME < now - last_log_time)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", log_str);
 		last_log_time = now;
