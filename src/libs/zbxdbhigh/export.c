@@ -34,8 +34,6 @@ static char	*problems_file_name;
 static FILE	*problems_file;
 static char	*export_dir;
 
-#define LOGGING_SUSPEND_TIME	(SEC_PER_MIN * 10)
-
 int	zbx_is_export_enabled(void)
 {
 	if (NULL == CONFIG_EXPORT_DIR)
@@ -113,6 +111,8 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 
 static void	file_write(const char *buf, size_t count, FILE **file, const char *name)
 {
+#define ZBX_LOGGING_SUSPEND_TIME	10
+
 	static time_t	last_log_time = 0;
 	time_t		now;
 	char		log_str[MAX_STRING_LEN];
@@ -123,7 +123,7 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 		goto error;
 	}
 
-	if (CONFIG_EXPORT_FILE_SIZE <= count + ftell(*file) + 1)
+	if (CONFIG_EXPORT_FILE_SIZE <= count + (size_t)ftell(*file) + 1)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
@@ -132,14 +132,16 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 
 		if( 0 == access( filename_old, F_OK ) && 0 != remove(filename_old))
 		{
-			zbx_snprintf(log_str, sizeof(log_str), "error while removing export file '%s': %s",
-					name, zbx_strerror(errno));
+			zbx_snprintf(log_str, sizeof(log_str), "cannot remove export file '%s': %s",
+					filename_old, zbx_strerror(errno));
 			goto error;
 		}
 
-		if (NULL != *file && 0 != fclose(*file))
+		if (0 != fclose(*file))
 		{
-			zbx_snprintf(log_str, sizeof(log_str), "closing file stream failed': %s", zbx_strerror(errno));
+			zbx_snprintf(log_str, sizeof(log_str), "cannot close export file %s': %s",
+					name, zbx_strerror(errno));
+			*file = NULL;
 			goto error;
 		}
 		*file = NULL;
@@ -157,34 +159,32 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 					name, zbx_strerror(errno));
 			goto error;
 		}
-
 	}
 
-	if (count != fwrite(buf, 1, count, *file))
+	if (count != fwrite(buf, 1, count, *file) || '\n' != fputc('\n', *file))
 	{
 		zbx_snprintf(log_str, sizeof(log_str), "cannot write to export file '%s': %s",
 				name, zbx_strerror(errno));
 		goto error;
 	}
 
-	if ('\n' != fputc('\n', *file))
-	{
-		zbx_snprintf(log_str, sizeof(log_str), "cannot write to export file '%s': %s",
-				name, zbx_strerror(errno));
-		goto error;
-	}
 	return;
 error:
-	if (NULL != *file)
-		fclose(*file);
-	*file = NULL;
+	if (NULL != *file && 0 != fclose(*file))
+	{
+		zbx_snprintf(log_str, sizeof(log_str), "cannot close export file %s': %s", name, zbx_strerror(errno));
+		*file = NULL;
+	}
+
 	now = time(NULL);
 
-	if (LOGGING_SUSPEND_TIME < now - last_log_time)
+	if (ZBX_LOGGING_SUSPEND_TIME < now - last_log_time)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", log_str);
 		last_log_time = now;
 	}
+
+#undef ZBX_LOGGING_SUSPEND_TIME
 }
 
 void	zbx_problems_export_write(const char *buf, size_t count)
