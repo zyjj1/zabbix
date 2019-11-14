@@ -1,1 +1,1 @@
-..F....... [ZBX-16848] fixed setup to check for the presence of the FileInfo extension (vasilijs)
+..F....... [ZBX-16848] fixed setup to check if PHP FileInfo extension exists (vasilijs)
