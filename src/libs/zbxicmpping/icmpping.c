@@ -195,7 +195,6 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	const char	*__function_name = "process_ping";
 	const int	ZBX_FPING_RESPONSE_TIME_ADD_CHARS = 5;
 	const int	ZBX_FPING_RESPONSE_TIME_CHARS_MAX = 15;
-	const int	ZBX_FPING_RESPONSE_LINE_MIN = 100;
 
 	FILE		*f;
 	char		*c, params[70];
