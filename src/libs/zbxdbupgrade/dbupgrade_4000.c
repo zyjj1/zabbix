@@ -258,7 +258,7 @@ static int	DBpatch_4000005(void)
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		time_period_id, every;
-	int			ret = SUCCEED, invalidate = 0;
+	int			invalidate = 0;
 	const ZBX_TABLE		*timeperiods;
 	const ZBX_FIELD		*field;
 
@@ -288,9 +288,9 @@ static int	DBpatch_4000005(void)
 
 	if (0 != invalidate &&
 			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
-		ret = FAIL;
+		return FAIL;
 
-	return ret;
+	return SUCCEED;
 }
 
 #endif
