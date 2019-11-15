@@ -257,7 +257,7 @@ static int	DBpatch_4000005(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		time_period_id, every = 1;
+	zbx_uint64_t		time_period_id, every;
 	int			ret = SUCCEED;
 	const ZBX_TABLE		*timeperiods;
 	const ZBX_FIELD		*field;
@@ -267,6 +267,11 @@ static int	DBpatch_4000005(void)
 			NULL != (field = DBget_field(timeperiods, "every")))
 	{
 		ZBX_STR2UINT64(every, field->default_value);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
 	}
 
 	zbx_vector_uint64_create(&ids);
