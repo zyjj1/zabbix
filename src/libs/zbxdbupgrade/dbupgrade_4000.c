@@ -258,10 +258,9 @@ static int	DBpatch_4000005(void)
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		time_period_id, every;
-	int			ret = SUCCEED;
+	int			ret = SUCCEED, invalidate = 0;
 	const ZBX_TABLE		*timeperiods;
 	const ZBX_FIELD		*field;
-	zbx_vector_uint64_t	ids;
 
 	if (NULL != (timeperiods = DBget_table("timeperiods")) &&
 			NULL != (field = DBget_field(timeperiods, "every")))
@@ -274,36 +273,22 @@ static int	DBpatch_4000005(void)
 		return FAIL;
 	}
 
-	zbx_vector_uint64_create(&ids);
 	result = DBselect("select timeperiodid from timeperiods where every=0");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(time_period_id, row[0]);
-		zbx_vector_uint64_append(&ids, time_period_id);
 
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid maintenance time period found: "ZBX_FS_UI64
 				", changing \"every\" to "ZBX_FS_UI64, time_period_id, every);
+		invalidate = 1;
 	}
 
 	DBfree_result(result);
 
-	if (0 < ids.values_num)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update timeperiods set every="ZBX_FS_UI64" where", every);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "timeperiodid", ids.values, ids.values_num);
-
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			ret = FAIL;
-
-		zbx_free(sql);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
+	if (0 != invalidate &&
+			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
+		ret = FAIL;
 
 	return ret;
 }
