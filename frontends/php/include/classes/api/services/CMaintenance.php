@@ -631,7 +631,9 @@ class CMaintenance extends CApiService {
 
 					if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Incorrect value for field "every": should be above 0'));
+							_s('Incorrect value for field "%1$s": %2$s.',
+								'every', _('should be above 0'))
+						);
 					}
 
 					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
