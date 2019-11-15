@@ -631,8 +631,8 @@ class CMaintenance extends CApiService {
 
 					if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.',
-								'every', _('should be above 0'))
+							_s('Incorrect value "%1$s" for unsigned int field "%2$s".',
+								$timeperiod['every'], 'every')
 						);
 					}
 
