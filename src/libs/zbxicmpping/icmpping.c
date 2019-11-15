@@ -193,6 +193,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		char *error, int max_error_len)
 {
 	const char	*__function_name = "process_ping";
+	const int	ZBX_FPING_RESPONSE_TIME_ADD_CHARS = 5;
+	const int	ZBX_FPING_RESPONSE_TIME_CHARS_MAX = 15;
+	const int	ZBX_FPING_RESPONSE_LINE_MIN = 100;
 
 	FILE		*f;
 	char		*c, params[70];
@@ -201,6 +204,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	ZBX_FPING_HOST	*host;
 	double		sec;
 	int 		i, ret = NOTSUPPORTED, index;
+	char		*str = NULL;
+	int		str_sz;
+	int		tmo_str_sz;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -414,9 +420,14 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		return ret;
 	}
 
-	if (NULL == fgets(tmp, sizeof(tmp), f))
+	tmo_str_sz = (0 != timeout ? zbx_snprintf(tmp, sizeof(tmp), "%d", timeout) + ZBX_FPING_RESPONSE_TIME_ADD_CHARS
+					: ZBX_FPING_RESPONSE_TIME_CHARS_MAX);
+	str_sz = count * tmo_str_sz + MAX_STRING_LEN;
+	str = zbx_malloc(str, (size_t)str_sz);
+
+	if (NULL == fgets(str, str_sz, f))
 	{
-		strscpy(tmp, "no output");
+		strscpy(str, "no output");
 	}
 	else
 	{
@@ -428,16 +439,22 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		do
 		{
-			zbx_rtrim(tmp, "\n");
-			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
+			if (NULL == strchr(str, '\n'))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", str);
+				zabbix_log(LOG_LEVEL_ERR, "cannot read whole fping response line at once");
+				continue;
+			}
+			zbx_rtrim(str, "\n");
+			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", str);
 
 			host = NULL;
 
-			if (NULL != (c = strchr(tmp, ' ')))
+			if (NULL != (c = strchr(str, ' ')))
 			{
 				*c = '\0';
 				for (i = 0; i < hosts_count; i++)
-					if (0 == strcmp(tmp, hosts[i].addr))
+					if (0 == strcmp(str, hosts[i].addr))
 					{
 						host = &hosts[i];
 						break;
@@ -448,13 +465,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			if (NULL == host)
 				continue;
 
-			if (NULL == (c = strstr(tmp, " : ")))
+			if (NULL == (c = strstr(str, " : ")))
 				continue;
 
 			/* when NIC bonding is used, there are also lines like */
 			/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
 
-			if (NULL != strstr(tmp, "duplicate for"))
+			if (NULL != strstr(str, "duplicate for"))
 				continue;
 
 			c += 3;
@@ -514,7 +531,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif
 			ret = SUCCEED;
 		}
-		while (NULL != fgets(tmp, sizeof(tmp), f));
+		while (NULL != fgets(str, str_sz, f));
+
+		zbx_free(str);
 
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);
