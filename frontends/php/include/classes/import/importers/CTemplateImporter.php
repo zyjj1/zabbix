@@ -38,8 +38,7 @@ class CTemplateImporter extends CImporter {
 
 		$this->checkCircularTemplateReferences($templates);
 
-		if (!$this->options['templateLinkage']['createMissing']
-				&& !$this->options['templateLinkage']['deleteMissing']) {
+		if (!$this->options['templateLinkage']['createMissing']) {
 			foreach ($templates as $name => $template) {
 				unset($templates[$name]['templates']);
 			}
