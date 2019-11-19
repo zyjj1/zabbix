@@ -115,7 +115,8 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 
 	static time_t	last_log_time = 0;
 	time_t		now;
-	char		log_str[MAX_STRING_LEN];
+	char		log_str[MAX_STRING_LEN] = {0};
+	long		file_offset;
 
 	if (NULL == *file && (NULL == (*file = fopen(name, "a"))))
 	{
@@ -123,7 +124,14 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 		goto error;
 	}
 
-	if (CONFIG_EXPORT_FILE_SIZE <= count + (size_t)ftell(*file) + 1)
+	if (-1 == (file_offset = ftell(*file)))
+	{
+		zbx_snprintf(log_str, sizeof(log_str), "cannot get current file position indicator value for '%s': %s",
+				name, zbx_strerror(errno));
+		goto error;
+	}
+
+	if (CONFIG_EXPORT_FILE_SIZE <= count + (size_t)file_offset + 1)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
@@ -172,7 +180,8 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 error:
 	if (NULL != *file && 0 != fclose(*file))
 	{
-		zbx_snprintf(log_str, sizeof(log_str), "cannot close export file %s': %s", name, zbx_strerror(errno));
+		zbx_snprintf(log_str + strlen(log_str), sizeof(log_str) - strlen(log_str),
+			"cannot close export file %s': %s", name, zbx_strerror(errno));
 		*file = NULL;
 	}
 
@@ -202,35 +211,26 @@ void	zbx_trends_export_write(const char *buf, size_t count)
 	file_write(buf, count, &trends_file, trends_file_name);
 }
 
+static void	zbx_flush(FILE *file, const char *file_name)
+{
+	if (0 != fflush(file))
+	zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file_name, zbx_strerror(errno));
+}
+
 void	zbx_problems_export_flush(void)
 {
-	if (NULL == problems_file)
-		return;
-	if (0 != fflush(problems_file))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot flush export file '%s': %s", problems_file_name,
-				zbx_strerror(errno));
-	}
+	if (NULL != problems_file)
+		zbx_flush(problems_file, problems_file_name);
 }
 
 void	zbx_history_export_flush(void)
 {
-	if (NULL == history_file)
-		return;
-	if (0 != fflush(history_file))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", history_file_name,
-				zbx_strerror(errno));
-	}
+	if (NULL != history_file)
+		zbx_flush(history_file, history_file_name);
 }
 
 void	zbx_trends_export_flush(void)
 {
-	if (NULL == trends_file)
-		return;
-	if (0 != fflush(trends_file))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", trends_file_name,
-				zbx_strerror(errno));
-	}
+	if (NULL != trends_file)
+		zbx_flush(trends_file, trends_file_name);
 }
