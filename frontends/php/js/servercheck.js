@@ -71,7 +71,7 @@ jQuery(function($) {
 		 * Start server status checks with 5 sec delay after page is loaded.
 		 */
 		init: function() {
-			return window.setTimeout(function () {
+			return window.setTimeout(function() {
 				// Looping function that check for server status every 10 seconds.
 				return window.setInterval(function() {
 					checker.call(true);
