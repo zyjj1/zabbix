@@ -181,8 +181,10 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 	return;
 error:
 	if (NULL != *file && 0 != fclose(*file))
+	{
 		zbx_snprintf(log_str + log_str_offset, sizeof(log_str) - log_str_offset,
-			"; cannot close export file %s': %s", name, zbx_strerror(errno));
+				"; cannot close export file %s': %s", name, zbx_strerror(errno));
+	}
 
 	*file = NULL;
 	now = time(NULL);
