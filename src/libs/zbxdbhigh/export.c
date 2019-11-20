@@ -115,18 +115,20 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 
 	static time_t	last_log_time = 0;
 	time_t		now;
-	char		log_str[MAX_STRING_LEN] = {0};
+	char		log_str[MAX_STRING_LEN];
 	long		file_offset;
+	size_t		log_str_offset = 0;
 
 	if (NULL == *file && (NULL == (*file = fopen(name, "a"))))
 	{
-		zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s", name, zbx_strerror(errno));
+		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+						name, zbx_strerror(errno));
 		goto error;
 	}
 
 	if (-1 == (file_offset = ftell(*file)))
 	{
-		zbx_snprintf(log_str, sizeof(log_str), "cannot get current file position indicator value for '%s': %s",
+		zbx_snprintf(log_str, sizeof(log_str), "cannot get current file position for '%s': %s",
 				name, zbx_strerror(errno));
 		goto error;
 	}
@@ -138,7 +140,7 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 		strscpy(filename_old, name);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 
-		if( 0 == access( filename_old, F_OK ) && 0 != remove(filename_old))
+		if(0 == access( filename_old, F_OK ) && 0 != remove(filename_old))
 		{
 			zbx_snprintf(log_str, sizeof(log_str), "cannot remove export file '%s': %s",
 					filename_old, zbx_strerror(errno));
@@ -180,8 +182,8 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 error:
 	if (NULL != *file && 0 != fclose(*file))
 	{
-		zbx_snprintf(log_str + strlen(log_str), sizeof(log_str) - strlen(log_str),
-			"cannot close export file %s': %s", name, zbx_strerror(errno));
+		zbx_snprintf(log_str + log_str_offset, sizeof(log_str) - log_str_offset,
+			"; cannot close export file %s': %s", name, zbx_strerror(errno));
 		*file = NULL;
 	}
 
@@ -214,7 +216,7 @@ void	zbx_trends_export_write(const char *buf, size_t count)
 static void	zbx_flush(FILE *file, const char *file_name)
 {
 	if (0 != fflush(file))
-	zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file_name, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file_name, zbx_strerror(errno));
 }
 
 void	zbx_problems_export_flush(void)
