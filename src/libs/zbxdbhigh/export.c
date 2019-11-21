@@ -122,14 +122,14 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 	if (NULL == *file && (NULL == (*file = fopen(name, "a"))))
 	{
 		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
-						name, zbx_strerror(errno));
+				name, zbx_strerror(errno));
 		goto error;
 	}
 
 	if (-1 == (file_offset = ftell(*file)))
 	{
 		log_str_offset = zbx_snprintf(log_str, sizeof(log_str),
-					"cannot get current file position for '%s': %s", name, zbx_strerror(errno));
+				"cannot get current position in export file '%s': %s", name, zbx_strerror(errno));
 		goto error;
 	}
 
@@ -142,15 +142,15 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 
 		if (0 == access(filename_old, F_OK) && 0 != remove(filename_old))
 		{
-			log_str_offset = zbx_snprintf(log_str, sizeof(log_str),
-					"cannot remove export file '%s': %s", filename_old, zbx_strerror(errno));
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot remove export file '%s': %s",
+					filename_old, zbx_strerror(errno));
 			goto error;
 		}
 
 		if (0 != fclose(*file))
 		{
 			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot close export file %s': %s",
-							name, zbx_strerror(errno));
+					name, zbx_strerror(errno));
 			*file = NULL;
 			goto error;
 		}
