@@ -1394,8 +1394,7 @@ retry:
 				*max_succeed = mapping_num;
 		}
 		// ZBX-16963: code removed as dead
-		/*
-		else if (1 < mapping_num)
+		/* else if (1 < mapping_num)
 		{
 			if (*min_fail > mapping_num)
 				*min_fail = mapping_num;
