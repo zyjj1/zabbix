@@ -687,8 +687,10 @@ SVGMapElement.prototype.updateImage = function() {
 			&& typeof this.options.actions !== 'undefined') {
 		var actions = JSON.parse(this.options.actions);
 
-		// 4 - SYSMAP_ELEMENT_TYPE_IMAGE. Don't draw context menu and hand cursor for image elements with no links.
-		if ((actions.data.elementtype == 4 && actions.data.urls.length > 0) || actions.data.elementtype != 4) {
+		if (actions.data.elementtype == 4 && !actions.data.urls.length) {
+			// 4 - SYSMAP_ELEMENT_TYPE_IMAGE. Don't draw context menu and hand cursor for image elements with no links.
+		}
+		else {
 			options['data-menu-popup'] = this.options.actions;
 			options['style'] = 'cursor: pointer';
 		}
