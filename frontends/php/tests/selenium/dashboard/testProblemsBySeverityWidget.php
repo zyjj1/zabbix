@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  * @backup widget
  * @backup profiles
  */
-
 class testProblemsBySeverityWidget extends CWebTest {
 
 	/*
