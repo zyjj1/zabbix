@@ -1393,12 +1393,14 @@ retry:
 			if (*max_succeed < mapping_num)
 				*max_succeed = mapping_num;
 		}
-		//ZBX-16963: code removed as dead
-		/*else if (1 < mapping_num)
+		// ZBX-16963: code removed as dead
+		/*
+		else if (1 < mapping_num)
 		{
 			if (*min_fail > mapping_num)
 				*min_fail = mapping_num;
-		}*/
+		}
+		*/
 	}
 	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex)
 	{
