@@ -356,7 +356,7 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, u
 
 		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
 		{
-			int disable_until;
+			int	disable_until;
 
 			if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
 					DCget_disable_until(item, host)))
@@ -367,7 +367,7 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, u
 			else
 			{
 				/* supported items and items that could not have been scheduled previously, but had */
-				/*  their update interval fixed, should be scheduled using their update intervals */
+				/* their update interval fixed, should be scheduled using their update intervals */
 				item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
 						custom_intervals, now);
 			}
@@ -9276,7 +9276,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  *             hostids_num    - [IN] the number of hostids                    *
  *             validator_func - [IN] an optional validator function           *
  *                                                                            *
- * Return value: The text value with expanded user macros. Uknown or invalid  *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *

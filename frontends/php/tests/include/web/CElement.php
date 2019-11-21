@@ -161,6 +161,9 @@ class CElement extends CBaseElement implements IWaitable {
 		if ($type !== null) {
 			$selector .= '::'.CXPathHelper::fromSelector($type, $locator);
 		}
+		else {
+			$selector .= '::*';
+		}
 
 		return $this->query($selector);
 	}
@@ -396,8 +399,10 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		foreach ($attributes as $key => $value) {
-			if (is_numeric($key) && $this->getAttribute($value) === null) {
-				return false;
+			if (is_numeric($key)) {
+				if ($this->getAttribute($value) === null) {
+					return false;
+				}
 			}
 			elseif ($this->getAttribute($key) !== $value) {
 				return false;
@@ -425,6 +430,34 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function isReady() {
 		return $this->isClickable();
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function isEnabled($enabled = true) {
+		$classes = explode(' ', parent::getAttribute('class'));
+
+		$is_enabled = parent::isEnabled()
+				&& (!array_intersect(['disabled', 'readonly'], $classes))
+				&& (parent::getAttribute('readonly') === null);
+
+		return $is_enabled === $enabled;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function click($force = false) {
+		try {
+			return parent::click();
+		} catch (Exception $exception) {
+			if (!$force) {
+				throw $exception;
+			}
+
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
 	}
 
 	/**
@@ -479,7 +512,7 @@ class CElement extends CBaseElement implements IWaitable {
 	public function detect($options = []) {
 
 		$tag = $this->getTagName();
-		if ($tag === 'textarea' ) {
+		if ($tag === 'textarea') {
 			return $this->asElement($options);
 		}
 
@@ -514,15 +547,19 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asCheckboxList($options);
 		}
 
-		if (in_array('range-control', $class)) {
-			return $this->asRangeControl($options);
+		if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
+			return $this->asCompositeInput($options);
+		}
+
+		if (in_array('input-color-picker', $class)) {
+			return $this->asColorPicker($options);
 		}
 
 		if (in_array('multilineinput-control', $class)) {
 			return $this->asMultiline($options);
 		}
 
-		self::addWarning('No specific element was detected');
+		CTest::addWarning('No specific element was detected');
 
 		return $this;
 	}
@@ -536,5 +573,41 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public static function onNotSupportedMethod($method) {
 		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
+	}
+
+	/**
+	 * Check element value.
+	 *
+	 * @param mixed $expected    expected value of the element
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		$value = $this->getValue();
+
+		if (is_array($value)) {
+			if (!is_array($expected)) {
+				$expected = [$expected];
+			}
+
+			foreach (['value', 'expected'] as $var) {
+				$values = [];
+				foreach ($$var as $item) {
+					$values[] = '"'.$item.'"';
+				}
+
+				sort($values);
+
+				$$var = implode(', ', $values);
+			}
+		}
+
+		if ($expected != $value && $raise_exception) {
+			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
+		}
+
+		return ($expected == $value);
 	}
 }

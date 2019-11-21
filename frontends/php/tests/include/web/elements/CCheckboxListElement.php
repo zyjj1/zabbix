@@ -26,13 +26,14 @@ require_once dirname(__FILE__).'/../CElement.php';
  * Checkbox list element.
  */
 class CCheckboxListElement extends CElement {
+
 	/**
 	 * Get collection of checkboxes.
 	 *
 	 * @return CElementCollection
 	 */
 	public function getCheckboxes() {
-		return $this->query('xpath://input[@type="checkbox"]')->asCheckbox()->all();
+		return $this->query('xpath:.//input[@type="checkbox"]')->asCheckbox()->all();
 	}
 
 	/**
@@ -134,5 +135,29 @@ class CCheckboxListElement extends CElement {
 		$this->set(array_diff($this->getLabels()->asText(), $labels), false);
 
 		return $this->set($labels, true);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		$xpath = 'xpath:.//input[@type="checkbox"][not(@disabled)]';
+
+		return (($this->getCheckboxes()->count() === $this->query($xpath)->count()) === $enabled);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		$value = [];
+
+		foreach ($this->getCheckboxes() as $checkbox) {
+			if ($checkbox->isChecked() && ($label = $checkbox->getLabel()) !== null) {
+				$value[] = $label->getText();
+			}
+		}
+
+		return $value;
 	}
 }

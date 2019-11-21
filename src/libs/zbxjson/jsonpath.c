@@ -462,7 +462,9 @@ static int	jsonpath_parse_path(const char *start, int *len)
 static int	jsonpath_parse_number(const char *start, int *len)
 {
 	const char	*ptr = start;
+	char		*end;
 	int		size;
+	double		tmp;
 
 	if ('-' == *ptr || '+' == *ptr)
 		ptr++;
@@ -486,7 +488,13 @@ static int	jsonpath_parse_number(const char *start, int *len)
 			ptr++;
 	}
 
-	*len = ptr - start;
+	errno = 0;
+	tmp = strtod(start, &end);
+
+	if (ptr != end || HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+		return FAIL;
+
+	*len = (int)(ptr - start);
 
 	return SUCCEED;
 }
@@ -915,6 +923,9 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 			case '\t':
 				break;
 			case ',':
+				if (NULL != start)
+					break;
+
 				if (0 == parsed_name)
 				{
 					ret = zbx_jsonpath_error(end);
@@ -2089,14 +2100,13 @@ static int	jsonpath_extract_numeric_value(const char *ptr, double *value)
 {
 	char	buffer[MAX_STRING_LEN];
 
-	if (('-' != *ptr && 0 == isdigit((unsigned char)*ptr)) ||
-		NULL == zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL))
+	if (NULL == zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL) ||
+		SUCCEED != is_double(buffer, value))
 	{
-		zbx_set_json_strerror("array value is not a number starting with: %s", ptr);
+		zbx_set_json_strerror("array value is not a number or out of range starting with: %s", ptr);
 		return FAIL;
 	}
 
-	*value = atof(buffer);
 	return SUCCEED;
 }
 
@@ -2207,6 +2217,11 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 		result /= objects->values_num;
 
 	*output = zbx_dsprintf(NULL, ZBX_FS_DBL, result);
+	if (SUCCEED != is_double(*output, NULL))
+	{
+		zbx_set_json_strerror("invalid function result: %s", *output);
+		goto out;
+	}
 	del_zeros(*output);
 	ret = SUCCEED;
 out:

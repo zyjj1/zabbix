@@ -70,17 +70,6 @@ class CMultilineElement extends CElement {
 	}
 
 	/**
-	 * Fill Multiline input element with data.
-	 *
-	 * @param $text    text to be written into the field
-	 *
-	 * @return $this
-	 */
-	public function fill($text) {
-		return $this->overwrite($text);
-	}
-
-	/**
 	 * Overwrite value in Multiline input.
 	 *
 	 * @param $text    text to be written into the field
@@ -121,6 +110,12 @@ class CMultilineElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return in_array('multilineinput-disabled', explode(' ', $this->getAttribute('class'))) !== $enabled;
+		$is_enabled = parent::isEnabled($enabled)
+				&& !array_intersect(
+					['multilineinput-disabled', 'multilineinput-readonly'],
+					explode(' ', $this->getAttribute('class'))
+				);
+
+		return $is_enabled === $enabled;
 	}
 }

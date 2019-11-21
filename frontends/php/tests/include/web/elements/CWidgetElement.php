@@ -54,7 +54,7 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget-content"]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
 	}
 
 	/**
@@ -82,7 +82,7 @@ class CWidgetElement extends CElement {
 	 * @return $this
 	 */
 	public function delete() {
-		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click();
+		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click()->waitUntilNotVisible();
 
 		return $this;
 	}

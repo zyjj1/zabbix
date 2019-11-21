@@ -127,6 +127,9 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+// MULTISELECT
+$multiselect-selected-bg-color: #222;
+
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
 	background-color: $ui-bg-selected-color !important;
@@ -245,6 +248,9 @@ $icon-widget-btn: (
 }
 .top-nav-profile {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important;
+}
+.top-nav-guest {
+	background: url(../img/icon-sprite.svg) no-repeat -241px -140px !important;
 }
 .top-nav-signout {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important;
@@ -585,15 +591,12 @@ ul.top-nav-icons {
 
 	.multiselect-list {
 
-		li {
+		li.selected {
 
-			&.selected {
-
-				.subfilter-enabled,
-				.subfilter-disable-btn {
-					background-color: $ui-hover-color;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
+			.subfilter-enabled,
+			.subfilter-disable-btn,
+			.subfilter-disable-btn:active {
+				@include box-shadow(0 0 0 1px rgba($blue, 1));
 			}
 		}
 	}
