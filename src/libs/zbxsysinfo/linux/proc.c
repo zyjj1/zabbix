@@ -276,7 +276,7 @@ int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx
 	{
 		if (NULL != guard)
 		{
-			if (0 == strncmp(buf, guard, guard_len))
+			if (0 == strncmp(buf, guard, guard_len) && 0 <= pos)
 			{
 				fseek(f, pos, SEEK_SET);
 				break;
