@@ -38,7 +38,7 @@ function ZBX_NotificationsAudio() {
 		this.audio.load();
 	}
 	catch(e) {
-		console.warn('Connot support notification audio for this device.');
+		console.warn('Cannot support notification audio for this device.');
 	}
 
 	this.wave = '';
@@ -48,7 +48,7 @@ function ZBX_NotificationsAudio() {
 	this.callback = null;
 
 	this.resetPromise();
-	this.audio && this.listen();
+	this.listen();
 }
 
 /**
@@ -58,6 +58,10 @@ function ZBX_NotificationsAudio() {
  */
 ZBX_NotificationsAudio.prototype.listen = function() {
 	var ms_step = 10;
+
+	if (!this.audio) {
+		return;
+	}
 
 	function resolveAudioState() {
 		if (this.play_once_on_ready) {
@@ -204,9 +208,10 @@ ZBX_NotificationsAudio.prototype.unmute = function() {
 /**
  * Tune player.
  *
- * @argument {array}   options
- * @argument {bool}    options[playOnce]        Player will not play in the loop if set to true.
- * @argument {number}  options[messageTimeout]  Message display timeout. Used to avoid playing when message box is gone.
+ * @argument {object} options
+ * @argument {bool}   options[playOnce]        Player will not play in the loop if set to true.
+ * @argument {number} options[messageTimeout]  Message display timeout. Used to avoid playing when message box is gone.
+ * @argument {mixed}  options[callback]
  *
  * @return {ZBX_NotificationsAudio}
  */
@@ -316,7 +321,7 @@ ZBX_NotificationsAudio.prototype.handleOnloadeddata = function() {
 		return;
 	}
 
-	promise.catch(function (error) {
+	promise.catch(function(error) {
 		if (error.name === 'NotAllowedError' && this.audio.paused) {
 			console.warn(error.message);
 			console.warn(
