@@ -500,9 +500,7 @@ class CTemplate extends CHostGeneral {
 
 			$templateCopy = $template;
 
-			$template['templates_link'] = (array_key_exists('templates', $template) && $template['templates'])
-				? $template['templates']
-				: null;
+			$template['templates_link'] = array_key_exists('templates', $template) ? $template['templates'] : null;
 
 			unset($template['templates'], $template['templateid'], $templateCopy['templates']);
 			$template['templates'] = [$templateCopy];
