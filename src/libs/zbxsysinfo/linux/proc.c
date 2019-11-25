@@ -269,20 +269,26 @@ int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx
 	if (NULL != guard)
 	{
 		guard_len = strlen(guard);
-		pos = ftell(f);
+		if (0 > (pos = ftell(f)))
+			return FAIL;
 	}
 
 	while (NULL != fgets(buf, (int)sizeof(buf), f))
 	{
 		if (NULL != guard)
 		{
-			if (0 == strncmp(buf, guard, guard_len) && 0 <= pos)
+			if (0 == strncmp(buf, guard, guard_len))
 			{
-				fseek(f, pos, SEEK_SET);
+				if ( 0 != fseek(f, pos, SEEK_SET))
+					ret = FAIL;
 				break;
 			}
 
-			pos = ftell(f);
+			if (0 > (pos = ftell(f)))
+			{
+				ret = FAIL;
+				break;
+			}
 		}
 
 		if (0 != strncmp(buf, label, label_len))
