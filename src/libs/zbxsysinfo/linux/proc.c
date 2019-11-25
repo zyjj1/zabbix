@@ -279,7 +279,7 @@ int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx
 		{
 			if (0 == strncmp(buf, guard, guard_len))
 			{
-				if ( 0 != fseek(f, pos, SEEK_SET))
+				if (0 != fseek(f, pos, SEEK_SET))
 					ret = FAIL;
 				break;
 			}
