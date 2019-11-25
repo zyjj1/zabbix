@@ -2355,7 +2355,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				item_hk_local.key = item->key;
 				item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-				if (NULL != item_hk && item == item_hk->item_ptr)
+				if (item == item_hk->item_ptr)
 				{
 					zbx_strpool_release(item_hk->key);
 					zbx_hashset_remove_direct(&config->items_hk, item_hk);
@@ -2860,37 +2860,34 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			if (NULL != (numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid)))
-			{
+			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid);
 
-				zbx_strpool_release(numitem->units);
+			zbx_strpool_release(numitem->units);
 
-				zbx_hashset_remove_direct(&config->numitems, numitem);
-			}
+			zbx_hashset_remove_direct(&config->numitems, numitem);
 		}
 
 		/* SNMP items */
 
 		if (SUCCEED == is_snmp_type(item->type))
 		{
-			if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
-			{
-				zbx_strpool_release(snmpitem->snmp_community);
-				zbx_strpool_release(snmpitem->snmp_oid);
-				zbx_strpool_release(snmpitem->snmpv3_securityname);
-				zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
-				zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
-				zbx_strpool_release(snmpitem->snmpv3_contextname);
+			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid);
 
-				zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
-			}
+			zbx_strpool_release(snmpitem->snmp_community);
+			zbx_strpool_release(snmpitem->snmp_oid);
+			zbx_strpool_release(snmpitem->snmpv3_securityname);
+			zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
+			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
+			zbx_strpool_release(snmpitem->snmpv3_contextname);
+
+			zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
 		}
 
 		/* IPMI items */
 
-		if (ITEM_TYPE_IPMI == item->type &&
-				NULL != (ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&config->ipmiitems, &itemid)))
+		if (ITEM_TYPE_IPMI == item->type)
 		{
+			ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&config->ipmiitems, &itemid);
 			zbx_strpool_release(ipmiitem->ipmi_sensor);
 			zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
 		}
@@ -2935,9 +2932,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* SSH items */
 
-		if (ITEM_TYPE_SSH == item->type &&
-				NULL != (sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &itemid)))
+		if (ITEM_TYPE_SSH == item->type)
 		{
+			sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &itemid);
+
 			zbx_strpool_release(sshitem->username);
 			zbx_strpool_release(sshitem->password);
 			zbx_strpool_release(sshitem->publickey);
@@ -2949,10 +2947,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* TELNET items */
 
-		if (ITEM_TYPE_TELNET == item->type &&
-				NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems,
-						&itemid)))
+		if (ITEM_TYPE_TELNET == item->type)
 		{
+			telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &itemid);
+
 			zbx_strpool_release(telnetitem->username);
 			zbx_strpool_release(telnetitem->password);
 			zbx_strpool_release(telnetitem->params);
@@ -2962,10 +2960,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* simple items */
 
-		if (ITEM_TYPE_SIMPLE == item->type &&
-				NULL != (simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems,
-						&itemid)))
+		if (ITEM_TYPE_SIMPLE == item->type)
 		{
+			simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems, &itemid);
+
 			zbx_strpool_release(simpleitem->username);
 			zbx_strpool_release(simpleitem->password);
 
@@ -2974,9 +2972,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* JMX items */
 
-		if (ITEM_TYPE_JMX == item->type &&
-				NULL != (jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &itemid)))
+		if (ITEM_TYPE_JMX == item->type)
 		{
+			jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &itemid);
+
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
 			zbx_strpool_release(jmxitem->jmx_endpoint);
@@ -2986,18 +2985,19 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* calculated items */
 
-		if (ITEM_TYPE_CALCULATED == item->type &&
-				NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid)))
+		if (ITEM_TYPE_CALCULATED == item->type)
 		{
+			calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid);
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
 		/* HTTP agent items */
 
-		if (ITEM_TYPE_HTTPAGENT == item->type &&
-				NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
+		if (ITEM_TYPE_HTTPAGENT == item->type)
 		{
+			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
+
 			zbx_strpool_release(httpitem->timeout);
 			zbx_strpool_release(httpitem->url);
 			zbx_strpool_release(httpitem->query_fields);
@@ -3021,7 +3021,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item_hk_local.key = item->key;
 		item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (NULL != item_hk && item == item_hk->item_ptr)
+		if (item == item_hk->item_ptr)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove_direct(&config->items_hk, item_hk);
@@ -5463,18 +5463,15 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	s1 = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &i1->itemid);
 	s2 = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &i2->itemid);
 
-	if (NULL != s1 && NULL != s2)
-	{
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_community, s2->snmp_community);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_securityname, s2->snmpv3_securityname);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_authpassphrase, s2->snmpv3_authpassphrase);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_privpassphrase, s2->snmpv3_privpassphrase);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_contextname, s2->snmpv3_contextname);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_securitylevel, s2->snmpv3_securitylevel);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_authprotocol, s2->snmpv3_authprotocol);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_privprotocol, s2->snmpv3_privprotocol);
-		ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_oid_type, s2->snmp_oid_type);
-	}
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_community, s2->snmp_community);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_securityname, s2->snmpv3_securityname);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_authpassphrase, s2->snmpv3_authpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_privpassphrase, s2->snmpv3_privpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_contextname, s2->snmpv3_contextname);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_securitylevel, s2->snmpv3_securitylevel);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_authprotocol, s2->snmpv3_authprotocol);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_privprotocol, s2->snmpv3_privprotocol);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_oid_type, s2->snmp_oid_type);
 
 	return 0;
 }
@@ -5531,12 +5528,9 @@ static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	j1 = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &i1->itemid);
 	j2 = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &i2->itemid);
 
-	if (NULL != j1 && NULL != j2)
-	{
-		ZBX_RETURN_IF_NOT_EQUAL(j1->username, j2->username);
-		ZBX_RETURN_IF_NOT_EQUAL(j1->password, j2->password);
-		ZBX_RETURN_IF_NOT_EQUAL(j1->jmx_endpoint, j2->jmx_endpoint);
-	}
+	ZBX_RETURN_IF_NOT_EQUAL(j1->username, j2->username);
+	ZBX_RETURN_IF_NOT_EQUAL(j1->password, j2->password);
+	ZBX_RETURN_IF_NOT_EQUAL(j1->jmx_endpoint, j2->jmx_endpoint);
 
 	return 0;
 }
@@ -6220,11 +6214,9 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
 			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
-			if (NULL != numitem)
-			{
-				dst_item->trends = numitem->trends;
-				dst_item->units = zbx_strdup(NULL, numitem->units);
-			}
+
+			dst_item->trends = numitem->trends;
+			dst_item->units = zbx_strdup(NULL, numitem->units);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &src_item->itemid)))
@@ -6241,25 +6233,22 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		case ITEM_TYPE_SNMPv3:
 			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &src_item->itemid);
 
-			if (NULL != snmpitem)
-			{
-				strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
-				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-				strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
-				dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-				strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
-				strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
-				dst_item->snmpv3_authprotocol = snmpitem->snmpv3_authprotocol;
-				dst_item->snmpv3_privprotocol = snmpitem->snmpv3_privprotocol;
-				strscpy(dst_item->snmpv3_contextname_orig, snmpitem->snmpv3_contextname);
+			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
+			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
+			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
+			strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
+			strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
+			dst_item->snmpv3_authprotocol = snmpitem->snmpv3_authprotocol;
+			dst_item->snmpv3_privprotocol = snmpitem->snmpv3_privprotocol;
+			strscpy(dst_item->snmpv3_contextname_orig, snmpitem->snmpv3_contextname);
 
-				dst_item->snmp_community = NULL;
-				dst_item->snmp_oid = NULL;
-				dst_item->snmpv3_securityname = NULL;
-				dst_item->snmpv3_authpassphrase = NULL;
-				dst_item->snmpv3_privpassphrase = NULL;
-				dst_item->snmpv3_contextname = NULL;
-			}
+			dst_item->snmp_community = NULL;
+			dst_item->snmp_oid = NULL;
+			dst_item->snmpv3_securityname = NULL;
+			dst_item->snmpv3_authpassphrase = NULL;
+			dst_item->snmpv3_privpassphrase = NULL;
+			dst_item->snmpv3_contextname = NULL;
 			break;
 		case ITEM_TYPE_TRAPPER:
 			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems, &src_item->itemid)))
@@ -7769,9 +7758,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
 
-			if (NULL != snmpitem &&
-					(ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
-							ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type))
+			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
+					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
 			{
 				max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
 			}
