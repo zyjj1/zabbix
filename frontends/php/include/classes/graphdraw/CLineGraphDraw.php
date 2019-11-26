@@ -24,7 +24,6 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
 	const MAX_SIDE_OFFSET = 130;
-
 	const GRAPH_BORDER_OFFSET = 10;
 
 	protected  $side_labels = [];
@@ -2527,6 +2526,9 @@ class CLineGraphDraw extends CGraphDraw {
 		imageOut($this->im);
 	}
 
+	/**
+	 * Draw side lables.
+	 */
 	public function drawSidesLegend() {
 		foreach ($this->side_labels as $side => $side_values) {
 			foreach ($side_values as $value) {
@@ -2547,6 +2549,9 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
+	/**
+	 * Calculating proper side label width.
+	 */
 	protected function calcSidesLegend() {
 		foreach ($this->side_labels as $side => $side_values) {
 			$max_str = '';
