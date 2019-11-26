@@ -4060,6 +4060,8 @@ svg {
   overflow: hidden;
   height: 100%;
   display: flex; }
+  .sysmap-widget-container svg {
+    flex-grow: 1; }
 
 @supports (-ms-ime-align: auto) {
   .navtree .problems {
