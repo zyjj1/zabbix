@@ -532,11 +532,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		}
 		while (NULL != fgets(str, str_sz, f));
 
-		zbx_free(str);
-
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);
 	}
+
+	zbx_free(str);
 	pclose(f);
 
 	unlink(filename);
