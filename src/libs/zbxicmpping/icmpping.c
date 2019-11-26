@@ -193,19 +193,18 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		char *error, int max_error_len)
 {
 	const char	*__function_name = "process_ping";
-	const int	ZBX_FPING_RESPONSE_TIME_ADD_CHARS = 5;
-	const int	ZBX_FPING_RESPONSE_TIME_CHARS_MAX = 15;
+	const int	fping_response_time_add_chars = 5;
+	const int	fping_response_time_chars_max = 15;
 
 	FILE		*f;
 	char		*c, params[70];
-	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buff[MAX_STRING_LEN];
 	size_t		offset;
 	ZBX_FPING_HOST	*host;
 	double		sec;
 	int 		i, ret = NOTSUPPORTED, index;
 	char		*str = NULL;
-	int		str_sz;
-	int		tmo_str_sz;
+	int		str_sz, timeout_str_sz, new_line_trimmed;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -419,9 +418,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		return ret;
 	}
 
-	tmo_str_sz = (0 != timeout ? zbx_snprintf(tmp, sizeof(tmp), "%d", timeout) + ZBX_FPING_RESPONSE_TIME_ADD_CHARS
-					: ZBX_FPING_RESPONSE_TIME_CHARS_MAX);
-	str_sz = count * tmo_str_sz + MAX_STRING_LEN;
+	timeout_str_sz = (0 != timeout ? zbx_snprintf(buff, sizeof(buff), "%d", timeout) +
+			fping_response_time_add_chars : fping_response_time_chars_max);
+	str_sz = count * timeout_str_sz + MAX_STRING_LEN;
 	str = zbx_malloc(str, (size_t)str_sz);
 
 	if (NULL == fgets(str, str_sz, f))
@@ -438,13 +437,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		do
 		{
-			if (NULL == strchr(str, '\n'))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", str);
-				zabbix_log(LOG_LEVEL_ERR, "cannot read whole fping response line at once");
-				continue;
-			}
-			zbx_rtrim(str, "\n");
+			new_line_trimmed = zbx_rtrim(str, "\n");
 			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", str);
 
 			host = NULL;
@@ -466,6 +459,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 			if (NULL == (c = strstr(str, " : ")))
 				continue;
+
+			if (0 == new_line_trimmed)
+			{
+				zbx_snprintf(error, max_error_len, "cannot read whole fping response line at once");
+				ret = NOTSUPPORTED;
+				break;
+			}
 
 			/* when NIC bonding is used, there are also lines like */
 			/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
@@ -541,7 +541,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	unlink(filename);
 
-	if (NOTSUPPORTED == ret)
+	if (NOTSUPPORTED == ret && '\0' == error[0])
 		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
