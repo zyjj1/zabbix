@@ -144,6 +144,14 @@ class CDashboardWidgetMap extends CDiv {
 						'trigger_name: "after_map_widget_config_update_'.$this->uniqueid.'"'.
 					'}'.
 				');';
+
+			$script_run .=
+				'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["onEditStart"],'.
+						'grid: {widget: 1},'.
+					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
+				'});';
 		}
 
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
@@ -164,14 +172,7 @@ class CDashboardWidgetMap extends CDiv {
 					'}'.
 				'});'.
 
-				'jQuery(".dashbrd-grid-container").dashboardGrid("callWidgetDataShare");'.
-
-				'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart", '.
-					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: ["onEditStart"],'.
-						'grid: {widget: 1},'.
-					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
-				'});';
+				'jQuery(".dashbrd-grid-container").dashboardGrid("callWidgetDataShare");';
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
