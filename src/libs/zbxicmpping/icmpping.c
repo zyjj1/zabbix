@@ -197,14 +197,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	const int	fping_response_time_chars_max = 15;
 
 	FILE		*f;
-	char		*c, params[70];
+	char		params[70];
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buff[MAX_STRING_LEN];
 	size_t		offset;
 	ZBX_FPING_HOST	*host;
-	double		sec;
 	int 		i, ret = NOTSUPPORTED, index;
 	char		*str = NULL;
-	int		str_sz, timeout_str_sz, new_line_trimmed;
+	int		str_sz, timeout_str_sz;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -425,7 +424,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (NULL == fgets(str, str_sz, f))
 	{
-		strscpy(str, "no output");
+		strscpy(tmp, "no output");
 	}
 	else
 	{
@@ -437,6 +436,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		do
 		{
+			int	new_line_trimmed;
+			char	*c;
+
 			new_line_trimmed = zbx_rtrim(str, "\n");
 			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", str);
 
@@ -507,6 +509,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				if (1 == host->status[index])
 				{
+					double sec;
+
 					sec = atof(c) / 1000; /* convert ms to seconds */
 
 					if (0 == host->rcv || host->min > sec)
