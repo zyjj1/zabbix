@@ -40,8 +40,12 @@ class CHostImporter extends CImporter {
 		$tmpls_to_clear = [];
 
 		foreach ($hosts as $host) {
-			// preserve host related templates to massAdd them later
-			if ($this->options['templateLinkage']['createMissing'] && !empty($host['templates'])) {
+			/*
+			 * Save linked templates for 2 purposes:
+			 *  - save linkages to add in case if 'create new' linkages is checked;
+			 *  - calculate missing linkages in case if 'delete missing' is checked.
+			 */
+			if (!empty($host['templates'])) {
 				foreach ($host['templates'] as $template) {
 					$templateId = $this->referencer->resolveTemplate($template['name']);
 					if (!$templateId) {
@@ -103,7 +107,7 @@ class CHostImporter extends CImporter {
 
 				$this->referencer->addHostRef($hostHost, $hostId);
 
-				if (!empty($templateLinkage[$hostHost])) {
+				if ($this->options['templateLinkage']['createMissing'] && !empty($templateLinkage[$hostHost])) {
 					API::Template()->massAdd([
 						'hosts' => ['hostid' => $hostId],
 						'templates' => $templateLinkage[$hostHost]
@@ -131,7 +135,7 @@ class CHostImporter extends CImporter {
 				}
 
 				// Make new template linkages.
-				if (!empty($templateLinkage[$host['host']])) {
+				if ($this->options['templateLinkage']['createMissing'] && !empty($templateLinkage[$host['host']])) {
 					API::Template()->massAdd([
 						'hosts' => $host,
 						'templates' => $templateLinkage[$host['host']]
