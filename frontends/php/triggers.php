@@ -223,7 +223,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$tags = getRequest('tags', []);
+	$tags = array_values(getRequest('tags', []));
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 
 	// Remove empty new tag lines.
@@ -414,7 +414,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 		]);
 
 		if ($triggers) {
-			$tags = getRequest('tags', []);
+			$tags = array_values(getRequest('tags', []));
 
 			// Remove empty new tag lines.
 			foreach ($tags as $key => $tag) {
@@ -588,7 +588,7 @@ elseif (isset($_REQUEST['form'])) {
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => getRequest('tags', []),
+		'tags' => array_values(getRequest('tags', [])),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
