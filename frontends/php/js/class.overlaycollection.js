@@ -105,7 +105,7 @@ OverlayCollection.prototype._fetchIndex = function(id) {
 		}
 	}
 
-	throw new Error('Fetching unexistent overlay: ' + id);
+	throw new Error('Fetching nonexistent overlay: ' + id);
 };
 
 /**

@@ -1265,8 +1265,6 @@
 	 * @param {object} $obj
 	 * @param {object} data
 	 * @param {object} widget
-	 *
-	 * @return {jqXHR}
 	 */
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
