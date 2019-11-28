@@ -64,7 +64,7 @@ if (hasRequest('valuemapid')) {
 if (hasRequest('add') || hasRequest('update')) {
 	$valuemap = [
 		'name' => getRequest('name'),
-		'mappings' => getRequest('mappings')
+		'mappings' => array_values(getRequest('mappings'))
 	];
 
 	if (hasRequest('update')) {
@@ -133,7 +133,7 @@ if (hasRequest('form')) {
 	}
 	else {
 		$data['name'] = getRequest('name', '');
-		$data['mappings'] = getRequest('mappings', []);
+		$data['mappings'] = array_values(getRequest('mappings', []));
 	}
 
 	if ($data['valuemapid'] != 0) {
