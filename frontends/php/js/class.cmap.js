@@ -17,23 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-var ZABBIX = ZABBIX || {};
-
-ZABBIX.namespace = function(namespace) {
-	var parts = namespace.split('.'),
-		parent = this,
-		i;
-
-	for (i = 0; i < parts.length; i++) {
-		if (typeof parent[parts[i]] === 'undefined') {
-			parent[parts[i]] = {};
-		}
-
-		parent = parent[parts[i]];
-	}
-
-	return parent;
-};
 
 ZABBIX.namespace('classes.Observer');
 
@@ -1523,9 +1506,6 @@ ZABBIX.apps.map = (function($) {
 
 						$('#link-connect-to').show();
 						this.form.show();
-
-						// resize multiselect
-						$('.multiselect').multiSelect('resize');
 					}
 
 					// only one shape is selected
@@ -2349,7 +2329,10 @@ ZABBIX.apps.map = (function($) {
 					this.data.inherited_label = null;
 				}
 
-				if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
+				if (this.data.label_type == CMap.LABEL_TYPE_LABEL) {
+					this.data.inherited_label = this.data.label;
+				}
+				else if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
 					if (this.data.elementtype != Selement.TYPE_IMAGE) {
 						this.data.inherited_label = this.data.elements[0].elementName;
 					}

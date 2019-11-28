@@ -2475,8 +2475,12 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	X509			*cert;
 #endif
 
-	if ((NULL == issuer || '\0' != *issuer) && (NULL == subject || '\0' != *subject))
+	if ((NULL == issuer || '\0' == *issuer) && (NULL == subject || '\0' == *subject))
 		return SUCCEED;
+
+	tls_issuer[0] = '\0';
+	tls_subject[0] = '\0';
+
 #if defined(HAVE_POLARSSL)
 	if (NULL == (cert = ssl_get_peer_cert(tls_ctx->ctx)))
 	{
@@ -2722,11 +2726,14 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGHUP and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2917,11 +2924,14 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGHUP and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -3206,11 +3216,14 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGHUP and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */

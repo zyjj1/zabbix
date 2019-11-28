@@ -187,10 +187,27 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 				if (0 != (s.protocol & ZBX_TCP_COMPRESS))
 					proxy->auto_compress = 1;
 
-				ret = zbx_send_proxy_data_response(proxy, &s, NULL);
+				if (!ZBX_IS_RUNNING())
+				{
+					int	flags = ZBX_TCP_PROTOCOL;
 
-				if (SUCCEED == ret)
-					*data = zbx_strdup(*data, s.buffer);
+					if (0 != (s.protocol & ZBX_TCP_COMPRESS))
+						flags |= ZBX_TCP_COMPRESS;
+
+					zbx_send_response_ext(&s, FAIL, "Zabbix server shutdown in progress", NULL,
+							flags, CONFIG_TIMEOUT);
+
+					zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from passive proxy at"
+							" \"%s\": Zabbix server shutdown in progress", s.peer);
+					ret = FAIL;
+				}
+				else
+				{
+					ret = zbx_send_proxy_data_response(proxy, &s, NULL);
+
+					if (SUCCEED == ret)
+						*data = zbx_strdup(*data, s.buffer);
+				}
 			}
 		}
 
@@ -296,13 +313,13 @@ static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **er
 	size_t	info_alloc = 0;
 
 	/* response tag will be set only in the case of errors */
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_RESPONSE, response, sizeof(response)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_RESPONSE, response, sizeof(response), NULL))
 		return SUCCEED;
 
 	if (0 != strcmp(response, ZBX_PROTO_VALUE_FAILED))
 		return SUCCEED;
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
 	{
 		zbx_free(*error);
 		*error = info;
@@ -677,7 +694,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	{
 		char	value[MAX_STRING_LEN];
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value)))
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
 			*more = atoi(value);
 	}
 out:
@@ -939,7 +956,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -980,5 +997,10 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 }

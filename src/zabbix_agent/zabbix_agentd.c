@@ -53,6 +53,7 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS		= NULL;
+char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
 char	*CONFIG_USER			= NULL;
@@ -235,6 +236,7 @@ static char	shortopts[] =
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
+static int		*threads_flags;
 
 unsigned char	program_type = ZBX_PROGRAM_TYPE_AGENTD;
 
@@ -280,7 +282,7 @@ void	zbx_co_uninitialize();
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
-void	zbx_free_service_resources(void);
+void	zbx_free_service_resources(int ret);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
@@ -416,7 +418,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 
 	for (i = 0; NULL != longopts[i].name; i++)
 	{
-		ch = longopts[i].val;
+		ch = (char)longopts[i].val;
 
 		if ('h' == ch || 'V' == ch)
 			continue;
@@ -742,7 +744,7 @@ fail:
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
-	char	*active_hosts = NULL;
+	static char	*active_hosts;
 
 	struct cfg_line	cfg[] =
 	{
@@ -813,6 +815,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"PerfCounterEn",		&CONFIG_PERF_COUNTERS_EN,		TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
 #endif
 		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -845,6 +849,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 #ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
+	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
 #endif
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
@@ -884,6 +889,7 @@ static void	zbx_free_config(void)
 #endif
 #ifdef _WINDOWS
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
+	zbx_strarr_free(CONFIG_PERF_COUNTERS_EN);
 #endif
 }
 
@@ -969,6 +975,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -976,6 +983,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -984,6 +992,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
+			zbx_free_service_resources(FAIL);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -992,6 +1001,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1000,10 +1010,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize performance counter collector: %s", error);
 		zbx_free(error);
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 
-	load_perf_counters(CONFIG_PERF_COUNTERS);
+	load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #endif
 	zbx_free_config();
 
@@ -1020,10 +1031,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
 				" parameter or the number of active servers in ServerActive configuration parameter.");
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 #endif
 	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 
@@ -1102,7 +1115,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	/* all exiting child processes should be caught by signal handlers */
 	THIS_SHOULD_NEVER_HAPPEN;
 #endif
-	zbx_on_exit();
+	zbx_on_exit(SUCCEED);
 
 	return SUCCEED;
 }
@@ -1114,12 +1127,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_service_resources(void)
+void	zbx_free_service_resources(int ret)
 {
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
+		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
 		zbx_free(threads);
+		zbx_free(threads_flags);
 	}
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
@@ -1140,11 +1154,11 @@ void	zbx_free_service_resources(void)
 	zabbix_close_log();
 }
 
-void	zbx_on_exit(void)
+void	zbx_on_exit(int ret)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
-	zbx_free_service_resources();
+	zbx_free_service_resources(ret);
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	zbx_tls_free();
@@ -1247,7 +1261,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 
-			load_perf_counters(CONFIG_PERF_COUNTERS);
+			load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #else
 			zbx_set_common_signal_handlers();
 #endif

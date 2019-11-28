@@ -240,7 +240,7 @@ $itemFormList->addRow(
 					->setAttribute('placeholder', _('name'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 1000))
+				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
@@ -671,19 +671,30 @@ $itemFormList->addRow(_('Custom intervals'),
 	'row_flex_intervals'
 );
 
-$keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history']))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAriaRequired();
 $itemFormList->addRow((new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
-	$keepHistory
+	(new CDiv([
+		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
+			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
+			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->setModern(true),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('history', $data['history']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	]))->addClass('wrap-multiple-controls')
 );
 
-$keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends']))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAriaRequired();
-$itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(), $keepTrend,
+$itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(),
+	(new CDiv([
+		(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
+			->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
+			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->setModern(true),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('trends', $data['trends']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	]))->addClass('wrap-multiple-controls'),
 	'row_trends'
 );
 

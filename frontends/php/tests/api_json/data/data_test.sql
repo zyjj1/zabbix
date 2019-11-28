@@ -30,10 +30,10 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15085,40067,40066,'vfs.fs.size[{#FSNAME},free]');
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
 INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
-INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (2,40066,'API discovery application');
-INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,2,'API discovery application');
+INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
+INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (900,375,900,'API discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
-INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);
+INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (900,900,40067);
 
 -- valuemap
 INSERT INTO valuemaps (valuemapid,name) VALUES (99,'API value map for update');
@@ -42,10 +42,10 @@ INSERT INTO valuemaps (valuemapid,name) VALUES (101,'API value map delete');
 INSERT INTO valuemaps (valuemapid,name) VALUES (102,'API value map delete2');
 INSERT INTO valuemaps (valuemapid,name) VALUES (103,'API value map delete3');
 INSERT INTO valuemaps (valuemapid,name) VALUES (104,'API value map delete4');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (904,100,'One','Online');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (905,100,'Two','Offline');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (906,102,'Three','Other');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (907,103,'Four','Unknown');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9004,100,'One','Online');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9005,100,'Two','Offline');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9006,102,'Three','Other');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9007,103,'Four','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
@@ -763,3 +763,56 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30004,'{99003}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99003, 40074, 30004, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
+
+-- testHistory
+INSERT INTO hstgrp (groupid, name) VALUES (1004, 'history.get/hosts');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (120005, 'history.get.host.1', 'history.get.host.1', 1, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1017, 120005, 1004);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (1010, 120005, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133758, 120005, 'item1', 2, 'item1', 3, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_uint (itemid, clock, value, ns) VALUES
+(133758, 1549350893, 1, 885479055),
+(133758, 1549350907, 2, 762947342),
+(133758, 1549350908, 3, 727124125),
+(133758, 1549350909, 4, 710589839),
+(133758, 1549350910, 5, 369715624),
+(133758, 1549350910, 5, 738923458),
+(133758, 1549350917, 5, 257150200),
+(133758, 1549350917, 5, 762668985),
+(133758, 1549350918, 5, 394517718),
+(133758, 1549350922, 6, 347073267),
+(133758, 1549350923, 7, 882834269),
+(133758, 1549350926, 8, 410826674),
+(133758, 1549350927, 9, 938887279),
+(133758, 1549350944, 0, 730916425);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133759, 120005, 'item2', 2, 'item2', 0, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history (itemid, clock, value, ns) VALUES
+(133759, 1549350947, 0.0000, 441606890),
+(133759, 1549350948, 0.0000, 544936503),
+(133759, 1549350950, 0.0000, 866715049),
+(133759, 1549350953, 1.0000, 154942891),
+(133759, 1549350955, 1.0000, 719111385),
+(133759, 1549350957, 1.0000, 594538048),
+(133759, 1549350958, 1.5000, 594538048),
+(133759, 1549350959, 1.0001, 594538048),
+(133759, 1549350960, 1.5000, 594538048),
+(133759, 1549350961, -1.0000, 594538048),
+(133759, 1549350962, -1.5000, 594538048);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133760, 120005, 'item3', 2, 'item3', 1, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_str (itemid, clock, value, ns) VALUES
+(133760, 1549350960, '1', 754460948),
+(133760, 1549350962, '1', 919404393),
+(133760, 1549350965, '1', 512878374);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133761, 120005, 'item4', 2, 'item4', 2, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_log (itemid, clock, timestamp, source, severity, value, logeventid, ns) VALUES
+(133761, 1549350969, 0, '', 0, '1', 0, 506909535),
+(133761, 1549350973, 0, '', 0, '2', 0, 336068358),
+(133761, 1549350976, 0, '', 0, '3', 0, 2798098),
+(133761, 1549350987, 0, '', 0, '4', 0, 755363307),
+(133761, 1549350992, 0, '', 0, '5', 0, 242736233);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133762, 120005, 'item5', 2, 'item5', 4, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_text (itemid, clock, value, ns) VALUES
+(133762, 1549350998, '1', 450920469),
+(133762, 1549350999, '2', 882825407),
+(133762, 1549351001, '3', 242835912);

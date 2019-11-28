@@ -127,15 +127,7 @@ class CLegacyWebTest extends CWebTest {
 		}
 
 		foreach ($strings as $string) {
-			$quote = '"';
-			if (strpos($string, $quote) !== false) {
-				$quote = '\'';
-				if (strpos($string, $quote) !== false) {
-					$this->fail('Cannot assert message detail text containig both single and double quotes.');
-				}
-			}
-
-			$this->zbxTestAssertElementPresentXpath('//div[@class="msg-details"]//li[contains(text(), '.$quote.$string.$quote.')]');
+			$this->zbxTestAssertElementPresentXpath('//div[@class="msg-details"]//li[contains(text(), '.CXPathHelper::escapeQuotes($string).')]');
 		}
 	}
 
@@ -252,8 +244,8 @@ class CLegacyWebTest extends CWebTest {
 		$xpath = 'xpath://div[contains(@class, "multiselect") and @id="'.$id.'"]/input';
 		$this->query($xpath)->one()->overwrite($string);
 		$this->zbxTestClickXpathWait(
-			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
-			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
+			"//div[@class='multiselect-available' and @data-opener='$id']/ul[@class='multiselect-suggest']".
+			"/li[@data-id='$string']"
 		);
 
 		$this->zbxTestMultiselectAssertSelected($id, $string.' (new)');

@@ -315,7 +315,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 	int				ret = FAIL;
 	intptr_t			h;	/* file HANDLE */
 	BY_HANDLE_FILE_INFORMATION	hfi;
-	FILE_ID_INFO			fid;
+	ZBX_FILE_ID_INFO		fid;
 
 	if (-1 == (h = _get_osfhandle(f)))
 	{
@@ -345,7 +345,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 	{
 		if (NULL != zbx_GetFileInformationByHandleEx)
 		{
-			if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, FileIdInfo, &fid, sizeof(fid)))
+			if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, zbx_FileIdInfo, &fid, sizeof(fid)))
 			{
 				*dev = fid.VolumeSerialNumber;
 				*ino_lo = fid.FileId.LowPart;
@@ -1903,9 +1903,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */
@@ -1989,9 +1997,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */

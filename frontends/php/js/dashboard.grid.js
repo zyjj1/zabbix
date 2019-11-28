@@ -996,15 +996,6 @@
 				doWidgetResize($obj, $(event.target), data);
 			},
 			resize: function(event, ui) {
-				// Hack for Safari to manually accept parent container height in pixels on widget resize.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
-				}
-
 				var $div = $(event.target);
 
 				if (ui.position.left < 0) {
@@ -1036,15 +1027,6 @@
 				// Hide resize handles for situation when mouse button was released outside dashboard container area.
 				if (widget['div'].has(event.toElement).length == 0) {
 					widget['div'].find('.ui-resizable-handle').hide();
-				}
-
-				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
 				}
 
 				// Invoke onResizeEnd on every affected widget.
@@ -1192,12 +1174,15 @@
 
 		startPreloader(widget);
 
+		$('#dashbrd-save').prop('disabled', true);
+
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: ajax_data,
-			dataType: 'json',
-			success: function(resp) {
+			dataType: 'json'
+		})
+			.then(function(resp) {
 				stopPreloader(widget);
 				var $content_header = $('h4', widget['content_header']),
 					debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
@@ -1241,7 +1226,14 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
+				$('#dashbrd-save').prop('disabled', false);
 
+			}, function() {
+				// TODO: gentle message about failed update of widget content
+				widget['update_attempts'] = 0;
+				startWidgetRefreshTimer($obj, data, widget, 3);
+			})
+			.then(function() {
 				var callOnDashboardReadyTrigger = false;
 				if (!widget['ready']) {
 					widget['ready'] = true; // leave it before registerDataExchangeCommit.
@@ -1256,13 +1248,7 @@
 				if (callOnDashboardReadyTrigger) {
 					doAction('onDashboardReady', $obj, data, null);
 				}
-			},
-			error: function() {
-				// TODO: gentle message about failed update of widget content
-				widget['update_attempts'] = 0;
-				startWidgetRefreshTimer($obj, data, widget, 3);
-			}
-		});
+			});
 
 		widget['initial_load'] = false;
 	}
@@ -1328,6 +1314,10 @@
 			}
 			else {
 				pos = findEmptyPosition($obj, data, type);
+				if (!pos) {
+					showMessageExhausted(data);
+					return;
+				}
 			}
 
 			$placeholder = $('<div>').css({
@@ -1424,19 +1414,24 @@
 	}
 
 	function findEmptyPosition($obj, data, type) {
-		var pos = {
-			'x': 0,
-			'y': 0,
-			'width': data['widget_defaults'][type]['size']['width'],
-			'height': data['widget_defaults'][type]['size']['height']
-		}
+		var pos_type = (typeof type === 'undefined') ? Object.keys(data.widget_defaults)[0] : type,
+			pos = {
+				'x': 0,
+				'y': 0,
+				'width': data.widget_defaults[pos_type].size.width,
+				'height': data.widget_defaults[pos_type].size.height
+			};
 
 		// Go y by row and try to position widget in each space.
-		var	max_col = data['options']['max-columns'] - pos['width'],
+		var	max_col = data.options['max-columns'] - pos.width,
+			max_row = data.options['max-rows'] - pos.height,
 			found = false,
 			x, y;
 
 		for (y = 0; !found; y++) {
+			if (y > max_row) {
+				return false;
+			}
 			for (x = 0; x <= max_col && !found; x++) {
 				pos['x'] = x;
 				pos['y'] = y;
@@ -1890,7 +1885,7 @@
 
 	function updateWidgetDynamic($obj, data, widget) {
 		// This function may be called for widget that is not in data['widgets'] array yet.
-		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
+		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] == '1') {
 			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
 					'hostid': data['dashboard']['dynamic']['hostid'],
@@ -1921,6 +1916,19 @@
 		}
 
 		return ref;
+	}
+
+	/**
+	 * Show message if dashboard free space exhausted.
+	 *
+	 * @param {object} data  Data from dashboard grid.
+	 */
+	function showMessageExhausted(data) {
+		data.dialogue.body.children('.msg-warning').remove();
+		data.dialogue.body.prepend(makeMessageBox(
+			'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
+		));
+		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
 	}
 
 	/**
@@ -2026,7 +2034,7 @@
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'))
+						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'));
 						new_widget_placeholder.container.addClass('disabled');
 					}
 					else {
@@ -2041,6 +2049,7 @@
 					}
 				}
 				else {
+					new_widget_placeholder.label.text(t('You do not have permissions to edit dashboard'));
 					new_widget_placeholder.container.addClass('disabled');
 				}
 
@@ -2380,6 +2389,12 @@
 					data: ajax_data,
 					dataType: 'json',
 					beforeSend: function() {
+						/*
+						 * Clear the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to center the popup while the widget form is being loaded.
+						 */
+						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+
 						body.empty()
 							.append($('<div>')
 								// The smallest possible size of configuration dialog.
@@ -2394,6 +2409,14 @@
 								));
 					},
 					success: function(resp) {
+						/*
+						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to have actual data for the popup positioning.
+						 */
+						if (resp.options.stick_to_top) {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+
 						body.empty();
 						body.append(resp.body);
 						if (typeof(resp.debug) !== 'undefined') {
@@ -2415,13 +2438,10 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						if (data.dialogue['widget_type'] === 'svggraph') {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						if (data.dialogue.widget === null
+								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
+							showMessageExhausted(data);
 						}
-						else {
-							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
-						}
-
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});

@@ -109,7 +109,15 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
+	}
+	else if (!ZBX_IS_RUNNING())
+	{
+		info = zbx_strdup(info, "Zabbix server shutdown in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer, info);
+		ret = FAIL;
+	}
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -134,7 +142,15 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
+	}
+	else if (!ZBX_IS_RUNNING())
+	{
+		info = zbx_strdup(info, "Zabbix server shutdown in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
+		ret = FAIL;
+	}
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -385,14 +401,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
-	if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
+	if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type), NULL))
 	{
 		if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW))
 		{
@@ -406,7 +422,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
 
-			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)) ||
+			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str), NULL) ||
 					FAIL == is_uint31(limit_str, &limit))
 			{
 				zbx_send_response(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
@@ -856,14 +872,14 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user))
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type), NULL))
 	{
 		if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_STATUS_PING))
 		{
@@ -950,7 +966,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)) &&
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type), NULL) &&
 			0 == strcmp(type, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 	{
 		char			from_str[ZBX_MAX_UINT64_LEN + 1], to_str[ZBX_MAX_UINT64_LEN + 1];
@@ -963,14 +979,14 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 			goto param_error;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str))
+		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str), NULL)
 				&& FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
 		{
 			strscpy(error, "invalid 'from' parameter");
 			goto param_error;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str)) &&
+		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str), NULL) &&
 				FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
 		{
 			strscpy(error, "invalid 'to' parameter");
@@ -1042,7 +1058,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			return FAIL;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 		{
 			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 			{
@@ -1250,7 +1266,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
@@ -1287,4 +1303,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

@@ -148,8 +148,45 @@ class CTableElement extends CElement {
 			$column++;
 		}
 
-		$selector = 'xpath:.//tbody/tr/td['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
-		return $this->query($selector)->asTableRow(['parent' => $this])->one(false);
+		$suffix = '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
+		$xpaths = ['//tbody/tr/td'.$suffix, '//tbody/tr/th'.$suffix];
+
+		return $this->query('xpath', implode('|', $xpaths))->asTableRow(['parent' => $this])->one(false);
+	}
+
+	/**
+	 * Find row by column value.
+	 *
+	 * @param array $content    column data
+	 *
+	 * @return CTableRow|null
+	 */
+	public function findRows($content) {
+		$rows = [];
+
+		if (CTestArrayHelper::isAssociative($content)) {
+			$content = [$content];
+		}
+
+		foreach ($this->getRows() as $row) {
+			foreach ($content as $columns) {
+				$found = true;
+
+				foreach ($columns as $name => $value) {
+					if (CTestArrayHelper::get($value, 'text', $value) !== $row->getColumnData($name, $value)) {
+						$found = false;
+						break;
+					}
+				}
+
+				if ($found) {
+					$rows[] = $row;
+					break;
+				}
+			}
+		}
+
+		return new CElementCollection($rows, CTableRowElement::class);
 	}
 
 	/**
