@@ -19,24 +19,18 @@
 
 package com.zabbix.gateway;
 
-import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.ArrayList;
-
-import javax.lang.model.type.ErrorType;
 import javax.management.AttributeList;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.MalformedObjectNameException;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularDataSupport;
-import javax.management.openmbean.InvalidKeyException;
-import javax.management.MalformedObjectNameException;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
 
@@ -58,12 +52,6 @@ class JMXItemChecker extends ItemChecker
 
 	static final int DISCOVERY_MODE_ATTRIBUTES = 0;
 	static final int DISCOVERY_MODE_BEANS = 1;
-
-	static final boolean SUCCESS = true;
-	static final boolean FAIL = false;
-
-	private static Map<String, Map<String, JSONObject>> dataObjectMap;
-	private AttributeList attributData;
 
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -96,15 +84,13 @@ class JMXItemChecker extends ItemChecker
 	}
 
 	@Override
-	protected JSONArray getValues() throws ZabbixException
+	JSONArray getValues() throws ZabbixException
 	{
 		JSONArray values = new JSONArray();
 
 		try
 		{
 			HashMap<String, String[]> env = null;
-			Set<String> processedKeys = new HashSet<String>();
-			dataObjectMap = new HashMap<String, Map<String, JSONObject>>();
 
 			if (null != username && null != password)
 			{
@@ -116,66 +102,7 @@ class JMXItemChecker extends ItemChecker
 			mbsc = jmxc.getMBeanServerConnection();
 
 			for (String key : keys)
-			{
-				ZabbixItem item = new ZabbixItem(key);
-
-				if (item.getKeyId().equals("jmx.discovery"))
-				{
-					getDiscoveryValue(key);
-				}
-				else if (item.getKeyId().equals("jmx"))
-				{
-					if (2 != item.getArgumentCount())
-					{
-						storeValue(key, null, "Incorrect item key, required key format: jmx[<object name>,<attribute name>].", FAIL);
-						continue;
-					}
-
-					String objectName = item.getArgument(1);
-
-					// keep track of keys that have been already processed
-					if (dataObjectMap.containsKey(objectName))
-						continue;
-
-					Map<String, JSONObject> attributeMap = new HashMap<String, JSONObject>();
-
-					for (String key2 : keys)
-					{
-						ZabbixItem item2 = new ZabbixItem(key2);
-
-						if (!item2.getKeyId().equals("jmx") || 2 != item2.getArgumentCount())
-							continue;
-
-						if (objectName.equals(item2.getArgument(1)))
-							attributeMap.put(item2.getArgument(2), null);
-					}
-
-					dataObjectMap.put(objectName, attributeMap);
-
-					attributData = new AttributeList();
-					getAttributeData(objectName);
-					processAttributeValues(objectName);
-				}
-				else
-					storeValue(key, null, "Cannot process key: ID '" + item.getKeyId() + "' is not supported.", FAIL);
-			}
-
-			for (String key : keys)
-			{
-				Map<String, JSONObject> attributeMap = new HashMap<String, JSONObject>();
-				ZabbixItem item = new ZabbixItem(key);
-
-				if (item.getKeyId().equals("jmx") && 2 == item.getArgumentCount())
-				{
-					attributeMap = dataObjectMap.get(item.getArgument(1));
-					values.put(attributeMap.get(item.getArgument(2)));
-				}
-				else
-				{
-					attributeMap = dataObjectMap.get(key);
-					values.put(attributeMap.get(JSON_TAG_DATA));
-				}
-			}
+				values.put(getJSONValue(key));
 		}
 		catch (SecurityException e1)
 		{
@@ -213,254 +140,150 @@ class JMXItemChecker extends ItemChecker
 		return values;
 	}
 
-	private void getAttributeData(String objectNameStr)
+	@Override
+	protected String getStringValue(String key) throws Exception
 	{
-		String realAttributeName;
-		ObjectName objectName = null;
-		Map<String, JSONObject> attributes = new HashMap<String, JSONObject>();
-		ArrayList<String> attributeList = new ArrayList<String>();
+		ZabbixItem item = new ZabbixItem(key);
 
-		attributes = dataObjectMap.get(objectNameStr);
-
-		// Attribute name and composite data field names are separated by dots. On the other hand the
-		// name may contain a dot too. In this case user needs to escape it with a backslash. Also the
-		// backslash symbols in the name must be escaped. So a real separator is unescaped dot and
-		// separatorIndex() is used to locate it.
-
-		for (Map.Entry<String, JSONObject> attribute : attributes.entrySet())
+		if (item.getKeyId().equals("jmx"))
 		{
-			realAttributeName = attribute.getKey();
-			int sep = HelperFunctionChest.separatorIndex(realAttributeName);
+			if (2 != item.getArgumentCount())
+				throw new ZabbixException("required key format: jmx[<object name>,<attribute name>]");
 
-			if (-1 != sep)
-				realAttributeName = realAttributeName.substring(0, sep);
+			ObjectName objectName = new ObjectName(item.getArgument(1));
+			String attributeName = item.getArgument(2);
+			String realAttributeName;
+			String fieldNames = "";
 
-			// Create a list of atributes without composite data. Method getAttributes() retrievs all
-			// composite data values for an attribute.
-			attributeList.add(realAttributeName);
-		}
+			// Attribute name and composite data field names are separated by dots. On the other hand the
+			// name may contain a dot too. In this case user needs to escape it with a backslash. Also the
+			// backslash symbols in the name must be escaped. So a real separator is unescaped dot and
+			// separatorIndex() is used to locate it.
 
-		Iterator itr = attributeList.iterator();
-
-		try
-		{
-			objectName = new ObjectName(objectNameStr);
-			attributData = mbsc.getAttributes(objectName, attributeList.toArray(new String[0]));
-		}
-		catch (MalformedObjectNameException e)
-		{
-			while(itr.hasNext())
-			{
-				storeValue(objectNameStr, itr.next().toString(), "Cannot get attribute data: the format of the object '"
-					+ objectNameStr + "' does not correspond to a valid ObjectName.", FAIL);
-			}
-		}
-		catch (Exception e1)
-		{
-			while(itr.hasNext())
-			{
-				String attrName = itr.next().toString();
-
-				try
-				{
-					Object attrValue = mbsc.getAttribute(objectName, attrName);
-					attributData.add(new javax.management.Attribute(attrName, attrValue));
-				}
-				catch (Exception e2)
-				{
-					storeValue(objectNameStr, attrName,
-						"Cannot get attribute data: invalid attribute registered on the MBean server.", FAIL);
-
-				}
-			}
-		}
-	}
-
-	private void processAttributeValues(String objectNameStr)
-	{
-		if (attributData.isEmpty())
-			return;
-
-		String realAttributeName;
-		Map<String, JSONObject> attributes = new HashMap<String, JSONObject>();
-
-		attributes = dataObjectMap.get(objectNameStr);
-
-		for (Map.Entry<String, JSONObject> attribute : attributes.entrySet())
-		{
-			String fieldName = "";
-			realAttributeName = attribute.getKey();
-			int sep = HelperFunctionChest.separatorIndex(attribute.getKey());
+			int sep = HelperFunctionChest.separatorIndex(attributeName);
 
 			if (-1 != sep)
 			{
-				realAttributeName = attribute.getKey().substring(0, sep);
-				fieldName = attribute.getKey().substring(sep + 1);
-			}
+				logger.trace("'{}' contains composite data", attributeName);
 
-			for (javax.management.Attribute a : attributData.asList())
+				realAttributeName = attributeName.substring(0, sep);
+				fieldNames = attributeName.substring(sep + 1);
+			}
+			else
+				realAttributeName = attributeName;
+
+			// unescape possible dots or backslashes that were escaped by user
+			realAttributeName = HelperFunctionChest.unescapeUserInput(realAttributeName);
+
+			logger.trace("attributeName:'{}'", realAttributeName);
+			logger.trace("fieldNames:'{}'", fieldNames);
+
+			try
 			{
-				if (a.getName().equals(realAttributeName))
-				{
-					try
-					{
-						getPrimitiveAttributeValue(objectNameStr, attribute.getKey(), a.getValue(), fieldName);
-					}
-					catch (Exception e)
-					{
-						storeValue(objectNameStr, attribute.getKey(),
-							"Cannot process object or attribute: " + e.getMessage() + ".", FAIL);
-					}
-					break;
-				}
+				return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+			}
+			catch (InstanceNotFoundException e)
+			{
+				throw new ZabbixException("Object or attribute not found.");
 			}
 		}
+		else if (item.getKeyId().equals("jmx.discovery"))
+		{
+			int argumentCount = item.getArgumentCount();
+
+			if (2 < argumentCount)
+				throw new ZabbixException("required key format: jmx.discovery[<discovery mode>,<object name>]");
+
+			ObjectName filter;
+
+			try
+			{
+				filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+			}
+			catch (MalformedObjectNameException e)
+			{
+				throw new ZabbixException("invalid object name format: " + item.getArgument(2));
+			}
+
+			int mode = DISCOVERY_MODE_ATTRIBUTES;
+			if (0 != argumentCount)
+			{
+				String modeName = item.getArgument(1);
+
+				if (modeName.equals("beans"))
+					mode = DISCOVERY_MODE_BEANS;
+				else if (!modeName.equals("attributes"))
+					throw new ZabbixException("invalid discovery mode: " + modeName);
+			}
+
+			JSONArray counters = new JSONArray();
+
+			for (ObjectName name : mbsc.queryNames(filter, null))
+			{
+				logger.trace("discovered object '{}'", name);
+
+				if (DISCOVERY_MODE_ATTRIBUTES == mode)
+					discoverAttributes(counters, name);
+				else
+					discoverBeans(counters, name);
+			}
+
+			JSONObject mapping = new JSONObject();
+			mapping.put(ItemChecker.JSON_TAG_DATA, counters);
+			return mapping.toString();
+		}
+		else
+			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
 	}
 
-	private void getPrimitiveAttributeValue(String objectName, String atributeName, Object attributeValue, String fieldNames) throws Exception
+	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws Exception
 	{
-		logger.trace("drilling down with data object '{}' and field names '{}'", attributeValue, fieldNames);
+		logger.trace("drilling down with data object '{}' and field names '{}'", dataObject, fieldNames);
 
-		if (null == attributeValue)
-			throw new Exception("attribute object is empty");
+		if (null == dataObject)
+			throw new ZabbixException("data object is null");
 
 		if (fieldNames.equals(""))
 		{
 			try
 			{
-				if (isPrimitiveAttributeType(attributeValue))
-				{
-					storeValue(objectName, atributeName, attributeValue.toString(), SUCCESS);
-					return;
-				}
+				if (isPrimitiveAttributeType(dataObject))
+					return dataObject.toString();
+				else
+					throw new NoSuchMethodException();
 			}
 			catch (NoSuchMethodException e)
 			{
-				throw new Exception("data object '" + attributeValue + "' type cannot be converted to string");
+				throw new ZabbixException("Data object type cannot be converted to string.");
 			}
 		}
 
-		if (attributeValue instanceof CompositeData)
+		if (dataObject instanceof CompositeData)
 		{
-			logger.trace("'{}' contains composite data", attributeValue);
+			logger.trace("'{}' contains composite data", dataObject);
 
-			Object compositeData;
-			CompositeData comp = (CompositeData)attributeValue;
+			CompositeData comp = (CompositeData)dataObject;
 
-			String attribute;
+			String dataObjectName;
 			String newFieldNames = "";
 
 			int sep = HelperFunctionChest.separatorIndex(fieldNames);
 
 			if (-1 != sep)
 			{
-				attribute = fieldNames.substring(0, sep);
+				dataObjectName = fieldNames.substring(0, sep);
 				newFieldNames = fieldNames.substring(sep + 1);
 			}
 			else
-				attribute = fieldNames;
+				dataObjectName = fieldNames;
 
 			// unescape possible dots or backslashes that were escaped by user
-			attribute = HelperFunctionChest.unescapeUserInput(attribute);
+			dataObjectName = HelperFunctionChest.unescapeUserInput(dataObjectName);
 
-			try
-			{
-				compositeData = comp.get(attribute);
-				getPrimitiveAttributeValue(objectName, atributeName, compositeData, newFieldNames);
-			}
-			catch (InvalidKeyException e)
-			{
-				throw new Exception("'" + attribute + "' is not an existing item name for this CompositeData instance");
-			}
+			return getPrimitiveAttributeValue(comp.get(dataObjectName), newFieldNames);
 		}
 		else
-			throw new Exception("unsupported attribute object type along the path: " + attributeValue.getClass());
-	}
-
-	private void getDiscoveryValue(String key) throws Exception
-	{
-		ZabbixItem item = new ZabbixItem(key);
-		int argumentCount = item.getArgumentCount();
-
-		if (2 < argumentCount)
-		{
-			storeValue(key, null, "Invalid key, required key format: jmx.discovery[<discovery mode>,<object name>].", FAIL);
-			return;
-		}
-
-		ObjectName filter;
-
-		try
-		{
-			filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
-		}
-		catch (MalformedObjectNameException e)
-		{
-			storeValue(key, null, "Invalid object name format: " + item.getArgument(2) + ".", FAIL);
-			return;
-		}
-
-		int mode = DISCOVERY_MODE_ATTRIBUTES;
-		if (0 != argumentCount)
-		{
-			String modeName = item.getArgument(1);
-
-			if (modeName.equals("beans"))
-			{
-				mode = DISCOVERY_MODE_BEANS;
-			}
-			else if (!modeName.equals("attributes"))
-			{
-				storeValue(key, null, "Invalid discovery mode: " + modeName + ".", FAIL);
-				return;
-			}
-		}
-
-		JSONArray counters = new JSONArray();
-
-		for (ObjectName name : mbsc.queryNames(filter, null))
-		{
-			logger.trace("discovered object '{}'", name);
-
-			if (DISCOVERY_MODE_ATTRIBUTES == mode)
-				discoverAttributes(counters, name);
-			else
-				discoverBeans(counters, name);
-		}
-
-		JSONObject mapping = new JSONObject();
-		mapping.put(JSON_TAG_DATA, counters);
-		storeValue(key, null, mapping.toString(), SUCCESS);
-	}
-
-	private void storeValue(String objectName, String atributeName, String valueStr, Boolean success)
-	{
-		JSONObject value = new JSONObject();
-		Map<String, JSONObject> attributeMap = new HashMap<String, JSONObject>();
-
-		if (null != atributeName)
-			attributeMap = dataObjectMap.get(objectName);
-		else
-			atributeName = JSON_TAG_DATA;
-
-		try
-		{
-			if (success)
-				value.put(JSON_TAG_VALUE, valueStr);
-			else
-				value.put(JSON_TAG_ERROR, valueStr);
-
-			attributeMap.put(atributeName, value);
-
-		}
-		catch (JSONException e)
-		{
-			Object[] logInfo = {JSON_TAG_ERROR, e.getMessage(), ZabbixException.getRootCauseMessage(e)};
-			logger.warn("cannot add JSON attribute '{}' with message '{}': {}", logInfo);
-			logger.debug("error caused by", e);
-		}
-
-		dataObjectMap.put(objectName, attributeMap);
+			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
 	private void discoverAttributes(JSONArray counters, ObjectName name) throws Exception
