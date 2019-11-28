@@ -26,8 +26,7 @@ class CLineGraphDraw extends CGraphDraw {
 	const MAX_SIDE_OFFSET = 130;
 	const GRAPH_BORDER_OFFSET = 10;
 
-	protected  $side_labels = [];
-
+	protected $side_labels = [];
 	protected $side_width = [];
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
@@ -2602,7 +2601,6 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->drawSides();
 
 		$this->calcSidesLegend();
-
 		$this->drawSidesLegend();
 
 		// Change graph width to proper.
