@@ -907,13 +907,13 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
 			continue;
 		}
 
-		if (0 != maintenance->hostids.values_num)
+		if (0 != maintenance->hostids.values_num)	/* sorted hosts ids */
 		{
 			zbx_vector_uint64_append_array(&host_maintenances[i].hostids, maintenance->hostids.values,
 					maintenance->hostids.values_num);
 		}
 
-		if (0 != maintenance->groupids.values_num)
+		if (0 != maintenance->groupids.values_num)	/* hosts groups */
 		{
 			zbx_dc_hostgroup_t	*group;
 
