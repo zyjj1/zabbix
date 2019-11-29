@@ -864,30 +864,6 @@ int	zbx_dc_update_maintenances(void)
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: dc_get_maintenances_by_ids                                       *
- *                                                                            *
- * Purpose: get maintenances by identifiers                                   *
- *                                                                            *
- ******************************************************************************/
-static void	dc_get_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *maintenances)
-{
-	zbx_dc_maintenance_t	*maintenance;
-	int			i;
-
-
-	for (i = 0; i < maintenanceids->values_num; i++)
-	{
-		if (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
-				&maintenanceids->values[i])))
-		{
-			zbx_vector_ptr_append(maintenances, maintenance);
-		}
-
-	}
-}
-
 static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids,
 		host_maintenance_t *host_maintenances, int *num)
 {
@@ -954,61 +930,6 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_maintenance_match_host                                        *
- *                                                                            *
- * Purpose: check if the host must be processed by the specified maintenance  *
- *                                                                            *
- * Parameters: maintenance - [IN] the maintenance                             *
- *             hostid      - [IN] identifier of the host to check             *
- *                                                                            *
- * Return value: SUCCEED - the host must be processed by the maintenance      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dc_maintenance_match_host(const zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid)
-{
-	int	ret = FAIL;
-
-	if (FAIL != zbx_vector_uint64_bsearch(&maintenance->hostids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-		return SUCCEED;
-
-	if (0 != maintenance->groupids.values_num)
-	{
-		int			i;
-		zbx_dc_hostgroup_t	*group;
-		zbx_vector_uint64_t	groupids;
-
-		zbx_vector_uint64_create(&groupids);
-
-		for (i = 0; i < maintenance->groupids.values_num; i++)
-			dc_get_nested_hostgroupids(maintenance->groupids.values[i], &groupids);
-
-		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		for (i = 0; i < groupids.values_num; i++)
-		{
-			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups,
-					&groupids.values[i])))
-			{
-				continue;
-			}
-
-			if (NULL != zbx_hashset_search(&group->hostids, &hostid))
-			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-
-		zbx_vector_uint64_destroy(&groupids);
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dc_get_host_maintenance_updates                                  *
  *                                                                            *
  * Purpose: gets maintenance updates for all hosts                            *
@@ -1046,7 +967,7 @@ static void	dc_get_host_maintenance_updates(const host_maintenance_t *host_maint
 			if (FAIL != zbx_vector_uint64_bsearch(&host_maintenances[i].hostids, host->hostid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				maintenance = (const zbx_dc_maintenance_t *)host_maintenances[i].maintenance;
+				maintenance = host_maintenances[i].maintenance;
 
 				if (0 == maintenanceid ||
 						(MAINTENANCE_TYPE_NORMAL == maintenance_type &&
@@ -1440,8 +1361,8 @@ static int	dc_compare_tags(const void *d1, const void *d2)
 int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids)
 {
 	const char			*__function_name = "zbx_dc_get_event_maintenances";
-	zbx_vector_ptr_t		maintenances;
-	int				i, j, k, ret = FAIL;
+	host_maintenance_t		*host_maintenances;
+	int				i, j, k, ret = FAIL, num;
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_event_suppress_query_t	*query;
 	ZBX_DC_ITEM			*item;
@@ -1451,9 +1372,13 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&maintenances);
-	zbx_vector_ptr_reserve(&maintenances, 100);
 	zbx_vector_uint64_create(&hostids);
+
+	host_maintenances = (host_maintenance_t *)zbx_malloc(NULL, sizeof(host_maintenance_t) *
+			maintenanceids->values_num);
+
+	for (i = 0; i < maintenanceids->values_num; i++)
+		zbx_vector_uint64_create(&host_maintenances[i].hostids);
 
 	/* event tags must be sorted by name to perform maintenance tag matching */
 
@@ -1466,9 +1391,9 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	RDLOCK_CACHE;
 
-	dc_get_maintenances_by_ids(maintenanceids, &maintenances);
+	dc_get_host_maintenances_by_ids(maintenanceids, host_maintenances, &num);
 
-	if (0 == maintenances.values_num)
+	if (0 == num)
 		goto unlock;
 
 	for (i = 0; i < event_queries->values_num; i++)
@@ -1495,16 +1420,17 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		/* find matching maintenances */
-		for (j = 0; j < maintenances.values_num; j++)
+		for (j = 0; j < num; j++)
 		{
-			maintenance = (zbx_dc_maintenance_t *)maintenances.values[j];
+			maintenance = host_maintenances[j].maintenance;
 
 			if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
 				continue;
 
 			for (k = 0; k < hostids.values_num; k++)
 			{
-				if (SUCCEED == dc_maintenance_match_host(maintenance, hostids.values[k]) &&
+				if (FAIL != zbx_vector_uint64_bsearch(&host_maintenances[j].hostids, hostids.values[k],
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC) &&
 						SUCCEED == dc_maintenance_match_tags(maintenance, &query->tags))
 				{
 					pair.first = maintenance->maintenanceid;
@@ -1522,7 +1448,11 @@ unlock:
 	UNLOCK_CACHE;
 
 	zbx_vector_uint64_destroy(&hostids);
-	zbx_vector_ptr_destroy(&maintenances);
+
+	for (i = 0; i < maintenanceids->values_num; i++)
+		zbx_vector_uint64_destroy(&host_maintenances[i].hostids);
+
+	zbx_free(host_maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
