@@ -864,6 +864,16 @@ int	zbx_dc_update_maintenances(void)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_get_host_maintenances_by_ids                                  *
+ *                                                                            *
+ * Purpose: check which hosts must be processed by the specified maintenances *
+ *                                                                            *
+ * Parameters: maintenance       - [IN] the maintenance ids                   *
+ *             host_maintenances - [OUT] maintenance and matching host ids    *
+ *                                                                            *
+ ******************************************************************************/
 static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids,
 		host_maintenance_t *host_maintenances, int *num)
 {
