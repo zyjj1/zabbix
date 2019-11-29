@@ -203,15 +203,15 @@ class CDashboardWidgetMap extends CDiv {
 				'if (IE11) {'.
 					'jQuery(".dashbrd-grid-container")'.
 						'.dashboardGrid("getWidgetsBy", "uniqueid", "'.$this->uniqueid.'")'.
-							'.each(function(widget) {'.
-								'var observer = new MutationObserver(function() {'.
-										'widget.content_body.find("svg text").each(function() {'.
-											'jQuery(this).attr("textLength", this.getBBox().width);'.
-										'});'.
+						'.each(function(widget) {'.
+							'var observer = new MutationObserver(function() {'.
+									'widget.content_body.find("svg text").each(function() {'.
+										'jQuery(this).attr("textLength", this.getBBox().width);'.
 									'});'.
+								'});'.
 
-								'observer.observe(widget.div[0], {attributes: true});'.
-							'});'.
+							'observer.observe(widget.div[0], {attributes: true});'.
+						'});'.
 				'}';
 		}
 
