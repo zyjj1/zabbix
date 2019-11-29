@@ -537,7 +537,7 @@ function closeDialogHandler(event) {
 
 				// Close context menu preloader.
 				case 'preloader':
-					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
+					overlayPreloaderDestroy(dialog.dialogueid);
 					break;
 
 				// Close overlay time picker.

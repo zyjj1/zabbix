@@ -475,12 +475,17 @@ function stripslashes(str) {
  * Function to remove preloader and moves focus to IU element that was clicked to open it.
  *
  * @param string   id			Preloader identifier.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayPreloaderDestroy(id, xhr) {
+function overlayPreloaderDestroy(id) {
 	if (typeof id !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+
+		var overlay = overlays_stack.getById(id)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('#' + id).remove();
