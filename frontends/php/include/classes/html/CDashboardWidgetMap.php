@@ -144,14 +144,6 @@ class CDashboardWidgetMap extends CDiv {
 						'trigger_name: "after_map_widget_config_update_'.$this->uniqueid.'"'.
 					'}'.
 				');';
-
-			$script_run .=
-				'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart", '.
-					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: ["onEditStart"],'.
-						'grid: {widget: 1},'.
-					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
-				'});';
 		}
 
 		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
@@ -172,7 +164,14 @@ class CDashboardWidgetMap extends CDiv {
 					'}'.
 				'});'.
 
-				'jQuery(".dashbrd-grid-container").dashboardGrid("callWidgetDataShare");';
+				'jQuery(".dashbrd-grid-container").dashboardGrid("callWidgetDataShare");'.
+
+				'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart", '.
+					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
+						'parameters: ["onEditStart"],'.
+						'grid: {widget: 1},'.
+					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
+				'});';
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
@@ -196,6 +195,24 @@ class CDashboardWidgetMap extends CDiv {
 						'trigger_name: "on_dashboard_ready_'.$this->uniqueid.'"'.
 					'}'.
 				');';
+		}
+
+		// Fix text label disappearing on DOM change in Internet Explorer 11 on Windows 7 (important).
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_MAP && $this->initial_load) {
+			$script_run .=
+				'if (IE11) {'.
+					'jQuery(".dashbrd-grid-container")'.
+						'.dashboardGrid("getWidgetsBy", "uniqueid", "'.$this->uniqueid.'")'.
+							'.each(function(widget) {'.
+								'var observer = new MutationObserver(function() {'.
+										'widget.content_body.find("svg text").each(function() {'.
+											'jQuery(this).attr("textLength", this.getBBox().width);'.
+										'});'.
+									'});'.
+
+								'observer.observe(widget.div[0], {attributes: true});'.
+							'});'.
+				'}';
 		}
 
 		return $script_run;

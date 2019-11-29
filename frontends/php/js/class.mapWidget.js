@@ -32,44 +32,18 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 			case 'onWidgetRefresh':
 				var div_id = jQuery('[data-uniqueid="' + grid['widget']['uniqueid'] + '"]').attr('id');
 				jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
-
 				break;
-
 			case 'afterUpdateWidgetConfig':
 				jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue',
 					grid['widget']['uniqueid'], 'current_sysmapid', grid['widget']['fields']['sysmapid']);
-
 				break;
-
 			case 'onDashboardReady':
 				if (typeof grid['widget']['storage']['current_sysmapid'] === 'undefined') {
 					grid['widget']['content_body'].html(data['html']);
 				}
-
 				break;
-
 			case 'onEditStart':
-				if (IE11) {
-					// Fix text label disappearing on DOM change in IE11.
-
-					var observer = new MutationObserver(function() {
-							grid['widget']['content_body'].find('svg text').each(function() {
-								jQuery(this).attr('textLength', this.getBBox().width);
-							});
-						});
-
-					observer.observe(grid['widget']['div'][0], {
-						attributes: true
-					});
-				}
-
-				const WIDGET_SYSMAP_SOURCETYPE_FILTER = 2;
-
-				if (grid['widget']['fields']['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER
-						&& grid['widget']['fields']['filter_widget_reference'] !== null) {
-					jQuery(".dashbrd-grid-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
-				}
-
+				jQuery(".dashbrd-grid-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
 				break;
 		}
 	}
