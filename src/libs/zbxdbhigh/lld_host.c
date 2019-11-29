@@ -1958,7 +1958,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	DBbegin();
 
-	if (SUCCEED != DBlock_record("hosts", parent_hostid, NULL, 0))
+	if (SUCCEED != DBlock_hostid(parent_hostid))
 	{
 		/* the host prototype was removed while processing lld rule */
 		DBrollback();

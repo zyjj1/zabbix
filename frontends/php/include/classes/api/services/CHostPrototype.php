@@ -912,7 +912,7 @@ class CHostPrototype extends CHostBase {
 			' FROM hosts h'.
 			' WHERE '.dbConditionInt('h.hostid', $hostPrototypeIds).
 			' FOR UPDATE'
-			);
+		);
 
 		$deleteHostPrototypes = $this->get([
 			'hostids' => $hostPrototypeIds,
@@ -1283,7 +1283,7 @@ class CHostPrototype extends CHostBase {
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionInt('gp.group_prototypeid', $groupPrototypeIds).
 			' FOR UPDATE'
-			);
+		);
 
 		// delete child group prototypes
 		$groupPrototypeChildren = DBfetchArray(DBselect(

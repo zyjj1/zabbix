@@ -57,7 +57,7 @@ class CGraphPrototypeManager {
 			' FROM graphs g'.
 			' WHERE '.dbConditionInt('g.graphid', $del_graphids).
 			' FOR UPDATE'
-			);
+		);
 
 		// Deleting discovered graphs.
 		$del_discovered_graphids = DBfetchColumn(DBselect(

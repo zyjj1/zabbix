@@ -2405,7 +2405,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_vector_uint64_append(&trigger_protoids, trigger_prototype->triggerid);
 	}
 
-	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_records("triggers", &trigger_protoids))
+	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
 	{
 		/* the host or trigger prototype was removed while processing lld rule */
 		DBrollback();

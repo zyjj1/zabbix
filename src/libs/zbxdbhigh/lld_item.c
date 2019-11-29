@@ -3162,7 +3162,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_vector_uint64_append(&item_protoids, item_prototype->itemid);
 	}
 
-	if (SUCCEED != DBlock_records("items", &item_protoids))
+	if (SUCCEED != DBlock_itemids(&item_protoids))
 	{
 		/* the item prototype was removed while processing lld rule */
 		ret = FAIL;

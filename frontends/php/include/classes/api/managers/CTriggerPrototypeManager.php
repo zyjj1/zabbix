@@ -59,7 +59,7 @@ class CTriggerPrototypeManager {
 			' FROM triggers t'.
 			' WHERE '.dbConditionInt('t.triggerid', $del_triggerids).
 			' FOR UPDATE'
-			);
+		);
 
 		// Deleting discovered triggers.
 		$del_discovered_triggerids = DBfetchColumn(DBselect(

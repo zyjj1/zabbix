@@ -79,7 +79,7 @@ class CItemPrototypeManager {
 			' FROM items i'.
 			' WHERE '.dbConditionInt('i.itemid', $del_itemids).
 			' FOR UPDATE'
-			);
+		);
 
 		// Deleting graph prototypes, which will remain without item prototypes.
 		$db_graphs = DBselect(
