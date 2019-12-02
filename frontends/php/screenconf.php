@@ -291,7 +291,7 @@ if (hasRequest('form')) {
 	$userids[$current_userid] = true;
 	$user_groupids = [];
 
-	if (!hasRequest('templateid') && (!array_key_exists('templateid', $screen) || !$screen['templateid'])) {
+	if (!hasRequest('templateid') && !array_key_exists('templateid', $screen)) {
 		if (!hasRequest('screenid') || hasRequest('form_refresh')) {
 			// Screen owner.
 			$screen_owner = getRequest('userid', $current_userid);
