@@ -974,12 +974,6 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 		if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
 			continue;
 
-		maintenance_status = HOST_MAINTENANCE_STATUS_OFF;
-		maintenance_type = MAINTENANCE_TYPE_NORMAL;
-		maintenanceid = 0;
-		maintenance_from = 0;
-		flags = 0;
-
 		if (NULL != (host_maintenance = zbx_hashset_search(host_maintenances, &host->hostid)))
 		{
 			maintenance_status = HOST_MAINTENANCE_STATUS_ON;
@@ -987,6 +981,15 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 			maintenanceid = host_maintenance->maintenance->maintenanceid;
 			maintenance_from = host_maintenance->maintenance->running_since;
 		}
+		else
+		{
+			maintenance_status = HOST_MAINTENANCE_STATUS_OFF;
+			maintenance_type = MAINTENANCE_TYPE_NORMAL;
+			maintenanceid = 0;
+			maintenance_from = 0;
+		}
+
+		flags = 0;
 
 		if (maintenanceid != host->maintenanceid)
 			flags |= ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID;
@@ -1094,8 +1097,8 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
  ******************************************************************************/
 void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates)
 {
-	const char		*__function_name = "zbx_dc_get_host_maintenance_updates";
-	zbx_hashset_t		host_maintenances;
+	const char	*__function_name = "zbx_dc_get_host_maintenance_updates";
+	zbx_hashset_t	host_maintenances;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
