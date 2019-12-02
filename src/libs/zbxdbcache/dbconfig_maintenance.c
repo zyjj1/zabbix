@@ -895,9 +895,6 @@ static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, cons
 	}
 }
 
-typedef void	(*assign_maintenance_to_host_f)(zbx_hashset_t *host_maintenances,
-		const zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid);
-
 /******************************************************************************
  *                                                                            *
  * Function: dc_get_host_maintenances_by_ids                                  *
@@ -909,7 +906,7 @@ typedef void	(*assign_maintenance_to_host_f)(zbx_hashset_t *host_maintenances,
  *                                                                            *
  ******************************************************************************/
 static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids,
-		zbx_hashset_t *host_maintenances, assign_maintenance_to_host_f cb)
+		zbx_hashset_t *host_maintenances)
 {
 	zbx_dc_maintenance_t	*maintenance;
 	int			i, j;
@@ -926,7 +923,7 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
 		}
 
 		for (j = 0; j < maintenance->hostids.values_num; j++)
-			cb(host_maintenances, maintenance, maintenance->hostids.values[j]);
+			dc_assign_maintenance_to_host(host_maintenances, maintenance, maintenance->hostids.values[j]);
 
 		if (0 != maintenance->groupids.values_num)	/* hosts groups */
 		{
@@ -952,7 +949,7 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
 				zbx_hashset_iter_reset(&group->hostids, &iter);
 
 				while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
-					cb(host_maintenances, maintenance, *phostid);
+					dc_assign_maintenance_to_host(host_maintenances, maintenance, *phostid);
 			}
 
 			zbx_vector_uint64_clear(&groupids);
@@ -1122,7 +1119,7 @@ void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenancei
 
 	RDLOCK_CACHE;
 
-	dc_get_host_maintenances_by_ids(maintenanceids, &host_maintenances, dc_assign_maintenance_to_host);
+	dc_get_host_maintenances_by_ids(maintenanceids, &host_maintenances);
 
 	/* host maintenance update must be performed even without running maintenances */
 	/* to reset host maintenances status for stopped maintenances                  */
@@ -1402,7 +1399,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	RDLOCK_CACHE;
 
-	dc_get_host_maintenances_by_ids(maintenanceids, &host_maintenances, dc_assign_maintenance_to_host);
+	dc_get_host_maintenances_by_ids(maintenanceids, &host_maintenances);
 
 	if (0 == host_maintenances.num_data)
 		goto unlock;
