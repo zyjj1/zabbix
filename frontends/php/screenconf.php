@@ -81,7 +81,7 @@ if (hasRequest('screenid')) {
 	}
 	else {
 		$screens = API::Screen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid', 'userid', 'private'],
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'userid', 'private'],
 			'selectUsers' => ['userid', 'permission'],
 			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'screenids' => getRequest('screenid'),
