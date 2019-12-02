@@ -26,154 +26,72 @@ jQuery(function($) {
 	 *
 	 * @type {Object}
 	 */
-	var checker = {
-		elem: document.querySelector('.msg-global-footer'),
-		delay: 5000, // 5 seconds
-		timeout: 10000, // 10 seconds
-		is_show: false,
-		last_response: null,
+	var ServerChecker = {
+		$message: null,
+		message_top: 0,
+		delay: 10000, // 10 seconds
+		warning: false,
+
+		start: function($message) {
+			if ($message.length) {
+				this.prepareNext(5000);
+
+				this.$message = $message;
+				this.$message.on('mouseenter', this.hideMessage.bind(this));
+			}
+		},
+
+		prepareNext: function(delay) {
+			setTimeout(this.check.bind(this), delay || this.delay);
+		},
 
 		/**
 		 * Sends ajax request to get Zabbix server availability and message to show if server is not available.
-		 *
-		 * @param {boolean} nocache  Add 'nocache' parameter to get result not from cache.
 		 */
-		call: function(nocache) {
-			var params = nocache ? {nocache: true} : {};
+		check: function() {
 			new RPC.Call({
 				'method': 'zabbix.status',
-				'params': params,
-				'onSuccess': $.proxy(this.onSuccess, this)
+				'params': {nocache: true},
+				'onSuccess': this.onSuccess.bind(this)
 			});
 		},
 
-		/**
-		 * Parse ajax responses and show / hide warning message.
-		 *
-		 * @param {object} response  Ajax response.
-		 */
-		onSuccess: function(response) {
-			if (response.result === this.last_response) {
-				return false;
+		onSuccess: function(resp) {
+			if (resp.result) {
+				this.hideMessage();
 			}
-
-			this.last_response = response.result;
-
-			if (response.result) {
-				return this.hide();
+			else {
+				this.$message.text(resp.message);
+				this.showMessage()
 			}
-
-			this.setMessage(response.message);
-			return this.show();
+			this.prepareNext();
 		},
 
-		/**
-		 * Start server status checks with 5 sec delay after page is loaded.
-		 */
-		init: function() {
-			return window.setTimeout(function() {
-				// Looping function that check for server status every 10 seconds.
-				return window.setInterval(function() {
-					checker.call(true);
-				}, checker.timeout);
-			}, this.delay);
-		},
+		showMessage: function(e) {
+			if (!this.warning || (e && (e.pageY < this.message_top || e.type == 'mouseleave'))) {
+				$(document).off('mousemove.ServerChecker mouseleave.ServerChecker');
 
-		/**
-		 * Set warning message.
-		 *
-		 * @param {string} message  Warning message.
-		 */
-		setMessage: function(message) {
-			this.elem.innerText = message;
-		},
-
-		/**
-		 * Show warning message.
-		 */
-		show: function() {
-			if (this.is_show || this.last_response) {
-				return false;
+				this.warning = true;
+				this.$message
+					.css("display", "flex").hide()
+					.fadeIn(200);
 			}
+		},
 
-			this.is_show = true;
+		hideMessage: function(e) {
+			if (this.warning) {
+				if (e && e.type == 'mouseenter') {
+					$(document).on('mousemove.ServerChecker mouseleave.ServerChecker', this.showMessage.bind(this));
 
-			var value_opacity = 0;
-
-			this.elem.style.opacity = value_opacity;
-			this.elem.style.display = 'flex';
-
-			(function anim() {
-				if (!checker.is_show) {
-					return false;
-				}
-
-				checker.elem.style.opacity = (value_opacity += .1);
-				if (checker.elem.style.opacity < 1) {
-					requestAnimationFrame(anim);
+					this.message_top = this.$message.offset().top;
 				}
 				else {
-					checker.elem.style.removeProperty('opacity');
+					this.warning = false;
 				}
-			})();
-		},
-
-		/**
-		 * Hide warning message.
-		 */
-		hide: function() {
-			if (!this.is_show) {
-				return false;
+				this.$message.fadeOut(200);
 			}
-
-			this.is_show = false;
-
-			var value_opacity = 1;
-
-			this.elem.style.opacity = value_opacity;
-			this.elem.style.display = 'flex';
-
-			(function anim() {
-				if (checker.is_show) {
-					return false;
-				}
-
-				checker.elem.style.opacity = (value_opacity -= .1);
-				if (checker.elem.style.opacity < 0.1) {
-					checker.elem.style.display = 'none';
-					checker.elem.style.removeProperty('opacity');
-				}
-				else {
-					requestAnimationFrame(anim);
-				}
-			})();
 		}
 	};
 
-	checker.init();
-
-	// Event that hide warning message when mouse hover it.
-	$(checker.elem).on('mouseenter', function() {
-		var $obj = $(this),
-			offset = $obj.offset(),
-			x1 = Math.floor(offset.left),
-			x2 = x1 + $obj.outerWidth(),
-			y1 = Math.floor(offset.top),
-			y2 = y1 + $obj.outerHeight();
-
-		checker.hide();
-
-		$(document).on('mousemove.messagehide', function(e) {
-			if (e.pageX < x1 || e.pageX > x2 || e.pageY < y1 || e.pageY > y2) {
-				checker.show();
-				$(document).off('mousemove.messagehide');
-				$(document).off('mouseleave.messagehide');
-			}
-		});
-		$(document).on('mouseleave.messagehide', function() {
-			checker.show();
-			$(document).off('mouseleave.messagehide');
-			$(document).off('mousemove.messagehide');
-		});
-	});
+	ServerChecker.start($('#msg-global-footer'));
 });
