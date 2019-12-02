@@ -347,7 +347,6 @@ if (hasRequest('form')) {
 			$data['screen']['private'] = getRequest('private', PRIVATE_SHARING);
 			$data['screen']['users'] = getRequest('users', []);
 			$data['screen']['userGroups'] = getRequest('userGroups', []);
-			$data['screen']['templateid'] = null;
 		}
 	}
 	else {
