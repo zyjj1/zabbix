@@ -1407,7 +1407,7 @@ static void	host_event_maintenance_clean(host_event_maintenance_t *host_event_ma
 int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids)
 {
 	const char			*__function_name = "zbx_dc_get_event_maintenances";
-	zbx_hashset_t			host_maintenances;
+	zbx_hashset_t			host_event_maintenances;
 	int				i, j, k, ret = FAIL;
 	zbx_event_suppress_query_t	*query;
 	ZBX_DC_ITEM			*item;
@@ -1421,7 +1421,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	zbx_vector_uint64_create(&hostids);
 
-	zbx_hashset_create_ext(&host_maintenances, maintenanceids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create_ext(&host_event_maintenances, maintenanceids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)host_event_maintenance_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	/* event tags must be sorted by name to perform maintenance tag matching */
@@ -1435,12 +1435,12 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	RDLOCK_CACHE;
 
-	dc_get_host_maintenances_by_ids(maintenanceids, &host_maintenances, dc_assign_maintenances_to_host);
+	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_maintenances_to_host);
 
-	if (0 == host_maintenances.num_data)
+	if (0 == host_event_maintenances.num_data)
 		goto unlock;
 
-	zbx_hashset_iter_reset(&host_maintenances, &iter);
+	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
 
 	while (NULL != (host_event_maintenance = (host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -1476,7 +1476,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 		{
 			const zbx_dc_maintenance_t	*maintenance;
 
-			if (NULL == (host_event_maintenance = zbx_hashset_search(&host_maintenances,
+			if (NULL == (host_event_maintenance = zbx_hashset_search(&host_event_maintenances,
 					&hostids.values[j])))
 			{
 				continue;
@@ -1506,7 +1506,7 @@ unlock:
 	UNLOCK_CACHE;
 
 	zbx_vector_uint64_destroy(&hostids);
-	zbx_hashset_destroy(&host_maintenances);
+	zbx_hashset_destroy(&host_event_maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
