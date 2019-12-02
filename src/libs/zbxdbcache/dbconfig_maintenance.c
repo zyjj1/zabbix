@@ -864,6 +864,18 @@ int	zbx_dc_update_maintenances(void)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_assign_maintenance_to_host                                    *
+ *                                                                            *
+ * Purpose: assign maintenance to host                                        *
+ *                                                                            *
+ * Parameters: host_maintenances - [OUT] host with maintenance is inserted or *
+ *                                       updated to new maintenance           *
+ *             maintenance       - [IN] maintenance that host is in           *
+ *             hostid            - [IN] ID of the host                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, const zbx_dc_maintenance_t *maintenance,
 		zbx_uint64_t hostid)
 {
