@@ -34,14 +34,14 @@ typedef struct
 	zbx_uint64_t			hostid;
 	const zbx_dc_maintenance_t	*maintenance;
 }
-host_maintenance_t;
+zbx_host_maintenance_t;
 
 typedef struct
 {
 	zbx_uint64_t		hostid;
 	zbx_vector_ptr_t	maintenances;
 }
-host_event_maintenance_t;
+zbx_host_event_maintenance_t;
 
 /******************************************************************************
  *                                                                            *
@@ -885,9 +885,9 @@ int	zbx_dc_update_maintenances(void)
 static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, zbx_dc_maintenance_t *maintenance,
 		zbx_uint64_t hostid)
 {
-	host_maintenance_t	*host_maintenance, host_maintenance_local;
+	zbx_host_maintenance_t	*host_maintenance, host_maintenance_local;
 
-	if (NULL == (host_maintenance = (host_maintenance_t *)zbx_hashset_search(host_maintenances, &hostid)))
+	if (NULL == (host_maintenance = (zbx_host_maintenance_t *)zbx_hashset_search(host_maintenances, &hostid)))
 	{
 		host_maintenance_local.hostid = hostid;
 		host_maintenance_local.maintenance = maintenance;
@@ -916,10 +916,10 @@ static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, zbx_
 static void	dc_assign_event_maintenance_to_host(zbx_hashset_t *host_event_maintenances,
 		zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid)
 {
-	host_event_maintenance_t	*host_event_maintenance, host_event_maintenance_local;
+	zbx_host_event_maintenance_t	*host_event_maintenance, host_event_maintenance_local;
 
-	if (NULL == (host_event_maintenance = (host_event_maintenance_t *)zbx_hashset_search(host_event_maintenances,
-			&hostid)))
+	if (NULL == (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_search(
+			host_event_maintenances, &hostid)))
 	{
 		host_event_maintenance_local.hostid = hostid;
 		zbx_vector_ptr_create(&host_event_maintenance_local.maintenances);
@@ -1020,7 +1020,7 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 	zbx_uint64_t			maintenanceid;
 	zbx_host_maintenance_diff_t	*diff;
 	unsigned int			flags;
-	const host_maintenance_t	*host_maintenance;
+	const zbx_host_maintenance_t	*host_maintenance;
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
@@ -1398,7 +1398,7 @@ static int	dc_compare_tags(const void *d1, const void *d2)
 	return strcmp(tag1->tag, tag2->tag);
 }
 
-static void	host_event_maintenance_clean(host_event_maintenance_t *host_event_maintenance)
+static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_event_maintenance)
 {
 	zbx_vector_ptr_destroy(&host_event_maintenance->maintenances);
 }
@@ -1427,7 +1427,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 	ZBX_DC_FUNCTION			*function;
 	zbx_vector_uint64_t		hostids;
 	zbx_hashset_iter_t		iter;
-	host_event_maintenance_t	*host_event_maintenance;
+	zbx_host_event_maintenance_t	*host_event_maintenance;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1454,7 +1454,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
 
-	while (NULL != (host_event_maintenance = (host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vector_ptr_sort(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		zbx_vector_ptr_uniq(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
