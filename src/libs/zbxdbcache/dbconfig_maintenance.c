@@ -1413,7 +1413,6 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 	ZBX_DC_ITEM			*item;
 	ZBX_DC_FUNCTION			*function;
 	zbx_vector_uint64_t		hostids;
-	zbx_uint64_pair_t		pair;
 	zbx_hashset_iter_t		iter;
 	host_event_maintenance_t	*host_event_maintenance;
 
@@ -1444,8 +1443,8 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	while (NULL != (host_event_maintenance = (host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_sort(&host_event_maintenance->maintenances, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-		zbx_vector_ptr_uniq(&host_event_maintenance->maintenances, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_ptr_sort(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_ptr_uniq(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
 	for (i = 0; i < event_queries->values_num; i++)
@@ -1484,10 +1483,20 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 			for (k = 0; k < host_event_maintenance->maintenances.values_num; k++)
 			{
+				zbx_uint64_pair_t	pair;
+
+				pair.first = maintenance->maintenanceid;
+
 				maintenance = (zbx_dc_maintenance_t *)host_event_maintenance->maintenances.values[k];
 
 				if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
 					continue;
+
+				if (FAIL != zbx_vector_uint64_pair_search(&query->maintenances, pair,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					continue;
+				}
 
 				if (SUCCEED != dc_maintenance_match_tags(maintenance, &query->tags))
 					continue;
@@ -1496,7 +1505,6 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 				pair.second = maintenance->running_until;
 				zbx_vector_uint64_pair_append(&query->maintenances, pair);
 				ret = SUCCEED;
-				break;
 			}
 		}
 
