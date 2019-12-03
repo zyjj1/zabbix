@@ -1486,10 +1486,11 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 				zbx_uint64_pair_t	pair;
 
 				maintenance = (zbx_dc_maintenance_t *)host_event_maintenance->maintenances.values[k];
-				pair.first = maintenance->maintenanceid;
 
 				if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
 					continue;
+
+				pair.first = maintenance->maintenanceid;
 
 				if (FAIL != zbx_vector_uint64_pair_search(&query->maintenances, pair,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -1500,7 +1501,6 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 				if (SUCCEED != dc_maintenance_match_tags(maintenance, &query->tags))
 					continue;
 
-				pair.first = maintenance->maintenanceid;
 				pair.second = maintenance->running_until;
 				zbx_vector_uint64_pair_append(&query->maintenances, pair);
 				ret = SUCCEED;
