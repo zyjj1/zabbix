@@ -902,7 +902,7 @@ static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, zbx_
 	}
 }
 
-static void	dc_assign_maintenances_to_host(zbx_hashset_t *host_event_maintenances,
+static void	dc_assign_event_maintenance_to_host(zbx_hashset_t *host_event_maintenances,
 		zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid)
 {
 	host_event_maintenance_t	*host_event_maintenance, host_event_maintenance_local;
@@ -1435,7 +1435,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	RDLOCK_CACHE;
 
-	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_maintenances_to_host);
+	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_event_maintenance_to_host);
 
 	if (0 == host_event_maintenances.num_data)
 		goto unlock;
