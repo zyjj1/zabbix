@@ -875,10 +875,9 @@ int	zbx_dc_update_maintenances(void)
  *                                                                            *
  * Function: dc_assign_maintenance_to_host                                    *
  *                                                                            *
- * Purpose: assign maintenance to host                                        *
+ * Purpose: assign maintenance to a host, host can only be in one maintenance *
  *                                                                            *
- * Parameters: host_maintenances - [OUT] host with maintenance is inserted or *
- *                                       updated to new maintenance           *
+ * Parameters: host_maintenances - [OUT] host with maintenance                *
  *             maintenance       - [IN] maintenance that host is in           *
  *             hostid            - [IN] ID of the host                        *
  *                                                                            *
@@ -902,6 +901,18 @@ static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, zbx_
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_assign_event_maintenance_to_host                              *
+ *                                                                            *
+ * Purpose: assign maintenance to a host that event belongs to, events can be *
+ *          in multiple maintenances at a time                                *
+ *                                                                            *
+ * Parameters: host_event_maintenances - [OUT] host with maintenances         *
+ *             maintenance             - [IN] maintenance that host is in     *
+ *             hostid                  - [IN] ID of the host                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	dc_assign_event_maintenance_to_host(zbx_hashset_t *host_event_maintenances,
 		zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid)
 {
@@ -914,7 +925,8 @@ static void	dc_assign_event_maintenance_to_host(zbx_hashset_t *host_event_mainte
 		zbx_vector_ptr_create(&host_event_maintenance_local.maintenances);
 		zbx_vector_ptr_append(&host_event_maintenance_local.maintenances, maintenance);
 
-		zbx_hashset_insert(host_event_maintenances, &host_event_maintenance_local, sizeof(host_event_maintenance_local));
+		zbx_hashset_insert(host_event_maintenances, &host_event_maintenance_local,
+				sizeof(host_event_maintenance_local));
 		return;
 	}
 
@@ -928,10 +940,11 @@ typedef void	(*assign_maintenance_to_host_f)(zbx_hashset_t *host_maintenances,
  *                                                                            *
  * Function: dc_get_host_maintenances_by_ids                                  *
  *                                                                            *
- * Purpose: check which hosts must be processed by the specified maintenances *
+ * Purpose: get hosts and their maintenances                                  *
  *                                                                            *
- * Parameters: maintenance       - [IN] the maintenance ids                   *
- *             host_maintenances - [OUT] maintenance and matching host ids    *
+ * Parameters: maintenanceids    - [IN] the maintenance ids                   *
+ *             host_maintenances - [OUT] the maintenances running on hosts    *
+ *             cb                - [IN] callback function                     *
  *                                                                            *
  ******************************************************************************/
 static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids,
@@ -994,8 +1007,8 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
  *                                                                            *
  * Purpose: gets maintenance updates for all hosts                            *
  *                                                                            *
- * Parameters: maintenances - [IN] the running maintenances                   *
- *             updates      - [OUT] updates to be applied                     *
+ * Parameters: host_maintenances - [IN] the maintenances running on hosts     *
+ *             updates           - [OUT] updates to be applied                *
  *                                                                            *
  ******************************************************************************/
 static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zbx_vector_ptr_t *updates)
