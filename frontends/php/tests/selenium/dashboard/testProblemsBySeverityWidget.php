@@ -108,22 +108,22 @@ class testProblemsBySeverityWidget extends CWebTest {
 							'Average' => 1
 						],
 						'Group to check Overview' => [
-							'Disaster' => '1\nof 1',
-							'High' => '1\nof 1',
-							'Average' => '1\nof 2',
-							'Warning' => '1\nof 1',
+							'Disaster' => "1\nof 1",
+							'High' => "1\nof 1",
+							'Average' => "1\nof 2",
+							'Warning' => "1\nof 1",
 							'Information' => '1',
-							'Not classified' => '1\nof 1'
+							'Not classified' => "1\nof 1"
 						],
 						'Host group for suppression' => [
-							'Average' => '1\nof 1'
+							'Average' => "1\nof 1"
 						],
 						'Host group for tag permissions' => [
-							'Not classified' => '2\nof 2'
+							'Not classified' => "2\nof 2"
 						],
 						'Zabbix servers' => [
-							'Average' => '1\nof 1',
-							'Warning' => '5\nof 5'
+							'Average' => "1\nof 1",
+							'Warning' => "5\nof 5"
 						]
 					]
 				]
@@ -174,12 +174,12 @@ class testProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Group to check Overview' => [
-							'Disaster' => '1\nof 1',
-							'High' => '1\nof 1',
-							'Average' => '1\nof 1',
-							'Warning' => '1\nof 1',
+							'Disaster' => "1\nof 1",
+							'High' => "1\nof 1",
+							'Average' => "1\nof 1",
+							'Warning' => "1\nof 1",
 							'Information' => '1',
-							'Not classified' => '1\nof 1'
+							'Not classified' => "1\nof 1"
 						]
 					]
 				]
@@ -195,7 +195,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Zabbix servers' => [
-							'Warning' => '1\nof 1'
+							'Warning' => "1\nof 1"
 						]
 					]
 				]
@@ -263,7 +263,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
 		$this->checkWidgetContent($data, $widget);
 
-		// Check the content of the overlay pop-up if needed.
+		// Check the content of details hintbox for Host "ЗАББИКС Сервер" and severity "Average" if needed.
 		if (CTestArrayHelper::get($data, 'check', 'nothing') === 'pop-up') {
 			$this->checkPopupContent($data, $widget);
 		}
@@ -326,13 +326,13 @@ class testProblemsBySeverityWidget extends CWebTest {
 							'Average' => '1'
 						],
 						'Group to check Overview' => [
-							'Average' => '1\nof 2'
+							'Average' => "1\nof 2"
 						],
 						'Host group for suppression' => [
-							'Average' => '1\nof 1'
+							'Average' => "1\nof 1"
 						],
 						'Zabbix servers' => [
-							'Average' => '1\nof 1'
+							'Average' => "1\nof 1"
 						]
 					]
 				]
@@ -499,7 +499,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->checkMessages($widget);
 		$this->checkWidgetContent($data, $widget);
 
-		// Check the content of the overlay pop-up if needed.
+		// Check the content of details hintbox for Host "ЗАББИКС Сервер" and severity "Average" if needed.
 		if (CTestArrayHelper::get($data, 'check', 'nothing') === 'pop-up') {
 			$this->checkPopupContent($data, $widget);
 		}
@@ -718,6 +718,10 @@ class testProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
+	/*
+	 * This function checks problem details hintbox content for Host "ЗАББИКС Сервер" and severity "Average".
+	 * Only one such problem should exist.
+	 */
 	private function checkPopupContent($data, $widget){
 		$expected_popup = [
 			'fields' => [
