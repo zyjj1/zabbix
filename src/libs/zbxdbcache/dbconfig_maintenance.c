@@ -1485,9 +1485,8 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 			{
 				zbx_uint64_pair_t	pair;
 
-				pair.first = maintenance->maintenanceid;
-
 				maintenance = (zbx_dc_maintenance_t *)host_event_maintenance->maintenances.values[k];
+				pair.first = maintenance->maintenanceid;
 
 				if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
 					continue;
