@@ -91,7 +91,7 @@ function getLocales() {
  *
  * @param string $language  ISO639-1 code or null for English support URL.
  *
- * @return string.
+ * @return string
  */
 function getSupportUrl($language = null) {
 	$urls = [
