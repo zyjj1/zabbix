@@ -95,8 +95,8 @@ function getLocales() {
  */
 function getSupportUrl($language = null) {
 	$urls = [
-		'ru' => 'https://www.zabbix.com/ru/support',
 		'ja' => 'https://www.zabbix.com/jp/support',
+		'ru' => 'https://www.zabbix.com/ru/support',
 		'zh' => 'https://www.zabbix.com/cn/support'
 	];
 
