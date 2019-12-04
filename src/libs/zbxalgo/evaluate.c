@@ -47,9 +47,6 @@
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
-#define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
-
 static const char	*ptr;		/* character being looked at */
 static int		level;		/* expression nesting level  */
 
@@ -693,7 +690,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	if (ZBX_UNKNOWN == *value)
 	{
-		/* Map Unknown result to error. Callers currently do not operate with ZBX_UNKNOWN. */
+		/* Map Unknown result to error. */
 		if (NULL != unknown_msgs)
 		{
 			if (0 > unknown_idx)
@@ -722,11 +719,9 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 			zbx_snprintf(error, max_error_len, "%s(): internal error: no message for unknown result",
 					__function_name);
 		}
-
-		*value = ZBX_INFINITY;
 	}
 
-	if (ZBX_INFINITY == *value)
+	if (ZBX_INFINITY == *value || ZBX_UNKNOWN == *value)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
 		return FAIL;
