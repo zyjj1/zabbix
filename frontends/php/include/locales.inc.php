@@ -95,11 +95,11 @@ function getLocales() {
  */
 function getSupportUrl($language) {
 	$urls = [
-		'ru' => 'https://www.zabbix.com/ru/support/',
-		'ja' => 'https://www.zabbix.com/jp/support/'
+		'ru' => 'https://www.zabbix.com/ru/support',
+		'ja' => 'https://www.zabbix.com/jp/support'
 	];
 
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support/';
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
 }
 
 /**
