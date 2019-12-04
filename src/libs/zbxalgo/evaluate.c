@@ -746,8 +746,8 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
  *             max_error_len - [IN]  error buffer size                        *
  *                                                                            *
  * Return value: SUCCEED - expression evaluated successfully,                 *
- *               FAIL    - expression evaluation failed                       *
  *                         or evaluation result is undefined (ZBX_UNKNOWN)    *
+ *               FAIL    - expression evaluation failed                       *
  *                                                                            *
  ******************************************************************************/
 int	evaluate_unknown(double *value, const char *expression, char *error, size_t max_error_len)
@@ -772,7 +772,7 @@ int	evaluate_unknown(double *value, const char *expression, char *error, size_t 
 		*value = ZBX_INFINITY;
 	}
 
-	if (ZBX_INFINITY == *value || ZBX_UNKNOWN == *value)
+	if (ZBX_INFINITY == *value)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
 		return FAIL;

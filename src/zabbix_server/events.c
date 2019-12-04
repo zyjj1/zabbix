@@ -698,9 +698,8 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		pos = token.loc.r;
 	}
 
-	if (SUCCEED == evaluate_unknown(&result, expression, error, sizeof(error)))
-		ret = zbx_double_compare(result, 1);
-	else if (ZBX_UNKNOWN == result)
+	if (SUCCEED == evaluate_unknown(&result, expression, error, sizeof(error)) &&
+			(result == ZBX_UNKNOWN || SUCCEED == zbx_double_compare(result, 1)))
 		ret = SUCCEED;
 
 out:
