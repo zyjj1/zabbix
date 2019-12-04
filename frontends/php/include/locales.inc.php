@@ -97,7 +97,7 @@ function getSupportUrl($language = null) {
 	$urls = [
 		'ru' => 'https://www.zabbix.com/ru/support',
 		'ja' => 'https://www.zabbix.com/jp/support',
-		'cn' => 'https://www.zabbix.com/cn/support'
+		'zh' => 'https://www.zabbix.com/cn/support'
 	];
 
 	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
