@@ -690,7 +690,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	if (ZBX_UNKNOWN == *value)
 	{
-		/* Map Unknown result to error. */
+		/* Map Unknown result to error. Callers currently do not operate with ZBX_UNKNOWN. */
 		if (NULL != unknown_msgs)
 		{
 			if (0 > unknown_idx)
@@ -719,6 +719,57 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 			zbx_snprintf(error, max_error_len, "%s(): internal error: no message for unknown result",
 					__function_name);
 		}
+
+		*value = ZBX_INFINITY;
+	}
+
+	if (ZBX_INFINITY == *value)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
+		return FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_unknown                                                 *
+ *                                                                            *
+ * Purpose: evaluate an expression like "(26.416>10) and not(0=ZBX_UNKNOWN0)" *
+ *                                                                            *
+ * Parameters: value         - [OUT] expression evaluation result             *
+ *             expression    - [IN]  expression to evaluate                   *
+ *             error         - [OUT] error message buffer                     *
+ *             max_error_len - [IN]  error buffer size                        *
+ *                                                                            *
+ * Return value: SUCCEED - expression evaluated successfully,                 *
+ *               FAIL    - expression evaluation failed                       *
+ *                         or evaluation result is undefined (ZBX_UNKNOWN)    *
+ *                                                                            *
+ ******************************************************************************/
+int	evaluate_unknown(double *value, const char *expression, char *error, size_t max_error_len)
+{
+	const char	*__function_name = "evaluate_with_unknown";
+	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
+						/* to catch errors */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
+
+	ptr = expression;
+	level = 0;
+
+	buffer = error;
+	max_buffer_len = max_error_len;
+
+	*value = evaluate_term1(&unknown_idx);
+
+	if ('\0' != *ptr && ZBX_INFINITY != *value)
+	{
+		zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unexpected token at \"%s\".", ptr);
+		*value = ZBX_INFINITY;
 	}
 
 	if (ZBX_INFINITY == *value || ZBX_UNKNOWN == *value)

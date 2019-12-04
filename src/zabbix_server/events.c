@@ -589,7 +589,7 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
  *                         (no matter what the old events are)                *
  *                                                                            *
  ******************************************************************************/
-static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event)
+static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event)
 {
 	int		i, ret;
 	zbx_tag_t	*tag;
@@ -599,7 +599,7 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 	{
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-			return SUCCEED;
+			return ZBX_UNKNOWN_STR "0";
 	}
 
 	switch (condition->type)
@@ -609,9 +609,9 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag.tag))
-					return SUCCEED;
+					return "1";
 			}
-			return FAIL;
+			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 			for (i = 0; i < event->tags.values_num; i++)
@@ -622,29 +622,29 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 				if (0 == strcmp(tag->tag, cond->tag) &&
 					SUCCEED == zbx_strmatch_condition(tag->value, cond->value, cond->op))
 				{
-					return SUCCEED;
+					return "1";
 				}
 			}
-			return FAIL;
+			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			ret =  correlation_match_event_hostgroup(event, condition->data.group.groupid);
 			if (CONDITION_OPERATOR_NOT_EQUAL == condition->data.group.op)
-				ret = (SUCCEED == ret ? FAIL : SUCCEED);
+				return (SUCCEED == ret ? "0" : "1");
 
-			return ret;
+			return (SUCCEED == ret ? "1" : "0");
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			for (i = 0; i < event->tags.values_num; i++)
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
-					return SUCCEED;
+					return ZBX_UNKNOWN_STR "0";
 			}
-			return FAIL;
+			break;
 	}
 
-	return FAIL;
+	return "0";
 }
 
 /******************************************************************************
@@ -664,21 +664,19 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
  ******************************************************************************/
 static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_EVENT *event)
 {
-	char			*expression, error[256], *dyn_value = NULL;
+	char			*expression, error[256];
 	const char		*value;
 	zbx_token_t		token;
-	int			pos = 0, ret = FAIL, i = 0;
+	int			pos = 0, ret = FAIL;
 	zbx_uint64_t		conditionid;
 	zbx_strloc_t		*loc;
 	zbx_corr_condition_t	*condition;
 	double			result;
-	zbx_vector_ptr_t	unknown_msgs;	/* pointers to messages about origins of 'unknown' values */
 
 	if ('\0' == *correlation->formula)
 		return SUCCEED;
 
 	expression = zbx_strdup(NULL, correlation->formula);
-	zbx_vector_ptr_create(&unknown_msgs);
 
 	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
@@ -690,35 +688,22 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		if (SUCCEED != is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
 			continue;
 
-		if (NULL == (condition = (zbx_corr_condition_t *)zbx_hashset_search(&correlation_rules.conditions, &conditionid)))
+		if (NULL == (condition = (zbx_corr_condition_t *)zbx_hashset_search(&correlation_rules.conditions,
+				&conditionid)))
 			goto out;
 
-		if (ZBX_CORR_CONDITION_OLD_EVENT_TAG == condition->type ||
-				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE == condition->type)
-		{
-			value = dyn_value = zbx_dsprintf(NULL, ZBX_UNKNOWN_STR "%d", i);
-			i++;
-		}
-		else if (SUCCEED == correlation_condition_match_new_event(condition, event))
-			value = "1";
-		else
-			value = "0";
+		value = correlation_condition_match_new_event(condition, event);
 
 		zbx_replace_string(&expression, token.loc.l, &token.loc.r, value);
 		pos = token.loc.r;
-
-		if (NULL != dyn_value)
-			zbx_free(dyn_value);
 	}
 
-	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), &unknown_msgs))
+	if (SUCCEED == evaluate_unknown(&result, expression, error, sizeof(error)))
 		ret = zbx_double_compare(result, 1);
 	else if (ZBX_UNKNOWN == result)
 		ret = SUCCEED;
 
 out:
-	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&unknown_msgs);
 	zbx_free(expression);
 
 	return ret;
@@ -860,6 +845,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 	int			i;
 	zbx_tag_t		*tag;
 	char			*tag_esc, *filter = NULL;
+	const char		*tmp;
 	size_t			filter_alloc = 0, filter_offset = 0;
 	zbx_vector_str_t	values;
 
@@ -869,10 +855,13 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-			if (SUCCEED == correlation_condition_match_new_event(condition, event))
+			tmp = (char*)correlation_condition_match_new_event(condition, event);
+			if (0 == strcmp(tmp, "0"))
+				filter = (char *)"0=1";
+			else if (0 == strcmp(tmp, "1"))
 				filter = (char *)"1=1";
 			else
-				filter = (char *)"0=1";
+				THIS_SHOULD_NEVER_HAPPEN;
 
 			return zbx_strdup(NULL, filter);
 	}
