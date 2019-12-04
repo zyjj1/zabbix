@@ -174,7 +174,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$tags = getRequest('tags', []);
+	$tags = array_values(getRequest('tags', []));
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 
 	// Remove empty new tag lines.

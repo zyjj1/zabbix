@@ -210,6 +210,7 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessionsType',
 			'form_refresh'
 		]);
+		$data['exec_params'] = array_values($data['exec_params']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
