@@ -27,18 +27,26 @@ jQuery(function($) {
 	 * @type {Object}
 	 */
 	var ServerChecker = {
-		$message: null,
-		message_top: 0,
+		$elem: null,
+		elem_offset_top: 0,
 		delay: 10000, // 10 seconds
 		warning: false,
 
-		start: function($message) {
-			if ($message.length) {
-				this.prepareNext(5000);
-
-				this.$message = $message;
-				this.$message.on('mouseenter', this.hideMessage.bind(this));
+		/**
+		 * Function to start check server status via RPC call.
+		 *
+		 * @param {object}  $elem    General element.
+		 * @param {integer} timeout  Check rate.
+		 */
+		start: function($elem, timeout) {
+			if (!$elem.length) {
+				return false;
 			}
+
+			this.prepareNext(timeout);
+
+			this.$elem = $elem;
+			this.$elem.on('mouseenter', this.hideMessage.bind(this));
 		},
 
 		prepareNext: function(delay) {
@@ -56,42 +64,45 @@ jQuery(function($) {
 			});
 		},
 
-		onSuccess: function(resp) {
-			if (resp.result) {
+		onSuccess: function(response) {
+			if (response.result) {
 				this.hideMessage();
 			}
 			else {
-				this.$message.text(resp.message);
+				this.$elem.text(response.message);
 				this.showMessage()
 			}
+
 			this.prepareNext();
 		},
 
 		showMessage: function(e) {
-			if (!this.warning || (e && (e.pageY < this.message_top || e.type == 'mouseleave'))) {
+			if (!this.warning || (e && (e.pageY < this.elem_offset_top || e.type === 'mouseleave'))) {
 				$(document).off('mousemove.ServerChecker mouseleave.ServerChecker');
 
 				this.warning = true;
-				this.$message
-					.css("display", "flex").hide()
+				this.$elem
+					.css('display', 'flex')
+					.hide()
 					.fadeIn(200);
 			}
 		},
 
 		hideMessage: function(e) {
 			if (this.warning) {
-				if (e && e.type == 'mouseenter') {
+				if (e && e.type === 'mouseenter') {
 					$(document).on('mousemove.ServerChecker mouseleave.ServerChecker', this.showMessage.bind(this));
 
-					this.message_top = this.$message.offset().top;
+					this.elem_offset_top = this.$elem.offset().top;
 				}
 				else {
 					this.warning = false;
 				}
-				this.$message.fadeOut(200);
+
+				this.$elem.fadeOut(200);
 			}
 		}
 	};
 
-	ServerChecker.start($('#msg-global-footer'));
+	ServerChecker.start($('#msg-global-footer'), 5000);
 });
