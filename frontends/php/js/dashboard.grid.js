@@ -1261,6 +1261,11 @@
 		updateWidgetContent($obj, data, widget);
 	}
 
+	/**
+	 * @param {object} $obj
+	 * @param {object} data
+	 * @param {object} widget
+	 */
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
 			fields = $('form', data.dialogue['body']).serializeJSON(),
@@ -1323,9 +1328,10 @@
 				.appendTo($obj);
 		}
 
-		$('.dialogue-widget-save', data.dialogue.div).prop('disabled', true);
+		var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
+		$save_btn.prop('disabled', true);
 
-		$.ajax({
+		overlays_stack.getById('widgetConfg').xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
@@ -1335,7 +1341,7 @@
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
-					$('.dialogue-widget-save', data.dialogue.div).prop('disabled', false);
+					$save_btn.prop('disabled', false);
 				}
 				else {
 					// No errors, proceed with update.
@@ -1395,6 +1401,9 @@
 				}
 			}
 		})
+			.fail(function() {
+				$save_btn.prop('disabled', false);
+			})
 			.always(function() {
 				if ($placeholder) {
 					$placeholder.remove();
