@@ -64,7 +64,7 @@ if (hasRequest('valuemapid')) {
 if (hasRequest('add') || hasRequest('update')) {
 	$valuemap = [
 		'name' => getRequest('name'),
-		'mappings' => array_values(getRequest('mappings'))
+		'mappings' => getRequest('mappings')
 	];
 
 	if (hasRequest('update')) {
