@@ -1266,6 +1266,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	if (1 == process_num)
+		DCsync_configuration(ZBX_DBSYNC_INIT);
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",

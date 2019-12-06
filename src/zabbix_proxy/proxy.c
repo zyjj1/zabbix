@@ -289,6 +289,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 	}
+	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
+	}
 	else if (local_server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
@@ -363,11 +368,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
 	{
@@ -1109,6 +1109,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
+				if (0 == CONFIG_CONFSYNCER_FORKS)
+					DCconfig_wait_sync();
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
 				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
