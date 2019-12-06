@@ -52,7 +52,13 @@ class CConfiguration extends CApiService {
 		$writer->formatOutput(false);
 		$export->setWriter($writer);
 
-		return $export->export();
+		$export_data = $export->export();
+
+		if ($export_data === false) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		return $export_data;
 	}
 
 	/**
@@ -109,7 +115,8 @@ class CConfiguration extends CApiService {
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'templateLinkage' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'templates' =>			['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
