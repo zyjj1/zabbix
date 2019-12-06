@@ -75,12 +75,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	zbx_set_sigusr_handler(zbx_dbconfig_sigusr_handler);
 
-	/* the initial configuration sync is done by server before worker processes are forked */
-	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	DCsync_configuration(ZBX_DBSYNC_INIT);
 
 	while (ZBX_IS_RUNNING())
 	{

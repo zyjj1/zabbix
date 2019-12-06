@@ -1088,12 +1088,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				while (0 == DCconfig_get_last_sync_time())
-				{
-					struct timespec	ts = {0, 100000000};
-
-					nanosleep(&ts, NULL);
-				}
+				DCconfig_wait_sync();
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);

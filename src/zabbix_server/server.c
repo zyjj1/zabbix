@@ -1055,25 +1055,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	/* make initial configuration sync before worker processes are forked */
-	DCsync_configuration(ZBX_DBSYNC_INIT);
-
-	if (SUCCEED != zbx_check_postinit_tasks(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	/* update maintenance states */
-	zbx_dc_update_maintenances();
-
-	DBclose();
-
-	zbx_vc_enable();
-
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
@@ -1116,7 +1097,26 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
+				/* make initial configuration sync before worker processes are forked */
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
+				DCconfig_wait_sync();
+
+				DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+				if (SUCCEED != zbx_check_postinit_tasks(&error))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
+							error);
+					zbx_free(error);
+					exit(EXIT_FAILURE);
+				}
+
+				/* update maintenance states */
+				zbx_dc_update_maintenances();
+
+				DBclose();
+
+				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_POLLER_TYPE_NORMAL;
