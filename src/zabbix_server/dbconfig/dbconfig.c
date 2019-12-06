@@ -78,7 +78,13 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	sec = zbx_time();
+	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT);
+	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
+			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
+	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 
 	while (ZBX_IS_RUNNING())
 	{

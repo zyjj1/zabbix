@@ -47,6 +47,8 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t);
 
+extern int	CONFIG_CONFSYNCER_FORKS;
+
 typedef struct
 {
 	zbx_counter_value_t	online;
@@ -1266,8 +1268,17 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (1 == process_num)
+	/* configuration sync is performed passively by trappers */
+	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
+	{
+		sec = zbx_time();
+
+		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 		DCsync_configuration(ZBX_DBSYNC_INIT);
+		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec]",
+				get_process_type_string(process_type), zbx_time() - sec);
+		sec = 0.0;
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
