@@ -1046,10 +1046,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	DCsync_configuration(ZBX_DBSYNC_INIT);
-	DBclose();
-
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
@@ -1092,6 +1088,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
+				while (0 == DCconfig_get_last_sync_time())
+				{
+					struct timespec	ts = {0, 100000000};
+
+					nanosleep(&ts, NULL);
+				}
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);

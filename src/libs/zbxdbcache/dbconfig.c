@@ -5274,12 +5274,19 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+out:
+	if (0 == sync_in_progress)
+	{
+		/* non recoverable database error is encountered */
+		THIS_SHOULD_NEVER_HAPPEN;
+		START_SYNC;
+	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
-out:
+
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&hosts_sync);
 	zbx_dbsync_clear(&hi_sync);

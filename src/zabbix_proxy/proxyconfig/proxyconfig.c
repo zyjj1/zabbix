@@ -153,7 +153,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
+	DCsync_configuration(ZBX_DBSYNC_INIT);
 	zbx_set_sigusr_handler(zbx_proxyconfig_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
