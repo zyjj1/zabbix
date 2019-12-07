@@ -144,6 +144,16 @@ class testScripts extends CAPITest {
 
 	public static function script_get() {
 		return [
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90020'],
+					'groupids' => ['no such id']
+				],
+				'expect' => [
+					'error' => 'Invalid parameter "/groupids/1": a number is expected.'
+				]
+			],
 			// 90020 is top group, nothing to inherit from
 			[
 				'params' => [
@@ -201,18 +211,6 @@ class testScripts extends CAPITest {
 					'error' => null,
 					'has.scriptid' => ['90020'],
 					'!has.scriptid' => ['90021']
-				]
-			],
-			// returns empty intersection of both selections
-			[
-				'params' => [
-					'output' => ['scriptid'],
-					'hostids' => ['90020'],
-					'groupids' => ['no such id']
-				],
-				'expect' => [
-					'error' => null,
-					'!has.scriptid' => ['90020', '90021', '90022', '90023']
 				]
 			],
 			// selectHosts test
