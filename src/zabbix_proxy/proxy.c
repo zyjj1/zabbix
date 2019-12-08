@@ -286,11 +286,13 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	}
 	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
+		/* make initial configuration sync before worker processes are forked on active Zabbix proxy */
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
 	{
+		/* make initial configuration sync before worker processes are forked on passive Zabbix proxy */
 		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
 		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
 	}

@@ -297,6 +297,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	}
 	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
+		/* make initial configuration sync before worker processes are forked */
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 	}
@@ -1097,7 +1098,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
-				/* make initial configuration sync before worker processes are forked */
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				DCconfig_wait_sync();
 
