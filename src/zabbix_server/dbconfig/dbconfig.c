@@ -70,9 +70,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_setproctitle("%s [waiting %d sec for processes]", get_process_type_string(process_type),
-			CONFIG_CONFSYNCER_FREQUENCY);
-
 	zbx_set_sigusr_handler(zbx_dbconfig_sigusr_handler);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));

@@ -1268,16 +1268,11 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	/* configuration sync is performed passively by trappers */
+	/* configuration sync is performed by trappers on passive Zabbix proxy */
 	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
 	{
-		sec = zbx_time();
-
 		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 		DCsync_configuration(ZBX_DBSYNC_INIT);
-		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec]",
-				get_process_type_string(process_type), zbx_time() - sec);
-		sec = 0.0;
 	}
 
 	while (ZBX_IS_RUNNING())
