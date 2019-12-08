@@ -1090,6 +1090,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
 				DCconfig_wait_sync();
 				break;
+			case ZBX_PROCESS_TYPE_TRAPPER:
+				thread_args.args = &listen_sock;
+				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
+				if (0 == CONFIG_CONFSYNCER_FORKS)
+					DCconfig_wait_sync();
+				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);
 				break;
@@ -1105,12 +1111,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_TRAPPER:
-				thread_args.args = &listen_sock;
-				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
-				if (0 == CONFIG_CONFSYNCER_FORKS)
-					DCconfig_wait_sync();
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
 				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
