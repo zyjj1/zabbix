@@ -21,6 +21,7 @@ package com.zabbix.gateway;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.HashSet;
 import javax.management.AttributeList;
 
@@ -49,6 +50,7 @@ class JMXItemChecker extends ItemChecker
 
 	private String username;
 	private String password;
+	private String jmx_endpoint;
 
 	static final int DISCOVERY_MODE_ATTRIBUTES = 0;
 	static final int DISCOVERY_MODE_BEANS = 1;
@@ -56,8 +58,6 @@ class JMXItemChecker extends ItemChecker
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
-
-		String jmx_endpoint;
 
 		try
 		{
@@ -289,35 +289,48 @@ class JMXItemChecker extends ItemChecker
 	private void discoverAttributes(JSONArray counters, ObjectName name) throws Exception
 	{
 		Map<String, Object> values = new HashMap<String, Object>();
-
 		MBeanAttributeInfo[] attributeArray = mbsc.getMBeanInfo(name).getAttributes();
-		int i = 0;
-		String[] attributeNames = new String[attributeArray.length];
 
-		for (MBeanAttributeInfo attrInfo : attributeArray)
-			attributeNames[i++] = attrInfo.getName();
+		if (0 == attributeArray.length)
+		{
+			logger.trace("object has no attributes");
+			return;
+		}
 
 		AttributeList attributes = new AttributeList();
+		String discoveredObjKey = jmx_endpoint + name;
+		DiscoveryObject cachedObj = JavaGateway.discoveredObjects.get(discoveredObjKey);
+		long now = System.currentTimeMillis();
 
-		try
+		if (null != cachedObj && SocketProcessor.MILLISECONDS_IN_DAY >= now - (cachedObj.timestamp))
 		{
-			attributes = mbsc.getAttributes(name, attributeNames);
-		}
-		catch (Exception e1)
-		{
-			for (MBeanAttributeInfo attrInfo : attributeArray)
+			if (cachedObj.bulk)
 			{
 				try
 				{
-					Object attrValue = mbsc.getAttribute(name, attrInfo.getName());
-					attributes.add(new javax.management.Attribute(attrInfo.getName(), attrValue));
+					attributes = collectAttributes(name, attributeArray);
 				}
-				catch (Exception e2)
+				catch (Exception e)
 				{
-					Object[] logInfo = {name, attrInfo.getName(), ZabbixException.getRootCauseMessage(e2)};
-					logger.warn("attribute processing '{},{}' failed: {}", logInfo);
-					logger.debug("error caused by", e2);
+					JavaGateway.discoveredObjects.put(discoveredObjKey, new DiscoveryObject(false, now));
+					cachedObj.setBulk(false);
 				}
+			}
+
+			if (!cachedObj.bulk)
+				attributes = collectAttribute(name, attributeArray);
+		}
+		else
+		{
+			try
+			{
+				attributes = collectAttributes(name, attributeArray);
+				JavaGateway.discoveredObjects.put(discoveredObjKey, new DiscoveryObject(true, now));
+			}
+			catch (Exception e)
+			{
+				attributes = collectAttribute(name, attributeArray);
+				JavaGateway.discoveredObjects.put(discoveredObjKey, new DiscoveryObject(false, now));
 			}
 		}
 
@@ -333,12 +346,6 @@ class JMXItemChecker extends ItemChecker
 		for (MBeanAttributeInfo attrInfo : attributeArray)
 		{
 			logger.trace("discovered attribute '{}'", attrInfo.getName());
-
-			if (!attrInfo.isReadable())
-			{
-				logger.trace("attribute not readable, skipping");
-				continue;
-			}
 
 			if (null == values.get(attrInfo.getName()))
 			{
@@ -359,6 +366,48 @@ class JMXItemChecker extends ItemChecker
 				logger.debug("error caused by", e);
 			}
 		}
+	}
+
+	private AttributeList collectAttributes(ObjectName name, MBeanAttributeInfo[] attributeArray) throws Exception
+	{
+		int i = 0;
+		String[] attributeNames = new String[attributeArray.length];
+
+		for (MBeanAttributeInfo attrInfo : attributeArray)
+		{
+			if (!attrInfo.isReadable())
+			{
+				logger.trace("attribute '{}' not readable, skipping", attrInfo.getName());
+				continue;
+			}
+
+			attributeNames[i++] = attrInfo.getName();
+		}
+
+		return mbsc.getAttributes(name, attributeNames);
+
+	}
+
+	private AttributeList collectAttribute(ObjectName name, MBeanAttributeInfo[] attributeArray)
+	{
+		AttributeList attributes = new AttributeList();
+
+		for (MBeanAttributeInfo attrInfo : attributeArray)
+		{
+			try
+			{
+				Object attrValue = mbsc.getAttribute(name, attrInfo.getName());
+				attributes.add(new javax.management.Attribute(attrInfo.getName(), attrValue));
+			}
+			catch (Exception e)
+			{
+				Object[] logInfo = {name, attrInfo.getName(), ZabbixException.getRootCauseMessage(e)};
+				logger.warn("attribute processing '{},{}' failed: {}", logInfo);
+				logger.debug("error caused by", e);
+			}
+		}
+
+		return attributes;
 	}
 
 	private void discoverBeans(JSONArray counters, ObjectName name)

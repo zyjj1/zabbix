@@ -20,6 +20,9 @@
 package com.zabbix.gateway;
 
 import java.net.Socket;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.json.*;
 
@@ -30,7 +33,11 @@ class SocketProcessor implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger(SocketProcessor.class);
 
+	private static long cleanupTime = System.currentTimeMillis();
 	private Socket socket;
+
+	public static final long MILLISECONDS_IN_HOUR = 1000 * 60 * 60;
+	public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_HOUR * 24;
 
 	SocketProcessor(Socket socket)
 	{
@@ -52,9 +59,21 @@ class SocketProcessor implements Runnable
 			JSONObject request = new JSONObject(speaker.getRequest());
 
 			if (request.getString(ItemChecker.JSON_TAG_REQUEST).equals(ItemChecker.JSON_REQUEST_INTERNAL))
+			{
 				checker = new InternalItemChecker(request);
+			}
 			else if (request.getString(ItemChecker.JSON_TAG_REQUEST).equals(ItemChecker.JSON_REQUEST_JMX))
+			{
 				checker = new JMXItemChecker(request);
+
+				long now = System.currentTimeMillis();
+
+				if (MILLISECONDS_IN_HOUR <= now - cleanupTime)
+				{
+					discoveredObjCleaner(now);
+					cleanupTime = now;
+				}
+			}
 			else
 				throw new ZabbixException("bad request tag value: '%s'", request.getString(ItemChecker.JSON_TAG_REQUEST));
 
@@ -100,5 +119,24 @@ class SocketProcessor implements Runnable
 		}
 
 		logger.debug("finished processing incoming connection");
+	}
+
+	private void discoveredObjCleaner(long now)
+	{
+		List<String> keys = new ArrayList<String>();
+
+		for (Map.Entry<String, DiscoveryObject> entry : JavaGateway.discoveredObjects.entrySet())
+		{
+			DiscoveryObject cachedObj = entry.getValue();
+
+			if (MILLISECONDS_IN_DAY <= now - cachedObj.timestamp)
+				keys.add(entry.getKey());
+		}
+
+		if (null != keys)
+		{
+			for (String objName : keys)
+				JavaGateway.discoveredObjects.remove(objName);
+		}
 	}
 }
