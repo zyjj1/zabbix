@@ -21,7 +21,6 @@ package com.zabbix.gateway;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.HashSet;
 import javax.management.AttributeList;
 
