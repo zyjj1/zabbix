@@ -1686,54 +1686,6 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: init_action_conditions                                           *
- *                                                                            *
- * Purpose: initialize and fill action evaluation data                        *
- *                                                                            *
- * Parameters: conditions - [OUT] action conditions data                      *
- *             opflags    - [IN]  flags specifying which actions to get       *
- *                                based on their operation classes            *
- *                                (see ZBX_ACTION_OPCLASS_* defines)          *
- *                                                                            *
- ******************************************************************************/
-void	init_action_conditions(zbx_action_conditions_t *conditions, unsigned char opflags)
-{
-	int	i;
-
-	zbx_vector_ptr_create(&conditions->actions);
-
-	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
-		zbx_hashset_create(&conditions->uniq_conditions[i], 0,
-				uniq_conditions_hash_func, uniq_conditions_compare_func);
-
-	zbx_dc_get_actions_eval(&conditions->actions, conditions->uniq_conditions, opflags);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: free_action_conditions                                           *
- *                                                                            *
- * Purpose: release allocated action evaluation data                          *
- *                                                                            *
- * Parameters: conditions - [IN] action conditions data                       *
- *                                                                            *
- ******************************************************************************/
-void	free_action_conditions(zbx_action_conditions_t *conditions)
-{
-	int	i;
-
-	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
-	{
-		zbx_conditions_eval_clean(&conditions->uniq_conditions[i]);
-		zbx_hashset_destroy(&conditions->uniq_conditions[i]);
-	}
-
-	zbx_vector_ptr_clear_ext(&conditions->actions, (zbx_clean_func_t)zbx_action_eval_free);
-	zbx_vector_ptr_destroy(&conditions->actions);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: check_event_conditions                                           *
  *                                                                            *
  * Purpose: check all unique conditions for given event and source            *
@@ -1763,66 +1715,6 @@ static int	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_con
 
 /******************************************************************************
  *                                                                            *
- * Function: check_internal_event_conditions                                  *
- *                                                                            *
- * Purpose: Check if there is no matching actions for internal events         *
- *          and unset ZBX_FLAGS_DB_EVENT_CREATE flag for such events.         *
- *          Recovery events are not created if they don't have problem event. *
- *                                                                            *
- * Parameters: events        - [IN/OUT] events to check                       *
- *             closed_events - [IN]     list of closed events                 *
- *             conditions    - [IN]     action conditions data                *
- *                                                                            *
- ******************************************************************************/
-void check_internal_event_conditions(zbx_vector_ptr_t *events, zbx_vector_uint64_pair_t *closed_events,
-		zbx_action_conditions_t *conditions)
-{
-	int		i, j, event_required;
-	DB_EVENT	*event;
-
-	for (i = 0; i < events->values_num; i++)
-	{
-		event_required = 0;
-		event = (DB_EVENT *)events->values[i];
-
-		if (EVENT_SOURCE_INTERNAL != event->source ||
-				0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-			continue;
-
-		if (SUCCEED == is_recovery_event(event))
-		{
-			/* don't create internal recovery event if it's not in closed_events */
-			for (j = 0; j < closed_events->values_num; j++)
-			{
-				if (event->eventid == closed_events->values[j].second)
-				{
-					event_required = 1;
-					break;
-				}
-			}
-		}
-		else if (SUCCEED == check_event_conditions(event, conditions->uniq_conditions))
-		{
-			/* don't create internal event if it doesn't have matching action */
-			for (j = 0; j < conditions->actions.values_num; j++)
-			{
-				zbx_action_eval_t	*action = (zbx_action_eval_t *)conditions->actions.values[j];
-
-				if (action->eventsource == event->source && SUCCEED == check_action_conditions(action))
-				{
-					event_required = 1;
-					break;
-				}
-			}
-		}
-
-		if (0 == event_required)
-			event->flags ^= ZBX_FLAGS_DB_EVENT_CREATE;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
@@ -1830,23 +1722,29 @@ void check_internal_event_conditions(zbx_vector_ptr_t *events, zbx_vector_uint64
  * Parameters: events        - [IN] events to apply actions for               *
  *             closed_events - [IN] a vector of closed event data -           *
  *                                  (PROBLEM eventid, OK eventid) pairs.      *
- *             conditions    - [IN] action conditions data                    *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events,
-		zbx_action_conditions_t *conditions)
+void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events)
 {
 	const char			*__function_name = "process_actions";
 
 	int				i;
+	zbx_vector_ptr_t		actions;
 	zbx_vector_ptr_t 		new_escalations;
 	zbx_vector_uint64_pair_t	rec_escalations;
+	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name,
 			(zbx_fs_size_t)events->values_num);
 
 	zbx_vector_ptr_create(&new_escalations);
 	zbx_vector_uint64_pair_create(&rec_escalations);
+
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
+
+	zbx_vector_ptr_create(&actions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
@@ -1864,13 +1762,15 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 
 		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION) ||
 				0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-			continue;
-
-		if (SUCCEED == check_event_conditions(event, conditions->uniq_conditions))
 		{
-			for (j = 0; j < conditions->actions.values_num; j++)
+			continue;
+		}
+
+		if (SUCCEED == check_event_conditions(event, uniq_conditions))
+		{
+			for (j = 0; j < actions.values_num; j++)
 			{
-				zbx_action_eval_t	*action = (zbx_action_eval_t *)conditions->actions.values[j];
+				zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
 
 				if (action->eventsource != event->source)
 					continue;
@@ -1895,6 +1795,15 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 			}
 		}
 	}
+
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		zbx_conditions_eval_clean(&uniq_conditions[i]);
+		zbx_hashset_destroy(&uniq_conditions[i]);
+	}
+
+	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
+	zbx_vector_ptr_destroy(&actions);
 
 	/* 3. Find recovered escalations and store escalationids in 'rec_escalation' by OK eventids. */
 	if (0 != closed_events->values_num)
@@ -2035,21 +1944,25 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 {
 	const char		*__function_name = "process_actions_by_acknowledgements";
 
+	zbx_vector_ptr_t	actions;
+	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
 	int			i, j, k, processed_num = 0, knext = 0;
 	zbx_vector_uint64_t	eventids;
 	zbx_ack_task_t		*ack_task;
 	zbx_vector_ptr_t	ack_escalations, events;
 	zbx_ack_escalation_t	*ack_escalation;
-	zbx_action_conditions_t	conditions;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&ack_escalations);
 
-	init_action_conditions(&conditions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
 
-	if (0 == conditions.actions.values_num)
+	zbx_vector_ptr_create(&actions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
+
+	if (0 == actions.values_num)
 		goto out;
 
 	zbx_vector_uint64_create(&eventids);
@@ -2083,12 +1996,12 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 		if (0 == event->eventid || 0 == event->trigger.triggerid)
 			continue;
 
-		if (SUCCEED != check_event_conditions(event, conditions.uniq_conditions))
+		if (SUCCEED != check_event_conditions(event, uniq_conditions))
 			continue;
 
-		for (j = 0; j < conditions.actions.values_num; j++)
+		for (j = 0; j < actions.values_num; j++)
 		{
-			zbx_action_eval_t	*action = (zbx_action_eval_t *)conditions.actions.values[j];
+			zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
 
 			if (action->eventsource != event->source)
 				continue;
@@ -2140,9 +2053,16 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 	zbx_vector_ptr_destroy(&events);
 
 	zbx_vector_uint64_destroy(&eventids);
-
 out:
-	free_action_conditions(&conditions);
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		zbx_conditions_eval_clean(&uniq_conditions[i]);
+		zbx_hashset_destroy(&uniq_conditions[i]);
+	}
+
+	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
+	zbx_vector_ptr_destroy(&actions);
+
 	zbx_vector_ptr_clear_ext(&ack_escalations, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ack_escalations);
 

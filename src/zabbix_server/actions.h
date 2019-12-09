@@ -44,20 +44,8 @@ typedef struct
 }
 zbx_ack_escalation_t;
 
-typedef struct
-{
-	zbx_vector_ptr_t	actions;
-	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
-}
-zbx_action_conditions_t;
-
-void	init_action_conditions(zbx_action_conditions_t *conditions, unsigned char opflags);
-void	free_action_conditions(zbx_action_conditions_t *conditions);
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
-void	check_internal_event_conditions(zbx_vector_ptr_t *events, zbx_vector_uint64_pair_t *closed_events,
-		zbx_action_conditions_t *conditions);
-void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events,
-		zbx_action_conditions_t *conditions);
+void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events);
 int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks);
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions);
 void	free_db_action(DB_ACTION *action);

@@ -1911,7 +1911,11 @@ static int	flush_events(void)
 	zbx_event_recovery_t		*recovery;
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
-	zbx_action_conditions_t		conditions;
+
+	ret = save_events();
+	save_problems();
+	save_event_recovery();
+	update_event_suppress_data();
 
 	zbx_vector_uint64_pair_create(&closed_events);
 
@@ -1923,20 +1927,10 @@ static int	flush_events(void)
 		zbx_vector_uint64_pair_append_ptr(&closed_events, &pair);
 	}
 
-	init_action_conditions(&conditions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
-	check_internal_event_conditions(&events, &closed_events, &conditions);
-
-	ret = save_events();
-	save_problems();
-	save_event_recovery();
-	update_event_suppress_data();
-
 	zbx_vector_uint64_pair_sort(&closed_events, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	process_actions(&events, &closed_events, &conditions);
-
+	process_actions(&events, &closed_events);
 	zbx_vector_uint64_pair_destroy(&closed_events);
-	free_action_conditions(&conditions);
 
 	return ret;
 }
