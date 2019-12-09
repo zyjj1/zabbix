@@ -49,6 +49,14 @@ typedef struct
 }
 zbx_event_problem_t;
 
+typedef enum
+{
+	CORRELATION_MATCH = 0,
+	CORRELATION_NO_MATCH,
+	CORRELATION_MAY_MATCH
+}
+zbx_correlation_match_result_t;
+
 static zbx_vector_ptr_t		events;
 static zbx_hashset_t		event_recovery;
 static zbx_hashset_t		correlation_cache;
@@ -583,10 +591,10 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
  * Parameters: condition - [IN] the correlation condition to check            *
  *             event     - [IN] the new event to match                        *
  *                                                                            *
- * Return value: SUCCEED - the correlation rule might match depending on old  *
- *                         events                                             *
- *               FAIL    - the correlation rule doesn't match the new event   *
- *                         (no matter what the old events are)                *
+ * Return value: "1"            - the correlation rule match event            *
+ *               "0"            - the correlation rule doesn't match event    *
+ *               "ZBX_UNKNOWN0" - the correlation rule might match            *
+ *                                depending on old events                     *
  *                                                                            *
  ******************************************************************************/
 static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event)
@@ -656,25 +664,27 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
  * Parameters: correlation - [IN] the correlation rule to check               *
  *             event       - [IN] the new event to match                      *
  *                                                                            *
- * Return value: SUCCEED - the correlation rule might match depending on old  *
- *                         events                                             *
- *               FAIL    - the correlation rule doesn't match the new event   *
- *                         (no matter what the old events are)                *
+ * Return value: CORRELATION_MATCH     - the correlation rule match           *
+ *               CORRELATION_MAY_MATCH - the correlation rule might match     *
+ *                                       depending on old events              *
+ *               CORRELATION_NO_MATCH  - the correlation rule doesn't match   *
  *                                                                            *
  ******************************************************************************/
-static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_EVENT *event)
+static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlation_t *correlation,
+		const DB_EVENT *event)
 {
-	char			*expression, error[256];
-	const char		*value;
-	zbx_token_t		token;
-	int			pos = 0, ret = FAIL;
-	zbx_uint64_t		conditionid;
-	zbx_strloc_t		*loc;
-	zbx_corr_condition_t	*condition;
-	double			result;
+	char				*expression, error[256];
+	const char			*value;
+	zbx_token_t			token;
+	int				pos = 0;
+	zbx_uint64_t			conditionid;
+	zbx_strloc_t			*loc;
+	zbx_corr_condition_t		*condition;
+	double				result;
+	zbx_correlation_match_result_t	ret = CORRELATION_NO_MATCH;
 
 	if ('\0' == *correlation->formula)
-		return SUCCEED;
+		return CORRELATION_MAY_MATCH;
 
 	expression = zbx_strdup(NULL, correlation->formula);
 
@@ -698,9 +708,13 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		pos = token.loc.r;
 	}
 
-	if (SUCCEED == evaluate_unknown(&result, expression, error, sizeof(error)) &&
-			(result == ZBX_UNKNOWN || SUCCEED == zbx_double_compare(result, 1)))
-		ret = SUCCEED;
+	if (SUCCEED == evaluate_unknown(&result, expression, error, sizeof(error)))
+	{
+		if (result == ZBX_UNKNOWN)
+			ret = CORRELATION_MAY_MATCH;
+		else if (SUCCEED == zbx_double_compare(result, 1))
+			ret = CORRELATION_MATCH;
+	}
 
 out:
 	zbx_free(expression);
@@ -844,7 +858,6 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 	int			i;
 	zbx_tag_t		*tag;
 	char			*tag_esc, *filter = NULL;
-	const char		*tmp;
 	size_t			filter_alloc = 0, filter_offset = 0;
 	zbx_vector_str_t	values;
 
@@ -854,15 +867,24 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-			tmp = correlation_condition_match_new_event(condition, event);
-			if (0 == strcmp(tmp, "0"))
-				filter = (char *)"0=1";
-			else if (0 == strcmp(tmp, "1"))
-				filter = (char *)"1=1";
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
+		{
+			const char *tmp = correlation_condition_match_new_event(condition, event);
 
-			return zbx_strdup(NULL, filter);
+			if ('\0' == tmp[1])
+			{
+				switch(tmp[0])
+				{
+					case '0':
+						return zbx_strdup(NULL, "0=1");
+					case '1':
+						return zbx_strdup(NULL, "1=1");
+				}
+			}
+
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			return zbx_strdup(NULL, "0=1");
+		}
 	}
 
 	/* replace old event dependent condition with sql filter on problem_tag pt table */
@@ -1092,13 +1114,21 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 	{
 		correlation = (zbx_correlation_t *)correlation_rules.correlations.values[i];
 
-		if (SUCCEED == correlation_match_new_event(correlation, event))
+		switch(correlation_match_new_event(correlation, event))
 		{
-			if (SUCCEED == correlation_has_old_event_filter(correlation) ||
-					SUCCEED == correlation_has_old_event_operation(correlation))
-				zbx_vector_ptr_append(&corr_old, correlation);
-			else
+			case CORRELATION_MATCH:
 				zbx_vector_ptr_append(&corr_new, correlation);
+				break;
+			case CORRELATION_NO_MATCH:	/* proceed with next rule */
+				break;
+			case CORRELATION_MAY_MATCH:
+				/* might match depending on old events */
+				if ((SUCCEED == correlation_has_old_event_filter(correlation) ||
+						SUCCEED == correlation_has_old_event_operation(correlation)))
+					zbx_vector_ptr_append(&corr_old, correlation);
+				else
+					zbx_vector_ptr_append(&corr_new, correlation);
+				break;
 		}
 	}
 
