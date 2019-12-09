@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-29 09:32+0300\n"
-"PO-Revision-Date: 2019-04-04 09:26+0300\n"
+"PO-Revision-Date: 2019-05-06 09:26+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1554362781.000000\n"
+"X-POOTLE-MTIME: 1557127610.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -2056,7 +2056,7 @@ msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro prototyp položky \"%2$
 
 #: srv_status.php:177
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr "Nelze formátovat strom. Zkontrolujte logickou struktůru v servisních linkách."
+msgstr "Nelze formátovat strom. Zkontrolujte logickou struktůru v servisních odkazech."
 
 #: services.php:451
 msgid "Cannot format tree."
@@ -3879,7 +3879,7 @@ msgstr "Smazat položku?"
 
 #: jsLoader.php:154
 msgid "Delete links between selected elements?"
-msgstr "Smazat propojení mezi označenými elementy?"
+msgstr "Smazat odkazy mezi vybranými prvky?"
 
 #: include/views/configuration.maintenance.edit.php:218
 msgid "Delete maintenance period?"
@@ -5252,7 +5252,7 @@ msgstr "Byla očekávána JSON-rpc verze 2.0, ale použitá je \"%s\"."
 #: include/views/configuration.maintenance.list.php:56
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr "Uplynutý"
+msgstr "Vypršela"
 
 #: include/graphs.inc.php:27 popup.php:1466
 msgid "Exploded"
@@ -7633,7 +7633,7 @@ msgstr "Neplatná odpověď přijatá od Zabbix serveru \"%1$s\"."
 #: include/classes/api/services/CHttpTest.php:741
 #, c-format
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr "Nesprávná hodnota typu stahování pro krok \"%1$s\" scénáře \"%2$s\"."
+msgstr "Nesprávná načtená hodnota režimu pro krok \"%1$s\" scénáře \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:799
 #, c-format
@@ -8922,7 +8922,7 @@ msgstr "Připojené k"
 #: include/views/js/monitoring.sysmaps.js.php:304
 #: include/views/js/monitoring.sysmaps.js.php:315
 msgid "Links"
-msgstr "Propojení"
+msgstr "Odkazy"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -11679,7 +11679,7 @@ msgstr "Fronta"
 
 #: queue.php:66
 msgid "Queue of items to be updated"
-msgstr "Fronta položek, které mají být aktualizovány"
+msgstr "Řada položek pro aktualizaci"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -12049,7 +12049,7 @@ msgstr "Zbývá pokusů"
 
 #: include/views/configuration.httpconf.popup.php:101
 msgid "Retrieve only headers"
-msgstr "Stahovat jen hlavičky"
+msgstr "Načíst pouze záhlaví"
 
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:563
@@ -16261,7 +16261,7 @@ msgstr "forecast() - Předpověď pro následující t sekund založená na peri
 
 #: popup_trexpr.php:286
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
-msgstr ""
+msgstr "fuzzytime() - Rozdíl mezi hodnotou položky (časovou značkou) a časovou značkou Zabbix serveru je menší nebo rovná T vteřinám (1 ano, 0 - ne) "
 
 #: include/views/configuration.item.edit.php:331
 #: include/views/configuration.item.edit.php:336
@@ -16324,7 +16324,7 @@ msgstr "interní"
 
 #: popup_trexpr.php:298
 msgid "iregexp() - Regular expression V matching last value in period T (non case-sensitive; 1 - match, 0 - no match)"
-msgstr "iregexp() - Regulérní výraz V shodný s poslední hodnotou v periodě T (neladí k případu; 1 - shodný, 0 - neshodný)"
+msgstr "iregexp() - Regulérní výraz V shodný s poslední hodnotou v periodě T (bez rozlišení velikosti písmen; 1 - shodný, 0 - neshodný)"
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
