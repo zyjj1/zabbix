@@ -867,24 +867,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-		{
-			const char *tmp = correlation_condition_match_new_event(condition, event);
-
-			if ('\0' == tmp[1])
-			{
-				switch(tmp[0])
-				{
-					case '0':
-						return zbx_strdup(NULL, "0=1");
-					case '1':
-						return zbx_strdup(NULL, "1=1");
-				}
-			}
-
-			THIS_SHOULD_NEVER_HAPPEN;
-
-			return zbx_strdup(NULL, "0=1");
-		}
+			return zbx_dsprintf(NULL, "%s=1", correlation_condition_match_new_event(condition, event));
 	}
 
 	/* replace old event dependent condition with sql filter on problem_tag pt table */
