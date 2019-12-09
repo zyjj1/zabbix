@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.15rc1');
-define('ZABBIX_API_VERSION',	'4.0.15');
+define('ZABBIX_VERSION',		'4.0.16rc1');
+define('ZABBIX_API_VERSION',	'4.0.16');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -1677,6 +1677,7 @@ define('ZBX_STYLE_TOP_NAV_CONTAINER', 'top-nav-container');
 define('ZBX_STYLE_TOP_NAV_HELP', 'top-nav-help');
 define('ZBX_STYLE_TOP_NAV_ICONS', 'top-nav-icons');
 define('ZBX_STYLE_TOP_NAV_PROFILE', 'top-nav-profile');
+define('ZBX_STYLE_TOP_NAV_GUEST', 'top-nav-guest');
 define('ZBX_STYLE_TOP_NAV_SIGNOUT', 'top-nav-signout');
 define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
 define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
