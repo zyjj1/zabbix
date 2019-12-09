@@ -393,6 +393,7 @@ class CScreen extends CApiService {
 		}
 
 		if ($result) {
+			$result = $this->unsetExtraFields($result, ['templateid'], []);
 			$result = $this->addRelatedObjects($options, $result);
 		}
 
