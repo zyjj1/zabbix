@@ -129,7 +129,7 @@ class SocketProcessor implements Runnable
 		{
 			DiscoveryObject cachedObj = entry.getValue();
 
-			if (MILLISECONDS_IN_DAY <= now - cachedObj.timestamp)
+			if (MILLISECONDS_IN_DAY <= now - cachedObj.getTimestamp())
 				keys.add(entry.getKey());
 		}
 

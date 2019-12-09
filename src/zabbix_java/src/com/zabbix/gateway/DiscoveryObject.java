@@ -35,14 +35,9 @@ class DiscoveryObject
 		this.bulk = bulk;
 	}
 
-	public Boolean getBulk()
+	public Boolean isBulk()
 	{
 		return bulk;
-	}
-
-	public void setTimestamp(long timestamp)
-	{
-		this.timestamp = timestamp;
 	}
 
 	public long getTimestamp()
