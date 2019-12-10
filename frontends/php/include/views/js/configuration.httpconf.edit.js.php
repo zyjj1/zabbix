@@ -595,6 +595,7 @@
 			frag.appendChild(hiddenInput('status_codes',     step.data.status_codes,     prefix_step));
 			frag.appendChild(hiddenInput('timeout',          step.data.timeout,          prefix_step));
 			frag.appendChild(hiddenInput('url',              step.data.url,              prefix_step));
+			frag.appendChild(hiddenInput('no',               step.data.no,               prefix_step));
 
 			if (step.data.retrieve_mode != httpconf.HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
 				if (step.data.post_type != httpconf.ZBX_POSTTYPE_FORM) {
