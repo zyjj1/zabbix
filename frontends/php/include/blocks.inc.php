@@ -486,6 +486,15 @@ function make_status_of_zbx() {
 				);
 			}
 		}
+
+		try {
+			checkDatabaseCharset();
+		}
+		catch (Exception $e) {
+			$table->addRow(
+				(new CRow((new CCol($e->getMessage()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+			);
+		}
 	}
 
 	return $table;
