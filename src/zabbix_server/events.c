@@ -1912,7 +1912,7 @@ static int	flush_events(void)
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
 
-	/* do not create events for internal actions if there is no internal actions */
+	/* do not create internal events if there is no internal actions enabled */
 	if (0 == DCget_internal_actions())
 	{
 		int		i;

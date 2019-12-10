@@ -1,1 +1,1 @@
-........S. [ZBX-17035] internal events without matching actions are not created (atumilovics)
+........S. [ZBX-17035] internal events are not created if there is no enabled internal actions (atumilovics)
