@@ -10,7 +10,6 @@ test case: 'Unknown comparison'
 in:
   expression: 'ZBX_UNKNOWN0 = ZBX_UNKNOWN0'
 out:
-  error: ''
   value: 'ZBX_UNKNOWN'
   return: 'SUCCEED'
 ---
@@ -18,7 +17,6 @@ test case: 'Unknown comparison'
 in:
   expression: 'ZBX_UNKNOWN0 = ZBX_UNKNOWN1'
 out:
-  error: ''
   value: 'ZBX_UNKNOWN'
   return: 'SUCCEED'
 ---
@@ -26,7 +24,6 @@ test case: 'Expression with unknown element "1 or ZBX_UNKNOWN0"'
 in:
   expression: '1 or ZBX_UNKNOWN0'
 out:
-  error: ''
   value: '1'
   return: 'SUCCEED'
 ---
@@ -34,7 +31,6 @@ test case: 'Expression with unknown element "1 or not(ZBX_UNKNOWN0)"'
 in:
   expression: '1 or not(ZBX_UNKNOWN0)'
 out:
-  error: ''
   value: '1'
   return: 'SUCCEED'
 ---
@@ -42,7 +38,6 @@ test case: 'Expression with unknown result "1 and not(ZBX_UNKNOWN0)"'
 in:
   expression: '1 and not(ZBX_UNKNOWN0)'
 out:
-  error: ''
   value: 'ZBX_UNKNOWN'
   return: 'SUCCEED'
 ---
@@ -50,7 +45,6 @@ test case: 'Expression with unknown result "1 > ZBX_UNKNOWN0"'
 in:
   expression: '1 > ZBX_UNKNOWN0'
 out:
-  error: ''
   value: 'ZBX_UNKNOWN'
   return: 'SUCCEED'
 ---
@@ -58,7 +52,6 @@ test case: 'Expression with unknown result "1 - ZBX_UNKNOWN0"'
 in:
   expression: '1 - ZBX_UNKNOWN0'
 out:
-  error: ''
   value: 'ZBX_UNKNOWN'
   return: 'SUCCEED'
 ...

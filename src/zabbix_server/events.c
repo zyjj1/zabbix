@@ -708,7 +708,7 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 		pos = token.loc.r;
 	}
 
-	if (SUCCEED == evaluate_unknown(&result, expression, error, sizeof(error)))
+	if (SUCCEED == evaluate_unknown(expression, &result, error, sizeof(error)))
 	{
 		if (result == ZBX_UNKNOWN)
 			ret = CORRELATION_MAY_MATCH;
@@ -1100,17 +1100,16 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 		switch(correlation_match_new_event(correlation, event))
 		{
 			case CORRELATION_MATCH:
-				zbx_vector_ptr_append(&corr_new, correlation);
-				break;
-			case CORRELATION_NO_MATCH:	/* proceed with next rule */
-				break;
-			case CORRELATION_MAY_MATCH:
-				/* might match depending on old events */
 				if ((SUCCEED == correlation_has_old_event_filter(correlation) ||
 						SUCCEED == correlation_has_old_event_operation(correlation)))
 					zbx_vector_ptr_append(&corr_old, correlation);
 				else
 					zbx_vector_ptr_append(&corr_new, correlation);
+				break;
+			case CORRELATION_NO_MATCH:	/* proceed with next rule */
+				break;
+			case CORRELATION_MAY_MATCH:	/* might match depending on old events */
+					zbx_vector_ptr_append(&corr_old, correlation);
 				break;
 		}
 	}

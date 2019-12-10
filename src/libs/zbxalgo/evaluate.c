@@ -740,8 +740,8 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
  *                                                                            *
  * Purpose: evaluate an expression like "(26.416>10) and not(0=ZBX_UNKNOWN0)" *
  *                                                                            *
- * Parameters: value         - [OUT] expression evaluation result             *
- *             expression    - [IN]  expression to evaluate                   *
+ * Parameters: expression    - [IN]  expression to evaluate                   *
+ *             value         - [OUT] expression evaluation result             *
  *             error         - [OUT] error message buffer                     *
  *             max_error_len - [IN]  error buffer size                        *
  *                                                                            *
@@ -750,7 +750,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
  *               FAIL    - expression evaluation failed                       *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_unknown(double *value, const char *expression, char *error, size_t max_error_len)
+int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "evaluate_with_unknown";
 	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */

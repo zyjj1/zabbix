@@ -19,64 +19,32 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
 #include "zbxalgo.h"
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_mock_error_t	error;
-	zbx_mock_handle_t	param_handle;
-
 	double			expected_value = 0.0, actual_value;
-	const char		*tmp, *expected_param_value_string, *expression;
+	const char		*tmp, *expression;
 	char			actual_error[256];
 	int			expected_result = FAIL, actual_result = FAIL;
 
 	ZBX_UNUSED(state);
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("expression", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expression)))
-	{
-		fail_msg("Cannot get input 'expression' from test case data: %s", zbx_mock_error_string(error));
-	}
+	expression = zbx_mock_get_parameter_string("in.expression");
+	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	tmp = zbx_mock_get_parameter_string("out.value");
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("return", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
+	if (SUCCEED != is_double(tmp, &expected_value))
 	{
-		fail_msg("Cannot get expected 'return' parameter from test case data: %s",
-				zbx_mock_error_string(error));
-	}
-	else
-	{
-		if (0 == strcmp("SUCCEED", tmp))
-			expected_result = SUCCEED;
-		else if (0 == strcmp("FAIL", tmp))
-			expected_result = FAIL;
+		if (0 == strcmp(tmp, ZBX_UNKNOWN_STR))
+			expected_value = ZBX_UNKNOWN;
 		else
-			fail_msg("Get unexpected 'return' parameter from test case data: %s", tmp);
+			fail_msg("out.value parameter \"%s\" is not double or is out of range.", tmp);
 	}
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("value", &param_handle)) ||
-		ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
-	{
-		fail_msg("Cannot get expected 'value' parameter from test case data: %s",
-			zbx_mock_error_string(error));
-	}
-	else if (SUCCEED == is_double(tmp, NULL))
-		expected_value = str2double(tmp);
-	else if (0 == strcmp(tmp, ZBX_UNKNOWN_STR))
-		expected_value = ZBX_UNKNOWN;
-	else
-		fail_msg("func_pos parameter \"%s\" is not double or is out of range.", tmp);
-
-	if (FAIL == expected_result && (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("error", &param_handle)) ||
-		ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expected_param_value_string))))
-	{
-		fail_msg("Cannot get expected 'error' parameters from test case data: %s",
-				zbx_mock_error_string(error));
-	}
-
-	if (expected_result != (actual_result = evaluate_unknown(&actual_value, expression, actual_error,
+	if (expected_result != (actual_result = evaluate_unknown(expression, &actual_value, actual_error,
 			sizeof(actual_error))))
 	{
 		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_sysinfo_ret_string(actual_result),
@@ -91,8 +59,4 @@ void	zbx_mock_test_entry(void **state)
 	}
 	else if (0 != zbx_double_compare(actual_value, expected_value))
 		fail_msg("Value %f not equal expected %f. Error: %s", actual_value, expected_value, actual_error);
-
-	if (0 != strlen(actual_error) && 0 != strlen(expected_param_value_string)
-			&& 0 != strcmp(actual_error, expected_param_value_string))
-		fail_msg("Got\n'%s' instead of\n'%s' as a value.", actual_error, expected_param_value_string);
 }
