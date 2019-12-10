@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-09 12:43+0200\n"
-"PO-Revision-Date: 2019-12-10 12:44+0300\n"
+"PO-Revision-Date: 2019-12-10 13:05+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1575974645.000000\n"
+"X-POOTLE-MTIME: 1575975920.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1105,17 +1105,17 @@ msgstr "Этикетка владельца"
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "В %1$s:%2$s %3$s каждую %4$s неделю"
+msgstr[1] "В %1$s:%2$s %3$s каждые %4$s недели"
+msgstr[2] "В %1$s:%2$s %3$s каждые %4$s недель"
 
 #: include/maintenances.inc.php:56
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "В %1$s:%2$s каждый %3$s день"
+msgstr[1] "В %1$s:%2$s каждые %3$s дня"
+msgstr[2] "В %1$s:%2$s каждые %3$s дней"
 
 #: include/maintenances.inc.php:118
 #, c-format
