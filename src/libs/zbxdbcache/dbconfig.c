@@ -8952,7 +8952,7 @@ int	DCconfig_get_last_sync_time(void)
 
 void	DCconfig_wait_sync(void)
 {
-	struct timespec	ts = {0, 100000000};
+	struct timespec	ts = {0, 1e8};
 
 	while (0 == config->sync_ts)
 		nanosleep(&ts, NULL);
