@@ -2302,14 +2302,14 @@ static int	dbsync_compare_action(const zbx_dc_action_t *action, const DB_ROW dbr
  *                                                                            *
  * Purpose: compares actions table with cached configuration data             *
  *                                                                            *
- * Parameter: cache - [IN] the configuration cache                            *
- *            sync  - [OUT] the changeset                                     *
+ * Parameter: sync             - [OUT] the changeset                          *
+ *            internal_actions - [OUT] the internal actions presence flag     *
  *                                                                            *
  * Return value: SUCCEED - the changeset was successfully calculated          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
+int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync, unsigned char *internal_actions)
 {
 	DB_ROW			dbrow;
 	DB_RESULT		result;
@@ -2317,6 +2317,18 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	zbx_dc_action_t		*action;
+
+	result = DBselect(
+			"select null"
+			" from actions"
+			" where eventsource=%d"
+				" and status=%d",
+			EVENT_SOURCE_INTERNAL,
+			ACTION_STATUS_ACTIVE);
+
+	*internal_actions = (NULL == DBfetch(result)) ? 0 : 1;
+
+	DBfree_result(result);
 
 	if (NULL == (result = DBselect(
 			"select actionid,eventsource,evaltype,formula"

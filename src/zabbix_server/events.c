@@ -1912,6 +1912,22 @@ static int	flush_events(void)
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
 
+	/* do not create events for internal actions if there is no internal actions */
+	if (0 == DCget_internal_actions())
+	{
+		int		i;
+		DB_EVENT	*event;
+
+		for (i = 0; i < events.values_num; i++)
+		{
+			event = (DB_EVENT *)events.values[i];
+
+			if (EVENT_SOURCE_INTERNAL == event->source &&
+					0 != (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+				event->flags ^= ZBX_FLAGS_DB_EVENT_CREATE;
+		}
+	}
+
 	ret = save_events();
 	save_problems();
 	save_event_recovery();

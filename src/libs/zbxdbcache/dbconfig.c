@@ -4716,6 +4716,7 @@ void	DCsync_configuration(unsigned char mode)
 				maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
 				maintenance_host_sync, hgroup_host_sync;
 	zbx_uint64_t		update_flags = 0;
+	unsigned char		internal_actions;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4938,7 +4939,7 @@ void	DCsync_configuration(unsigned char mode)
 	expr_sec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_actions(&action_sync))
+	if (FAIL == zbx_dbsync_compare_actions(&action_sync, &internal_actions))
 		goto out;
 	action_sec = zbx_time() - sec;
 
@@ -4989,6 +4990,7 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_actions(&action_sync);
 	action_sec2 = zbx_time() - sec;
+	config->internal_actions = internal_actions;
 
 	sec = zbx_time();
 	DCsync_action_ops(&action_op_sync);
@@ -5788,6 +5790,8 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
+
+	config->internal_actions = 0;
 
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != CONFIG_TIMER_FORKS)
@@ -10229,6 +10233,29 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hosts->num_data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_internal_actions                                           *
+ *                                                                            *
+ * Purpose: get internal actions presence flag                                *
+ *                                                                            *
+ * Return value: 0 - no internal actions configured and enabled               *
+ *               1 - there are internal actions that are enabled              *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	DCget_internal_actions(void)
+{
+	unsigned char ret;
+
+	RDLOCK_CACHE;
+
+	ret = config->internal_actions;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************

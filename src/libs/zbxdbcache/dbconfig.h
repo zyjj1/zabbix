@@ -691,6 +691,8 @@ typedef struct
 	int			sync_ts;
 	int			item_sync_ts;
 
+	unsigned char		internal_actions;		/* flag to prevent internal event creation */
+
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
 	zbx_uint64_t		*maintenance_update_flags;	/* Array of flags to manage timer maintenance updates.*/
