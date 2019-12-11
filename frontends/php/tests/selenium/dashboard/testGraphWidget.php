@@ -40,7 +40,7 @@ class testGraphWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name';
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int';
 
 	/**
 	 * Open dashboard and add/edit graph widget.
@@ -1705,6 +1705,7 @@ class testGraphWidget extends CWebTest {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
+		sleep(3); // TODO: remove after fix in ZBX-16918
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check valuse in updated widget.
@@ -1724,6 +1725,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
+		sleep(3); // TODO: remove after fix in ZBX-16918
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -2100,8 +2102,7 @@ class testGraphWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']')->one(false) === null);
+		$this->assertTrue($dashboard->getWidget($name, false) === null);
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

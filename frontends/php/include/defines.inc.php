@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.15rc1');
-define('ZABBIX_API_VERSION',	'4.0.15');
+define('ZABBIX_VERSION',		'4.0.16rc1');
+define('ZABBIX_API_VERSION',	'4.0.16');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -1708,17 +1708,6 @@ define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS
 define('MACRO_TYPE_INHERITED',	0x01);
 define('MACRO_TYPE_HOSTMACRO',	0x02);
 define('MACRO_TYPE_BOTH',		0x03);	// MACRO_TYPE_INHERITED | MACRO_TYPE_HOSTMACRO
-
-// if magic quotes on, then get rid of them
-if (get_magic_quotes_gpc()) {
-	function zbx_stripslashes($value) {
-		$value = is_array($value) ? array_map('zbx_stripslashes', $value) : stripslashes($value);
-		return $value;
-	}
-	$_GET = zbx_stripslashes($_GET);
-	$_POST = zbx_stripslashes($_POST);
-	$_COOKIE = zbx_stripslashes($_COOKIE);
-}
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');
