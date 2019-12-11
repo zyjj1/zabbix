@@ -90,6 +90,41 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 
+		// Check layout at Macros tab.
+		$this->zbxTestTabSwitch('Macros');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
+		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
+		$this->zbxTestWaitForPageToLoad();
+
+		// Create two macros arrays: from DB and from Frontend form.
+		$macros = [
+			'database' => CDBHelper::getAll('SELECT macro, value FROM globalmacro'),
+			'frontend' => []
+		];
+
+		// Write macros rows from Frontend to array.
+		$table = $this->query('id:tbl_macros')->asTable()->one();
+		$count = $table->getRows()->count();
+		for ($i = 0; $i < $count; $i += 1) {
+			$macro = [];
+			$row = $table->getRow($i);
+			$macro['macro'] = $row->query('xpath:./td[1]/input')->one()->getValue();
+			$macro['value'] = $row->query('xpath:./td[3]/input')->one()->getValue();
+
+			$macros['frontend'][] = $macro;
+		}
+
+		// Sort arrays by Macros.
+		foreach ($macros as &$array) {
+			usort($array, function ($a, $b) {
+				return strcmp($a['macro'], $b['macro']);
+			});
+		}
+		unset($array);
+
+		// Compare macros from DB with macros from Frontend.
+		$this->assertEquals($macros['database'], $macros['frontend']);
+
 		//Check layout at Host Inventory tab.
 		$this->zbxTestTabSwitch('Host inventory');
 		for ($i = 0; $i < 3; $i++) {
@@ -103,37 +138,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
-
-		// Macro tab check must be after IPMI tab (this must be changed when ZBX-14609 will CLOSED).
-		// Check layout at Macros tab.
-		$this->zbxTestTabSwitch('Macros');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
-		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
-		$this->zbxTestWaitForPageToLoad();
-
-		$macros = CDBHelper::getAll('SELECT * FROM globalmacro');
-		foreach ($macros as $macro) {
-			// Macro check and row selection.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//input[@class="macro"][@readonly][@value="'.
-					$macro['macro'].'"]/../..')
-			);
-			// Effective value.
-			$this->assertEquals($macro['value'], $element->findElement(
-					WebDriverBy::xpath('./td[3]/input[@type="text"][@readonly]')
-			)->getAttribute('value'));
-
-			// Template value.
-			$this->assertEquals('', $element->findElement(WebDriverBy::xpath('./td[5]/div'))->getText());
-			// Global value.
-			$this->assertEquals('"'.$macro['value'].'"', $element->findElement(
-					WebDriverBy::xpath('./td[7]/div')
-			)->getText());
-		}
-
-		// Total macro count.
-		$this->assertEquals(count($macros), count($this->webDriver->findElements(
-				WebDriverBy::xpath('//input[@class="macro"]')
-		)));
 	}
 
 	public static function getCreateData() {
