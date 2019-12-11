@@ -691,7 +691,7 @@ typedef struct
 	int			sync_ts;
 	int			item_sync_ts;
 
-	unsigned char		internal_actions;		/* flag to prevent internal event creation */
+	unsigned int		internal_actions;		/* number of enabled internal actions */
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */

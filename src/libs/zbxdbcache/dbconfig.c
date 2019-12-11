@@ -3540,8 +3540,16 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(actionid, row[0]);
 		action = (zbx_dc_action_t *)DCfind_id(&config->actions, actionid, sizeof(zbx_dc_action_t), &found);
 
+		ZBX_STR2UCHAR(action->eventsource, row[1]);
+		ZBX_STR2UCHAR(action->evaltype, row[2]);
+
+		DCstrpool_replace(found, &action->formula, row[3]);
+
 		if (0 == found)
 		{
+			if (EVENT_SOURCE_INTERNAL == action->eventsource)
+				config->internal_actions++;
+
 			zbx_vector_ptr_create_ext(&action->conditions, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 
@@ -3549,11 +3557,6 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 
 			action->opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
-
-		ZBX_STR2UCHAR(action->eventsource, row[1]);
-		ZBX_STR2UCHAR(action->evaltype, row[2]);
-
-		DCstrpool_replace(found, &action->formula, row[3]);
 	}
 
 	/* remove deleted actions */
@@ -3561,6 +3564,9 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 	{
 		if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&config->actions, &rowid)))
 			continue;
+
+		if (EVENT_SOURCE_INTERNAL == action->eventsource)
+			config->internal_actions--;
 
 		zbx_strpool_release(action->formula);
 		zbx_vector_ptr_destroy(&action->conditions);
@@ -4716,7 +4722,6 @@ void	DCsync_configuration(unsigned char mode)
 				maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
 				maintenance_host_sync, hgroup_host_sync;
 	zbx_uint64_t		update_flags = 0;
-	unsigned char		internal_actions;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4939,7 +4944,7 @@ void	DCsync_configuration(unsigned char mode)
 	expr_sec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_actions(&action_sync, &internal_actions))
+	if (FAIL == zbx_dbsync_compare_actions(&action_sync))
 		goto out;
 	action_sec = zbx_time() - sec;
 
@@ -4990,7 +4995,6 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_actions(&action_sync);
 	action_sec2 = zbx_time() - sec;
-	config->internal_actions = internal_actions;
 
 	sec = zbx_time();
 	DCsync_action_ops(&action_op_sync);
@@ -10241,13 +10245,12 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
  *                                                                            *
  * Purpose: get internal actions presence flag                                *
  *                                                                            *
- * Return value: 0 - no internal actions configured and enabled               *
- *               1 - there are internal actions that are enabled              *
+ * Return value: number of enabled internal actions                           *
  *                                                                            *
  ******************************************************************************/
-unsigned char	DCget_internal_actions(void)
+unsigned int	DCget_internal_actions(void)
 {
-	unsigned char ret;
+	unsigned int ret;
 
 	RDLOCK_CACHE;
 
