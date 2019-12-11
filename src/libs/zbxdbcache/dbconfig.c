@@ -10243,7 +10243,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
  *                                                                            *
  * Function: DCget_internal_actions                                           *
  *                                                                            *
- * Purpose: get internal actions presence flag                                *
+ * Purpose: get number of enabled internal actions                            *
  *                                                                            *
  * Return value: number of enabled internal actions                           *
  *                                                                            *
