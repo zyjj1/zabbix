@@ -1922,9 +1922,8 @@ static int	flush_events(void)
 		{
 			event = (DB_EVENT *)events.values[i];
 
-			if (EVENT_SOURCE_INTERNAL == event->source &&
-					0 != (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-				event->flags ^= ZBX_FLAGS_DB_EVENT_CREATE;
+			if (EVENT_SOURCE_INTERNAL == event->source)
+				event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
 		}
 	}
 
