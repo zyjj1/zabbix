@@ -54,8 +54,10 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_UNKNOWN == expected_value)
 	{
 		if (actual_value != expected_value)
+		{
 			fail_msg("Value %f not equal expected ZBX_UNKNOWN. Error: %s",
-					actual_value, expected_value, actual_error);
+					actual_value, actual_error);
+		}
 	}
 	else if (0 != zbx_double_compare(actual_value, expected_value))
 		fail_msg("Value %f not equal expected %f. Error: %s", actual_value, expected_value, actual_error);
