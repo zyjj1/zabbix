@@ -1097,11 +1097,10 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 	{
 		correlation = (zbx_correlation_t *)correlation_rules.correlations.values[i];
 
-		switch(correlation_match_new_event(correlation, event))
+		switch (correlation_match_new_event(correlation, event))
 		{
 			case CORRELATION_MATCH:
-				if ((SUCCEED == correlation_has_old_event_filter(correlation) ||
-						SUCCEED == correlation_has_old_event_operation(correlation)))
+				if (SUCCEED == correlation_has_old_event_operation(correlation))
 					zbx_vector_ptr_append(&corr_old, correlation);
 				else
 					zbx_vector_ptr_append(&corr_new, correlation);
