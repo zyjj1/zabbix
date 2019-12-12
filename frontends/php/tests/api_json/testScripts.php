@@ -144,6 +144,18 @@ class testScripts extends CAPITest {
 
 	public static function script_get() {
 		return [
+			// Only identifier field is returned on empty selection.
+			[
+				'params' => [
+					'output' => [],
+					'groupids' => ['90020']
+				],
+				'expect' => [
+					'error' => null,
+					'result_keys' => ['scriptid']
+				]
+			],
+			// Strict validation is used.
 			[
 				'params' => [
 					'output' => ['scriptid'],
@@ -162,7 +174,8 @@ class testScripts extends CAPITest {
 				],
 				'expect' => [
 					'error' => null,
-					'has.scriptid' => ['90020']
+					'has.scriptid' => ['90020'],
+					'result_keys' => ['scriptid']
 				]
 			],
 			// group 90021 is child group of 90020 and script from parent group is inherited
@@ -173,7 +186,8 @@ class testScripts extends CAPITest {
 				],
 				'expect' => [
 					'error' => null,
-					'has.scriptid' => ['90021', '90020']
+					'has.scriptid' => ['90021', '90020'],
+					'result_keys' => ['scriptid']
 				]
 			],
 			// host 90021 is in group 90021 that is child a group of 90020 and script from parent group is inherited
@@ -184,7 +198,8 @@ class testScripts extends CAPITest {
 				],
 				'expect' => [
 					'error' => null,
-					'has.scriptid' => ['90021', '90020']
+					'has.scriptid' => ['90021', '90020'],
+					'result_keys' => ['scriptid']
 				]
 			],
 			// child host has 2 inherited scripts but only one of them may not be invoked on parent group
@@ -197,7 +212,8 @@ class testScripts extends CAPITest {
 				'expect' => [
 					'error' => null,
 					'has.scriptid' => ['90020'],
-					'!has.scriptid' => ['90021']
+					'!has.scriptid' => ['90021'],
+					'result_keys' => ['scriptid']
 				]
 			],
 			// child group has 2 inherited scripts but only one of them may not be invoked on parent group host
@@ -210,7 +226,8 @@ class testScripts extends CAPITest {
 				'expect' => [
 					'error' => null,
 					'has.scriptid' => ['90020'],
-					'!has.scriptid' => ['90021']
+					'!has.scriptid' => ['90021'],
+					'result_keys' => ['scriptid']
 				]
 			],
 			// selectHosts test
@@ -226,7 +243,8 @@ class testScripts extends CAPITest {
 					'has.scriptid:hostid' => [
 						'90020' => ['90020', '90021', '90022', '90023'],
 						'90021' => ['90021', '90022', '90023']
-					]
+					],
+					'result_keys' => ['hosts', 'scriptid']
 				]
 			],
 			// selectHosts test
@@ -248,7 +266,8 @@ class testScripts extends CAPITest {
 					'!has.scriptid:hostid' => [
 						'90020' => [],
 						'90021' => ['90021']
-					]
+					],
+					'result_keys' => ['hosts', 'scriptid']
 				]
 			],
 			// selectGroups test
@@ -264,7 +283,8 @@ class testScripts extends CAPITest {
 					'has.scriptid:groupid' => [
 						'90020' => ['90020', '90021', '90022', '90023'],
 						'90021' => ['90021', '90022', '90023']
-					]
+					],
+					'result_keys' => ['groups', 'scriptid']
 				]
 			],
 			// selectGroups test
@@ -286,7 +306,8 @@ class testScripts extends CAPITest {
 					'!has.scriptid:groupid' => [
 						'90020' => [],
 						'90021' => ['90021']
-					]
+					],
+					'result_keys' => ['groups', 'scriptid']
 				]
 			],
 			// selectGroups test
@@ -301,7 +322,8 @@ class testScripts extends CAPITest {
 				],
 				'expect' => [
 					'error' => null,
-					'groupsObjectProperties' => ['flags']
+					'groupsObjectProperties' => ['flags'],
+					'result_keys' => ['groups', 'scriptid']
 				]
 			]
 		];
@@ -372,6 +394,14 @@ class testScripts extends CAPITest {
 					ksort($group);
 					$this->assertEquals($expect['groupsObjectProperties'], array_keys($group));
 				}
+			}
+		}
+
+		if (array_key_exists('result_keys', $expect)) {
+			foreach ($response['result'] as $script) {
+				sort($expect['result_keys']);
+				ksort($script);
+				$this->assertEquals($expect['result_keys'], array_keys($script));
 			}
 		}
 	}
