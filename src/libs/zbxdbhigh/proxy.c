@@ -3722,9 +3722,6 @@ int	zbx_get_protocol_version(struct zbx_json_parse *jp)
  *             info         - [OUT] address of a pointer to the info          *
  *                                     string (should be freed by the caller) *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
  * Comments: This function is used to parse the new proxy history data        *
  *           protocol introduced in Zabbix v3.3.                              *
  *                                                                            *
