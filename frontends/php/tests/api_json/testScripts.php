@@ -144,7 +144,7 @@ class testScripts extends CAPITest {
 
 	public static function script_get() {
 		return [
-			// Only identifier field is returned on empty selection.
+			// No fields are returned on empty selection.
 			[
 				'params' => [
 					'output' => [],
@@ -152,7 +152,7 @@ class testScripts extends CAPITest {
 				],
 				'expect' => [
 					'error' => null,
-					'result_keys' => ['scriptid']
+					'result_keys' => []
 				]
 			],
 			// Strict validation is used.
