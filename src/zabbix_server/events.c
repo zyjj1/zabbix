@@ -1764,6 +1764,47 @@ exit:
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_recovery_event                                                *
+ *                                                                            *
+ * Purpose: checks if the event is recovery event                             *
+ *                                                                            *
+ * Parameters: event - [IN] the event to check                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is recovery event                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_recovery_event(const DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
+			return SUCCEED;
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (TRIGGER_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_ITEM:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: add_event_suppress_data                                          *
  *                                                                            *
  * Purpose: adds event suppress data for problem events matching active       *
@@ -1907,24 +1948,30 @@ out:
  ******************************************************************************/
 static int	flush_events(void)
 {
-	int				ret;
+	int				ret, i;
 	zbx_event_recovery_t		*recovery;
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
+	DB_EVENT			*event;
+	unsigned int			internal_actions;
 
 	/* do not create internal events if there is no internal actions enabled */
-	if (0 == DCget_internal_actions())
+	internal_actions = DCget_internal_actions();
+
+	for (i = 0; i < events.values_num; i++)
 	{
-		int		i;
-		DB_EVENT	*event;
+		event = (DB_EVENT *)events.values[i];
 
-		for (i = 0; i < events.values_num; i++)
+		if (EVENT_SOURCE_INTERNAL != event->source)
+			continue;
+
+		if (SUCCEED == is_recovery_event(event))
 		{
-			event = (DB_EVENT *)events.values[i];
-
-			if (EVENT_SOURCE_INTERNAL == event->source)
+			if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_RECOVER))
 				event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
 		}
+		else if (0 == internal_actions)
+			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
 	}
 
 	ret = save_events();
@@ -1972,6 +2019,9 @@ static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
 	}
+
+	if (EVENT_SOURCE_INTERNAL == source)
+		event->flags |= ZBX_FLAGS_DB_EVENT_RECOVER;
 
 	recovery_local.eventid = eventid;
 
