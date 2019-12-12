@@ -25,19 +25,27 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 trait MacrosTrait {
 
+	protected $table_selector = 'id:tbl_macros';
+
+	public function setTableSelector($selector) {
+		$this->table_selector = $selector;
+	}
+
 	/**
 	 * Get macros table element with mapping set.
 	 *
 	 * @return CMultifieldTable
 	 */
-	protected function getMacrosTable() {
-		return $this->query('id:tbl_macros')->asMultifieldTable([
+	protected function getMacrosTable($value_column = 'Value') {
+		return $this->query($this->table_selector)->asMultifieldTable([
 			'mapping' => [
 				'Macro' => [
+					'name' => 'macro',
 					'selector' => 'xpath:./input',
 					'class' => 'CElement'
 				],
-				'Value' => [
+				$value_column => [
+					'name' => 'value',
 					'selector' => 'xpath:./input',
 					'class' => 'CElement'
 				]
@@ -89,16 +97,16 @@ trait MacrosTrait {
 		foreach ($data as $i => $values) {
 			if (CTestArrayHelper::get($values, 'action') !== USER_ACTION_REMOVE) {
 				$rows[$i] = [
-					'Macro' => CTestArrayHelper::get($values, 'Macro', ''),
-					'Value' => CTestArrayHelper::get($values, 'Value', '')
+					'macro' => CTestArrayHelper::get($values, 'macro', ''),
+					'value' => CTestArrayHelper::get($values, 'value', '')
 				];
 			}
 		}
 
 		if (!$rows) {
 			$rows[] = [
-				'Macro' => '',
-				'Value' => ''
+				'macro' => '',
+				'value' => ''
 			];
 		}
 

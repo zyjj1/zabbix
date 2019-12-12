@@ -25,6 +25,12 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 trait FilterTrait {
 
+	protected $filter_selector = 'id:filter-tags';
+
+	public function setFilterSelector($selector) {
+		$this->filter_selector = $selector;
+	}
+
 	/**
 	 * Get tag table element with mapping set.
 	 *
@@ -32,8 +38,8 @@ trait FilterTrait {
 	 *
 	 * @return CMultifieldTable
 	 */
-	protected function getTagTable($selector = 'id:filter-tags') {
-		return $this->query($selector)->asMultifieldTable([
+	protected function getTagTable() {
+		return $this->query($this->filter_selector)->asMultifieldTable([
 			'mapping' => [
 				[
 					'name' => 'name',
@@ -62,7 +68,7 @@ trait FilterTrait {
 	 *
 	 * @return CMultifieldTablelement
 	 */
-	public function setTags($tags, $selector = 'id:filter-tags') {
+	public function setTags($tags) {
 		$table = $this->getTagTable($selector);
 
 		foreach ($tags as $i => $tag) {
@@ -82,7 +88,7 @@ trait FilterTrait {
 	 *
 	 * @return array
 	 */
-	public function getTags($selector = 'id:filter-tags') {
+	public function getTags() {
 		return $this->getTagTable($selector)->getValue();
 	}
 
@@ -91,7 +97,7 @@ trait FilterTrait {
 	 *
 	 * @param array $data    tag element values
 	 */
-	public function assertTags($data, $selector = 'id:filter-tags') {
+	public function assertTags($data) {
 		$rows = [];
 		foreach ($data as $i => $values) {
 			$rows[$i] = [
