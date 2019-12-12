@@ -287,7 +287,7 @@ class CScreenBuilder {
 	 */
 	protected static function appendTemplatedScreenOption(array $options) {
 		if (array_key_exists('screen', $options)) {
-			$options['isTemplatedScreen'] = (bool) $options['screen']['templateid'];
+			$options['isTemplatedScreen'] = (bool) array_key_exists('templateid', $options['screen']);
 		}
 		elseif (array_key_exists('screenid', $options) && $options['screenid'] > 0) {
 			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get([
@@ -640,15 +640,6 @@ class CScreenBuilder {
 	}
 
 	/**
-	 * Insert javascript to make time control synchronizes with NOW!
-	 *
-	 * @static
-	 */
-	public static function insertScreenRefreshTimeJs() {
-		zbx_add_post_js('timeControl.useTimeRefresh('.CWebUser::getRefresh().');');
-	}
-
-	/**
 	 * Insert javascript to init screens.
 	 *
 	 * @static
@@ -686,7 +677,6 @@ class CScreenBuilder {
 	 */
 	public static function insertScreenStandardJs(array $timeline) {
 		CScreenBuilder::insertScreenScrollJs($timeline);
-		CScreenBuilder::insertScreenRefreshTimeJs();
 		CScreenBuilder::insertProcessObjectsJs();
 	}
 
