@@ -208,6 +208,9 @@ struct	_DC_TRIGGER;
 #define ZBX_SQL_ITEM_FIELDS_NUM	15
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
+#define ZBX_DB_DEFAULT_CHARACTER_SET	"utf8"
+#define ZBX_DB_DEFAULT_COLLATION	"utf8_bin"
+
 #ifdef HAVE_ORACLE
 #	define ZBX_PLSQL_BEGIN	"begin\n"
 #	define ZBX_PLSQL_END	"end;"
@@ -644,6 +647,8 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
+
+void	DBcheck_character_set();
 
 /* bulk insert support */
 
