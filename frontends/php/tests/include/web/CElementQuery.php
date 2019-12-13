@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CElement.php';
 require_once dirname(__FILE__).'/CElementCollection.php';
+require_once dirname(__FILE__).'/elements/CNullElement.php';
 require_once dirname(__FILE__).'/elements/CFormElement.php';
 require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
@@ -297,7 +298,7 @@ class CElementQuery implements IWaitable {
 		}
 		catch (NoSuchElementException $exception) {
 			if (!$should_exist) {
-				return null;
+				return new CNullElement(array_merge($this->options, ['parent' => $parent, 'by' => $this->by]));
 			}
 
 			throw $exception;
@@ -423,12 +424,7 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target) {
-			$element = $target->one(false);
-			if ($element === null) {
-				return false;
-			}
-
-			return $element->isVisible();
+			return $target->one(false)->isVisible();
 		};
 	}
 
@@ -439,7 +435,7 @@ class CElementQuery implements IWaitable {
 	 * @param string       $prefix    xpath prefix
 	 * @param array|string $class     element classes to look for
 	 *
-	 * @return CElement|null
+	 * @return CElement|CNullElement
 	 */
 	public static function getInputElement($target, $prefix = './', $class = null) {
 		$classes = [
@@ -495,11 +491,12 @@ class CElementQuery implements IWaitable {
 				$xpaths[] = $prefix.$selector;
 			}
 
-			if (($element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false)) !== null) {
+			$element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false);
+			if ($element->isValid()) {
 				return $element;
 			}
 		}
 
-		return null;
+		return new CNullElement(['locator' => 'input element']);
 	}
 }
