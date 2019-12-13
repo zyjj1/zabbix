@@ -1046,9 +1046,7 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
  * Purpose: find problem events that must be recovered by global correlation  *
  *          rules and check if the new event must be closed                   *
  *                                                                            *
- * Parameters: event         - [IN] the new event                             *
- *             open_problems - [IN] 1 - if there are open problems            *
- *                                  0 - otherwise                             *
+ * Parameters: event - [IN] the new event                                     *
  *                                                                            *
  * Comments: The correlation data (zbx_event_recovery_t) of events that       *
  *           must be closed are added to event_correlation hashset            *
@@ -1060,9 +1058,9 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
  *                based on the rest correlation conditions                    *
  *                                                                            *
  ******************************************************************************/
-static void	correlate_event_by_global_rules(DB_EVENT *event, unsigned char open_problems)
+static void	correlate_event_by_global_rules(DB_EVENT *event)
 {
-	int			i;
+	int			i, open_problems = -1;
 	zbx_correlation_t	*correlation;
 	zbx_vector_ptr_t	corr_old, corr_new;
 	char			*sql = NULL;
@@ -1077,29 +1075,45 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, unsigned char open_
 
 	for (i = 0; i < correlation_rules.correlations.values_num; i++)
 	{
+		int	add_to = 0; /* 1 = corr_new; 2= corr_old */
+
 		correlation = (zbx_correlation_t *)correlation_rules.correlations.values[i];
 
 		switch (correlation_match_new_event(correlation, event, SUCCEED))
 		{
 			case CORRELATION_MATCH:
-				if (SUCCEED == correlation_has_old_event_operation(correlation))
-					zbx_vector_ptr_append(&corr_old, correlation);
-				else
-					zbx_vector_ptr_append(&corr_new, correlation);
+				add_to = (SUCCEED == correlation_has_old_event_operation(correlation)) ? 2: 1;
 				break;
 			case CORRELATION_NO_MATCH:	/* proceed with next rule */
 				break;
 			case CORRELATION_MAY_MATCH:	/* might match depending on old events */
-				if (0 == open_problems)
-				{
-					if (CORRELATION_MATCH == correlation_match_new_event(correlation, event, FAIL))
-						zbx_vector_ptr_append(&corr_new, correlation);
-				}
-				else
-					zbx_vector_ptr_append(&corr_old, correlation);
-
+				add_to = 2;
 				break;
 		}
+
+		if (2 == add_to)
+		{
+			if (-1 == open_problems)
+			{
+				DB_RESULT	result;
+
+				result = DBselectN("select eventid from problem"
+						" where r_eventid is null and source="
+						ZBX_STR(EVENT_SOURCE_TRIGGERS), 1);
+				open_problems = (NULL == DBfetch(result)) ? 0 : 1;
+				DBfree_result(result);
+			}
+
+			if (0 == open_problems)
+			{
+				if (CORRELATION_MATCH == correlation_match_new_event(correlation, event, FAIL))
+					zbx_vector_ptr_append(&corr_new, correlation);
+			}
+			else
+				zbx_vector_ptr_append(&corr_old, correlation);
+		}
+		else if (1 == add_to)
+			zbx_vector_ptr_append(&corr_new, correlation);
 	}
 
 	if (0 != corr_new.values_num)
@@ -1176,17 +1190,13 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 
 	int			i, index;
 	zbx_trigger_diff_t	*diff;
-	DB_RESULT		result;
-	unsigned char		open_problems;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, correlation_cache.num_data);
 
 	zbx_dc_correlation_rules_get(&correlation_rules);
 
-	result = DBselectN("select eventid from problem"
-			" where r_eventid is null and source=" ZBX_STR(EVENT_SOURCE_TRIGGERS), 1);
-	open_problems = (NULL == DBfetch(result)) ? 0 : 1;
-	DBfree_result(result);
+	if (0 == correlation_rules.correlations.values_num)
+		goto out;
 
 	/* process global correlation and queue the events that must be closed */
 	for (i = 0; i < trigger_events->values_num; i++)
@@ -1196,7 +1206,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 		if (0 == (ZBX_FLAGS_DB_EVENT_CREATE & event->flags))
 			continue;
 
-		correlate_event_by_global_rules(event, open_problems);
+		correlate_event_by_global_rules(event);
 
 		/* force value recalculation based on open problems for triggers with */
 		/* events closed by 'close new' correlation operation                */
@@ -1211,6 +1221,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 		}
 	}
 
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
