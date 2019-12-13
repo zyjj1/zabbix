@@ -2087,7 +2087,8 @@ out:
  * Function: process_internal_events_without_actions                          *
  *                                                                            *
  * Purpose: do not generate unnecessary internal events if there are no       *
- *          internal actions                                                  *
+ *          internal actions and no problem recovery from when actions were   *
+ *          enabled                                                           *
  *                                                                            *
  * Parameters: internal_events - [IN/OUT] the events to process               *
  *                                                                            *
