@@ -1678,7 +1678,7 @@ class testFormAction extends CLegacyWebTest {
 						'value' => 'application',
 					],
 					[
-						'type' => 'Tag',
+						'type' => 'Tag name',
 						'operator' => 'does not contain',
 						'value' => 'Does not contain Tag',
 					],
@@ -1846,7 +1846,7 @@ class testFormAction extends CLegacyWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-					case 'Tag':
+					case 'Tag name':
 					case 'Received value':
 						if (array_key_exists('operator', $condition)) {
 							$this->zbxTestDropdownSelectWait('new_condition_operator', $condition['operator']);
