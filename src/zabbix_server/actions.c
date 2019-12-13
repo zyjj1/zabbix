@@ -1543,18 +1543,18 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	}
 	DBfree_result(result);
 
-	if (0 != lnk_templateids.values_num)
-	{
-		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_template_add(event, &lnk_templateids);
-	}
-
 	if (0 != del_templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		op_template_del(event, &del_templateids);
+	}
+
+	if (0 != lnk_templateids.values_num)
+	{
+		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_template_add(event, &lnk_templateids);
 	}
 
 	if (0 != new_groupids.values_num)
