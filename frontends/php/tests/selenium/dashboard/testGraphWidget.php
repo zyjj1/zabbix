@@ -1756,8 +1756,8 @@ class testGraphWidget extends CWebTest {
 					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setTags($data['Problems']['tags'], 'id:tags_table_tags');
-					}
+						$this->setFilterSelector('id:tags_table_tags');
+						$this->setTags($data['Problems']['tags']);					}
 					break;
 
 				case 'Overrides':

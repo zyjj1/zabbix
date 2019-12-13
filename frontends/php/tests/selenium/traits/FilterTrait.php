@@ -69,7 +69,7 @@ trait FilterTrait {
 	 * @return CMultifieldTablelement
 	 */
 	public function setTags($tags) {
-		$table = $this->getTagTable($selector);
+		$table = $this->getTagTable();
 
 		foreach ($tags as $i => $tag) {
 			if ($i === 0) {
@@ -89,7 +89,7 @@ trait FilterTrait {
 	 * @return array
 	 */
 	public function getTags() {
-		return $this->getTagTable($selector)->getValue();
+		return $this->getTagTable()->getValue();
 	}
 
 	/**
@@ -107,6 +107,6 @@ trait FilterTrait {
 			];
 		}
 
-		$this->assertEquals($rows, $this->getTags($selector), 'Tags on a page does not match tags in data provider.');
+		$this->assertEquals($rows, $this->getTags(), 'Tags on a page does not match tags in data provider.');
 	}
 }
