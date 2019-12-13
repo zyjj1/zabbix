@@ -1548,8 +1548,8 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 					{
 						zbx_vector_uint64_remove(&lnk_templateids, i);
 					}
-					else
-						zbx_vector_uint64_append(&del_templateids, templateid);
+
+					zbx_vector_uint64_append(&del_templateids, templateid);
 				}
 				break;
 			case OPERATION_TYPE_HOST_INVENTORY:
