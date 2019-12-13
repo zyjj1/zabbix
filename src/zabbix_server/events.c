@@ -1918,7 +1918,7 @@ out:
  ******************************************************************************/
 static int	flush_events(void)
 {
-	int				ret, i;
+	int				ret;
 	zbx_event_recovery_t		*recovery;
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
