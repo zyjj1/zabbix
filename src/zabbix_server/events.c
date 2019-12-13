@@ -2082,6 +2082,16 @@ out:
 	zbx_vector_uint64_destroy(&triggerids);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: process_internal_events_without_actions                          *
+ *                                                                            *
+ * Purpose: do not generate unnecessary internal events if there are no       *
+ *          internal actions                                                  *
+ *                                                                            *
+ * Parameters: internal_events - [IN/OUT] the events to process               *
+ *                                                                            *
+ ******************************************************************************/
 static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_events)
 {
 	DB_EVENT	*event;
@@ -2090,7 +2100,6 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_e
 	if (0 == DCget_internal_action_count())
 		return;
 
-	/* don't save internal problem events in case there are no internal actions */
 	for (i = 0; i < internal_events->values_num; i++)
 	{
 		event = (DB_EVENT *)internal_events->values[i];
