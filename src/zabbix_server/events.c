@@ -259,21 +259,10 @@ static int	save_events(void)
 	int			j, num = 0, insert_tags = 0;
 	zbx_uint64_t		eventid;
 	DB_EVENT		*event;
-	unsigned int		internal_actions;
-
-	internal_actions = DCget_internal_action_count();
 
 	for (i = 0; i < events.values_num; i++)
 	{
 		event = (DB_EVENT *)events.values[i];
-
-		/* don't save internal problem events in case there are no internal actions */
-		if (0 == internal_actions && EVENT_SOURCE_INTERNAL == event->source &&
-				0 == (event->flags & ZBX_FLAGS_DB_EVENT_RECOVER))
-		{
-			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
-			continue;
-		}
 
 		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_CREATE) && 0 == event->eventid)
 			num++;
@@ -2093,6 +2082,24 @@ out:
 	zbx_vector_uint64_destroy(&triggerids);
 }
 
+static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_events)
+{
+	DB_EVENT	*event;
+	int		i;
+
+	if (0 == DCget_internal_action_count())
+		return;
+
+	/* don't save internal problem events in case there are no internal actions */
+	for (i = 0; i < internal_events->values_num; i++)
+	{
+		event = (DB_EVENT *)internal_events->values[i];
+
+		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_RECOVER))
+			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_open_problems                                                *
@@ -2607,6 +2614,9 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		if (0 != internal_ok_events.values_num)
 			process_internal_ok_events(&internal_ok_events);
+
+		if (0 != internal_events.values_num)
+			process_internal_events_without_actions(&internal_events);
 
 		if (0 != trigger_events.values_num)
 		{
