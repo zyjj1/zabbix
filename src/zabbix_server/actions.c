@@ -1590,6 +1590,47 @@ zbx_escalation_new_t;
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_recovery_event                                                *
+ *                                                                            *
+ * Purpose: checks if the event is recovery event                             *
+ *                                                                            *
+ * Parameters: event - [IN] the event to check                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is recovery event                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_recovery_event(const DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
+			return SUCCEED;
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (TRIGGER_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_ITEM:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: uniq_conditions_compare_func                                     *
  *                                                                            *
  * Purpose: compare to find equal conditions                                  *
