@@ -3108,7 +3108,8 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
-		*info = zbx_strdup(*info, zbx_json_strerror());
+		error = zbx_strdup(error, zbx_json_strerror());
+		ret = FAIL;
 		goto out;
 	}
 
@@ -3721,20 +3722,17 @@ int	zbx_get_protocol_version(struct zbx_json_parse *jp)
  *             info         - [OUT] address of a pointer to the info          *
  *                                     string (should be freed by the caller) *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
  * Comments: This function is used to parse the new proxy history data        *
  *           protocol introduced in Zabbix v3.3.                              *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
+static void	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
 		zbx_data_session_t *session, zbx_timespec_t *unique_shift, char **info)
 {
 	const char		*__function_name = "process_proxy_history_data_33";
 
 	const char		*pnext = NULL;
-	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
+	int			processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
 	double			sec;
 	DC_ITEM			*items;
 	char			*error = NULL;
@@ -3798,7 +3796,6 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 
 	if (NULL == error)
 	{
-		ret = SUCCEED;
 		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed_num, total_num - processed_num, total_num, zbx_time() - sec);
 	}
@@ -3808,9 +3805,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 		*info = error;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -3913,11 +3908,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			zbx_free(token);
 		}
 
-		if (SUCCEED != (ret = process_proxy_history_data_33(proxy, &jp_data, session, &unique_shift,
-				&error_step)))
-		{
-			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
-		}
+		process_proxy_history_data_33(proxy, &jp_data, session, &unique_shift, &error_step);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
