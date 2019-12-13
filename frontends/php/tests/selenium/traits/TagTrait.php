@@ -85,8 +85,8 @@ trait TagTrait {
 	 */
 	public function assertTags($data) {
 		$rows = [];
-		foreach ($data as $i => $values) {
-			$rows[$i] = [
+		foreach ($data as $values) {
+			$rows[] = [
 				'name' => CTestArrayHelper::get($values, 'name', ''),
 				'value' => CTestArrayHelper::get($values, 'value', ''),
 			];

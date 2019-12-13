@@ -94,9 +94,9 @@ trait MacrosTrait {
 	 */
 	public function assertMacros($data = []) {
 		$rows = [];
-		foreach ($data as $i => $values) {
+		foreach ($data as $values) {
 			if (CTestArrayHelper::get($values, 'action') !== USER_ACTION_REMOVE) {
-				$rows[$i] = [
+				$rows[] = [
 					'macro' => CTestArrayHelper::get($values, 'macro', ''),
 					'value' => CTestArrayHelper::get($values, 'value', '')
 				];
