@@ -10241,24 +10241,24 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_internal_actions                                           *
+ * Function: DCget_internal_action_count                                      *
  *                                                                            *
  * Purpose: get number of enabled internal actions                            *
  *                                                                            *
  * Return value: number of enabled internal actions                           *
  *                                                                            *
  ******************************************************************************/
-unsigned int	DCget_internal_actions(void)
+unsigned int	DCget_internal_action_count(void)
 {
-	unsigned int ret;
+	unsigned int count;
 
 	RDLOCK_CACHE;
 
-	ret = config->internal_actions;
+	count = config->internal_actions;
 
 	UNLOCK_CACHE;
 
-	return ret;
+	return count;
 }
 
 /******************************************************************************

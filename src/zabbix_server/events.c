@@ -1913,7 +1913,7 @@ static int	flush_events(void)
 	zbx_hashset_iter_t		iter;
 
 	/* don't create problem events in case there are no internal actions */
-	if (0 == DCget_internal_actions())
+	if (0 == DCget_internal_action_count())
 	{
 		DB_EVENT	*event;
 
