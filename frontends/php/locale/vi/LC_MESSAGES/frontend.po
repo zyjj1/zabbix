@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-09 12:43+0200\n"
+"POT-Creation-Date: 2019-12-15 01:43+0200\n"
 "PO-Revision-Date: 2019-03-12 09:36+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -745,7 +745,7 @@ msgstr "Thời gian ít hơn"
 msgid "Age less than %s"
 msgstr "Thời gian ít hơn %s"
 
-#: app/views/administration.script.list.php:78 app/views/popup.generic.php:602
+#: app/views/administration.script.list.php:78 app/views/popup.generic.php:607
 #: include/items.inc.php:349 include/views/configuration.httpconf.edit.php:100
 msgid "Agent"
 msgstr "Agent"
@@ -1296,7 +1296,7 @@ msgid "Available"
 msgstr "Sẵn sàng"
 
 #: adm.triggerseverities.php:37 adm.triggerseverities.php:38
-#: include/views/administration.general.triggerSeverity.edit.php:62
+#: include/views/administration.general.trigseverity.edit.php:62
 msgid "Average"
 msgstr "Trung bình"
 
@@ -1499,7 +1499,7 @@ msgstr "Canada (136 ký tự)"
 #: include/views/conf.import.php:126
 #: include/views/js/administration.general.housekeeper.edit.js.php:40
 #: include/views/js/administration.general.trigger.options.js.php:21
-#: include/views/js/administration.general.triggerSeverity.js.php:13
+#: include/views/js/administration.general.trigseverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
 #: include/views/js/configuration.discovery.edit.js.php:124
 #: include/views/js/configuration.discovery.edit.js.php:566
@@ -3574,7 +3574,7 @@ msgstr "Chứa"
 #: include/views/administration.general.regularexpressions.edit.php:33
 #: include/views/administration.general.regularexpressions.list.php:32
 #: include/views/administration.general.trigger.options.edit.php:33
-#: include/views/administration.general.triggerSeverity.edit.php:33
+#: include/views/administration.general.trigseverity.edit.php:33
 #: include/views/administration.general.valuemapping.edit.php:33
 #: include/views/administration.general.valuemapping.list.php:35
 #: include/views/administration.general.workingtime.edit.php:31
@@ -3965,7 +3965,7 @@ msgstr "Tùy chỉnh screen"
 msgid "Custom script"
 msgstr "Tùy chỉnh script"
 
-#: include/views/administration.general.triggerSeverity.edit.php:87
+#: include/views/administration.general.trigseverity.edit.php:87
 msgid "Custom severity names affect all locales and require manual translation!"
 msgstr "Tùy chỉnh tên mức độ nghiêm trọng ảnh hưởng đến tất cả các local và yêu cầu biên dịch bằng tay!"
 
@@ -4084,7 +4084,7 @@ msgstr "Dữ liệu"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Thống kê dữ liệu bộ nhớ cache. Cache - một trong các giá trị (các chế độ: all, float, uint, str, log, text), lịch sử (Các chế độ: pfree, total, used, free), xu hướng (Các chế độ: pfree, total, used, free), văn bản (Các chế độ: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2727
+#: include/classes/graphdraw/CLineGraphDraw.php:2735
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4653,7 +4653,7 @@ msgstr "Phụ thuộc"
 msgid "Dependent item"
 msgstr "Item phụ thuộc"
 
-#: app/views/popup.generic.php:288 include/triggers.inc.php:2737
+#: app/views/popup.generic.php:293 include/triggers.inc.php:2737
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4843,7 +4843,7 @@ msgid "Disabled"
 msgstr "Đã vô hiệu hóa"
 
 #: adm.triggerseverities.php:41 adm.triggerseverities.php:42
-#: include/views/administration.general.triggerSeverity.edit.php:78
+#: include/views/administration.general.trigseverity.edit.php:78
 msgid "Disaster"
 msgstr "Thảm họa"
 
@@ -5769,7 +5769,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Hết hạn"
 
-#: app/views/popup.generic.php:530 include/graphs.inc.php:27
+#: app/views/popup.generic.php:535 include/graphs.inc.php:27
 msgid "Exploded"
 msgstr "Exploded"
 
@@ -6618,8 +6618,8 @@ msgstr "Các nhóm"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1419
-#: include/classes/graphdraw/CLineGraphDraw.php:1426
+#: include/classes/graphdraw/CLineGraphDraw.php:1421
+#: include/classes/graphdraw/CLineGraphDraw.php:1428
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -6738,7 +6738,7 @@ msgid "Hierarchy"
 msgstr "Thứ bậc"
 
 #: adm.triggerseverities.php:39 adm.triggerseverities.php:40
-#: include/views/administration.general.triggerSeverity.edit.php:70
+#: include/views/administration.general.trigseverity.edit.php:70
 msgid "High"
 msgstr "Cao"
 
@@ -8565,7 +8565,7 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
-#: include/sounds.inc.php:111 usergrps.php:318 usergrps.php:358
+#: include/sounds.inc.php:112 usergrps.php:318 usergrps.php:358
 #: usergrps.php:361
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
@@ -8616,7 +8616,7 @@ msgstr "Thông tin"
 
 #: adm.triggerseverities.php:33 adm.triggerseverities.php:34
 #: include/items.inc.php:31
-#: include/views/administration.general.triggerSeverity.edit.php:46
+#: include/views/administration.general.trigseverity.edit.php:46
 msgid "Information"
 msgstr "Thông tin"
 
@@ -9900,7 +9900,7 @@ msgstr "Đánh mất"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Quy tắc phát hiện mức độ thấp ở trạng thái \"không được hỗ trợ\""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1387
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
 msgid "M"
 msgstr "M"
 
@@ -11465,7 +11465,7 @@ msgstr "Không có cờ boolean bị phản đối."
 msgid "None"
 msgstr "Không có"
 
-#: app/views/popup.generic.php:533 include/graphs.inc.php:24
+#: app/views/popup.generic.php:538 include/graphs.inc.php:24
 #: include/items.inc.php:160 include/triggers.inc.php:1278
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:224
@@ -11509,7 +11509,7 @@ msgid "Not available"
 msgstr "Không sẵn sàng"
 
 #: adm.triggerseverities.php:31 adm.triggerseverities.php:32
-#: include/views/administration.general.triggerSeverity.edit.php:37
+#: include/views/administration.general.trigseverity.edit.php:37
 msgid "Not classified"
 msgstr "Chưa phân loại"
 
@@ -12541,7 +12541,7 @@ msgstr "Quyền truy cập có thể chỉ được gán cho nhóm ngươ
 msgid "Persian (fa_IR)"
 msgstr "Persian (fa_IR)"
 
-#: app/views/popup.generic.php:527 include/graphs.inc.php:26
+#: app/views/popup.generic.php:532 include/graphs.inc.php:26
 msgid "Pie"
 msgstr "Pie"
 
@@ -13428,22 +13428,22 @@ msgstr "Phục hồi"
 
 #: include/views/js/administration.general.housekeeper.edit.js.php:37
 #: include/views/js/administration.general.trigger.options.js.php:18
-#: include/views/js/administration.general.triggerSeverity.js.php:10
+#: include/views/js/administration.general.trigseverity.js.php:10
 msgid "Reset all fields to default values?"
 msgstr "Đặt lại tất cả các trường thành giá trị mặc định?"
 
 #: include/views/js/administration.general.housekeeper.edit.js.php:36
 #: include/views/js/administration.general.trigger.options.js.php:17
-#: include/views/js/administration.general.triggerSeverity.js.php:9
+#: include/views/js/administration.general.trigseverity.js.php:9
 msgid "Reset confirmation"
 msgstr "Phục hồi xác nhận"
 
 #: include/views/administration.general.housekeeper.edit.php:157
 #: include/views/administration.general.trigger.options.edit.php:102
-#: include/views/administration.general.triggerSeverity.edit.php:96
+#: include/views/administration.general.trigseverity.edit.php:96
 #: include/views/js/administration.general.housekeeper.edit.js.php:46
 #: include/views/js/administration.general.trigger.options.js.php:27
-#: include/views/js/administration.general.triggerSeverity.js.php:19
+#: include/views/js/administration.general.trigseverity.js.php:19
 msgid "Reset defaults"
 msgstr "Phục hồi mặc định"
 
@@ -14128,7 +14128,7 @@ msgid "Security name"
 msgstr "Tên bảo mật"
 
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:97
-#: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:630
+#: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:635
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
 #: include/classes/html/CMultiSelect.php:74
 #: include/classes/widgets/CWidgetHelper.php:156
@@ -14291,13 +14291,13 @@ msgid "Serif"
 msgstr "Serif"
 
 #: app/controllers/CControllerWidgetClockView.php:85
-#: app/views/administration.script.list.php:81 app/views/popup.generic.php:605
+#: app/views/administration.script.list.php:81 app/views/popup.generic.php:610
 #: include/classes/screens/CScreenClock.php:83
 #: include/views/configuration.host.list.php:84 queue.php:167
 msgid "Server"
 msgstr "Máy chủ"
 
-#: app/views/administration.script.list.php:84 app/views/popup.generic.php:608
+#: app/views/administration.script.list.php:84 app/views/popup.generic.php:613
 msgid "Server (proxy)"
 msgstr "Máy chủ (proxy)"
 
@@ -14864,7 +14864,7 @@ msgstr "Chỉ định một số điều kiện lọc để xem các giá trị.
 msgid "Speed"
 msgstr "Tốc độ"
 
-#: app/views/popup.generic.php:524 include/graphs.inc.php:25
+#: app/views/popup.generic.php:529 include/graphs.inc.php:25
 #: include/views/monitoring.history.php:225
 msgid "Stacked"
 msgstr "Xếp chồng"
@@ -15834,7 +15834,7 @@ msgstr "Các khuynh hướng "
 #: app/controllers/CControllerPopupTriggerWizard.php:216
 #: app/controllers/CControllerPopupTriggerWizard.php:287
 #: app/views/popup.services.php:44 include/actions.inc.php:44
-#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:486
+#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:488
 #: include/events.inc.php:229 include/maps.inc.php:26
 #: include/triggers.inc.php:1250
 #: include/views/configuration.services.edit.php:87
@@ -16023,8 +16023,8 @@ msgid "Trigger recovery expression must contain at least one host:key reference.
 msgstr "Biểu thức khôi phục trigger phải chứa ít nhất một máy chủ: tham chiếu khóa."
 
 #: include/html.inc.php:763
-#: include/views/administration.general.triggerSeverity.edit.php:25
-#: include/views/administration.general.triggerSeverity.edit.php:93
+#: include/views/administration.general.trigseverity.edit.php:25
+#: include/views/administration.general.trigseverity.edit.php:93
 msgid "Trigger severities"
 msgstr "Mức độ quan trọng của trigger"
 
@@ -16511,7 +16511,7 @@ msgstr "Up"
 #: include/views/administration.general.other.edit.php:73
 #: include/views/administration.general.regularexpressions.edit.php:144
 #: include/views/administration.general.trigger.options.edit.php:101
-#: include/views/administration.general.triggerSeverity.edit.php:95
+#: include/views/administration.general.trigseverity.edit.php:95
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
@@ -17336,7 +17336,7 @@ msgstr "W"
 
 #: adm.triggerseverities.php:35 adm.triggerseverities.php:36
 #: include/items.inc.php:33
-#: include/views/administration.general.triggerSeverity.edit.php:54
+#: include/views/administration.general.trigseverity.edit.php:54
 #: include/views/general.warning.php:21
 msgid "Warning"
 msgstr "Cảnh báo"
@@ -17620,7 +17620,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:714
+#: include/classes/graphdraw/CLineGraphDraw.php:716
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Giá trị cực đại của trục Y phải lớn hơn giá trị cực tiểu trục Y."
 
@@ -17999,9 +17999,9 @@ msgstr "chỉ ảnh hưởng đến dữ liệu được lọc"
 msgid "agent"
 msgstr "agent"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1862
 #: include/classes/html/CSeverity.php:80
-#: include/classes/pagefilter/CPageFilter.php:767
+#: include/classes/pagefilter/CPageFilter.php:772
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18099,8 +18099,8 @@ msgstr "Đăng ký tự động"
 msgid "auto-registered host"
 msgstr "Host được đăng ký tự động"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1842
-#: include/classes/graphdraw/CLineGraphDraw.php:1864
+#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1866
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18267,7 +18267,7 @@ msgstr "dayofweek () - Ngày trong tuần"
 msgid "days"
 msgstr "Ngày"
 
-#: include/classes/pagefilter/CPageFilter.php:654
+#: include/classes/pagefilter/CPageFilter.php:659
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18516,7 +18516,7 @@ msgstr "item mẫu"
 msgid "key is empty"
 msgstr "Không có key"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1840
+#: include/classes/graphdraw/CLineGraphDraw.php:1842
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18527,7 +18527,7 @@ msgstr "Cuối cùng"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Giá trị T cuối cùng (gần đây nhất)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1977
+#: include/classes/graphdraw/CLineGraphDraw.php:1979
 msgid "left"
 msgstr "bên trái"
 
@@ -18565,9 +18565,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1387
-#: include/classes/graphdraw/CLineGraphDraw.php:1395
-#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1397
+#: include/classes/graphdraw/CLineGraphDraw.php:1404
 msgid "m-d"
 msgstr "m-d"
 
@@ -18593,8 +18593,8 @@ msgstr "Bản đồ"
 msgid "matches"
 msgstr "Khớp với"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1843
-#: include/classes/graphdraw/CLineGraphDraw.php:1857
+#: include/classes/graphdraw/CLineGraphDraw.php:1845
+#: include/classes/graphdraw/CLineGraphDraw.php:1859
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18615,8 +18615,8 @@ msgstr "số lượng phụ thuộc tối đa đạt đến"
 msgid "maximum number of dependency levels reached"
 msgstr "số lượng mức độ phụ thuộc tối đa đạt được"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1841
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1843
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18689,7 +18689,7 @@ msgstr "new"
 msgid "new event tag name"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1935
+#: include/classes/graphdraw/CLineGraphDraw.php:1937
 #: include/classes/graphdraw/CPieGraphDraw.php:359
 msgid "no data"
 msgstr "Không có dữ liệu"
@@ -18713,8 +18713,8 @@ msgstr "not in"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:75
-#: include/classes/pagefilter/CPageFilter.php:713
-#: include/classes/pagefilter/CPageFilter.php:767 include/forms.inc.php:1128
+#: include/classes/pagefilter/CPageFilter.php:718
+#: include/classes/pagefilter/CPageFilter.php:772 include/forms.inc.php:1128
 #: include/views/monitoring.screen.php:63 slides.php:191
 msgid "not selected"
 msgstr "Không được chọn"
@@ -18843,7 +18843,7 @@ msgstr "biểu thức chính quy"
 msgid "remember selected"
 msgstr "Ghi nhớ lựa chọn"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1977
+#: include/classes/graphdraw/CLineGraphDraw.php:1979
 msgid "right"
 msgstr "Bên phải "
 

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-09 12:43+0200\n"
-"PO-Revision-Date: 2019-04-18 08:34+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"POT-Creation-Date: 2019-12-15 01:43+0200\n"
+"PO-Revision-Date: 2019-12-13 06:04+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1555569249.000000\n"
+"X-POOTLE-MTIME: 1576209860.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -745,7 +745,7 @@ msgstr "表示期間"
 msgid "Age less than %s"
 msgstr "表示期間 %s"
 
-#: app/views/administration.script.list.php:78 app/views/popup.generic.php:602
+#: app/views/administration.script.list.php:78 app/views/popup.generic.php:607
 #: include/items.inc.php:349 include/views/configuration.httpconf.edit.php:100
 msgid "Agent"
 msgstr "エージェント"
@@ -1292,7 +1292,7 @@ msgid "Available"
 msgstr "利用可能"
 
 #: adm.triggerseverities.php:37 adm.triggerseverities.php:38
-#: include/views/administration.general.triggerSeverity.edit.php:62
+#: include/views/administration.general.trigseverity.edit.php:62
 msgid "Average"
 msgstr "軽度の障害"
 
@@ -1495,7 +1495,7 @@ msgstr "カナダ (136文字)"
 #: include/views/conf.import.php:126
 #: include/views/js/administration.general.housekeeper.edit.js.php:40
 #: include/views/js/administration.general.trigger.options.js.php:21
-#: include/views/js/administration.general.triggerSeverity.js.php:13
+#: include/views/js/administration.general.trigseverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
 #: include/views/js/configuration.discovery.edit.js.php:124
 #: include/views/js/configuration.discovery.edit.js.php:566
@@ -1699,7 +1699,7 @@ msgstr "Webシナリオを追加できません"
 
 #: jsLoader.php:128
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "ウィジェットが追加できません: ダッシュボードの空き領域が足りません。"
 
 #: jsLoader.php:121
 msgid "Cannot add widgets in kiosk mode"
@@ -1755,7 +1755,7 @@ msgstr "データベースに接続できません。"
 
 #: include/views/js/configuration.httpconf.edit.js.php:79
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "POSTデータを変換できません:"
 
 #: graphs.php:387
 msgid "Cannot copy graph"
@@ -3566,7 +3566,7 @@ msgstr "含む"
 #: include/views/administration.general.regularexpressions.edit.php:33
 #: include/views/administration.general.regularexpressions.list.php:32
 #: include/views/administration.general.trigger.options.edit.php:33
-#: include/views/administration.general.triggerSeverity.edit.php:33
+#: include/views/administration.general.trigseverity.edit.php:33
 #: include/views/administration.general.valuemapping.edit.php:33
 #: include/views/administration.general.valuemapping.list.php:35
 #: include/views/administration.general.workingtime.edit.php:31
@@ -3957,7 +3957,7 @@ msgstr "カスタムスクリーン"
 msgid "Custom script"
 msgstr "カスタムスクリプト"
 
-#: include/views/administration.general.triggerSeverity.edit.php:87
+#: include/views/administration.general.trigseverity.edit.php:87
 msgid "Custom severity names affect all locales and require manual translation!"
 msgstr "カスタム深刻度の名前はすべての言語に影響するため、複数言語を使用している場合は手動で翻訳を行ってください！"
 
@@ -4076,7 +4076,7 @@ msgstr "データ"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "データキャッシュの統計。cache - values (mode: all, float, uint, str, log, text)、history (mode: pfree, total, used, free)、trend (mode: pfree, total, used, free)、text (mode: pfree, total, used, free)。"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2727
+#: include/classes/graphdraw/CLineGraphDraw.php:2735
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4645,7 +4645,7 @@ msgstr "依存先"
 msgid "Dependent item"
 msgstr "依存アイテム"
 
-#: app/views/popup.generic.php:288 include/triggers.inc.php:2737
+#: app/views/popup.generic.php:293 include/triggers.inc.php:2737
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4835,7 +4835,7 @@ msgid "Disabled"
 msgstr "無効"
 
 #: adm.triggerseverities.php:41 adm.triggerseverities.php:42
-#: include/views/administration.general.triggerSeverity.edit.php:78
+#: include/views/administration.general.trigseverity.edit.php:78
 msgid "Disaster"
 msgstr "致命的な障害"
 
@@ -5025,13 +5025,13 @@ msgstr "計算しない"
 #: include/views/configuration.item.massupdate.php:522
 #: include/views/configuration.item.prototype.edit.php:677
 msgid "Do not keep history"
-msgstr ""
+msgstr "ヒストリを保存しない"
 
 #: include/views/configuration.item.edit.php:815
 #: include/views/configuration.item.massupdate.php:539
 #: include/views/configuration.item.prototype.edit.php:690
 msgid "Do not keep trends"
-msgstr ""
+msgstr "トレンドを保存しない"
 
 #: jsLoader.php:140 jsLoader.php:256
 msgid "Do you wish to replace the conditional expression?"
@@ -5155,12 +5155,12 @@ msgstr "重要度名\"%s\"は重複しています"
 #: include/classes/api/services/CTriggerGeneral.php:504
 #, c-format
 msgid "Duplicate trigger prototype with name \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"という名前のトリガーのプロトタイプが重複しています。"
 
 #: include/classes/api/services/CTriggerGeneral.php:498
 #, c-format
 msgid "Duplicate trigger with name \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"という名前のトリガーが重複しています。"
 
 #: include/classes/api/services/CMap.php:735
 #: include/classes/api/services/CMap.php:1188
@@ -5709,7 +5709,7 @@ msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:651
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr "WMIクエリを実行して最初の検索結果を返却。リクエストに応じて整数値、浮動小数点値、文字列値、テキスト値を返す。"
+msgstr "WMIクエリを実行して最初の検索結果を返す。リクエストに応じて整数値、浮動小数点値、文字列値、テキスト値を返す。"
 
 #: app/controllers/CControllerPopupGeneric.php:317
 #: app/views/administration.script.edit.php:48
@@ -5761,7 +5761,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "メンテナンス期間の終了"
 
-#: app/views/popup.generic.php:530 include/graphs.inc.php:27
+#: app/views/popup.generic.php:535 include/graphs.inc.php:27
 msgid "Exploded"
 msgstr "分解円グラフ"
 
@@ -6610,8 +6610,8 @@ msgstr "グループ"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1419
-#: include/classes/graphdraw/CLineGraphDraw.php:1426
+#: include/classes/graphdraw/CLineGraphDraw.php:1421
+#: include/classes/graphdraw/CLineGraphDraw.php:1428
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -6730,7 +6730,7 @@ msgid "Hierarchy"
 msgstr "階層"
 
 #: adm.triggerseverities.php:39 adm.triggerseverities.php:40
-#: include/views/administration.general.triggerSeverity.edit.php:70
+#: include/views/administration.general.trigseverity.edit.php:70
 msgid "High"
 msgstr "重度の障害"
 
@@ -8557,7 +8557,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
-#: include/sounds.inc.php:111 usergrps.php:318 usergrps.php:358
+#: include/sounds.inc.php:112 usergrps.php:318 usergrps.php:358
 #: usergrps.php:361
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
@@ -8608,7 +8608,7 @@ msgstr "情報"
 
 #: adm.triggerseverities.php:33 adm.triggerseverities.php:34
 #: include/items.inc.php:31
-#: include/views/administration.general.triggerSeverity.edit.php:46
+#: include/views/administration.general.trigseverity.edit.php:46
 msgid "Information"
 msgstr "情報"
 
@@ -9376,7 +9376,7 @@ msgstr "JSONデータ"
 #: include/classes/api/services/CItemGeneral.php:1996
 #: include/classes/api/services/CItemGeneral.php:2025
 msgid "JSON is expected"
-msgstr ""
+msgstr "JSONで指定してください"
 
 #: include/classes/validators/CNewValidator.php:101
 msgid "JSON string is expected"
@@ -9529,7 +9529,7 @@ msgstr "言語"
 #: include/classes/api/services/CUser.php:553
 #, c-format
 msgid "Language \"%1$s\" is not supported."
-msgstr ""
+msgstr "言語\"%1$s\"はサポートしていません。"
 
 #: include/func.inc.php:1690
 msgctxt "page navigation"
@@ -9892,7 +9892,7 @@ msgstr "Lost"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "ローレベルディスカバリが\"取得不可\"の状態"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1387
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
 msgid "M"
 msgstr "M"
 
@@ -10830,7 +10830,7 @@ msgstr "新しいイベントのホストグループ"
 
 #: include/correlation.inc.php:50 include/correlation.inc.php:202
 msgid "New event tag name"
-msgstr ""
+msgstr "新しいイベントのタグ名"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
@@ -11457,7 +11457,7 @@ msgstr "論理値ではないフラグは廃止予定です。"
 msgid "None"
 msgstr "なし"
 
-#: app/views/popup.generic.php:533 include/graphs.inc.php:24
+#: app/views/popup.generic.php:538 include/graphs.inc.php:24
 #: include/items.inc.php:160 include/triggers.inc.php:1278
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:224
@@ -11501,7 +11501,7 @@ msgid "Not available"
 msgstr "利用不可"
 
 #: adm.triggerseverities.php:31 adm.triggerseverities.php:32
-#: include/views/administration.general.triggerSeverity.edit.php:37
+#: include/views/administration.general.trigseverity.edit.php:37
 msgid "Not classified"
 msgstr "未分類"
 
@@ -11801,7 +11801,7 @@ msgstr "正常"
 
 #: include/correlation.inc.php:49 include/correlation.inc.php:197
 msgid "Old event tag name"
-msgstr ""
+msgstr "古いイベントのタグ名"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
@@ -12533,7 +12533,7 @@ msgstr "権限はユーザーグループにのみ割り当てることができ
 msgid "Persian (fa_IR)"
 msgstr "ペルシャ語 (fa_IR)"
 
-#: app/views/popup.generic.php:527 include/graphs.inc.php:26
+#: app/views/popup.generic.php:532 include/graphs.inc.php:26
 msgid "Pie"
 msgstr "円グラフ"
 
@@ -13420,22 +13420,22 @@ msgstr "リセット"
 
 #: include/views/js/administration.general.housekeeper.edit.js.php:37
 #: include/views/js/administration.general.trigger.options.js.php:18
-#: include/views/js/administration.general.triggerSeverity.js.php:10
+#: include/views/js/administration.general.trigseverity.js.php:10
 msgid "Reset all fields to default values?"
 msgstr "すべてのフィールドをデフォルト値に戻しますか？"
 
 #: include/views/js/administration.general.housekeeper.edit.js.php:36
 #: include/views/js/administration.general.trigger.options.js.php:17
-#: include/views/js/administration.general.triggerSeverity.js.php:9
+#: include/views/js/administration.general.trigseverity.js.php:9
 msgid "Reset confirmation"
 msgstr "リセットの確認"
 
 #: include/views/administration.general.housekeeper.edit.php:157
 #: include/views/administration.general.trigger.options.edit.php:102
-#: include/views/administration.general.triggerSeverity.edit.php:96
+#: include/views/administration.general.trigseverity.edit.php:96
 #: include/views/js/administration.general.housekeeper.edit.js.php:46
 #: include/views/js/administration.general.trigger.options.js.php:27
-#: include/views/js/administration.general.triggerSeverity.js.php:19
+#: include/views/js/administration.general.trigseverity.js.php:19
 msgid "Reset defaults"
 msgstr "デフォルトにリセット"
 
@@ -13466,7 +13466,7 @@ msgstr "相関関係ルールによって解決済。"
 #: include/classes/screens/CScreenHostTriggers.php:249
 #: include/classes/screens/CScreenProblem.php:1020
 msgid "Resolved by inaccessible user."
-msgstr ""
+msgstr "アクセスできないユーザーによって解決済。"
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:248
@@ -13534,7 +13534,7 @@ msgstr "MBeanオブジェクトまたはその属性を記述するJSONオブジ
 
 #: include/classes/items/CHelpItems.php:1061
 msgid "Return first column of the first row of the SQL query result."
-msgstr "SQLクエリ実行結果の最初の行の最初の列を返却。"
+msgstr "SQLクエリ実行結果の最初の行の最初の列を返す。"
 
 #: include/classes/items/CHelpItems.php:1071
 msgid "Return value of an attribute of MBean object."
@@ -13542,7 +13542,7 @@ msgstr "MBeanオブジェクトの属性の値を返す。"
 
 #: include/classes/items/CHelpItems.php:679
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
-msgstr "ICMP pingの応答時間を秒で返却。例： 0.02"
+msgstr "ICMP pingの応答時間を秒で返す。例： 0.02"
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:655
@@ -13556,19 +13556,19 @@ msgstr "Zabbixでホストのネットワークインターフェースを記述
 
 #: include/classes/items/CHelpItems.php:975
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
-msgstr "ホスト上の特定のチェック種別の稼働状況返却。このアイテムの値がホストリストの稼働状況アイコンに対応する。有効なtypes： agent, snmp, ipmi, jmx。"
+msgstr "ホスト上の特定のチェック種別の稼働状況を返す。このアイテムの値がホストリストの稼働状況アイコンに対応する。有効なtypes： agent, snmp, ipmi, jmx。"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "Returns current maintenance status of the host."
-msgstr "ホストの現在のメンテナンス状態を返却。"
+msgstr "ホストの現在のメンテナンス状態を返す。"
 
 #: include/classes/items/CHelpItems.php:991
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
-msgstr "関連付けられているZabbix Java Gatewayの情報返却。有効なオプション：ping, version。"
+msgstr "関連付けられているZabbix Java Gatewayの情報を返す。有効なオプション：ping, version。"
 
 #: include/classes/items/CHelpItems.php:675
 msgid "Returns percentage of lost ICMP ping packets."
-msgstr "ICMP pingパケットのロスト率を返却。"
+msgstr "ICMP pingパケットのロスト率を返す。"
 
 #: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:746
@@ -14120,7 +14120,7 @@ msgid "Security name"
 msgstr "セキュリティ名"
 
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:97
-#: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:630
+#: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:635
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
 #: include/classes/html/CMultiSelect.php:74
 #: include/classes/widgets/CWidgetHelper.php:156
@@ -14283,13 +14283,13 @@ msgid "Serif"
 msgstr "Serif"
 
 #: app/controllers/CControllerWidgetClockView.php:85
-#: app/views/administration.script.list.php:81 app/views/popup.generic.php:605
+#: app/views/administration.script.list.php:81 app/views/popup.generic.php:610
 #: include/classes/screens/CScreenClock.php:83
 #: include/views/configuration.host.list.php:84 queue.php:167
 msgid "Server"
 msgstr "サーバー"
 
-#: app/views/administration.script.list.php:84 app/views/popup.generic.php:608
+#: app/views/administration.script.list.php:84 app/views/popup.generic.php:613
 msgid "Server (proxy)"
 msgstr "サーバーまたはプロキシ"
 
@@ -14856,7 +14856,7 @@ msgstr "値を表示するにはいくつかのフィルター条件を指定し
 msgid "Speed"
 msgstr "スピード"
 
-#: app/views/popup.generic.php:524 include/graphs.inc.php:25
+#: app/views/popup.generic.php:529 include/graphs.inc.php:25
 #: include/views/monitoring.history.php:225
 msgid "Stacked"
 msgstr "積算グラフ"
@@ -15027,7 +15027,7 @@ msgstr "停止"
 #: include/views/configuration.item.prototype.edit.php:678
 #: include/views/configuration.item.prototype.edit.php:691
 msgid "Storage period"
-msgstr ""
+msgstr "保存期間"
 
 #: include/hosts.inc.php:35
 msgid "Straight"
@@ -15329,7 +15329,7 @@ msgstr "テンプレートを追加しました"
 
 #: include/views/conf.import.php:97
 msgid "Template and host properties that are inherited through template linkage will be unlinked and cleared."
-msgstr ""
+msgstr "テンプレートにリンクされて継承されているテンプレートおよびホストのプロパティは、リンクが解除されてクリアされます。"
 
 #: include/classes/api/services/CHostBase.php:260
 msgid "Template cannot be linked to another template more than once even through other templates."
@@ -15826,7 +15826,7 @@ msgstr "トレンド"
 #: app/controllers/CControllerPopupTriggerWizard.php:216
 #: app/controllers/CControllerPopupTriggerWizard.php:287
 #: app/views/popup.services.php:44 include/actions.inc.php:44
-#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:486
+#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:488
 #: include/events.inc.php:229 include/maps.inc.php:26
 #: include/triggers.inc.php:1250
 #: include/views/configuration.services.edit.php:87
@@ -16015,8 +16015,8 @@ msgid "Trigger recovery expression must contain at least one host:key reference.
 msgstr "トリガーの復旧条件式には少なくとも1つのhost:keyへの参照が必要です。"
 
 #: include/html.inc.php:763
-#: include/views/administration.general.triggerSeverity.edit.php:25
-#: include/views/administration.general.triggerSeverity.edit.php:93
+#: include/views/administration.general.trigseverity.edit.php:25
+#: include/views/administration.general.trigseverity.edit.php:93
 msgid "Trigger severities"
 msgstr "トリガーの深刻度"
 
@@ -16503,7 +16503,7 @@ msgstr "Up"
 #: include/views/administration.general.other.edit.php:73
 #: include/views/administration.general.regularexpressions.edit.php:144
 #: include/views/administration.general.trigger.options.edit.php:101
-#: include/views/administration.general.triggerSeverity.edit.php:95
+#: include/views/administration.general.trigseverity.edit.php:95
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
@@ -16914,19 +16914,19 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 #: include/classes/items/CHelpItems.php:715
 #: include/classes/items/CHelpItems.php:739
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "VMwareデータストアのバイト単位かトータルからのパーセンテージによる容量の統計値。バイト単位なら整数、パーセンテージなら浮動小数で返却。"
+msgstr "VMwareデータストアのバイト単位かトータルからのパーセンテージによる容量の統計値。バイト単位なら整数、パーセンテージなら浮動小数で返す。"
 
 #: include/classes/items/CHelpItems.php:723
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
-msgstr ""
+msgstr "VMwareデータストアのハイパーバイザーのリスト、<url> - VMwareサービスURL>、<datastore> - データストア名"
 
 #: include/classes/items/CHelpItems.php:711
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMwareのデータストアの読み込み、<url> - VMwareサービスURL、<datastore> - データストア名、<mode> - latency/maxlatency - 平均値または最大値"
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMwareのデータストアの書き込み、<url> - VMwareサービスURL、<datastore> - データストア名、<mode> - latency/maxlatency - 平均値または最大値"
 
 #: include/classes/items/CHelpItems.php:703
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
@@ -16954,7 +16954,7 @@ msgstr "VMwareハイパーバイザーのデータストア書き込み統計、
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのデータストアのリスト、<url> - VMwareサービスURL>、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/items/CHelpItems.php:775
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -17237,15 +17237,15 @@ msgstr "任意のパフォーマンスカウンター値。リクエストに応
 
 #: include/correlation.inc.php:227
 msgid "Value of new event tag"
-msgstr ""
+msgstr "新しいイベントタグの値"
 
 #: include/correlation.inc.php:212 include/correlation.inc.php:220
 msgid "Value of old event tag"
-msgstr ""
+msgstr "古いイベントタグの値"
 
 #: include/actions.inc.php:331
 msgid "Value of tag"
-msgstr ""
+msgstr "タグの値"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:357
 msgid "Value: no data"
@@ -17328,7 +17328,7 @@ msgstr "W"
 
 #: adm.triggerseverities.php:35 adm.triggerseverities.php:36
 #: include/items.inc.php:33
-#: include/views/administration.general.triggerSeverity.edit.php:54
+#: include/views/administration.general.trigseverity.edit.php:54
 #: include/views/general.warning.php:21
 msgid "Warning"
 msgstr "警告"
@@ -17340,7 +17340,7 @@ msgstr "警告"
 
 #: jsLoader.php:143
 msgid "Warning message"
-msgstr ""
+msgstr "警告メッセージ"
 
 #: jsLoader.php:214
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -17595,7 +17595,7 @@ msgstr "XMLが空です"
 
 #: include/classes/api/services/CItemGeneral.php:1981
 msgid "XML is expected"
-msgstr ""
+msgstr "XMLで指定してください"
 
 #: include/views/js/monitoring.sysmaps.js.php:247
 #: include/views/js/monitoring.sysmaps.js.php:382
@@ -17612,7 +17612,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "Y軸の最大値はY軸の最小値よりも大きな値を設定してください"
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:714
+#: include/classes/graphdraw/CLineGraphDraw.php:716
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y軸の最大値はY軸の最小値よりも大きな値を設定してください。"
 
@@ -17764,7 +17764,7 @@ msgstr "ユーザーを作成する権限がありません。"
 
 #: jsLoader.php:122
 msgid "You do not have permissions to edit dashboard"
-msgstr ""
+msgstr "ダッシュボードを編集する権限がありません"
 
 #: include/func.inc.php:1827
 msgid "You have no permissions to access this page."
@@ -17928,7 +17928,7 @@ msgstr "文字列で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:563
 msgid "a floating point value is expected"
-msgstr ""
+msgstr "浮動小数の値で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:287
 msgid "a hexadecimal colour code (6 symbols) is expected"
@@ -17991,9 +17991,9 @@ msgstr "フィルターしたデータにのみ影響があります"
 msgid "agent"
 msgstr "エージェント"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1862
 #: include/classes/html/CSeverity.php:80
-#: include/classes/pagefilter/CPageFilter.php:767
+#: include/classes/pagefilter/CPageFilter.php:772
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18050,11 +18050,11 @@ msgstr "具体的な時間を指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:433
 msgid "an integer is expected"
-msgstr ""
+msgstr "整数で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:472
 msgid "an unsigned integer is expected"
-msgstr ""
+msgstr "符号なし整数で指定してください"
 
 #: include/views/monitoring.history.php:163
 msgid "as Blue"
@@ -18091,8 +18091,8 @@ msgstr "自動登録"
 msgid "auto-registered host"
 msgstr "自動登録ホスト"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1842
-#: include/classes/graphdraw/CLineGraphDraw.php:1864
+#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1866
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18259,7 +18259,7 @@ msgstr "dayofweek() - 曜日(月曜 - 1、日曜 - 7)"
 msgid "days"
 msgstr "日"
 
-#: include/classes/pagefilter/CPageFilter.php:654
+#: include/classes/pagefilter/CPageFilter.php:659
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18508,7 +18508,7 @@ msgstr "アイテムパターン"
 msgid "key is empty"
 msgstr "キーが設定されていません"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1840
+#: include/classes/graphdraw/CLineGraphDraw.php:1842
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18519,7 +18519,7 @@ msgstr "最新値"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 最新値"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1977
+#: include/classes/graphdraw/CLineGraphDraw.php:1979
 msgid "left"
 msgstr "左"
 
@@ -18557,9 +18557,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1387
-#: include/classes/graphdraw/CLineGraphDraw.php:1395
-#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1397
+#: include/classes/graphdraw/CLineGraphDraw.php:1404
 msgid "m-d"
 msgstr "m/d"
 
@@ -18585,8 +18585,8 @@ msgstr "マップ"
 msgid "matches"
 msgstr "一致する"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1843
-#: include/classes/graphdraw/CLineGraphDraw.php:1857
+#: include/classes/graphdraw/CLineGraphDraw.php:1845
+#: include/classes/graphdraw/CLineGraphDraw.php:1859
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18607,8 +18607,8 @@ msgstr "依存アイテムの数が最大数に達しました"
 msgid "maximum number of dependency levels reached"
 msgstr "依存レベルの数が最大数に達しました\""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1841
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1843
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18679,9 +18679,9 @@ msgstr "新規"
 
 #: include/views/configuration.correlation.edit.php:142
 msgid "new event tag name"
-msgstr ""
+msgstr "新しいイベントのタグ名"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1935
+#: include/classes/graphdraw/CLineGraphDraw.php:1937
 #: include/classes/graphdraw/CPieGraphDraw.php:359
 msgid "no data"
 msgstr "データなし"
@@ -18705,8 +18705,8 @@ msgstr "期間外"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:75
-#: include/classes/pagefilter/CPageFilter.php:713
-#: include/classes/pagefilter/CPageFilter.php:767 include/forms.inc.php:1128
+#: include/classes/pagefilter/CPageFilter.php:718
+#: include/classes/pagefilter/CPageFilter.php:772 include/forms.inc.php:1128
 #: include/views/monitoring.screen.php:63 slides.php:191
 msgid "not selected"
 msgstr "選択されていません"
@@ -18754,7 +18754,7 @@ msgstr "off"
 
 #: include/views/configuration.correlation.edit.php:145
 msgid "old event tag name"
-msgstr ""
+msgstr "古いイベントのタグ名"
 
 #: include/classes/setup/CFrontendSetup.php:311
 #: include/classes/setup/CFrontendSetup.php:328
@@ -18835,7 +18835,7 @@ msgstr "正規表現"
 msgid "remember selected"
 msgstr "選択を記憶"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1977
+#: include/classes/graphdraw/CLineGraphDraw.php:1979
 msgid "right"
 msgstr "右"
 
@@ -19158,7 +19158,7 @@ msgstr "値は%1$sから指定してください"
 
 #: include/correlation.inc.php:215
 msgid "value of new event tag"
-msgstr ""
+msgstr "新しいイベントタグの値"
 
 #: include/actions.inc.php:566 include/actions.inc.php:584
 #: include/actions.inc.php:729 include/actions.inc.php:747
