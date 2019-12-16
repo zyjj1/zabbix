@@ -2093,7 +2093,8 @@ out:
  * Parameters: internal_events - [IN/OUT] the events to process               *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_events)
+static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_problem_events,
+		zbx_vector_ptr_t *internal_ok_events)
 {
 	DB_EVENT	*event;
 	int		i;
@@ -2101,9 +2102,12 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_e
 	if (0 != DCget_internal_action_count())
 		return;
 
-	for (i = 0; i < internal_events->values_num; i++)
+	for (i = 0; i < internal_problem_events->values_num; i++)
+		((DB_EVENT *)internal_problem_events->values[i])->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+
+	for (i = 0; i < internal_ok_events->values_num; i++)
 	{
-		event = (DB_EVENT *)internal_events->values[i];
+		event = (DB_EVENT *)internal_ok_events->values[i];
 
 		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_RECOVER))
 			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
@@ -2565,7 +2569,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 	const char		*__function_name = "zbx_process_events";
 	int			i, processed_num = 0;
 	zbx_uint64_t		eventid;
-	zbx_vector_ptr_t	internal_ok_events, trigger_events, internal_events;
+	zbx_vector_ptr_t	internal_problem_events, internal_ok_events, trigger_events, internal_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name,
 			(zbx_fs_size_t)events.values_num);
@@ -2575,6 +2579,8 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 	if (0 != events.values_num)
 	{
+		zbx_vector_ptr_create(&internal_problem_events);
+		zbx_vector_ptr_reserve(&internal_problem_events, events.values_num);
 		zbx_vector_ptr_create(&internal_ok_events);
 		zbx_vector_ptr_reserve(&internal_ok_events, events.values_num);
 
@@ -2605,15 +2611,21 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 					case EVENT_OBJECT_TRIGGER:
 						if (TRIGGER_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						else
+							zbx_vector_ptr_append(&internal_problem_events, event);
 						zbx_vector_ptr_append(&internal_events, event);
 						break;
 					case EVENT_OBJECT_ITEM:
 						if (ITEM_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						else
+							zbx_vector_ptr_append(&internal_problem_events, event);
 						break;
 					case EVENT_OBJECT_LLDRULE:
 						if (ITEM_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						else
+							zbx_vector_ptr_append(&internal_problem_events, event);
 						break;
 				}
 			}
@@ -2625,8 +2637,8 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		if (0 != internal_ok_events.values_num)
 			process_internal_ok_events(&internal_ok_events);
 
-		if (0 != internal_events.values_num)
-			process_internal_events_without_actions(&internal_events);
+		if (0 != internal_problem_events.values_num || 0 != internal_ok_events.values_num)
+			process_internal_events_without_actions(&internal_problem_events, &internal_ok_events);
 
 		if (0 != trigger_events.values_num)
 		{
@@ -2642,6 +2654,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
+		zbx_vector_ptr_destroy(&internal_problem_events);
 		zbx_vector_ptr_destroy(&internal_events);
 	}
 
