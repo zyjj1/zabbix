@@ -1039,6 +1039,26 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
 	}
 }
 
+/* specifies correlation execution scope */
+typedef enum
+{
+	ZBX_CHECK_NEW_EVENTS,
+	ZBX_CHECK_OLD_EVENTS
+}
+zbx_correlation_scope_t;
+
+/* flag to cache state of problem table during event correlation */
+typedef enum
+{
+	/* unknown state, not initialized */
+	ZBX_PROBLEM_STATE_UNKNOWN = -1,
+	/* all problems are resolved */
+	ZBX_PROBLEM_STATE_RESOLVED,
+	/* at least one open problem exists */
+	ZBX_PROBLEM_STATE_OPEN
+}
+zbx_problem_state_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: correlate_event_by_global_rules                                  *
@@ -1058,9 +1078,9 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
  *                based on the rest correlation conditions                    *
  *                                                                            *
  ******************************************************************************/
-static void	correlate_event_by_global_rules(DB_EVENT *event)
+static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t *problem_state)
 {
-	int			i, open_problems = -1;
+	int			i;
 	zbx_correlation_t	*correlation;
 	zbx_vector_ptr_t	corr_old, corr_new;
 	char			*sql = NULL;
@@ -1075,44 +1095,53 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 
 	for (i = 0; i < correlation_rules.correlations.values_num; i++)
 	{
-		int	add_to = 0; /* 1 = corr_new; 2= corr_old */
+		zbx_correlation_scope_t	scope;
 
 		correlation = (zbx_correlation_t *)correlation_rules.correlations.values[i];
 
 		switch (correlation_match_new_event(correlation, event, SUCCEED))
 		{
 			case CORRELATION_MATCH:
-				add_to = (SUCCEED == correlation_has_old_event_operation(correlation)) ? 2: 1;
+				if (SUCCEED == correlation_has_old_event_operation(correlation))
+					scope = ZBX_CHECK_OLD_EVENTS;
+				else
+					scope = ZBX_CHECK_NEW_EVENTS;
 				break;
 			case CORRELATION_NO_MATCH:	/* proceed with next rule */
-				break;
+				continue;
 			case CORRELATION_MAY_MATCH:	/* might match depending on old events */
-				add_to = 2;
+				scope = ZBX_CHECK_OLD_EVENTS;
 				break;
 		}
 
-		if (2 == add_to)
+		if (ZBX_CHECK_OLD_EVENTS == scope)
 		{
-			if (-1 == open_problems)
+			if (ZBX_PROBLEM_STATE_UNKNOWN == *problem_state)
 			{
 				DB_RESULT	result;
 
 				result = DBselectN("select eventid from problem"
 						" where r_eventid is null and source="
 						ZBX_STR(EVENT_SOURCE_TRIGGERS), 1);
-				open_problems = (NULL == DBfetch(result)) ? 0 : 1;
+				if (NULL == DBfetch(result))
+					*problem_state = ZBX_PROBLEM_STATE_RESOLVED;
+				else
+					*problem_state = ZBX_PROBLEM_STATE_OPEN;
 				DBfree_result(result);
 			}
 
-			if (0 == open_problems)
+			if (ZBX_PROBLEM_STATE_RESOLVED == *problem_state)
 			{
+				/* with no open problems all conditions involving old events will fail       */
+				/* so there are no need to check old events. Instead re-check if correlation */
+				/* still matches the new event and must be processed in new event scope.     */
 				if (CORRELATION_MATCH == correlation_match_new_event(correlation, event, FAIL))
 					zbx_vector_ptr_append(&corr_new, correlation);
 			}
 			else
 				zbx_vector_ptr_append(&corr_old, correlation);
 		}
-		else if (1 == add_to)
+		else
 			zbx_vector_ptr_append(&corr_new, correlation);
 	}
 
@@ -1190,6 +1219,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 
 	int			i, index;
 	zbx_trigger_diff_t	*diff;
+	zbx_problem_state_t	problem_state = ZBX_PROBLEM_STATE_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, correlation_cache.num_data);
 
@@ -1206,7 +1236,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 		if (0 == (ZBX_FLAGS_DB_EVENT_CREATE & event->flags))
 			continue;
 
-		correlate_event_by_global_rules(event);
+		correlate_event_by_global_rules(event, &problem_state);
 
 		/* force value recalculation based on open problems for triggers with */
 		/* events closed by 'close new' correlation operation                */
