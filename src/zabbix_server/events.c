@@ -621,6 +621,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 			for (i = 0; i < event->tags.values_num; i++)
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
+
 				if (0 == strcmp(tag->tag, condition->data.tag.tag))
 					return "1";
 			}
@@ -632,6 +633,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 				zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
 
 				tag = (zbx_tag_t *)event->tags.values[i];
+
 				if (0 == strcmp(tag->tag, cond->tag) &&
 					SUCCEED == zbx_strmatch_condition(tag->value, cond->value, cond->op))
 				{
@@ -642,6 +644,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			ret =  correlation_match_event_hostgroup(event, condition->data.group.groupid);
+
 			if (CONDITION_OPERATOR_NOT_EQUAL == condition->data.group.op)
 				return (SUCCEED == ret ? "0" : "1");
 
@@ -651,6 +654,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 			for (i = 0; i < event->tags.values_num; i++)
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
+
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
 					return (SUCCEED == old_value) ? ZBX_UNKNOWN_STR "0" : "0";
 			}
@@ -1066,7 +1070,8 @@ zbx_problem_state_t;
  * Purpose: find problem events that must be recovered by global correlation  *
  *          rules and check if the new event must be closed                   *
  *                                                                            *
- * Parameters: event - [IN] the new event                                     *
+ * Parameters: event         - [IN] the new event                             *
+ *             problem_state - [IN/OUT] problem state cache variable          *
  *                                                                            *
  * Comments: The correlation data (zbx_event_recovery_t) of events that       *
  *           must be closed are added to event_correlation hashset            *
@@ -1123,6 +1128,7 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 				result = DBselectN("select eventid from problem"
 						" where r_eventid is null and source="
 						ZBX_STR(EVENT_SOURCE_TRIGGERS), 1);
+
 				if (NULL == DBfetch(result))
 					*problem_state = ZBX_PROBLEM_STATE_RESOLVED;
 				else
