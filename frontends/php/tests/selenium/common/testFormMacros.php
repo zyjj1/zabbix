@@ -20,13 +20,13 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 
 /**
  * Base class for Macros tests.
  */
-abstract class testFormMacros extends CLegacyWebTest {
+abstract class testFormMacros extends CWebTest {
 
 	use MacrosTrait;
 

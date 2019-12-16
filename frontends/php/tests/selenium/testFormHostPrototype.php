@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 
 /**
  * @backup hosts
  */
-class testFormHostPrototype extends testFormMacros {
+class testFormHostPrototype extends CLegacyWebTest {
 
 	use MacrosTrait;
 
@@ -67,8 +68,22 @@ class testFormHostPrototype extends testFormMacros {
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
-		// Check inherited macros in form matching with DB.
-		$this->checkInheritedGlobalMacros();
+		// Create two macros arrays: from DB and from Frontend form.
+		$macros = [
+			'database' => CDBHelper::getAll('SELECT macro, value FROM globalmacro'),
+			'frontend' => $this->getMacrosTable('Effective value')->getValue()
+		];
+
+		// Sort arrays by Macros.
+		foreach ($macros as &$array) {
+			usort($array, function ($a, $b) {
+				return strcmp($a['macro'], $b['macro']);
+			});
+		}
+		unset($array);
+
+		// Compare macros from DB with macros from Frontend.
+		$this->assertEquals($macros['database'], $macros['frontend']);
 
 		// Check layout at Encryption tab.
 		$this->zbxTestTabSwitch('Encryption');
