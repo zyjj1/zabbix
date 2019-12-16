@@ -2090,7 +2090,8 @@ out:
  *          internal actions and no problem recovery from when actions were   *
  *          enabled                                                           *
  *                                                                            *
- * Parameters: internal_events - [IN/OUT] the events to process               *
+ * Parameters: internal_problem_events - [IN/OUT] problem events to process   *
+ * Parameters: internal_ok_events      - [IN/OUT] recovery events to process  *
  *                                                                            *
  ******************************************************************************/
 static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_problem_events,
