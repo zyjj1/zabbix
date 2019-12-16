@@ -94,7 +94,10 @@ class CControllerPopupHttpStep extends CController {
 			elseif ($page_options['timeout'][0] !== '{') {
 				$seconds = timeUnitToSeconds($page_options['timeout']);
 
-				if (bccomp($seconds, SEC_PER_HOUR) > 0) {
+				if ($seconds == 0) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a number cannot be zero')));
+				}
+				else if (bccomp($seconds, SEC_PER_HOUR) > 0) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a number is too large')));
 				}
 			}
