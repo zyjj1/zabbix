@@ -2098,7 +2098,7 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_e
 	DB_EVENT	*event;
 	int		i;
 
-	if (0 == DCget_internal_action_count())
+	if (0 != DCget_internal_action_count())
 		return;
 
 	for (i = 0; i < internal_events->values_num; i++)
