@@ -330,6 +330,9 @@ class CMultifieldTableElement extends CTableElement {
 	 * @return $this
 	 */
 	public function fill($data) {
+		if (CTestArrayHelper::isAssociative($data)) {
+			$data = [$data];
+		}
 		foreach ($data as $row) {
 			$action = CTestArrayHelper::get($row, 'action', USER_ACTION_ADD);
 			unset($row['action']);
