@@ -557,7 +557,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($db_trigger['url'] !== '') {
-				$menu_data['url'] = CHtmlUrlValidator::validate($db_trigger['url'])
+				$menu_data['url'] = CHtmlUrlValidator::validate($db_trigger['url'], false)
 					? $db_trigger['url']
 					: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($db_trigger['url'],
 							false, false)).'\');';
