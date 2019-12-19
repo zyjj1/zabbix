@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-15 01:43+0200\n"
-"PO-Revision-Date: 2019-12-13 06:04+0300\n"
+"PO-Revision-Date: 2019-12-19 05:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1576209860.000000\n"
+"X-POOTLE-MTIME: 1576726342.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -10830,11 +10830,11 @@ msgstr "新しいイベントのホストグループ"
 
 #: include/correlation.inc.php:50 include/correlation.inc.php:202
 msgid "New event tag name"
-msgstr "新しいイベントのタグ名"
+msgstr "新しいイベントタグ名"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr "新しいイベントのタグの値"
+msgstr "新しいイベントタグの値"
 
 #: include/views/configuration.host.massupdate.php:104
 msgid "New host group"
@@ -11801,11 +11801,11 @@ msgstr "正常"
 
 #: include/correlation.inc.php:49 include/correlation.inc.php:197
 msgid "Old event tag name"
-msgstr "古いイベントのタグ名"
+msgstr "古いイベントタグ名"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr "古いイベントのタグの値"
+msgstr "古いイベントタグの値"
 
 #: app/views/administration.proxy.list.php:144
 #: include/views/monitoring.sysmap.constructor.php:48
@@ -16918,7 +16918,7 @@ msgstr "VMwareデータストアのバイト単位かトータルからのパー
 
 #: include/classes/items/CHelpItems.php:723
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
-msgstr "VMwareデータストアのハイパーバイザーのリスト、<url> - VMwareサービスURL>、<datastore> - データストア名"
+msgstr "VMwareデータストアのハイパーバイザーのリスト、<url> - VMwareサービスURL、<datastore> - データストア名"
 
 #: include/classes/items/CHelpItems.php:711
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -16954,7 +16954,7 @@ msgstr "VMwareハイパーバイザーのデータストア書き込み統計、
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "VMwareハイパーバイザーのデータストアのリスト、<url> - VMwareサービスURL>、<uuid> - VMwareハイパーバイザーのホスト名"
+msgstr "VMwareハイパーバイザーのデータストアのリスト、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/items/CHelpItems.php:775
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18679,7 +18679,7 @@ msgstr "新規"
 
 #: include/views/configuration.correlation.edit.php:142
 msgid "new event tag name"
-msgstr "新しいイベントのタグ名"
+msgstr "新しいイベントタグ名"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1937
 #: include/classes/graphdraw/CPieGraphDraw.php:359
@@ -18754,7 +18754,7 @@ msgstr "off"
 
 #: include/views/configuration.correlation.edit.php:145
 msgid "old event tag name"
-msgstr "古いイベントのタグ名"
+msgstr "古いイベントタグ名"
 
 #: include/classes/setup/CFrontendSetup.php:311
 #: include/classes/setup/CFrontendSetup.php:328
