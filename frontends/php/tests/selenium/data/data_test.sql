@@ -2148,17 +2148,17 @@ INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALU
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (107, 104, 'problemsbysv', 'Reference PBS widget to delete', 6, 0, 6, 5);
 
 -- testHostMacros
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1180, 20006, '{$MACRO1}', '');
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1181, 20006, '{$MACRO2}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90100, 20006, '{$MACRO1}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90101, 20006, '{$MACRO2}', '');
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (30010, 'Host for macros remove', 'Host for macros remove', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90900, 30010, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30010, 20030);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1174, 30010, '{$MACRO_FOR_REMOVE1}', '');
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1175, 30010, '{$MACRO_FOR_REMOVE2}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90102, 30010, '{$MACRO_FOR_REMOVE1}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90103, 30010, '{$MACRO_FOR_REMOVE2}', '');
 
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1176, 40000, '{$TEMPLATE_MACRO1}', '');
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1177, 40000, '{$TEMPLATE_MACRO2}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90104, 40000, '{$TEMPLATE_MACRO1}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90105, 40000, '{$TEMPLATE_MACRO2}', '');
 
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1178, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '');
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (1179, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90106, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '');
