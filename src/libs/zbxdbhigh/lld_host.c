@@ -1442,8 +1442,11 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t			db_insert, db_insert_gdiscovery;
 	zbx_vector_ptr_t		new_groups;
+	zbx_vector_uint64_t		group_prototype_ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&group_prototype_ids);
 
 	for (i = 0; i < groups->values_num; i++)
 	{
@@ -1453,7 +1456,11 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 			continue;
 
 		if (0 == group->groupid)
+		{
 			new_groups_num++;
+			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+				zbx_vector_uint64_append(&group_prototype_ids, group->group_prototypeid);
+		}
 		else if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			upd_groups_num++;
 	}
@@ -1462,6 +1469,13 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 		goto out;
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_group_prototypeids(&group_prototype_ids))
+	{
+		/* the host group prototype was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_groups_num)
 	{
@@ -1576,6 +1590,8 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 	DBcommit();
 out:
+	zbx_vector_uint64_destroy(&group_prototype_ids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

@@ -643,6 +643,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
 #define DBlock_hostids(ids)			DBlock_records("hosts", ids)
 #define DBlock_triggerids(ids)			DBlock_records("triggers", ids)
 #define DBlock_itemids(ids)			DBlock_records("items", ids)
+#define DBlock_group_prototypeids(ids)		DBlock_records("group_prototype", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
