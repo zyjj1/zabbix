@@ -219,6 +219,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
+	error[0] = '\0';
+
 	if (-1 == access(CONFIG_FPING_LOCATION, X_OK))
 	{
 #if !defined(HAVE_IPV6)
