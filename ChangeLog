@@ -7,7 +7,6 @@ Changes for 4.0.16rc1
 
 New features:
 A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
-.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 
 Bug fixes:
 ..F....... [ZBX-17101] fixed url validation before output (miks)
@@ -32,6 +31,7 @@ A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
 .......PS. [ZBX-16915] fixed memory leak (mabele)
 ........S. [ZBX-17008] improved Zabbix server performance when using maintenance (vso)
 ........S. [ZBX-16779] fixed infinite loop when writing export to file fails (mabele)
+.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.15
