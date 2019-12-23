@@ -120,6 +120,11 @@ out:
 	return ret;
 }
 
+int	__zbx_fstat(int fd, zbx_stat_t *buf)
+{
+	return _fstat64(fd, buf);
+}
+
 #endif
 
 /******************************************************************************
