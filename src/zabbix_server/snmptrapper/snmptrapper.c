@@ -518,7 +518,7 @@ static int	open_trap_file(void)
 	{
 		error = zbx_dsprintf(error, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
 				zbx_strerror(errno));
-		delay_trap_logs(error, LOG_LEVEL_CRIT);// Check!!!
+		delay_trap_logs(error, LOG_LEVEL_CRIT);
 		close(trap_fd);
 		trap_fd = -1;
 		goto out;
