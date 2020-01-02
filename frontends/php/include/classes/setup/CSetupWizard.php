@@ -435,11 +435,10 @@ class CSetupWizard extends CForm {
 			}
 		}
 
-		try {
-			checkDatabaseCharset();
-		}
-		catch(Exception $e) {
-			error($e->getMessage());
+		$db = DB::getDbBackend();
+
+		if (!$db->checkEncoding()) {
+			error($db->getWarning());
 			return false;
 		}
 

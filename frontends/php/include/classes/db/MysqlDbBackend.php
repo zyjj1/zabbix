@@ -23,6 +23,12 @@
  */
 class MysqlDbBackend extends DbBackend {
 
+	public function checkEncoding() {
+		global $DB;
+
+		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB);
+	}
+
 	/**
 	 * Check if 'dbversion' table exists.
 	 *
@@ -39,4 +45,41 @@ class MysqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	private function checkDatabaseEncoding(array $DB) {
+		$row = DBfetch(DBselect('SELECT default_character_set_name db_charset FROM information_schema.schemata'.
+			' WHERE '.dbConditionString('schema_name', [$DB['DATABASE']])
+		));
+
+		if ($row && strtoupper($row['db_charset']) != ZBX_DB_DEFAULT_CHARSET) {
+			$this->setWarning(_s('Incorrect default charset for Zabbix database: %1$s.',
+				_s('"%1$s" instead "%2$s"', $row['db_charset'], ZBX_DB_DEFAULT_CHARSET)
+			));
+			return false;
+		}
+
+		return true;
+	}
+
+	private function checkTablesEncoding(array $DB) {
+		$tables = DBfetchColumn(DBSelect('SELECT table_name FROM information_schema.columns'.
+			' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).
+				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
+				' AND '.dbConditionString('data_type', ['text', 'varchar', 'longtext']).
+				' AND ('.
+					' UPPER(character_set_name)!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET).
+					' OR collation_name!='.zbx_dbstr(ZBX_DB_MYSQL_DEFAULT_COLLATION).
+				')'
+		), 'table_name');
+
+		if ($tables) {
+			$tables = array_unique($tables);
+			$this->setWarning(_n('Unsupported character_set or collation for table: %s',
+				'Unsupported character_set or collation for tables: %s',
+				implode(', ', $tables), implode(', ', $tables), count($tables)
+			));
+			return false;
+		}
+
+		return true;
+	}
 }
