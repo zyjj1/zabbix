@@ -494,14 +494,18 @@ void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int pro
 	for (; proc_num < process_forks; proc_num++)
 	{
 		zbx_stat_process_t	*process;
-		unsigned short		one_total = 0, one_counter;
+		unsigned int		one_total = 0, one_counter;
 
 		process = &collector->process[proc_type][proc_num];
 
 		for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
-			one_total += process->h_counter[s][current] - process->h_counter[s][collector->first];
+		{
+			one_total += (unsigned short)(process->h_counter[s][current] -
+					process->h_counter[s][collector->first]);
+		}
 
-		one_counter = process->h_counter[state][current] - process->h_counter[state][collector->first];
+		one_counter = (unsigned short)(process->h_counter[state][current] -
+				process->h_counter[state][collector->first]);
 
 		switch (aggr_func)
 		{
