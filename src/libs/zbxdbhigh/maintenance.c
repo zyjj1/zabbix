@@ -62,12 +62,12 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	/* Row level shared locks are not supported in Oracle. Table lock in share mode leads to deadlock on */
 	/* event_suppress insertion due to locking that occurs in order to satisfy foreign key constraint.   */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid" ZBX_FOR_UPDATE);
- #else
+#else
 	/* For PostgreSQL table level locks are used because row level shared locks have reader preference which */
 	/* could lead to theoretical situation when server blocks out frontend from maintenances updates.        */
 	DBexecute("lock table maintenances in share mode");
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid");
- #endif
+#endif
 	result = DBselect("%s", sql);
 	zbx_free(sql);
 
