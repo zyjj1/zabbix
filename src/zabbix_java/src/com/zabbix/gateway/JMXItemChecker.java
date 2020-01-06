@@ -385,7 +385,6 @@ class JMXItemChecker extends ItemChecker
 		}
 
 		return mbsc.getAttributes(name, attributeNames);
-
 	}
 
 	private AttributeList collectAttribute(ObjectName name, MBeanAttributeInfo[] attributeArray)
