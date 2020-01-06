@@ -899,7 +899,7 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
 int	zbx_dc_update_maintenances(void);
 void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates);
 void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates);
-int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids);
+int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_vector_uint64_t *maintenanceids);
 int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 void	zbx_dc_maintenance_set_update_flags(void);
