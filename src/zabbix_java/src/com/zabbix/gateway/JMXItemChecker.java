@@ -301,7 +301,7 @@ class JMXItemChecker extends ItemChecker
 		DiscoveryObject cachedObj = JavaGateway.discoveredObjects.get(discoveredObjKey);
 		long now = System.currentTimeMillis();
 
-		if (null != cachedObj && SocketProcessor.MILLISECONDS_IN_DAY >= now - (cachedObj.getTimestamp()))
+		if (null != cachedObj && now <= cachedObj.getExpirationTime())
 		{
 			if (cachedObj.isBulk())
 			{
@@ -311,8 +311,9 @@ class JMXItemChecker extends ItemChecker
 				}
 				catch (Exception e)
 				{
-					JavaGateway.discoveredObjects.put(discoveredObjKey, new DiscoveryObject(false, now));
 					cachedObj.setBulk(false);
+					cachedObj.setExpirationTime(now);
+					JavaGateway.discoveredObjects.put(discoveredObjKey, cachedObj);
 				}
 			}
 

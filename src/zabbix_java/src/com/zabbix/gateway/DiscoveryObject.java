@@ -22,12 +22,12 @@ package com.zabbix.gateway;
 class DiscoveryObject
 {
 	Boolean bulk;
-	long timestamp;
+	long expirationTime;
 
-	public DiscoveryObject(Boolean bulk, long timestamp)
+	public DiscoveryObject(Boolean bulk, long now)
 	{
 		this.bulk = bulk;
-		this.timestamp = timestamp;
+		this.expirationTime = now + SocketProcessor.MILLISECONDS_IN_DAY;
 	}
 
 	public void setBulk(Boolean bulk)
@@ -40,8 +40,13 @@ class DiscoveryObject
 		return bulk;
 	}
 
-	public long getTimestamp()
+	public void setExpirationTime(long now)
 	{
-		return timestamp;
+		this.expirationTime = now + SocketProcessor.MILLISECONDS_IN_DAY;
+	}
+
+	public long getExpirationTime()
+	{
+		return expirationTime;
 	}
 }

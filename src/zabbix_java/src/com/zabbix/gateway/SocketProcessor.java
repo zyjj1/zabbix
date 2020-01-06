@@ -23,6 +23,7 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.json.*;
 
@@ -36,7 +37,7 @@ class SocketProcessor implements Runnable
 	private static long cleanupTime = System.currentTimeMillis();
 	private Socket socket;
 
-	public static final long MILLISECONDS_IN_HOUR = 1000 * 60 * 60;
+	private static final long MILLISECONDS_IN_HOUR = 1000 * 60 * 60;
 	public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_HOUR * 24;
 
 	SocketProcessor(Socket socket)
@@ -47,7 +48,7 @@ class SocketProcessor implements Runnable
 	@Override
 	public void run()
 	{
-		logger.debug("starting to process incoming connection");
+		logger.warn("starting to process incoming connection");
 
 		BinaryProtocolSpeaker speaker = null;
 		ItemChecker checker = null;
@@ -68,10 +69,10 @@ class SocketProcessor implements Runnable
 
 				long now = System.currentTimeMillis();
 
-				if (MILLISECONDS_IN_HOUR <= now - cleanupTime)
+				if (now >= cleanupTime)
 				{
-					discoveredObjCleaner(now);
-					cleanupTime = now;
+					cleanDiscoveredObjects(now);
+					cleanupTime = now + MILLISECONDS_IN_HOUR;
 				}
 			}
 			else
@@ -121,22 +122,16 @@ class SocketProcessor implements Runnable
 		logger.debug("finished processing incoming connection");
 	}
 
-	private void discoveredObjCleaner(long now)
+	private void cleanDiscoveredObjects(long now)
 	{
-		List<String> keys = new ArrayList<String>();
-
-		for (Map.Entry<String, DiscoveryObject> entry : JavaGateway.discoveredObjects.entrySet())
+		for(Iterator<Map.Entry<String, DiscoveryObject>> it = JavaGateway.discoveredObjects.entrySet().iterator();
+			it.hasNext(); )
 		{
+			Map.Entry<String, DiscoveryObject> entry = it.next();
 			DiscoveryObject cachedObj = entry.getValue();
 
-			if (MILLISECONDS_IN_DAY <= now - cachedObj.getTimestamp())
-				keys.add(entry.getKey());
-		}
-
-		if (null != keys)
-		{
-			for (String objName : keys)
-				JavaGateway.discoveredObjects.remove(objName);
+			if(now >= cachedObj.getExpirationTime())
+				it.remove();
 		}
 	}
 }
