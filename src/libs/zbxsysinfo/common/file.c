@@ -182,6 +182,12 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
+		goto err;
+	}
+
 	if (0 != zbx_fstat(f, &stat_buf))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));

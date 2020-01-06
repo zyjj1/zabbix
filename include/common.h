@@ -1213,7 +1213,6 @@ zbx_uint64_t	suffix2factor(char c);
 #if defined(_WINDOWS)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
-int	__zbx_fstat(int fd, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
 #else
 typedef struct stat	zbx_stat_t;
