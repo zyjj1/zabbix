@@ -1412,7 +1412,9 @@ static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_even
  * Parameters: event_queries -  [IN/OUT] in - event data                      *
  *                                       out - running maintenances for each  *
  *                                            event                           *
- *             maintenanceids - [IN] the maintenances to process              *
+ *             maintenanceids - [IN/OUT]                                      *
+ *                                 IN - the maintenances to process           *
+ *                                 OUT - the maintenances matching events     *
  *                                                                            *
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
