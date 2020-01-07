@@ -83,6 +83,32 @@ class testGraphWidget extends CWebTest {
 	}
 
 	/**
+	 * Check screenshots of graph widget form.
+	 */
+	public function testGraphWidget_FormLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$overlay = $dashboard->addWidget();
+		$form = $overlay->asForm();
+		$form->fill(['Type' => 'Graph']);
+		$form->waitUntilReloaded();
+		$element = $overlay->query('id:svg-graph-preview')->one();
+
+		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
+		foreach ($tabs as $tab) {
+			$form->selectTab($tab);
+			if ($tab === 'Overrides') {
+				$button = $form->query('button:Add new override')->one()->click();
+				// Remove border radius from button element.
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+			}
+
+			$this->page->removeFocus();
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+		}
+	}
+
+	/**
 	 * Check validation of graph widget fields.
 	 */
 	private function validate($data, $tab) {
