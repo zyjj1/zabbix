@@ -648,7 +648,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
-void	DBcheck_character_set();
+void	DBcheck_character_set(void);
 
 /* bulk insert support */
 

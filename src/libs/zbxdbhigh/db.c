@@ -2125,11 +2125,10 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 	return ret;
 }
 
-void	DBcheck_character_set()
+void	DBcheck_character_set(void)
 {
 #if defined(HAVE_MYSQL)
 	char		*database_name_esc;
-	int		rows_count;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -2167,13 +2166,10 @@ void	DBcheck_character_set()
 			"(character_set_name != '%s' OR collation_name != '%s')",
 			database_name_esc, ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_COLLATION);
 	row = DBfetch(result);
-	rows_count = 0;
-	if (NULL != row)
-		rows_count = atoi(row[0]);
-	if (0 < rows_count)
+	if (NULL != row && 0 != strcmp("0", row[0]))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%i column(s) in [%s] has character_set_name or collation_name "
-				"that is not supported by Zabbix", rows_count, CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "%s column(s) in [%s] has character_set_name or collation_name "
+				"that is not supported by Zabbix", row[0], CONFIG_DBNAME);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set [%s] and collation [%s] should be used in database",
 				ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_COLLATION);
 	}
@@ -2215,9 +2211,8 @@ void	DBcheck_character_set()
 
 	char		*database_name_esc = NULL;
 	char		*schema_name_esc = NULL;
-	char		char_set[CHARSET_NAME_LENGTH_MAX] = {'\0'};
-	const int	max_oid_len = 20;
-	char		oid[OID_LENGTH_MAX] = {'\0'};
+	char		char_set[CHARSET_NAME_LENGTH_MAX] = "";
+	char		oid[OID_LENGTH_MAX] = "";
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -2262,16 +2257,12 @@ void	DBcheck_character_set()
 			"WHERE atttypid IN (25,1043) AND c.relnamespace = %s AND c.relam = 0 "
 			"AND l.collname != 'default'",
 			oid);
-	if (NULL != (row = DBfetch(result)))
+	row = DBfetch(result);
+	if (NULL != row && 0 != strcmp("0", row[0]))
 	{
-		char	*row_count = row[0];
-
-		if (0 != strcmp("0", row_count))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "database has [%s] fields set to character set different from "
-					"default [%s]. Zabbix supports only [%s] character set",
-					row_count, ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_CHARACTER_SET);
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "database has [%s] fields set to character set different from "
+				"default [%s]. Zabbix supports only [%s] character set",
+				row[0], ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_CHARACTER_SET);
 	}
 	DBfree_result(result);
 
