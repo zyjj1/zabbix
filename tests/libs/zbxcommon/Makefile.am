@@ -4,6 +4,7 @@ SERVER_tests = \
 	parse_key \
 	replace_key_params_dyn \
 	calculate_item_nextcheck \
+	calculate_item_nextcheck_unreachable \
 	zbx_function_get_param_dyn \
 	zbx_token_find \
 	zbx_interval_preproc \
@@ -13,7 +14,8 @@ SERVER_tests = \
 	zbx_trim_float \
 	zbx_trim_integer \
 	zbx_variant_compare \
-	zbx_user_macro_parse
+	zbx_user_macro_parse \
+	convert_to_utf8
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -145,6 +147,18 @@ calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+calculate_item_nextcheck_unreachable_SOURCES = \
+	calculate_item_nextcheck_unreachable.c \
+	$(COMMON_SRC_FILES)
+
+calculate_item_nextcheck_unreachable_LDADD = \
+	$(COMMON_LIB_FILES)
+
+calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
+
+calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@
+
+calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 zbx_function_get_param_dyn_SOURCES = \
 	zbx_function_get_param_dyn.c \
@@ -283,5 +297,18 @@ zbx_user_macro_parse_LDADD += @SERVER_LIBS@
 zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+convert_to_utf8_SOURCES = \
+     convert_to_utf8.c \
+     $(COMMON_SRC_FILES)
+
+convert_to_utf8_LDADD = \
+     $(COMMON_LIB_FILES)
+
+convert_to_utf8_LDADD += @SERVER_LIBS@
+
+convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@
+
+convert_to_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

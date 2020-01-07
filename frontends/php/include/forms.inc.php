@@ -103,7 +103,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 			$data['messages']['enabled'] = 0;
 		}
 		if (!isset($data['messages']['sounds.recovery'])) {
-			$data['messages']['sounds.recovery'] = 'alarm_ok.wav';
+			$data['messages']['sounds.recovery'] = 'alarm_ok.mp3';
 		}
 		if (!isset($data['messages']['triggers.recovery'])) {
 			$data['messages']['triggers.recovery'] = 0;
@@ -975,7 +975,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
-		'delay_flex' => getRequest('delay_flex', []),
+		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
@@ -1324,7 +1324,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 	else {
 		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => ['valemapid', 'name']
+			'output' => ['valuemapid', 'name']
 		]);
 
 		CArrayHelper::sort($data['valuemaps'], ['name']);
@@ -1545,7 +1545,7 @@ function getTriggerFormData(array $data) {
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 
-		// select first host from triggers if gived not match
+		// Select first host from triggers if no matching value is given.
 		$hosts = $trigger['hosts'];
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);

@@ -323,7 +323,7 @@ class CScreenBase {
 		// Get page file.
 		if ($this->required_parameters['pageFile'] && $this->pageFile === null) {
 			global $page;
-			$this->pageFile = $page['file'];
+			$this->pageFile = ($page === null) ? null : $page['file'];
 		}
 
 		// Calculate timeline.
@@ -370,15 +370,6 @@ class CScreenBase {
 	 */
 	public function getScreenId() {
 		return 'flickerfreescreen_'.$this->getDataId();
-	}
-
-	/**
-	 * Get profile url params.
-	 *
-	 * @return string
-	 */
-	public function getProfileUrlParams() {
-		return '&profileIdx='.$this->profileIdx.'&profileIdx2='.$this->profileIdx2;
 	}
 
 	/**

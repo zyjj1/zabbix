@@ -932,7 +932,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 #define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	is_double_suffix(const char *str, unsigned char flags);
-int	is_double(const char *c);
+int	is_double(const char *str, double *value);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
 int	is_int_prefix(const char *c);
@@ -1023,6 +1023,8 @@ int	zbx_validate_interval(const char *str, char **error);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, int *res);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
@@ -1054,7 +1056,7 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
@@ -1135,9 +1137,9 @@ zbx_range_t;
 
 typedef struct
 {
-	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V46 */
-	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)            */
-	/*                                  0       1       2       3             */
+	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
+	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)           */
+	/*                                  0       1       2       3            */
 	zbx_range_t	range[ZBX_IPRANGE_GROUPS_V6];
 
 	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */

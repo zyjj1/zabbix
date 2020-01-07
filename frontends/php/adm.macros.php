@@ -108,7 +108,7 @@ if (hasRequest('update')) {
 $data = [];
 
 if (hasRequest('form_refresh')) {
-	$data['macros'] = getRequest('macros', []);
+	$data['macros'] = array_values(getRequest('macros', []));
 }
 else {
 	$data['macros'] = API::UserMacro()->get([

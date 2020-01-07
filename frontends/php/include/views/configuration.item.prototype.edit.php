@@ -240,7 +240,7 @@ $itemFormList->addRow(
 					->setAttribute('placeholder', _('name'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 1000))
+				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
@@ -780,7 +780,7 @@ $preprocessing = (new CTable())
 	]);
 
 foreach ($data['preprocessing'] as $i => $step) {
-	// Depeding on preprocessing type, display corresponding params field and placeholders.
+	// Depending on preprocessing type, display corresponding params field and placeholders.
 	$params = [];
 
 	// Use numeric box for multiplier, otherwise use text box.

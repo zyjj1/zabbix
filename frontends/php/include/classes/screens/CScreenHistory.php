@@ -218,7 +218,7 @@ class CScreenHistory extends CScreenBase {
 
 					if (in_array($items[$history_row['itemid']]['value_type'],
 							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
+						$value = '"'.$value.'"';
 					}
 					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($value, '%f', $value);
@@ -228,8 +228,8 @@ class CScreenHistory extends CScreenBase {
 						' '.$value;
 
 					if (count($items) > 1) {
-						$row .= ' "'.str_replace('"', '""', $items[$history_row['itemid']]['hosts'][0]['name'].
-							NAME_DELIMITER.$items[$history_row['itemid']]['name_expanded']).'"';
+						$row .= ' "'.$items[$history_row['itemid']]['hosts'][0]['name'].NAME_DELIMITER.
+							$items[$history_row['itemid']]['name_expanded'].'"';
 					}
 					$output[] = $row;
 				}
@@ -541,16 +541,18 @@ class CScreenHistory extends CScreenBase {
 	 * @return string
 	 */
 	protected function getGraphUrl(array $itemIds) {
-		$url = new CUrl('chart.php');
-		$url->setArgument('from', $this->timeline['from']);
-		$url->setArgument('to', $this->timeline['to']);
-		$url->setArgument('itemids', $itemIds);
-		$url->setArgument('type', $this->graphType);
+		$url = (new CUrl('chart.php'))
+			->setArgument('from', $this->timeline['from'])
+			->setArgument('to', $this->timeline['to'])
+			->setArgument('itemids', $itemIds)
+			->setArgument('type', $this->graphType)
+			->setArgument('profileIdx', $this->profileIdx)
+			->setArgument('profileIdx2', $this->profileIdx2);
 
 		if ($this->action == HISTORY_BATCH_GRAPH) {
 			$url->setArgument('batch', 1);
 		}
 
-		return $url->getUrl().$this->getProfileUrlParams();
+		return $url->getUrl();
 	}
 }

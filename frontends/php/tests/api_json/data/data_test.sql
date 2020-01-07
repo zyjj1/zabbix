@@ -30,10 +30,10 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15085,40067,40066,'vfs.fs.size[{#FSNAME},free]');
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
 INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
-INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (2,40066,'API discovery application');
-INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,2,'API discovery application');
+INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
+INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (900,375,900,'API discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
-INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);
+INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (900,900,40067);
 
 -- valuemap
 INSERT INTO valuemaps (valuemapid,name) VALUES (99,'API value map for update');
@@ -42,10 +42,10 @@ INSERT INTO valuemaps (valuemapid,name) VALUES (101,'API value map delete');
 INSERT INTO valuemaps (valuemapid,name) VALUES (102,'API value map delete2');
 INSERT INTO valuemaps (valuemapid,name) VALUES (103,'API value map delete3');
 INSERT INTO valuemaps (valuemapid,name) VALUES (104,'API value map delete4');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (904,100,'One','Online');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (905,100,'Two','Offline');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (906,102,'Three','Other');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (907,103,'Four','Unknown');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9004,100,'One','Online');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9005,100,'Two','Offline');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9006,102,'Three','Other');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9007,103,'Four','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);

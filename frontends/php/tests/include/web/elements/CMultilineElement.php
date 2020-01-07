@@ -53,7 +53,7 @@ class CMultilineElement extends CElement {
 	public function edit() {
 		$this->query('xpath:.//button[@type="button"]')->one()->click();
 
-		return $this->query('xpath://div[@id="overlay_dialogue"]')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		return $this->query('xpath://div[contains(@class, "multilineinput-modal")]')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 
 	/**
@@ -63,21 +63,10 @@ class CMultilineElement extends CElement {
 	 */
 	public function clear() {
 		$dialog = $this->edit();
-		$dialog->query('xpath:.//textarea[@class="multilineinput-textarea"]')->one()->clear();
+		$dialog->query('xpath:.//textarea[contains(@class, "multilineinput-textarea")]')->one()->clear();
 		$dialog->query('button:Apply')->one()->click();
 
 		return $this;
-	}
-
-	/**
-	 * Fill Multiline input element with data.
-	 *
-	 * @param $text    text to be written into the field
-	 *
-	 * @return $this
-	 */
-	public function fill($text) {
-		return $this->overwrite($text);
 	}
 
 	/**
@@ -89,7 +78,7 @@ class CMultilineElement extends CElement {
 	 */
 	public function overwrite($text) {
 		$dialog = $this->edit();
-		$dialog->query('xpath:.//textarea[@class="multilineinput-textarea"]')->one()->overwrite($text);
+		$dialog->query('xpath:.//textarea[contains(@class, "multilineinput-textarea")]')->one()->overwrite($text);
 		$dialog->query('button:Apply')->one()->click();
 		$dialog->waitUntilNotPresent();
 
@@ -115,5 +104,18 @@ class CMultilineElement extends CElement {
 	 */
 	public function selectValue() {
 		self::onNotSupportedMethod(__FUNCTION__);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		$is_enabled = parent::isEnabled($enabled)
+				&& !array_intersect(
+					['multilineinput-disabled', 'multilineinput-readonly'],
+					explode(' ', $this->getAttribute('class'))
+				);
+
+		return $is_enabled === $enabled;
 	}
 }

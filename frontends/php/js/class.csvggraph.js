@@ -120,6 +120,7 @@ jQuery(function ($) {
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
 			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			overlayDialogueOnLoad(true, graph.hintBoxItem);
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				$('.dashbrd-grid-container')
@@ -361,7 +362,7 @@ jQuery(function ($) {
 	/**
 	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
-	 * this function. Tolerance is used to find exacly matched point only.
+	 * this function. Tolerance is used to find exactly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
 		var data_tag = ds.querySelector(':not(.svg-point-highlight)');

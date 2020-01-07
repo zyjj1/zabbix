@@ -40,12 +40,21 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
+	 * Get header of widget.
+	 *
+	 * @return string
+	 */
+	public function getHeaderText() {
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4')->one()->getText();
+	}
+
+	/**
 	 * Get content of widget.
 	 *
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget-content"]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
 	}
 
 	/**
@@ -63,8 +72,19 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click();
+		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click(true);
 		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
+	}
+
+	/**
+	 * Delete widget.
+	 *
+	 * @return $this
+	 */
+	public function delete() {
+		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click()->waitUntilNotVisible();
+
+		return $this;
 	}
 
 	/**
@@ -78,3 +98,4 @@ class CWidgetElement extends CElement {
 		};
 	}
 }
+

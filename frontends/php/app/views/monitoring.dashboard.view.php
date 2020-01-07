@@ -37,7 +37,7 @@ else {
 	$this->addJsFile('csvggraphwidget.js');
 	$this->addJsFile('class.cclock.js');
 	$this->addJsFile('class.cnavtree.js');
-	$this->addJsFile('class.mapWidget.js');
+	$this->addJsFile('class.mapwidget.js');
 	$this->addJsFile('class.svg.canvas.js');
 	$this->addJsFile('class.svg.map.js');
 
@@ -162,7 +162,6 @@ else {
 	// must be done before adding widgets, because it causes dashboard to resize.
 	if ($data['show_timeselector']) {
 		$this->addPostJS(
-			'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
 			'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
 				CJs::encodeJson($data['timeControlData']).
 			');'.

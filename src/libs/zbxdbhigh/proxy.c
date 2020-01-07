@@ -318,7 +318,7 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
 {
 	char	*ch_error, host[HOST_HOST_LEN_MAX];
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX, NULL))
 	{
 		*error = zbx_strdup(*error, "missing name of proxy");
 		return FAIL;
@@ -1724,7 +1724,7 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 			goto out;
 		}
 
-		if (SUCCEED != (ret = zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOSTID, &tmp, &tmp_alloc)))
+		if (SUCCEED != (ret = zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOSTID, &tmp, &tmp_alloc, NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto out;
@@ -1742,7 +1742,7 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
 			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_available[i], &tmp,
-					&tmp_alloc))
+					&tmp_alloc, NULL))
 			{
 				continue;
 			}
@@ -1753,7 +1753,7 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_error[i], &tmp, &tmp_alloc))
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_error[i], &tmp, &tmp_alloc, NULL))
 				continue;
 
 			ha->agents[i].error = zbx_strdup(NULL, tmp);
@@ -1782,9 +1782,13 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, (zbx_host_availability_t *)hosts.values[i]))
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
+					(zbx_host_availability_t *)hosts.values[i]))
+			{
+				continue;
+			}
 
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
@@ -2185,7 +2189,7 @@ try_again:
 		if (0 != hd->logeventid)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 
-		if (0 != hd->state)
+		if (ITEM_STATE_NORMAL != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
 		if (0 == (PROXY_HISTORY_FLAG_NOVALUE & hd->flags))
@@ -2390,10 +2394,13 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	if (HOST_STATUS_MONITORED != item->host.status)
 		return FAIL;
 
+	/* update item nextcheck during maintenance */
 	if (SUCCEED == in_maintenance_without_data_collection(item->host.maintenance_status,
 			item->host.maintenance_type, item->type) &&
 			item->host.maintenance_from <= value->ts.sec)
-		return FAIL;
+	{
+		return SUCCEED;
+	}
 
 	/* empty values are only allowed for meta information update packets */
 	if (NULL == value->value)
@@ -2563,12 +2570,12 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp), NULL))
 	{
 		sec = atoi(tmp);
 		client_timediff.sec = ts_recv->sec - sec;
 
-		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp), NULL))
 		{
 			ns = atoi(tmp);
 			client_timediff.ns = ts_recv->ns - ns;
@@ -2620,12 +2627,12 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 
 	memset(av, 0, sizeof(zbx_agent_value_t));
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc, NULL))
 	{
 		if (FAIL == is_uint31(tmp, &av->ts.sec))
 			goto out;
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
 		{
 			if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
 				0LL, 999999999LL))
@@ -2650,25 +2657,25 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 	else
 		zbx_timespec(&av->ts);
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc, NULL))
 		av->state = (unsigned char)atoi(tmp);
 
 	/* Unsupported item meta information must be ignored for backwards compatibility. */
 	/* New agents will not send meta information for items in unsupported state.      */
 	if (ITEM_STATE_NOTSUPPORTED != av->state)
 	{
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc, NULL))
 		{
 			av->meta = 1;	/* contains meta information */
 
 			is_uint64(tmp, &av->lastlogsize);
 
-			if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
+			if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc, NULL))
 				av->mtime = atoi(tmp);
 		}
 	}
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc, NULL))
 	{
 		av->value = zbx_strdup(av->value, tmp);
 	}
@@ -2681,19 +2688,19 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		}
 	}
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, &tmp, &tmp_alloc, NULL))
 		av->timestamp = atoi(tmp);
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGSOURCE, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGSOURCE, &tmp, &tmp_alloc, NULL))
 		av->source = zbx_strdup(av->source, tmp);
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGSEVERITY, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGSEVERITY, &tmp, &tmp_alloc, NULL))
 		av->severity = atoi(tmp);
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc, NULL))
 		av->logeventid = atoi(tmp);
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_ID, &tmp, &tmp_alloc) ||
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_ID, &tmp, &tmp_alloc, NULL) ||
 			SUCCEED != is_uint64(tmp, &av->id))
 	{
 		av->id = 0;
@@ -2723,7 +2730,7 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
 {
 	char	buffer[MAX_ID_LEN + 1];
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_ITEMID, buffer, sizeof(buffer)))
+	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_ITEMID, buffer, sizeof(buffer), NULL))
 		return FAIL;
 
 	if (SUCCEED != is_uint64(buffer, itemid))
@@ -2748,12 +2755,12 @@ static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, z
 {
 	char	buffer[MAX_STRING_LEN];
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_HOST, buffer, sizeof(buffer)))
+	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_HOST, buffer, sizeof(buffer), NULL))
 		return FAIL;
 
 	hk->host = zbx_strdup(hk->host, buffer);
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_KEY, buffer, sizeof(buffer)))
+	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_KEY, buffer, sizeof(buffer), NULL))
 	{
 		zbx_free(hk->host);
 		return FAIL;
@@ -3101,11 +3108,12 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
-		*info = zbx_strdup(*info, zbx_json_strerror());
+		error = zbx_strdup(error, zbx_json_strerror());
+		ret = FAIL;
 		goto out;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc, NULL))
 	{
 		size_t	token_len;
 
@@ -3311,17 +3319,17 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp), NULL))
 			goto json_parse_error;
 
 		itemtime = atoi(tmp);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp), NULL))
 			goto json_parse_error;
 
 		ZBX_STR2UINT64(drule.druleid, tmp);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp), NULL))
 			goto json_parse_error;
 
 		if ('\0' != *tmp)
@@ -3329,7 +3337,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		else
 			dcheckid = 0;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
 			goto json_parse_error;
 
 		if (SUCCEED != is_ip(ip))
@@ -3338,7 +3346,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			continue;
 		}
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp), NULL))
 		{
 			port = 0;
 		}
@@ -3348,10 +3356,10 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			continue;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc, NULL))
 			*value = '\0';
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns), NULL))
 		{
 			*dns = '\0';
 		}
@@ -3361,7 +3369,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			continue;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
 			status = atoi(tmp);
 		else
 			status = 0;
@@ -3518,12 +3526,12 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
-		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
+		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp), NULL)))
 			break;
 
 		itemtime = atoi(tmp);
 
-		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host))))
+		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL)))
 			break;
 
 		if (FAIL == zbx_check_hostname(host, NULL))
@@ -3534,12 +3542,12 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 		}
 
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
-				&host_metadata, &host_metadata_alloc))
+				&host_metadata, &host_metadata_alloc, NULL))
 		{
 			*host_metadata = '\0';
 		}
 
-		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
+		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL)))
 			break;
 
 		if (SUCCEED != is_ip(ip))
@@ -3548,7 +3556,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			continue;
 		}
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns), NULL))
 		{
 			*dns = '\0';
 		}
@@ -3558,7 +3566,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			continue;
 		}
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp), NULL))
 		{
 			port = ZBX_DEFAULT_AGENT_PORT;
 		}
@@ -3684,7 +3692,7 @@ int	zbx_get_protocol_version(struct zbx_json_parse *jp)
 	int	version;
 
 	if (NULL != jp &&
-			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value)) &&
+			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL) &&
 			NULL != (pminor = strchr(value, '.')))
 	{
 		*pminor++ = '\0';
@@ -3714,20 +3722,17 @@ int	zbx_get_protocol_version(struct zbx_json_parse *jp)
  *             info         - [OUT] address of a pointer to the info          *
  *                                     string (should be freed by the caller) *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
  * Comments: This function is used to parse the new proxy history data        *
  *           protocol introduced in Zabbix v3.3.                              *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
+static void	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
 		zbx_data_session_t *session, zbx_timespec_t *unique_shift, char **info)
 {
 	const char		*__function_name = "process_proxy_history_data_33";
 
 	const char		*pnext = NULL;
-	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
+	int			processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
 	double			sec;
 	DC_ITEM			*items;
 	char			*error = NULL;
@@ -3791,7 +3796,6 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 
 	if (NULL == error)
 	{
-		ret = SUCCEED;
 		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed_num, total_num - processed_num, total_num, zbx_time() - sec);
 	}
@@ -3801,9 +3805,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 		*info = error;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -3890,7 +3892,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		size_t			token_alloc = 0;
 		zbx_data_session_t	*session = NULL;
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc))
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc, NULL))
 		{
 			size_t	token_len;
 
@@ -3906,11 +3908,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			zbx_free(token);
 		}
 
-		if (SUCCEED != (ret = process_proxy_history_data_33(proxy, &jp_data, session, &unique_shift,
-				&error_step)))
-		{
-			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
-		}
+		process_proxy_history_data_33(proxy, &jp_data, session, &unique_shift, &error_step);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))

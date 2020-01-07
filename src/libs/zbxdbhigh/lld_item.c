@@ -1379,8 +1379,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
-			if (FAIL == (ret = is_double(pp->params)))
-				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
+			if (FAIL == (ret = is_double(pp->params, NULL)))
+				zbx_snprintf(err, sizeof(err), "value is not numeric or out of range: %s", pp->params);
 			break;
 	}
 
@@ -2294,7 +2294,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
+static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
 		zbx_vector_ptr_t *items, zbx_hashset_t *items_index, char **error)
 {
 	const char			*__function_name = "lld_items_make";
@@ -3109,8 +3109,13 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	zbx_uint64_t		itemid, itemdiscoveryid;
 	zbx_db_insert_t		db_insert, db_insert_idiscovery;
 	zbx_lld_item_index_t	item_index_local;
+	zbx_vector_uint64_t	upd_keys;
+	char			*sql = NULL;
+	size_t			sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&upd_keys);
 
 	if (0 == items->values_num)
 		goto out;
@@ -3123,9 +3128,15 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			continue;
 
 		if (0 == item->itemid)
+		{
 			new_items++;
+		}
 		else if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
+		{
 			upd_items++;
+			if(0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+				zbx_vector_uint64_append(&upd_keys, item->itemid);
+		}
 	}
 
 	if (0 == new_items && 0 == upd_items)
@@ -3141,6 +3152,31 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		}
 
 		*host_locked = 1;
+	}
+
+	if (0 != upd_items)
+		sql = (char*)zbx_malloc(NULL, sql_alloc);
+
+	if (0 != upd_keys.values_num)
+	{
+		sql_offset = 0;
+
+		zbx_vector_uint64_sort(&upd_keys, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+#ifdef HAVE_MYSQL
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set key_=concat('#',key_) where");
+#else
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set key_='#'||key_ where");
+#endif
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", upd_keys.values,
+				upd_keys.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+		{
+			ret = FAIL;
+			goto out;
+		}
+
 	}
 
 	if (0 != new_items)
@@ -3203,12 +3239,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 	if (0 != upd_items)
 	{
-		char				*sql = NULL;
-		size_t				sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 		zbx_lld_item_prototype_t	*item_prototype;
 		int				index;
 
-		sql = (char*)zbx_malloc(NULL, sql_alloc);
+		sql_offset = 0;
+
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < items->values_num; i++)
@@ -3237,9 +3272,10 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		if (sql_offset > 16)
 			DBexecute("%s", sql);
-		zbx_free(sql);
 	}
 out:
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&upd_keys);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
@@ -4093,7 +4129,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
+static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
 		zbx_hashset_t *items_index)
 {
 	int				i, j;
@@ -5089,7 +5125,7 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
  *               FAIL    - items cannot be added/updated                      *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
 		int lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_items";
@@ -5149,7 +5185,12 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 					&host_record_is_locked))
 	{
 		lld_items_applications_save(&items_applications, &items, &applications);
-		DBcommit();
+
+		if (ZBX_DB_OK != DBcommit())
+		{
+			ret = FAIL;
+			goto clean;
+		}
 	}
 	else
 	{

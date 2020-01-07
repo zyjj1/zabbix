@@ -431,9 +431,9 @@ typedef struct
 	zbx_vector_ptr_t	correlations;
 	zbx_hashset_t		conditions;
 
-	/* Configuration synchonization timestamp of the rules. */
-	/* Update the cache if this timesamp is less than the   */
-	/* current configuration synchonization timestamp.      */
+	/* Configuration synchronization timestamp of the rules. */
+	/* Update the cache if this timesamp is less than the    */
+	/* current configuration synchronization timestamp.      */
 	int			sync_ts;
 }
 zbx_correlation_rules_t;
@@ -685,6 +685,7 @@ int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_last_sync_time(void);
+void	DCconfig_wait_sync(void);
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
 int	DCconfig_get_proxypoller_nextcheck(void);
 

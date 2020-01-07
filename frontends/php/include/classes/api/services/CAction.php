@@ -656,12 +656,15 @@ class CAction extends CApiService {
 		// Insert actions into db, get back array with new actionids.
 		$actions = DB::save('actions', $actions);
 		$actions = zbx_toHash($actions, 'actionid');
+		$audit = [];
 
 		$conditions_to_create = [];
 		$operations_to_create = [];
 
 		// Collect conditions and operations to be created and set appropriate action ID.
 		foreach ($actions as $actionid => $action) {
+			$audit[] = ['actionid' => $actionid, 'name' => $action['name']];
+
 			if (isset($action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
 					$condition['actionid'] = $actionid;
@@ -724,6 +727,8 @@ class CAction extends CApiService {
 		// Add operations.
 		$this->addOperations($operations_to_create);
 
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION, $audit);
+
 		return ['actionids' => array_keys($actions)];
 	}
 
@@ -768,7 +773,7 @@ class CAction extends CApiService {
 		$operations_to_update = [];
 		$operationids_to_delete = [];
 
-		$actionsUpdateData = [];
+		$actions_update_data = [];
 
 		$newActionConditions = null;
 		foreach ($actions as $actionId => $action) {
@@ -941,12 +946,13 @@ class CAction extends CApiService {
 			}
 
 			if ($actionUpdateValues) {
-				$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+				$actions_update_data[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
 			}
 		}
 
-		if ($actionsUpdateData) {
-			DB::update('actions', $actionsUpdateData);
+		if ($actions_update_data) {
+			DB::update('actions', $actions_update_data);
+			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
 		}
 
 		// add, update and delete operations
@@ -1489,7 +1495,7 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls throught
+					// falls through
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if ($type_changed) {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
@@ -2927,7 +2933,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		// Validate conditions and operations in regard to whats in database now.
+		// Validate conditions and operations in regard to what's in database now.
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
@@ -3266,8 +3272,8 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given host groups
 	 *
-	 * @param array $groupids
-	 * @param tring $error
+	 * @param  array     $groupids
+	 * @param  string    $error
 	 */
 	private function checkHostGroupsPermissions(array $groupids, $error) {
 		if ($groupids) {
@@ -3290,8 +3296,8 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts
 	 *
-	 * @param array $hostids
-	 * @param tring $error
+	 * @param  array     $hostids
+	 * @param  string    $error
 	 */
 	private function checkHostsPermissions(array $hostids, $error) {
 		if ($hostids) {

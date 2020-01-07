@@ -76,6 +76,14 @@ struct zbx_custom_interval
 	zbx_scheduler_interval_t	*scheduling;
 };
 
+const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
+{
+	INTERFACE_TYPE_AGENT,
+	INTERFACE_TYPE_SNMP,
+	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_IPMI
+};
+
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
 #ifdef _WINDOWS
@@ -1056,7 +1064,7 @@ static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function recursively calls itself for each filter fragment. *
@@ -1180,7 +1188,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if a filter already exists. This         *
@@ -2212,7 +2220,58 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 	return nextcheck;
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_item_nextcheck_unreachable                             *
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for item on unreachable host        *
+ *                                                                            *
+ * Parameters: simple_interval  - [IN] default delay value, can be overridden *
+ *             custom_intervals - [IN] preprocessed custom intervals          *
+ *             disable_until    - [IN] timestamp for next check               *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until)
+{
+	int	nextcheck = 0;
+	time_t	next_interval, tmax, scheduled_check = 0;
 
+	/* first try to parse out and calculate scheduled intervals */
+	if (NULL != custom_intervals)
+		scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, disable_until);
+
+	/* Try to find the nearest 'nextcheck' value with condition */
+	/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
+	/* possible to check the item within a year, fail. */
+
+	nextcheck = disable_until;
+	tmax = disable_until + SEC_PER_YEAR;
+
+	if (NULL != custom_intervals)
+	{
+		while (nextcheck < tmax)
+		{
+			if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
+				break;
+
+			/* find the flexible interval change */
+			if (FAIL == get_next_delay_interval(custom_intervals->flexible, nextcheck, &next_interval))
+			{
+				nextcheck = ZBX_JAN_2038;
+				break;
+			}
+			nextcheck = next_interval;
+		}
+	}
+
+	if (0 != scheduled_check && scheduled_check < nextcheck)
+		nextcheck = (int)scheduled_check;
+
+	return nextcheck;
+}
 /******************************************************************************
  *                                                                            *
  * Function: calculate_proxy_nextcheck                                        *
@@ -2616,23 +2675,12 @@ int	is_double_suffix(const char *str, unsigned char flags)
 	return '\0' == *str ? SUCCEED : FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: is_double                                                        *
- *                                                                            *
- * Purpose: check if the string is double                                     *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is double                              *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-int	is_double(const char *str)
+static int	is_double_valid_syntax(const char *str)
 {
 	int	len;
+
+	/* Valid syntax is a decimal number optionally followed by a decimal exponent. */
+	/* Leading and trailing white space, NAN, INF and hexadecimal notation are not allowed. */
 
 	if ('-' == *str || '+' == *str)		/* check leading sign */
 		str++;
@@ -2657,6 +2705,48 @@ int	is_double(const char *str)
 	}
 
 	return '\0' == *str ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_double                                                        *
+ *                                                                            *
+ * Purpose: validate and optionally convert a string to a number of type      *
+ *         'double'                                                           *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] output buffer where to write the converted value *
+ *                     (optional, can be NULL)                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the string can be converted to 'double' and       *
+ *                          was converted if 'value' is not NULL              *
+ *                FAIL - the string does not represent a valid 'double' or    *
+ *                       its value is outside of valid range                  *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
+int	is_double(const char *str, double *value)
+{
+	double	tmp;
+	char	*endptr;
+
+	/* Not all strings accepted by strtod() can be accepted in Zabbix. */
+	/* Therefore additional, more strict syntax check is used before strtod(). */
+
+	if (SUCCEED != is_double_valid_syntax(str))
+		return FAIL;
+
+	errno = 0;
+	tmp = strtod(str, &endptr);
+
+	if ('\0' != *endptr || HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+		return FAIL;
+
+	if (NULL != value)
+		*value = tmp;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2930,15 +3020,14 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_boolean(const char *str, zbx_uint64_t *value)
 {
+	double	dbl_tmp;
 	int	res;
 
-	if (SUCCEED == (res = is_double(str)))
-		*value = (0 != atof(str));
+	if (SUCCEED == (res = is_double(str, &dbl_tmp)))
+		*value = (0 != dbl_tmp);
 	else
 	{
 		char	tmp[16];

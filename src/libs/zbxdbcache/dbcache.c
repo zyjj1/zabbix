@@ -57,7 +57,7 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 
-#define ZBX_IDS_SIZE	8
+#define ZBX_IDS_SIZE	9
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
@@ -4457,12 +4457,13 @@ void	DCupdate_hosts_availability(void)
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		if (SUCCEED == zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
+		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
 				(zbx_host_availability_t *)hosts.values[i]))
 		{
-			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
+			continue;
 		}
 
+		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
 		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 	}
 

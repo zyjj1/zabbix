@@ -319,7 +319,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, char **error)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
+		int flags, int now, char **error)
 {
 	zbx_uint64_t	seed;
 
@@ -355,10 +356,21 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, i
 
 		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
 		{
-			/* supported items and items that could not have been scheduled previously, but had their */
-			/* update interval fixed, should be scheduled using their update intervals */
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
-					now);
+			int	disable_until;
+
+			if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
+					DCget_disable_until(item, host)))
+			{
+				item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+						custom_intervals, disable_until);
+			}
+			else
+			{
+				/* supported items and items that could not have been scheduled previously, but had */
+				/* their update interval fixed, should be scheduled using their update intervals */
+				item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
+						custom_intervals, now);
+			}
 		}
 		else
 		{
@@ -2773,7 +2785,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				char	*error = NULL;
 
-				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
+				if (FAIL == DCitem_nextcheck_update(item, host, item->state, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
@@ -5262,12 +5274,19 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+out:
+	if (0 == sync_in_progress)
+	{
+		/* non recoverable database error is encountered */
+		THIS_SHOULD_NEVER_HAPPEN;
+		START_SYNC;
+	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
-out:
+
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&hosts_sync);
 	zbx_dbsync_clear(&hi_sync);
@@ -7573,7 +7592,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, NULL);
+	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -8931,6 +8950,14 @@ int	DCconfig_get_last_sync_time(void)
 	return config->sync_ts;
 }
 
+void	DCconfig_wait_sync(void)
+{
+	struct timespec	ts = {0, 1e8};
+
+	while (0 == config->sync_ts)
+		nanosleep(&ts, NULL);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_proxypoller_hosts                                   *
@@ -9264,7 +9291,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  *             hostids_num    - [IN] the number of hostids                    *
  *             validator_func - [IN] an optional validator function           *
  *                                                                            *
- * Return value: The text value with expanded user macros. Uknown or invalid  *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
@@ -11314,7 +11341,8 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
+			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec,
+					NULL);
 	}
 
 	UNLOCK_CACHE;

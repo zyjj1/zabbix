@@ -53,6 +53,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		// Transforms corrupted data to default values.
+		$form->validate();
 
 		$config = select_config();
 
@@ -71,7 +73,10 @@ class CControllerDashboardWidgetEdit extends CController {
 			'dialogue' => [
 				'type' => $type,
 				'name' => $this->getInput('name', ''),
-				'fields' => $form->getFields()
+				'fields' => $form->getFields(),
+				'options' => [
+					'stick_to_top' => CWidgetConfig::getDialogueStickToTop($type)
+				]
 			],
 			'known_widget_types' => $known_widget_types,
 			'captions' => $this->getCaptions($form)

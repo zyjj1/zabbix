@@ -23,6 +23,7 @@
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/locales.inc.php';
+require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // if we must provide language constants on language different from English
 if (isset($_GET['lang'])) {
@@ -44,8 +45,6 @@ if (isset($_GET['lang'])) {
 	// numeric Locale to default
 	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
 }
-
-require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
@@ -74,7 +73,13 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.cmessages.js' => '',
+	'class.promise.js' => '',
+	'class.localstorage.js' => '',
+	'class.notifications.js' => '',
+	'class.notification.js' => '',
+	'class.notification.collection.js' => '',
+	'class.notifications.audio.js' => '',
+	'class.browsertab.js' => '',
 	'class.cnavtree.js' => '',
 	'class.cookie.js' => '',
 	'class.coverride.js' => '',
@@ -84,8 +89,9 @@ $availableJScripts = [
 	'class.csvggraph.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
+	'class.overlaycollection.js' => '',
 	'class.cverticalaccordion.js' => '',
-	'class.mapWidget.js' => '',
+	'class.mapwidget.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
 	'class.cviewswitcher.js' => '',
@@ -113,10 +119,13 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
+		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval')
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -128,7 +137,10 @@ $tranStrings = [
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Success message' => _('Success message'),
+		'Error message' => _('Error message'),
+		'Warning message' => _('Warning message')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
@@ -190,7 +202,9 @@ $tranStrings = [
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
 	],
-	'class.cmessages.js' => [
+	'class.notifications.js' => [
+		'S_PROBLEM_ON' => _('Problem on'),
+		'S_RESOLVED' => _('Resolved'),
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLEAR' => _('Clear'),
@@ -299,13 +313,16 @@ $tranStrings = [
 	]
 ];
 
+$js = '';
 if (empty($_GET['files'])) {
+
 	$files = [
 		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
 		'class.cdebug.js',
+		'class.overlaycollection.js',
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
@@ -321,18 +338,30 @@ if (empty($_GET['files'])) {
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
-		$files[] = 'class.cmessages.js';
+		require_once dirname(__FILE__).'/include/defines.inc.php';
+
+		if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
+			$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
+		}
+
+		$files[] = 'class.promise.js';
+		$files[] = 'class.localstorage.js';
+		$files[] = 'class.browsertab.js';
+		$files[] = 'class.notification.collection.js';
+		$files[] = 'class.notifications.audio.js';
+		$files[] = 'class.notification.js';
+		$files[] = 'class.notifications.js';
 	}
 }
 else {
 	$files = $_GET['files'];
 }
 
-$js = 'if (typeof(locale) == "undefined") { var locale = {}; }'."\n";
+$js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= "locale['".$origStr."'] = ".zbx_jsvalue($str).";";
+			$js .= 'locale[\'' . $origStr . '\'] = ' . zbx_jsvalue($str) . ';';
 		}
 	}
 }

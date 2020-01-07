@@ -18,6 +18,40 @@
  **/
 
 
+/**
+ * An object that is used to namespace objects, allows to retrieve and write objects via arbitrary path.
+ */
+window.ZABBIX = Object.create({
+
+	/**
+	 * @param {string} path  Dot separated path. Each segment is used as object key.
+	 * @param {mixed} value  Optional value to be written into path only if path held undefined before.
+	 *
+	 * @return {mixed}  Value underlying the path is returned.
+	 */
+	namespace: function(path, value) {
+		return path.split('.').reduce(function(obj, pt, idx, src) {
+			var last = (idx + 1 == src.length);
+
+			if (typeof obj[pt] === 'undefined') {
+				obj[pt] = last ? value : {};
+			}
+
+			return obj[pt];
+		}, this);
+	},
+
+	/**
+	 * Logs user out, also, handles side effects before that.
+	 */
+	logout: function() {
+		var ls = this.namespace('instances.localStorage');
+		ls && ls.destruct();
+
+		redirect('index.php?reconnect=1', 'post', 'sid', true);
+	}
+});
+
 jQuery(function($) {
 
 	$.propHooks.disabled = {
@@ -166,7 +200,7 @@ jQuery(function($) {
 	 * Event handler for the preloader elements destroy.
 	 */
 	function menuPopupPreloaderCloseHandler(event) {
-		overlayPreloaderDestroy(event.data.id, event.data.xhr);
+		overlayPreloaderDestroy(event.data.id);
 	}
 
 	/**
@@ -227,12 +261,12 @@ jQuery(function($) {
 
 		$(document)
 			.off('click', menuPopupPreloaderCloseHandler)
-			.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+			.on('click', {id: $preloader.prop('id')}, menuPopupPreloaderCloseHandler);
 
 		return false;
 	});
 
-	/*
+	/**
 	 * add.popup event
 	 *
 	 * Call multiselect method 'addData' if parent was multiselect, execute addPopupValues function

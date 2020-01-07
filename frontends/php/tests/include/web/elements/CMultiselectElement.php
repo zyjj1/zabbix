@@ -28,6 +28,48 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CMultiselectElement extends CElement {
 
 	/**
+	 * Multiselect fill modes.
+	 */
+	const MODE_SELECT	= 0;
+	const MODE_TYPE		= 1;
+
+	protected static $default_mode = self::MODE_TYPE;
+	protected $mode;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function __construct(RemoteWebElement $element, $options = []) {
+		parent::__construct($element, $options);
+
+		if ($this->mode === null) {
+			$this->mode = self::$default_mode;
+		}
+	}
+
+	/**
+	 * Set default fill mode.
+	 *
+	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 */
+	public static function setDefaultFillMode($mode) {
+		self::$default_mode = $mode;
+	}
+
+	/**
+	 * Set fill mode.
+	 *
+	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 *
+	 * @return $this
+	 */
+	public function setFillMode($mode) {
+		$this->mode = $mode;
+
+		return $this;
+	}
+
+	/**
 	 * Remove all elements from multiselect.
 	 *
 	 * @return $this
@@ -133,6 +175,22 @@ class CMultiselectElement extends CElement {
 	}
 
 	/**
+	 * Get collection of multiselect controls (buttons).
+	 *
+	 * @return CElement
+	 */
+	public function getControls() {
+		$xpath = 'xpath:.//button';
+		$buttons = [];
+
+		foreach ($this->query($xpath)->all() as $button) {
+			$buttons[$button->getText()] = $button;
+		}
+
+		return new CElementCollection($buttons);
+	}
+
+	/**
 	 * Open selection overlay dialog.
 	 *
 	 * @param mixed $context  overlay dialog context (hostgroup / host)
@@ -140,9 +198,54 @@ class CMultiselectElement extends CElement {
 	 * @return COverlayDialogElement
 	 */
 	public function edit($context = null) {
-		$this->query('xpath:.//div[@class="multiselect-button"]/button')->one()->click();
+		/* TODO: extend the function for composite elements with two buttons,
+		 * Example of such multiselect: [ Input field ] ( Select item ) ( Select prototype )
+		 */
+		$this->getControls()->first()->click();
 
 		return COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($context);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function type($text) {
+		if (!is_array($text)) {
+			$text = [$text];
+		}
+
+		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one();
+		$id = CXPathHelper::escapeQuotes($this->query('class:multiselect')->one()->getAttribute('id'));
+		foreach ($text as $value) {
+			$input->overwrite($value)->fireEvent();
+
+			if (!$value) {
+				continue;
+			}
+
+			$content = CXPathHelper::escapeQuotes($value);
+			try {
+				$element = $this->query('xpath', implode('|', [
+					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
+					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]'.
+					'/span[text()='.$content.']'
+				]))->waitUntilPresent();
+			}
+			catch (NoSuchElementException $exception) {
+				throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
+			}
+
+			$element->one()->click();
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function overwrite($text) {
+		return $this->clear()->type($text);
 	}
 
 	/**
@@ -155,6 +258,10 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function fill($labels, $context = null) {
+		if ($this->mode !== self::MODE_SELECT && $this->mode !== self::MODE_TYPE) {
+			throw new Exception('Unknown fill mode is set for multiselect element.');
+		}
+
 		$this->clear();
 
 		if ($context === null && is_array($labels)) {
@@ -172,13 +279,56 @@ class CMultiselectElement extends CElement {
 						$label = $label['values'];
 					}
 
-					$this->selectMultiple($label, $context);
+					if ($this->mode === self::MODE_SELECT) {
+						$this->selectMultiple($label, $context);
+					}
+					else {
+						$this->type($label);
+					}
 				}
 
 				return $this;
 			}
 		}
 
-		return $this->selectMultiple($labels, $context);
+		if ($this->mode === self::MODE_SELECT) {
+			return $this->selectMultiple($labels, $context);
+		}
+
+		return $this->type($labels);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		return $this->getSelected();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
+		if ($input === null && $enabled) {
+			return false;
+		}
+
+		if ($input !== null && !$input->isEnabled($enabled)) {
+			return false;
+		}
+
+		$multiselect = $this->query('class:multiselect')->one(false);
+		if ($multiselect && ($multiselect->getAttribute('aria-disabled') === 'true') === $enabled) {
+			return false;
+		}
+
+		foreach ($this->getControls() as $control) {
+			if ($control->isEnabled() !== $enabled) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

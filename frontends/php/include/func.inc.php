@@ -101,7 +101,7 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS, true);
+	setcookie($name, $value, isset($time) ? $time : 0, CSession::getDefaultCookiePath(), null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
@@ -294,7 +294,7 @@ function zbx_date2str($format, $value = null) {
 }
 
 /**
- * Calculates and converts timestamp to string represenation.
+ * Calculates and converts timestamp to string representation.
  *
  * @param int|string $start_date  Start date timestamp.
  * @param int|string $end_date    End date timestamp.
@@ -987,7 +987,7 @@ function zbx_is_int($var) {
 
 /**
  * Look for two arrays field value and create 3 array lists, one with arrays where field value exists only in first array
- * second with arrays where field values are only in second array and both where fiel values are in both arrays.
+ * second with arrays where field values are only in second array and both where field values are in both arrays.
  *
  * @param array  $primary
  * @param array  $secondary
@@ -1373,7 +1373,7 @@ function zbx_toObject($value, $field, $preserve_keys = false) {
  * Converts the given value to a numeric array:
  * - a scalar value will be converted to an array and added as the only element;
  * - an array with first element key containing only numeric characters will be converted to plain zero-based numeric array.
- * This is used for reseting nonsequential numeric arrays;
+ * This is used for resetting nonsequential numeric arrays;
  * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
  *
  * @param mixed $value
@@ -1854,7 +1854,12 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
-		(new CView('general.warning', $data))->render();
+		if (detect_page_type() == PAGE_TYPE_JS) {
+			(new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->render();
+		}
+		else {
+			(new CView('general.warning', $data))->render();
+		}
 		exit;
 	}
 }
