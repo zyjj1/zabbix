@@ -118,7 +118,7 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history)
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
 		if (0 != (flags & (1 << i)))
-			ret |= writer->flush(writer);
+			ret = writer->flush(writer);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

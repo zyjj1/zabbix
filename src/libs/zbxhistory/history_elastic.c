@@ -393,6 +393,7 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL session");
 		return;
 	}
+
 	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_URL, data->post_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_POSTFIELDS, data->buf)) ||
@@ -405,15 +406,19 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 					page_w[hist->value_type].errbuf)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Could not set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
-		goto error;
+		return;
 	}
+
 	*page_w[hist->value_type].errbuf = '\0';
+
 	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PRIVATE, &page_w[hist->value_type])))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Could not set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
-		goto error;
+		return;
 	}
+
 	page_w[hist->value_type].page.offset = 0;
+
 	if (0 < page_w[hist->value_type].page.alloc)
 		*page_w[hist->value_type].page.data = '\0';
 
@@ -422,9 +427,6 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 	zbx_vector_ptr_append(&writer.ifaces, hist);
 
 	return;
-
-error:
-	elastic_close(hist);
 }
 
 /************************************************************************************
