@@ -83,7 +83,33 @@ class testGraphWidget extends CWebTest {
 	}
 
 	/**
-	 * Check validation of graph widget tabs fields.
+	 * Check screenshots of graph widget form.
+	 */
+	public function testGraphWidget_FormLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$overlay = $dashboard->addWidget();
+		$form = $overlay->asForm();
+		$form->fill(['Type' => 'Graph']);
+		$form->waitUntilReloaded();
+		$element = $overlay->query('id:svg-graph-preview')->one();
+
+		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
+		foreach ($tabs as $tab) {
+			$form->selectTab($tab);
+			if ($tab === 'Overrides') {
+				$button = $form->query('button:Add new override')->one()->click();
+				// Remove border radius from button element.
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+			}
+
+			$this->page->removeFocus();
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+		}
+	}
+
+	/**
+	 * Check validation of graph widget fields.
 	 */
 	private function validate($data, $tab) {
 		$old_hash = CDBHelper::getHash($this->sql);
@@ -314,7 +340,7 @@ class testGraphWidget extends CWebTest {
 		$data = [];
 
 		// Add host and item values for the first "Data set" in each case of the data provider.
-		foreach ($this->getDatasetValidationData() as $item) {
+		foreach ($this->getDataSetValidationData() as $item) {
 			if (array_key_exists('Data set', $item[0])) {
 				$item[0]['Data set'][0] = array_merge($item[0]['Data set'][0], [
 					'host' => 'ЗАББИКС Сервер',
@@ -325,6 +351,7 @@ class testGraphWidget extends CWebTest {
 			$data[] = $item;
 		}
 
+		// Add aditional test cases to data provider.
 		return array_merge($data, [
 			// Empty host and/or item field.
 			[
@@ -378,8 +405,8 @@ class testGraphWidget extends CWebTest {
 		$data = [];
 
 		// Add existing widget name for each case in data provider.
-		foreach ($this->getDatasetValidationData() as $item) {
-				$item[0]['Widget name'] = 'Test cases for update';
+		foreach ($this->getDataSetValidationData() as $item) {
+			$item[0]['Widget name'] = 'Test cases for update';
 
 			$data[] = $item;
 		}
@@ -612,7 +639,7 @@ class testGraphWidget extends CWebTest {
 		$data = [];
 
 		foreach ($this->getTimePeriodValidationData() as $item) {
-				$item[0]['Widget name'] = 'Test cases for update';
+			$item[0]['Widget name'] = 'Test cases for update';
 
 			$data[] = $item;
 		}
@@ -828,7 +855,7 @@ class testGraphWidget extends CWebTest {
 		$data = [];
 
 		foreach ($this->getAxesValidationData() as $item) {
-				$item[0]['Widget name'] = 'Test cases for simple update and deletion';
+			$item[0]['Widget name'] = 'Test cases for simple update and deletion';
 
 			$data[] = $item;
 		}
@@ -1072,14 +1099,14 @@ class testGraphWidget extends CWebTest {
 
 		// Add host and item values for tab "Data set" and "Overrides" for each data provider.
 		foreach ($this->getOverridesValidationData() as $item) {
-				$item[0]['Data set'] = [
-					'host' => 'ЗАББИКС Сервер',
-					'item' => 'Agent ping'
-				];
-				$item[0]['Overrides'][0] = array_merge($item[0]['Overrides'][0], [
-					'host' => 'One host',
-					'item' => 'One item'
-				]);
+			$item[0]['Data set'] = [
+				'host' => 'ЗАББИКС Сервер',
+				'item' => 'Agent ping'
+			];
+			$item[0]['Overrides'][0] = array_merge($item[0]['Overrides'][0], [
+				'host' => 'One host',
+				'item' => 'One item'
+			]);
 
 			$data[] = $item;
 		}
@@ -1155,7 +1182,7 @@ class testGraphWidget extends CWebTest {
 
 		// Add existing widget name for each case in data provider.
 		foreach ($this->getOverridesValidationData() as $item) {
-				$item[0]['Widget name'] = 'Test cases for update';
+			$item[0]['Widget name'] = 'Test cases for update';
 
 			$data[] = $item;
 		}
@@ -1705,7 +1732,7 @@ class testGraphWidget extends CWebTest {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
-		sleep(3); // TODO: remove after fix in ZBX-16918
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check valuse in updated widget.
@@ -1725,7 +1752,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
-		sleep(3); // TODO: remove after fix in ZBX-16918
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -1756,7 +1783,8 @@ class testGraphWidget extends CWebTest {
 					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setTags($data['Problems']['tags'], 'id:tags_table_tags');
+						$this->setFilterSelector('id:tags_table_tags');
+						$this->setTags($data['Problems']['tags']);
 					}
 					break;
 
@@ -1850,6 +1878,7 @@ class testGraphWidget extends CWebTest {
 			$last = count($overrides) - 1;
 
 			foreach ($overrides as $i => $override) {
+				// Prepare non-standard fields.
 				$mapping = [
 					'options' => [
 						'selector' => 'xpath://button[@data-row='.CXPathHelper::escapeQuotes($i).']',
@@ -1914,6 +1943,7 @@ class testGraphWidget extends CWebTest {
 			}
 		}
 
+		// Check values in Problems tab.
 		if (array_key_exists('Problems', $data)) {
 			$form->selectTab('Problems');
 			if (CTestArrayHelper::get($data, 'Problems.fields.Problem hosts', false)) {
@@ -1928,6 +1958,7 @@ class testGraphWidget extends CWebTest {
 			}
 		}
 
+		// Check values in Overrides tab.
 		if (array_key_exists('Overrides', $data)) {
 			$form->selectTab('Overrides');
 			if (CTestArrayHelper::isAssociative($data['Overrides'])) {
@@ -1974,7 +2005,7 @@ class testGraphWidget extends CWebTest {
 
 	public static function getDashboardCancelData() {
 		return [
-			// dd new graph widget.
+			// Add new graph widget.
 			[
 				[
 					'main_fields' => [
@@ -2013,7 +2044,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
-		$this->fillDatasets($data['Data set']);
+		$this->fillDataSets($data['Data set']);
 		$form->submit();
 
 		// Check added or updated graph widget.
@@ -2067,7 +2098,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
-		$this->fillDatasets($data['Data set']);
+		$this->fillDataSets($data['Data set']);
 		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
 				->asOverlayDialog()->one();
 		$overlay->close();
@@ -2076,8 +2107,8 @@ class testGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false) === null);
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -2102,7 +2133,7 @@ class testGraphWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue($dashboard->getWidget($name, false) === null);
+		$this->assertTrue(!$dashboard->getWidget($name, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
