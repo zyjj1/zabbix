@@ -1412,14 +1412,12 @@ static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_even
  * Parameters: event_queries -  [IN/OUT] in - event data                      *
  *                                       out - running maintenances for each  *
  *                                            event                           *
- *             maintenanceids - [IN/OUT]                                      *
- *                                 IN - the maintenances to process           *
- *                                 OUT - the maintenances matching events     *
+ *             maintenanceids - [IN] the maintenances to process              *
  *                                                                            *
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_vector_uint64_t *maintenanceids)
+int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids)
 {
 	const char			*__function_name = "zbx_dc_get_event_maintenances";
 	zbx_hashset_t			host_event_maintenances;
@@ -1450,8 +1448,6 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_vector_ui
 	RDLOCK_CACHE;
 
 	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_event_maintenance_to_host);
-
-	zbx_vector_uint64_clear(maintenanceids);
 
 	if (0 == host_event_maintenances.num_data)
 		goto unlock;
@@ -1520,7 +1516,6 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_vector_ui
 
 				pair.second = maintenance->running_until;
 				zbx_vector_uint64_pair_append(&query->maintenances, pair);
-				zbx_vector_uint64_append(maintenanceids, maintenance->maintenanceid);
 				ret = SUCCEED;
 			}
 		}
