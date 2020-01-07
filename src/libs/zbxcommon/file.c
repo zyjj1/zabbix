@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "comms.h"
 
 #if defined(_WINDOWS)
 int	__zbx_open(const char *pathname, int flags)
