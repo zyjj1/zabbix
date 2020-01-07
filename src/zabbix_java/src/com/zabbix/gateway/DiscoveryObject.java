@@ -21,13 +21,15 @@ package com.zabbix.gateway;
 
 class DiscoveryObject
 {
+	private static final long MILLISECONDS_IN_DAY = SocketProcessor.MILLISECONDS_IN_HOUR * 24;
+
 	Boolean bulk;
 	long expirationTime;
 
 	public DiscoveryObject(Boolean bulk, long now)
 	{
 		this.bulk = bulk;
-		this.expirationTime = now + SocketProcessor.MILLISECONDS_IN_DAY;
+		this.expirationTime = now + MILLISECONDS_IN_DAY;
 	}
 
 	public void setBulk(Boolean bulk)
@@ -42,7 +44,7 @@ class DiscoveryObject
 
 	public void setExpirationTime(long now)
 	{
-		this.expirationTime = now + SocketProcessor.MILLISECONDS_IN_DAY;
+		this.expirationTime = now + MILLISECONDS_IN_DAY;
 	}
 
 	public long getExpirationTime()

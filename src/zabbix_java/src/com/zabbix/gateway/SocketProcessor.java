@@ -37,8 +37,7 @@ class SocketProcessor implements Runnable
 	private static long cleanupTime = System.currentTimeMillis();
 	private Socket socket;
 
-	private static final long MILLISECONDS_IN_HOUR = 1000 * 60 * 60;
-	public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_HOUR * 24;
+	public static final long MILLISECONDS_IN_HOUR = 1000 * 60 * 60;
 
 	SocketProcessor(Socket socket)
 	{
@@ -48,7 +47,7 @@ class SocketProcessor implements Runnable
 	@Override
 	public void run()
 	{
-		logger.warn("starting to process incoming connection");
+		logger.debug("starting to process incoming connection");
 
 		BinaryProtocolSpeaker speaker = null;
 		ItemChecker checker = null;
