@@ -276,7 +276,7 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
 
 	for (i = 1; i <= groups->values_num; i++)
 	{
-		group = zbx_strdup(NULL, (const char*)groups->values[i - 1]);
+		group = zbx_strdup(NULL, groups->values[i - 1]);
 		zbx_strcpy_alloc(str, str_alloc, str_offset, separator);
 		separator = (char *)", ";
 
@@ -604,13 +604,13 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 			if (REQUEST_PARAMETER_TYPE_STRING != type)
 			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid host group list."));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid host group list: %s", groups));
 				goto out;
 			}
 		}
 	}
 	else
-		zbx_vector_str_append(&group_names, zbx_strdup(NULL, (char*)groups));
+		zbx_vector_str_append(&group_names, zbx_strdup(NULL, groups));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Host groups: '%s', Item key: '%s', Item function: '%s'", groups, itemkey, tmp);
 

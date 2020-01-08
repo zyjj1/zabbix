@@ -69,8 +69,8 @@ void	zbx_mock_test_entry(void **state)
 			ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("types", &out_types))) &&
 			SUCCEED == expected_result)
 	{
-		fail_msg("Malformed test case data, expected key, parameters and type should be either both present ("
-				"for a valid key) or both absent (for an invalid key).");
+		fail_msg("Malformed test case data, expected key, parameters and type should be either all present"
+				" (for a valid key) or all absent (for an invalid key).");
 	}
 	else if (ZBX_MOCK_SUCCESS != error && SUCCEED == expected_result)
 	{
@@ -119,7 +119,7 @@ void	zbx_mock_test_entry(void **state)
 
 		if (ZBX_MOCK_END_OF_VECTOR != error)
 		{
-			fail_msg("Cannot get expected parameter #%d from test case data: %s", i,
+			fail_msg("Cannot get expected parameter/type #%d from test case data: %s", i,
 					zbx_mock_error_string(error));
 		}
 

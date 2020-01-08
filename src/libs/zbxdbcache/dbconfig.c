@@ -11230,7 +11230,7 @@ void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vecto
 	{
 		zbx_dc_hostgroup_t	group_local, *group;
 
-		group_local.name = (const char*)groups->values[i];
+		group_local.name = groups->values[i];
 
 		if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local,
 				dc_compare_hgroups)))
