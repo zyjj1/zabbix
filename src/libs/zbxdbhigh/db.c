@@ -2197,7 +2197,7 @@ void	DBcheck_character_set(void)
 		if (0 != strcasecmp(value, ZBX_DB_DEFAULT_CHARACTER_SET))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "database %s has incorrect parameter %s value: "
-					"%s instead %s.\nZabbix supports only %s character set.",
+					"%s instead %s. Zabbix supports only %s character set.",
 					database_name_esc, parameter, value, ZBX_DB_DEFAULT_CHARACTER_SET,
 					ZBX_DB_DEFAULT_CHARACTER_SET);
 		}
