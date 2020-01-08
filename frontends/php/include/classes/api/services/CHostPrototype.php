@@ -906,6 +906,14 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypeIds = array_merge($hostPrototypeIds, $childHostPrototypeIds);
 
+		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
+		DBselect(
+			'SELECT NULL'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionInt('h.hostid', $hostPrototypeIds).
+			' FOR UPDATE'
+		);
+
 		$deleteHostPrototypes = $this->get([
 			'hostids' => $hostPrototypeIds,
 			'output' => ['host'],
@@ -1269,6 +1277,14 @@ class CHostPrototype extends CHostBase {
 	 * @param array $groupPrototypeIds
 	 */
 	protected function deleteGroupPrototypes(array $groupPrototypeIds) {
+		// Lock group prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionInt('gp.group_prototypeid', $groupPrototypeIds).
+			' FOR UPDATE'
+		);
+
 		// delete child group prototypes
 		$groupPrototypeChildren = DBfetchArray(DBselect(
 			'SELECT gp.group_prototypeid FROM group_prototype gp WHERE '.dbConditionInt('templateid', $groupPrototypeIds)
