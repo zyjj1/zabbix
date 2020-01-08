@@ -123,13 +123,13 @@ class SocketProcessor implements Runnable
 
 	private void cleanDiscoveredObjects(long now)
 	{
-		for(Iterator<Map.Entry<String, DiscoveryObject>> it = JavaGateway.discoveredObjects.entrySet().iterator();
+		for (Iterator<Map.Entry<String, Long>> it = JavaGateway.iterativeAttributes.entrySet().iterator();
 			it.hasNext(); )
 		{
-			Map.Entry<String, DiscoveryObject> entry = it.next();
-			DiscoveryObject cachedObj = entry.getValue();
+			Map.Entry<String, Long> entry = it.next();
+			long expirationTime = entry.getValue();
 
-			if(now >= cachedObj.getExpirationTime())
+			if (now >= expirationTime)
 				it.remove();
 		}
 	}

@@ -296,41 +296,32 @@ class JMXItemChecker extends ItemChecker
 			return;
 		}
 
+		String[] attributeNames = getAttributeNames(attributeArray);
 		AttributeList attributes = new AttributeList();
-		String discoveredObjKey = jmx_endpoint + name;
-		DiscoveryObject cachedObj = JavaGateway.discoveredObjects.get(discoveredObjKey);
+		String discoveredObjKey = jmx_endpoint + "#" + name;
+		Long expirationTime = JavaGateway.iterativeAttributes.get(discoveredObjKey);
 		long now = System.currentTimeMillis();
 
-		if (null != cachedObj && now <= cachedObj.getExpirationTime())
+		if (null != expirationTime && now <= expirationTime)
 		{
-			if (cachedObj.isBulk())
-			{
-				try
-				{
-					attributes = collectAttributes(name, attributeArray);
-				}
-				catch (Exception e)
-				{
-					cachedObj.setBulk(false);
-					cachedObj.setExpirationTime(now);
-					JavaGateway.discoveredObjects.put(discoveredObjKey, cachedObj);
-				}
-			}
-
-			if (!cachedObj.isBulk())
-				attributes = collectAttribute(name, attributeArray);
+			attributes = getAttributesIterative(name, attributeNames);
 		}
 		else
 		{
 			try
 			{
-				attributes = collectAttributes(name, attributeArray);
-				JavaGateway.discoveredObjects.put(discoveredObjKey, new DiscoveryObject(true, now));
+				attributes = getAttributesBulk(name, attributeNames);
+
+				if (null != expirationTime)
+					JavaGateway.iterativeAttributes.remove(discoveredObjKey);
 			}
 			catch (Exception e)
 			{
-				attributes = collectAttribute(name, attributeArray);
-				JavaGateway.discoveredObjects.put(discoveredObjKey, new DiscoveryObject(false, now));
+				attributes = getAttributesIterative(name, attributeNames);
+
+				// This object's attributes will be collected iteratively for next 24h. After that it will
+				// be checked if it is possible to successfully collect all attributes in bulk mode.
+				JavaGateway.iterativeAttributes.put(discoveredObjKey, now + SocketProcessor.MILLISECONDS_IN_HOUR * 24);
 			}
 		}
 
@@ -368,7 +359,7 @@ class JMXItemChecker extends ItemChecker
 		}
 	}
 
-	private AttributeList collectAttributes(ObjectName name, MBeanAttributeInfo[] attributeArray) throws Exception
+	private String[] getAttributeNames(MBeanAttributeInfo[] attributeArray)
 	{
 		int i = 0;
 		String[] attributeNames = new String[attributeArray.length];
@@ -384,23 +375,28 @@ class JMXItemChecker extends ItemChecker
 			attributeNames[i++] = attrInfo.getName();
 		}
 
+		return attributeNames;
+	}
+
+	private AttributeList getAttributesBulk(ObjectName name, String[] attributeNames) throws Exception
+	{
 		return mbsc.getAttributes(name, attributeNames);
 	}
 
-	private AttributeList collectAttribute(ObjectName name, MBeanAttributeInfo[] attributeArray)
+	private AttributeList getAttributesIterative(ObjectName name, String[] attributeNames)
 	{
 		AttributeList attributes = new AttributeList();
 
-		for (MBeanAttributeInfo attrInfo : attributeArray)
+		for (String attributeName: attributeNames)
 		{
 			try
 			{
-				Object attrValue = mbsc.getAttribute(name, attrInfo.getName());
-				attributes.add(new javax.management.Attribute(attrInfo.getName(), attrValue));
+				Object attrValue = mbsc.getAttribute(name, attributeName);
+				attributes.add(new javax.management.Attribute(attributeName, attrValue));
 			}
 			catch (Exception e)
 			{
-				Object[] logInfo = {name, attrInfo.getName(), ZabbixException.getRootCauseMessage(e)};
+				Object[] logInfo = {name, attributeName, ZabbixException.getRootCauseMessage(e)};
 				logger.warn("attribute processing '{},{}' failed: {}", logInfo);
 				logger.debug("error caused by", e);
 			}
