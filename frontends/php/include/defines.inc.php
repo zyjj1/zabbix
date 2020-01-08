@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.16rc1');
-define('ZABBIX_API_VERSION',	'4.0.16');
+define('ZABBIX_VERSION',		'4.0.17rc1');
+define('ZABBIX_API_VERSION',	'4.0.17');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -49,7 +49,7 @@ define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
-// Date and time format seperators must be synced with setSDateFromOuterObj() in class.calendar.js.
+// Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
@@ -1110,7 +1110,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 		)*? # match \" or any character except "
 	\")
 	|
-	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at beginning and any character except , and ] afterwards
 	|
 	() # match empty and only empty part
 )');
