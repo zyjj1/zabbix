@@ -514,14 +514,13 @@ try_again:
 				else
 				{
 					char		http_status[MAX_STRING_LEN];
-					long int	err;
-					CURLcode	curl_err;
+					long int	response_code;
 
-					if (CURLE_OK == (curl_err = curl_easy_getinfo(msg->easy_handle,
-							CURLINFO_RESPONSE_CODE, &err)))
+					if (CURLE_OK == curl_easy_getinfo(msg->easy_handle,
+							CURLINFO_RESPONSE_CODE, &response_code))
 					{
 						zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
-								err);
+								response_code);
 					}
 					else
 					{
