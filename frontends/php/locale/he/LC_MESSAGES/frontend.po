@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-15 01:43+0200\n"
+"POT-Creation-Date: 2020-01-05 01:43+0200\n"
 "PO-Revision-Date: 2018-11-30 14:01+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -679,7 +679,7 @@ msgstr "הוספת מארח"
 msgid "Add multiple maps"
 msgstr "הוספת מספר מפות"
 
-#: include/classes/widgets/CWidgetHelper.php:1093
+#: include/classes/widgets/CWidgetHelper.php:1092
 msgid "Add new data set"
 msgstr "הוספת ערכת נתונים חדשה"
 
@@ -1344,7 +1344,7 @@ msgid "Base DN"
 msgstr "DN בסיס"
 
 #: include/classes/widgets/CWidgetHelper.php:688
-#: include/classes/widgets/CWidgetHelper.php:959
+#: include/classes/widgets/CWidgetHelper.php:958
 msgid "Base colour"
 msgstr "צבע בסיס"
 
@@ -3184,7 +3184,7 @@ msgid "Close problem"
 msgstr "סגירת התקלה"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:221
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:221
 #: jsLoader.php:226
 msgid "Collapse"
 msgstr "צמצום"
@@ -3401,7 +3401,7 @@ msgstr "הגדרת תבניות מאקרו"
 msgid "Configuration of maintenance periods"
 msgstr "הגדרת תקופות תחזוקה"
 
-#: app/controllers/CControllerMediatypeEdit.php:215
+#: app/controllers/CControllerMediatypeEdit.php:216
 #: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "הגדרת סוגי מדיה"
@@ -3506,7 +3506,7 @@ msgstr "התחברות אל"
 
 #: include/classes/widgets/CWidgetHelper.php:668
 #: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:1016
+#: include/classes/widgets/CWidgetHelper.php:1015
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "מחובר"
@@ -4136,7 +4136,7 @@ msgstr "נתונים"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "סטטיסטיקת מטמון נתונים. מטמון - אחד מהערכים (מצבים: all,‏ float,‏ uint,‏ str,‏ log,‏ text), היסטוריה (מצבים: pfree,‏ total,‏ used,‏ free), מגמה (מצבים: pfree,‏ total,‏ used,‏ free), טקסט (מצבים: pfree,‏ total,‏ used,‏ free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2735
+#: include/classes/graphdraw/CLineGraphDraw.php:2694
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4349,7 +4349,7 @@ msgstr "בהשהיה של"
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:579
-#: include/classes/widgets/CWidgetHelper.php:946 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:945 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -5131,7 +5131,7 @@ msgstr "זמן אי פעילות"
 #: include/classes/widgets/CWidgetHelper.php:702
 #: include/classes/widgets/CWidgetHelper.php:703
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:963
+#: include/classes/widgets/CWidgetHelper.php:962
 msgid "Draw"
 msgstr "ציור"
 
@@ -5801,7 +5801,7 @@ msgid "Execution confirmation"
 msgstr "אימות הרצה"
 
 #: include/classes/html/CCollapsibleUiWidget.php:59
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:222
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:222
 #: jsLoader.php:225
 msgid "Expand"
 msgstr "הרחבה"
@@ -6087,7 +6087,7 @@ msgstr "פרטי זמן על הקובץ. מחזירה מספר שלם וחיוב
 #: include/classes/widgets/CWidgetHelper.php:726
 #: include/classes/widgets/CWidgetHelper.php:727
 #: include/classes/widgets/CWidgetHelper.php:728
-#: include/classes/widgets/CWidgetHelper.php:996
+#: include/classes/widgets/CWidgetHelper.php:995
 msgid "Fill"
 msgstr "מילוי"
 
@@ -6676,8 +6676,8 @@ msgstr "קבוצות"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1421
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1416
+#: include/classes/graphdraw/CLineGraphDraw.php:1423
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -8606,9 +8606,9 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
-#: include/classes/graphdraw/CLineGraphDraw.php:118
-#: include/classes/graphdraw/CLineGraphDraw.php:246
-#: include/classes/graphdraw/CLineGraphDraw.php:256
+#: include/classes/graphdraw/CLineGraphDraw.php:113
+#: include/classes/graphdraw/CLineGraphDraw.php:241
+#: include/classes/graphdraw/CLineGraphDraw.php:251
 #: include/classes/graphdraw/CPieGraphDraw.php:203
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
@@ -9729,7 +9729,7 @@ msgstr "לטבית (lv_LV)"
 
 #: include/classes/widgets/CWidgetHelper.php:671
 #: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:1027
+#: include/classes/widgets/CWidgetHelper.php:1026
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -9763,7 +9763,7 @@ msgstr "הגבלה לתוצאות החיפוש והסינון"
 
 #: include/classes/widgets/CWidgetHelper.php:660
 #: include/classes/widgets/CWidgetHelper.php:702
-#: include/classes/widgets/CWidgetHelper.php:965 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:964 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:351
 #: include/views/js/monitoring.sysmaps.js.php:695
@@ -9972,7 +9972,7 @@ msgstr "אבד"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "כלל גילוי ברמה נמוכה במצב „לא נתמך“"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
 msgid "M"
 msgstr "M"
 
@@ -10203,8 +10203,8 @@ msgid "Map element label type"
 msgstr "סוג תווית רכיב במפה"
 
 #: sysmap.php:102
-msgid "Map is updated! Return?"
-msgstr "המפה עודכנה! להחזיר?"
+msgid "Map is updated! Return to map list?"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:176
 msgid "Map label type"
@@ -10571,7 +10571,7 @@ msgstr "שדה „name” חסר לתרשים."
 #: include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:742
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1011
+#: include/classes/widgets/CWidgetHelper.php:1010
 msgid "Missing data"
 msgstr "נתונים חסרים"
 
@@ -11516,7 +11516,7 @@ msgstr "הופסק השימוש בדגלונים שאינם בוליאנים."
 #: app/views/monitoring.problem.view.php:276
 #: include/classes/widgets/CWidgetHelper.php:667
 #: include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:1015
+#: include/classes/widgets/CWidgetHelper.php:1014
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -12669,13 +12669,13 @@ msgstr "נא לבחור בשני רכיבים"
 #: include/classes/widgets/CWidgetHelper.php:737
 #: include/classes/widgets/CWidgetHelper.php:738
 #: include/classes/widgets/CWidgetHelper.php:739
-#: include/classes/widgets/CWidgetHelper.php:979
+#: include/classes/widgets/CWidgetHelper.php:978
 msgid "Point size"
 msgstr "גודל נקודה"
 
 #: include/classes/widgets/CWidgetHelper.php:661
 #: include/classes/widgets/CWidgetHelper.php:703
-#: include/classes/widgets/CWidgetHelper.php:966
+#: include/classes/widgets/CWidgetHelper.php:965
 #: include/views/js/monitoring.sysmaps.js.php:371
 msgid "Points"
 msgstr "נקודות"
@@ -13660,7 +13660,7 @@ msgstr "מחזירה אחוזים של מנות נתונים מסוג ping ב־I
 
 #: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1028
+#: include/classes/widgets/CWidgetHelper.php:1027
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14217,8 +14217,8 @@ msgstr "שם אבטחה"
 #: include/classes/widgets/CWidgetHelper.php:485
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:555
-#: include/classes/widgets/CWidgetHelper.php:902
-#: include/classes/widgets/CWidgetHelper.php:923 include/forms.inc.php:411
+#: include/classes/widgets/CWidgetHelper.php:901
+#: include/classes/widgets/CWidgetHelper.php:922 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
@@ -14952,7 +14952,7 @@ msgstr "בערימה"
 
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:966
 msgid "Staircase"
 msgstr "גרם מדרגות"
 
@@ -15771,7 +15771,7 @@ msgstr "תקופת זמן"
 #: app/controllers/CControllerPopupTriggerExpr.php:198
 #: include/classes/widgets/CWidgetHelper.php:673
 #: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:1031
+#: include/classes/widgets/CWidgetHelper.php:1030
 msgid "Time shift"
 msgstr "היסט זמן"
 
@@ -15875,7 +15875,7 @@ msgstr "התמרת תוצאות שאילתת SQL לפריט JSON לטובת גי
 #: include/classes/widgets/CWidgetHelper.php:714
 #: include/classes/widgets/CWidgetHelper.php:715
 #: include/classes/widgets/CWidgetHelper.php:716
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:986
 msgid "Transparency"
 msgstr "שקיפות"
 
@@ -15885,7 +15885,7 @@ msgstr "שגיאת העברה."
 
 #: include/classes/widgets/CWidgetHelper.php:669
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:1018
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "להתייחס כ־0"
@@ -15917,7 +15917,7 @@ msgstr "מגמות"
 #: app/controllers/CControllerPopupTriggerWizard.php:216
 #: app/controllers/CControllerPopupTriggerWizard.php:287
 #: app/views/popup.services.php:44 include/actions.inc.php:44
-#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:488
+#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:483
 #: include/events.inc.php:229 include/maps.inc.php:26
 #: include/triggers.inc.php:1250
 #: include/views/configuration.services.edit.php:87
@@ -17553,7 +17553,7 @@ msgstr "בעת פעילות"
 #: include/classes/widgets/CWidgetHelper.php:698
 #: include/classes/widgets/CWidgetHelper.php:699
 #: include/classes/widgets/CWidgetHelper.php:700
-#: include/classes/widgets/CWidgetHelper.php:971
+#: include/classes/widgets/CWidgetHelper.php:970
 #: include/views/configuration.graph.edit.php:84
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -17712,7 +17712,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:716
+#: include/classes/graphdraw/CLineGraphDraw.php:711
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "הערך המרבי של ציר ה־Y חייב להיות גדול מהערך המזערי של ציר ה־Y."
 
@@ -17727,7 +17727,7 @@ msgstr "צד ציר ה־Y"
 #: include/classes/widgets/CWidgetHelper.php:670
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1025
+#: include/classes/widgets/CWidgetHelper.php:1024
 msgid "Y-axis"
 msgstr "ציר Y"
 
@@ -18091,7 +18091,7 @@ msgstr "משפיע על הנתונים המסוננים"
 msgid "agent"
 msgstr "סוכן"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1862
+#: include/classes/graphdraw/CLineGraphDraw.php:1873
 #: include/classes/html/CSeverity.php:80
 #: include/classes/pagefilter/CPageFilter.php:772
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
@@ -18191,8 +18191,8 @@ msgstr "רישום אוטומטי"
 msgid "auto-registered host"
 msgstr "מארח שנרשם אוטומטית"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
-#: include/classes/graphdraw/CLineGraphDraw.php:1866
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
+#: include/classes/graphdraw/CLineGraphDraw.php:1877
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18494,7 +18494,7 @@ msgid "host is not monitored"
 msgstr "המארח לא מנוטר"
 
 #: include/classes/widgets/CWidgetHelper.php:529
-#: include/classes/widgets/CWidgetHelper.php:898
+#: include/classes/widgets/CWidgetHelper.php:897
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr "תבנית מארח"
@@ -18547,11 +18547,11 @@ msgid "invalid byte sequence in UTF-8"
 msgstr "רצף בתים שגוי ב־UTF-8"
 
 #: include/classes/api/services/CItemGeneral.php:336
-#: include/classes/graphdraw/CLineGraphDraw.php:118
+#: include/classes/graphdraw/CLineGraphDraw.php:113
 msgid "invalid delay"
 msgstr "זמן המתנה שגוי"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:247
+#: include/classes/graphdraw/CLineGraphDraw.php:242
 #: include/classes/graphdraw/CPieGraphDraw.php:204
 #: include/classes/helpers/CSvgGraphHelper.php:236
 msgid "invalid history storage period"
@@ -18569,7 +18569,7 @@ msgstr "שם המארח שגוי"
 msgid "invalid regular expression"
 msgstr "ביטוי רגולרי שגוי"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:257
+#: include/classes/graphdraw/CLineGraphDraw.php:252
 #: include/classes/graphdraw/CPieGraphDraw.php:214
 #: include/classes/helpers/CSvgGraphHelper.php:248
 msgid "invalid trend storage period"
@@ -18600,7 +18600,7 @@ msgid "item is disabled"
 msgstr "הפריט מושבת"
 
 #: include/classes/widgets/CWidgetHelper.php:551
-#: include/classes/widgets/CWidgetHelper.php:919
+#: include/classes/widgets/CWidgetHelper.php:918
 msgid "item pattern"
 msgstr "תבנית פריט"
 
@@ -18608,7 +18608,7 @@ msgstr "תבנית פריט"
 msgid "key is empty"
 msgstr "המפתח ריק"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1842
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18619,7 +18619,7 @@ msgstr "אחרון"
 msgid "last() - Last (most recent) T value"
 msgstr "last()‎ - ערך ה־T (העדכני ביותר)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "left"
 msgstr "שמאל"
 
@@ -18657,9 +18657,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
-#: include/classes/graphdraw/CLineGraphDraw.php:1397
-#: include/classes/graphdraw/CLineGraphDraw.php:1404
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
+#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1399
 msgid "m-d"
 msgstr "m-d"
 
@@ -18685,8 +18685,8 @@ msgstr "מפה"
 msgid "matches"
 msgstr "התאמות"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1845
-#: include/classes/graphdraw/CLineGraphDraw.php:1859
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18707,8 +18707,8 @@ msgstr "כמות הפריטים התלויים המרבית מולאה"
 msgid "maximum number of dependency levels reached"
 msgstr "כמות הרמות המרבית לתלויות מולאה"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1843
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18781,7 +18781,7 @@ msgstr "חדש"
 msgid "new event tag name"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1937
+#: include/classes/graphdraw/CLineGraphDraw.php:1948
 #: include/classes/graphdraw/CPieGraphDraw.php:359
 msgid "no data"
 msgstr "אין נתונים"
@@ -18790,7 +18790,7 @@ msgstr "אין נתונים"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr "nodata()‎ - לא התקבלו נתונים במשך T (1 - אמת, 0 - שקר)"
 
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:1032
 msgid "none"
 msgstr "ללא"
 
@@ -18935,7 +18935,7 @@ msgstr "ביטוי רגולרי"
 msgid "remember selected"
 msgstr "שמירת הנבחרים"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "right"
 msgstr "ימינה"
 
@@ -19121,8 +19121,8 @@ msgid "type here to search"
 msgstr "יש להקליד כאן כדי לחפש"
 
 #: include/classes/validators/CApiInputValidator.php:1577
-msgid "unacceptible URL"
-msgstr "הכתובת בלתי מתקבלת"
+msgid "unacceptable URL"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:172
 msgid "unexpected end of key"

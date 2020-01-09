@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-15 01:43+0200\n"
+"POT-Creation-Date: 2020-01-05 01:43+0200\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -662,7 +662,7 @@ msgstr "호스트 추가"
 msgid "Add multiple maps"
 msgstr "복수의 맵을 추가"
 
-#: include/classes/widgets/CWidgetHelper.php:1093
+#: include/classes/widgets/CWidgetHelper.php:1092
 msgid "Add new data set"
 msgstr "새로운 데이터 셋을 추가"
 
@@ -1324,7 +1324,7 @@ msgid "Base DN"
 msgstr "Base DN"
 
 #: include/classes/widgets/CWidgetHelper.php:688
-#: include/classes/widgets/CWidgetHelper.php:959
+#: include/classes/widgets/CWidgetHelper.php:958
 msgid "Base colour"
 msgstr "기본 색상"
 
@@ -3127,7 +3127,7 @@ msgid "Close problem"
 msgstr "장애의 클로즈"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:221
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:221
 #: jsLoader.php:226
 msgid "Collapse"
 msgstr "축소"
@@ -3344,7 +3344,7 @@ msgstr "매크로 설정"
 msgid "Configuration of maintenance periods"
 msgstr "메인터넌스 기간 설정"
 
-#: app/controllers/CControllerMediatypeEdit.php:215
+#: app/controllers/CControllerMediatypeEdit.php:216
 #: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "미디어 타입의 설정"
@@ -3449,7 +3449,7 @@ msgstr "접속 방법"
 
 #: include/classes/widgets/CWidgetHelper.php:668
 #: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:1016
+#: include/classes/widgets/CWidgetHelper.php:1015
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "접속됨"
@@ -4076,7 +4076,7 @@ msgstr "데이터"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "데이터캐쉬 통계. cache - values (mode: all, float, uint, str, log, text), history (mode: pfree, total, used, free), trend (mode: pfree, total, used, free), text (mode: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2735
+#: include/classes/graphdraw/CLineGraphDraw.php:2694
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4289,7 +4289,7 @@ msgstr "연장 시간"
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:579
-#: include/classes/widgets/CWidgetHelper.php:946 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:945 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -5069,7 +5069,7 @@ msgstr "정지 시간"
 #: include/classes/widgets/CWidgetHelper.php:702
 #: include/classes/widgets/CWidgetHelper.php:703
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:963
+#: include/classes/widgets/CWidgetHelper.php:962
 msgid "Draw"
 msgstr "그래프 형식"
 
@@ -5738,7 +5738,7 @@ msgid "Execution confirmation"
 msgstr "실행 확인"
 
 #: include/classes/html/CCollapsibleUiWidget.php:59
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:222
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:222
 #: jsLoader.php:225
 msgid "Expand"
 msgstr "전개"
@@ -6024,7 +6024,7 @@ msgstr "파일의 시간 정보. UNIX의 타임스탬프로 integer를 리턴"
 #: include/classes/widgets/CWidgetHelper.php:726
 #: include/classes/widgets/CWidgetHelper.php:727
 #: include/classes/widgets/CWidgetHelper.php:728
-#: include/classes/widgets/CWidgetHelper.php:996
+#: include/classes/widgets/CWidgetHelper.php:995
 msgid "Fill"
 msgstr "채우기"
 
@@ -6611,8 +6611,8 @@ msgstr "그룹"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1421
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1416
+#: include/classes/graphdraw/CLineGraphDraw.php:1423
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -8537,9 +8537,9 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
-#: include/classes/graphdraw/CLineGraphDraw.php:118
-#: include/classes/graphdraw/CLineGraphDraw.php:246
-#: include/classes/graphdraw/CLineGraphDraw.php:256
+#: include/classes/graphdraw/CLineGraphDraw.php:113
+#: include/classes/graphdraw/CLineGraphDraw.php:241
+#: include/classes/graphdraw/CLineGraphDraw.php:251
 #: include/classes/graphdraw/CPieGraphDraw.php:203
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
@@ -9650,7 +9650,7 @@ msgstr "라트비아어 (lv_LV)"
 
 #: include/classes/widgets/CWidgetHelper.php:671
 #: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:1027
+#: include/classes/widgets/CWidgetHelper.php:1026
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -9684,7 +9684,7 @@ msgstr "검색/필터 항목의 상한치"
 
 #: include/classes/widgets/CWidgetHelper.php:660
 #: include/classes/widgets/CWidgetHelper.php:702
-#: include/classes/widgets/CWidgetHelper.php:965 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:964 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:351
 #: include/views/js/monitoring.sysmaps.js.php:695
@@ -9893,7 +9893,7 @@ msgstr "불명"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Low-level 디스커버리가 \"취득불가\" 상태"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
 msgid "M"
 msgstr "M"
 
@@ -10124,8 +10124,8 @@ msgid "Map element label type"
 msgstr "맵 요소의 레이블 타입"
 
 #: sysmap.php:102
-msgid "Map is updated! Return?"
-msgstr "맵을 저장하였습니다! 이전 화면으로 돌아가시겠습니까?"
+msgid "Map is updated! Return to map list?"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:176
 msgid "Map label type"
@@ -10487,7 +10487,7 @@ msgstr "그래프의 \"name\" 항목이 존재하지 않습니다."
 #: include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:742
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1011
+#: include/classes/widgets/CWidgetHelper.php:1010
 msgid "Missing data"
 msgstr "결손 데이터"
 
@@ -11432,7 +11432,7 @@ msgstr "boolean이 아닌 플래그는 폐지될 예정입니다."
 #: app/views/monitoring.problem.view.php:276
 #: include/classes/widgets/CWidgetHelper.php:667
 #: include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:1015
+#: include/classes/widgets/CWidgetHelper.php:1014
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -12584,13 +12584,13 @@ msgstr "2개의 요소를 선택하여 주십시오"
 #: include/classes/widgets/CWidgetHelper.php:737
 #: include/classes/widgets/CWidgetHelper.php:738
 #: include/classes/widgets/CWidgetHelper.php:739
-#: include/classes/widgets/CWidgetHelper.php:979
+#: include/classes/widgets/CWidgetHelper.php:978
 msgid "Point size"
 msgstr "포인트 사이즈"
 
 #: include/classes/widgets/CWidgetHelper.php:661
 #: include/classes/widgets/CWidgetHelper.php:703
-#: include/classes/widgets/CWidgetHelper.php:966
+#: include/classes/widgets/CWidgetHelper.php:965
 #: include/views/js/monitoring.sysmaps.js.php:371
 msgid "Points"
 msgstr "포인트"
@@ -13573,7 +13573,7 @@ msgstr "ICMP ping 패킷의 실패율을 리턴."
 
 #: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1028
+#: include/classes/widgets/CWidgetHelper.php:1027
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14129,8 +14129,8 @@ msgstr "보안 이름"
 #: include/classes/widgets/CWidgetHelper.php:485
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:555
-#: include/classes/widgets/CWidgetHelper.php:902
-#: include/classes/widgets/CWidgetHelper.php:923 include/forms.inc.php:411
+#: include/classes/widgets/CWidgetHelper.php:901
+#: include/classes/widgets/CWidgetHelper.php:922 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
@@ -14864,7 +14864,7 @@ msgstr "누적 그래프"
 
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:966
 msgid "Staircase"
 msgstr "막대 그래프"
 
@@ -15681,7 +15681,7 @@ msgstr "기간"
 #: app/controllers/CControllerPopupTriggerExpr.php:198
 #: include/classes/widgets/CWidgetHelper.php:673
 #: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:1031
+#: include/classes/widgets/CWidgetHelper.php:1030
 msgid "Time shift"
 msgstr "타임 시프트"
 
@@ -15785,7 +15785,7 @@ msgstr "변환한 SQL쿼리의 실행결과를 로우레벨 디스커버리의 J
 #: include/classes/widgets/CWidgetHelper.php:714
 #: include/classes/widgets/CWidgetHelper.php:715
 #: include/classes/widgets/CWidgetHelper.php:716
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:986
 msgid "Transparency"
 msgstr "투명도"
 
@@ -15795,7 +15795,7 @@ msgstr "전송에러."
 
 #: include/classes/widgets/CWidgetHelper.php:669
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:1018
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "0 으로 처리"
@@ -15827,7 +15827,7 @@ msgstr "트렌드"
 #: app/controllers/CControllerPopupTriggerWizard.php:216
 #: app/controllers/CControllerPopupTriggerWizard.php:287
 #: app/views/popup.services.php:44 include/actions.inc.php:44
-#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:488
+#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:483
 #: include/events.inc.php:229 include/maps.inc.php:26
 #: include/triggers.inc.php:1250
 #: include/views/configuration.services.edit.php:87
@@ -17454,7 +17454,7 @@ msgstr "연락 허용 시간대"
 #: include/classes/widgets/CWidgetHelper.php:698
 #: include/classes/widgets/CWidgetHelper.php:699
 #: include/classes/widgets/CWidgetHelper.php:700
-#: include/classes/widgets/CWidgetHelper.php:971
+#: include/classes/widgets/CWidgetHelper.php:970
 #: include/views/configuration.graph.edit.php:84
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -17613,7 +17613,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:716
+#: include/classes/graphdraw/CLineGraphDraw.php:711
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y축의 최댓값은 Y축의 최솟값보다도 큰 숫자로 설정해주십시오."
 
@@ -17628,7 +17628,7 @@ msgstr "Y축"
 #: include/classes/widgets/CWidgetHelper.php:670
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1025
+#: include/classes/widgets/CWidgetHelper.php:1024
 msgid "Y-axis"
 msgstr "Y축"
 
@@ -17992,7 +17992,7 @@ msgstr "필터링된 데이만 영향을 받습니다"
 msgid "agent"
 msgstr "에이전트"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1862
+#: include/classes/graphdraw/CLineGraphDraw.php:1873
 #: include/classes/html/CSeverity.php:80
 #: include/classes/pagefilter/CPageFilter.php:772
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
@@ -18092,8 +18092,8 @@ msgstr "자동 등록"
 msgid "auto-registered host"
 msgstr "자동등록 호스트"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
-#: include/classes/graphdraw/CLineGraphDraw.php:1866
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
+#: include/classes/graphdraw/CLineGraphDraw.php:1877
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18396,7 +18396,7 @@ msgid "host is not monitored"
 msgstr "호스트가 비활성"
 
 #: include/classes/widgets/CWidgetHelper.php:529
-#: include/classes/widgets/CWidgetHelper.php:898
+#: include/classes/widgets/CWidgetHelper.php:897
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr "호스트 패턴"
@@ -18449,11 +18449,11 @@ msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8의 바이트 시퀀스가 올바르지 않습니다"
 
 #: include/classes/api/services/CItemGeneral.php:336
-#: include/classes/graphdraw/CLineGraphDraw.php:118
+#: include/classes/graphdraw/CLineGraphDraw.php:113
 msgid "invalid delay"
 msgstr "갱신간격이 올바르지 않습니다"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:247
+#: include/classes/graphdraw/CLineGraphDraw.php:242
 #: include/classes/graphdraw/CPieGraphDraw.php:204
 #: include/classes/helpers/CSvgGraphHelper.php:236
 msgid "invalid history storage period"
@@ -18471,7 +18471,7 @@ msgstr "호스트의 이름이 올바르지 않습니다"
 msgid "invalid regular expression"
 msgstr "정규표현식이 올바르지 않습니다"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:257
+#: include/classes/graphdraw/CLineGraphDraw.php:252
 #: include/classes/graphdraw/CPieGraphDraw.php:214
 #: include/classes/helpers/CSvgGraphHelper.php:248
 msgid "invalid trend storage period"
@@ -18502,7 +18502,7 @@ msgid "item is disabled"
 msgstr "아이템이 비활성"
 
 #: include/classes/widgets/CWidgetHelper.php:551
-#: include/classes/widgets/CWidgetHelper.php:919
+#: include/classes/widgets/CWidgetHelper.php:918
 msgid "item pattern"
 msgstr "아이템 패턴"
 
@@ -18510,7 +18510,7 @@ msgstr "아이템 패턴"
 msgid "key is empty"
 msgstr "키가 설정되지 않았습니다."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1842
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18521,7 +18521,7 @@ msgstr "최신값"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 최신값"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "left"
 msgstr "왼쪽"
 
@@ -18559,9 +18559,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
-#: include/classes/graphdraw/CLineGraphDraw.php:1397
-#: include/classes/graphdraw/CLineGraphDraw.php:1404
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
+#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1399
 msgid "m-d"
 msgstr "m/d"
 
@@ -18587,8 +18587,8 @@ msgstr "맵"
 msgid "matches"
 msgstr "일치한다"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1845
-#: include/classes/graphdraw/CLineGraphDraw.php:1859
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18609,8 +18609,8 @@ msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 msgid "maximum number of dependency levels reached"
 msgstr "의존 레벨 수가 최대수에 도달하였습니다"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1843
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18683,7 +18683,7 @@ msgstr "신규"
 msgid "new event tag name"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1937
+#: include/classes/graphdraw/CLineGraphDraw.php:1948
 #: include/classes/graphdraw/CPieGraphDraw.php:359
 msgid "no data"
 msgstr "데이터 없음"
@@ -18692,7 +18692,7 @@ msgstr "데이터 없음"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr "nodata() - 기간 T동안 취득한 데이터 없음 (1 - 데이터 없음, 0 - false)"
 
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:1032
 msgid "none"
 msgstr "없음"
 
@@ -18837,7 +18837,7 @@ msgstr "정규 표현"
 msgid "remember selected"
 msgstr "선택상태를 보존"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "right"
 msgstr "오른쪽"
 
@@ -19023,8 +19023,8 @@ msgid "type here to search"
 msgstr "검색 문자열을 입력"
 
 #: include/classes/validators/CApiInputValidator.php:1577
-msgid "unacceptible URL"
-msgstr "인정되지 않은 URL"
+msgid "unacceptable URL"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:172
 msgid "unexpected end of key"

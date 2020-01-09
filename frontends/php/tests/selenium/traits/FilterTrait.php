@@ -66,7 +66,7 @@ trait FilterTrait {
 	/**
 	 * Add new tag, select tag operator, name and value.
 	 *
-	 * @param array   $tags        tag operator, name and value
+	 * @param array   $tags   tag operator, name and value
 	 *
 	 * @return CMultifieldTablelement
 	 */

@@ -714,6 +714,8 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
+	$i = 1;
+
 	foreach($data['steps'] as $stepid => $step) {
 		$pairs_grouped = [
 			'query_fields' => [],
@@ -728,6 +730,7 @@ if (isset($_REQUEST['form'])) {
 			}
 			$data['steps'][$stepid]['pairs'] = $pairs_grouped;
 		}
+		$data['steps'][$stepid]['no'] = $i++;
 	}
 
 	// render view

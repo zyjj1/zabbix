@@ -241,7 +241,7 @@ $jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 $tab_overrides = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['or']), CWidgetHelper::getGraphOverride($fields['or'], $form_name));
 
-$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or'], $form_name);
+$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or']);
 $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields['or'], $form_name);
 
 // Create CTabView.
@@ -254,7 +254,7 @@ $form_tabs = (new CTabView())
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
-	->onTabChange('jQuery.colorpicker("hide");')
+	->onTabChange('jQuery.colorpicker("hide");jQuery(window).trigger("resize");')
 	->setSelected(0);
 
 // Add CTabView to form.
