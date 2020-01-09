@@ -299,7 +299,7 @@ class JMXItemChecker extends ItemChecker
 		String[] attributeNames = getAttributeNames(attributeArray);
 		AttributeList attributes = new AttributeList();
 		String discoveredObjKey = jmx_endpoint + "#" + name;
-		Long expirationTime = JavaGateway.iterativeAttributes.get(discoveredObjKey);
+		Long expirationTime = JavaGateway.iterativeObjects.get(discoveredObjKey);
 		long now = System.currentTimeMillis();
 
 		if (null != expirationTime && now <= expirationTime)
@@ -313,7 +313,7 @@ class JMXItemChecker extends ItemChecker
 				attributes = getAttributesBulk(name, attributeNames);
 
 				if (null != expirationTime)
-					JavaGateway.iterativeAttributes.remove(discoveredObjKey);
+					JavaGateway.iterativeObjects.remove(discoveredObjKey);
 			}
 			catch (Exception e)
 			{
@@ -321,7 +321,7 @@ class JMXItemChecker extends ItemChecker
 
 				// This object's attributes will be collected iteratively for next 24h. After that it will
 				// be checked if it is possible to successfully collect all attributes in bulk mode.
-				JavaGateway.iterativeAttributes.put(discoveredObjKey, now + SocketProcessor.MILLISECONDS_IN_HOUR * 24);
+				JavaGateway.iterativeObjects.put(discoveredObjKey, now + SocketProcessor.MILLISECONDS_IN_HOUR * 24);
 			}
 		}
 

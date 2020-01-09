@@ -123,7 +123,7 @@ class SocketProcessor implements Runnable
 
 	private void cleanDiscoveredObjects(long now)
 	{
-		for (Iterator<Map.Entry<String, Long>> it = JavaGateway.iterativeAttributes.entrySet().iterator();
+		for (Iterator<Map.Entry<String, Long>> it = JavaGateway.iterativeObjects.entrySet().iterator();
 			it.hasNext(); )
 		{
 			Map.Entry<String, Long> entry = it.next();
