@@ -297,7 +297,7 @@ class JMXItemChecker extends ItemChecker
 		}
 
 		String[] attributeNames = getAttributeNames(attributeArray);
-		AttributeList attributes = new AttributeList();
+		AttributeList attributes;
 		String discoveredObjKey = jmx_endpoint + "#" + name;
 		Long expirationTime = JavaGateway.iterativeObjects.get(discoveredObjKey);
 		long now = System.currentTimeMillis();
