@@ -406,7 +406,7 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 					page_w[hist->value_type].errbuf)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Could not set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
-		return;
+		goto out;
 	}
 
 	*page_w[hist->value_type].errbuf = '\0';
@@ -414,7 +414,7 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PRIVATE, &page_w[hist->value_type])))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Could not set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
-		return;
+		goto out;
 	}
 
 	page_w[hist->value_type].page.offset = 0;
@@ -427,6 +427,8 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 	zbx_vector_ptr_append(&writer.ifaces, hist);
 
 	return;
+out:
+	elastic_close(hist);
 }
 
 /************************************************************************************
