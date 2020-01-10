@@ -44,7 +44,7 @@ trait MacrosTrait {
 	 * @return CMultifieldTable
 	 */
 	protected function getMacrosTable($value_column = 'Value') {
-		return $this->query($this->table_selector)->asMultifieldTable([
+		return $this->query('id:tbl_macros')->asMultifieldTable([
 			'mapping' => [
 				'Macro' => [
 					'name' => 'macro',
@@ -88,7 +88,7 @@ trait MacrosTrait {
 	/**
 	 * Remove macros rows.
 	 *
-	 * @return array
+	 * @return $this
 	 */
 	public function removeMacros() {
 		return $this->getMacrosTable()->clear();

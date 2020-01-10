@@ -226,7 +226,7 @@ class CMediatype extends CApiService {
 				);
 			}
 
-			// Check additional fields and values depeding on type.
+			// Check additional fields and values depending on media type.
 			$this->checkRequiredFieldsByType($mediatype);
 
 			switch ($mediatype['type']) {

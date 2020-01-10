@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-15 01:43+0200\n"
+"POT-Creation-Date: 2020-01-05 01:43+0200\n"
 "PO-Revision-Date: 2019-01-29 07:38+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -668,7 +668,7 @@ msgstr "添加主机"
 msgid "Add multiple maps"
 msgstr "添加多个拓扑图"
 
-#: include/classes/widgets/CWidgetHelper.php:1093
+#: include/classes/widgets/CWidgetHelper.php:1092
 msgid "Add new data set"
 msgstr "添加新数据集"
 
@@ -1330,7 +1330,7 @@ msgid "Base DN"
 msgstr "基于 DN"
 
 #: include/classes/widgets/CWidgetHelper.php:688
-#: include/classes/widgets/CWidgetHelper.php:959
+#: include/classes/widgets/CWidgetHelper.php:958
 msgid "Base colour"
 msgstr "基色"
 
@@ -3133,7 +3133,7 @@ msgid "Close problem"
 msgstr "关闭问题"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:221
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:221
 #: jsLoader.php:226
 msgid "Collapse"
 msgstr "宕机"
@@ -3350,7 +3350,7 @@ msgstr "配置宏"
 msgid "Configuration of maintenance periods"
 msgstr "配置维护时段"
 
-#: app/controllers/CControllerMediatypeEdit.php:215
+#: app/controllers/CControllerMediatypeEdit.php:216
 #: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "配置媒体类型"
@@ -3455,7 +3455,7 @@ msgstr "连接到"
 
 #: include/classes/widgets/CWidgetHelper.php:668
 #: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:1016
+#: include/classes/widgets/CWidgetHelper.php:1015
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "已连接"
@@ -4082,7 +4082,7 @@ msgstr "数据"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "数据缓存统计.缓存—可以是值(可选mode参数： all, float, uint, str, log, text),数据数据(可选mode参数:pfree, total, used, free),趋势数据（可选mode参数：pfree, total, used, free),文本数据(可选mode参数：pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2735
+#: include/classes/graphdraw/CLineGraphDraw.php:2694
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4295,7 +4295,7 @@ msgstr "被延迟由于"
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:579
-#: include/classes/widgets/CWidgetHelper.php:946 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:945 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -5074,7 +5074,7 @@ msgstr "断线时间"
 #: include/classes/widgets/CWidgetHelper.php:702
 #: include/classes/widgets/CWidgetHelper.php:703
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:963
+#: include/classes/widgets/CWidgetHelper.php:962
 msgid "Draw"
 msgstr "绘制"
 
@@ -5743,7 +5743,7 @@ msgid "Execution confirmation"
 msgstr "执行确认"
 
 #: include/classes/html/CCollapsibleUiWidget.php:59
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:222
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:222
 #: jsLoader.php:225
 msgid "Expand"
 msgstr "扩展"
@@ -6029,7 +6029,7 @@ msgstr "文件事件信息，返回的是时间戳 整数"
 #: include/classes/widgets/CWidgetHelper.php:726
 #: include/classes/widgets/CWidgetHelper.php:727
 #: include/classes/widgets/CWidgetHelper.php:728
-#: include/classes/widgets/CWidgetHelper.php:996
+#: include/classes/widgets/CWidgetHelper.php:995
 msgid "Fill"
 msgstr "填"
 
@@ -6618,8 +6618,8 @@ msgstr "群组"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1421
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1416
+#: include/classes/graphdraw/CLineGraphDraw.php:1423
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -8545,9 +8545,9 @@ msgstr "\"%1$s\" 字段的值不正确。"
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
-#: include/classes/graphdraw/CLineGraphDraw.php:118
-#: include/classes/graphdraw/CLineGraphDraw.php:246
-#: include/classes/graphdraw/CLineGraphDraw.php:256
+#: include/classes/graphdraw/CLineGraphDraw.php:113
+#: include/classes/graphdraw/CLineGraphDraw.php:241
+#: include/classes/graphdraw/CLineGraphDraw.php:251
 #: include/classes/graphdraw/CPieGraphDraw.php:203
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
@@ -9658,7 +9658,7 @@ msgstr "拉脱维亚语(lv_LV)"
 
 #: include/classes/widgets/CWidgetHelper.php:671
 #: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:1027
+#: include/classes/widgets/CWidgetHelper.php:1026
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -9693,7 +9693,7 @@ msgstr "搜索/过滤组件限制"
 
 #: include/classes/widgets/CWidgetHelper.php:660
 #: include/classes/widgets/CWidgetHelper.php:702
-#: include/classes/widgets/CWidgetHelper.php:965 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:964 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:351
 #: include/views/js/monitoring.sysmaps.js.php:695
@@ -9902,7 +9902,7 @@ msgstr "失去"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "低级发现规则在“不支持”状态"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
 msgid "M"
 msgstr "M"
 
@@ -10133,8 +10133,8 @@ msgid "Map element label type"
 msgstr "拓扑元素标签类型"
 
 #: sysmap.php:102
-msgid "Map is updated! Return?"
-msgstr "拓扑图已更新!返回?"
+msgid "Map is updated! Return to map list?"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:176
 msgid "Map label type"
@@ -10496,7 +10496,7 @@ msgstr "缺少\"名称\"的图形栏位"
 #: include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:742
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1011
+#: include/classes/widgets/CWidgetHelper.php:1010
 msgid "Missing data"
 msgstr "缺少数据"
 
@@ -11441,7 +11441,7 @@ msgstr "不推荐使用非布尔标志。"
 #: app/views/monitoring.problem.view.php:276
 #: include/classes/widgets/CWidgetHelper.php:667
 #: include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:1015
+#: include/classes/widgets/CWidgetHelper.php:1014
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -12594,13 +12594,13 @@ msgstr "请选择两个组件"
 #: include/classes/widgets/CWidgetHelper.php:737
 #: include/classes/widgets/CWidgetHelper.php:738
 #: include/classes/widgets/CWidgetHelper.php:739
-#: include/classes/widgets/CWidgetHelper.php:979
+#: include/classes/widgets/CWidgetHelper.php:978
 msgid "Point size"
 msgstr "点尺寸"
 
 #: include/classes/widgets/CWidgetHelper.php:661
 #: include/classes/widgets/CWidgetHelper.php:703
-#: include/classes/widgets/CWidgetHelper.php:966
+#: include/classes/widgets/CWidgetHelper.php:965
 #: include/views/js/monitoring.sysmaps.js.php:371
 msgid "Points"
 msgstr "点"
@@ -13585,7 +13585,7 @@ msgstr "返回ICMP ping包丢失的百分数."
 
 #: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1028
+#: include/classes/widgets/CWidgetHelper.php:1027
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14142,8 +14142,8 @@ msgstr "安全名称"
 #: include/classes/widgets/CWidgetHelper.php:485
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:555
-#: include/classes/widgets/CWidgetHelper.php:902
-#: include/classes/widgets/CWidgetHelper.php:923 include/forms.inc.php:411
+#: include/classes/widgets/CWidgetHelper.php:901
+#: include/classes/widgets/CWidgetHelper.php:922 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
@@ -14877,7 +14877,7 @@ msgstr "层积的"
 
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:966
 msgid "Staircase"
 msgstr "楼梯"
 
@@ -15695,7 +15695,7 @@ msgstr "时间期间"
 #: app/controllers/CControllerPopupTriggerExpr.php:198
 #: include/classes/widgets/CWidgetHelper.php:673
 #: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:1031
+#: include/classes/widgets/CWidgetHelper.php:1030
 msgid "Time shift"
 msgstr "间隔(秒)"
 
@@ -15799,7 +15799,7 @@ msgstr "将转换后的SQL查询到低级别的发现JSON对象的执行结果�
 #: include/classes/widgets/CWidgetHelper.php:714
 #: include/classes/widgets/CWidgetHelper.php:715
 #: include/classes/widgets/CWidgetHelper.php:716
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:986
 msgid "Transparency"
 msgstr "透明度"
 
@@ -15809,7 +15809,7 @@ msgstr "传输错误."
 
 #: include/classes/widgets/CWidgetHelper.php:669
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:1018
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "视为 0"
@@ -15841,7 +15841,7 @@ msgstr "趋势"
 #: app/controllers/CControllerPopupTriggerWizard.php:216
 #: app/controllers/CControllerPopupTriggerWizard.php:287
 #: app/views/popup.services.php:44 include/actions.inc.php:44
-#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:488
+#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:483
 #: include/events.inc.php:229 include/maps.inc.php:26
 #: include/triggers.inc.php:1250
 #: include/views/configuration.services.edit.php:87
@@ -17468,7 +17468,7 @@ msgstr "当启用时"
 #: include/classes/widgets/CWidgetHelper.php:698
 #: include/classes/widgets/CWidgetHelper.php:699
 #: include/classes/widgets/CWidgetHelper.php:700
-#: include/classes/widgets/CWidgetHelper.php:971
+#: include/classes/widgets/CWidgetHelper.php:970
 #: include/views/configuration.graph.edit.php:84
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -17627,7 +17627,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:716
+#: include/classes/graphdraw/CLineGraphDraw.php:711
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y axis MAX value must be greater than Y axis MIN value."
 
@@ -17642,7 +17642,7 @@ msgstr "纵轴Y侧"
 #: include/classes/widgets/CWidgetHelper.php:670
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1025
+#: include/classes/widgets/CWidgetHelper.php:1024
 msgid "Y-axis"
 msgstr "Y轴"
 
@@ -18006,7 +18006,7 @@ msgstr "只影响过滤后的数据"
 msgid "agent"
 msgstr "agent代理程序"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1862
+#: include/classes/graphdraw/CLineGraphDraw.php:1873
 #: include/classes/html/CSeverity.php:80
 #: include/classes/pagefilter/CPageFilter.php:772
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
@@ -18106,8 +18106,8 @@ msgstr "自动注册"
 msgid "auto-registered host"
 msgstr "自动被注册的主机"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
-#: include/classes/graphdraw/CLineGraphDraw.php:1866
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
+#: include/classes/graphdraw/CLineGraphDraw.php:1877
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18409,7 +18409,7 @@ msgid "host is not monitored"
 msgstr "主机不受监控"
 
 #: include/classes/widgets/CWidgetHelper.php:529
-#: include/classes/widgets/CWidgetHelper.php:898
+#: include/classes/widgets/CWidgetHelper.php:897
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr "主机样式"
@@ -18462,11 +18462,11 @@ msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8中无效的字节排序"
 
 #: include/classes/api/services/CItemGeneral.php:336
-#: include/classes/graphdraw/CLineGraphDraw.php:118
+#: include/classes/graphdraw/CLineGraphDraw.php:113
 msgid "invalid delay"
 msgstr "无效延迟"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:247
+#: include/classes/graphdraw/CLineGraphDraw.php:242
 #: include/classes/graphdraw/CPieGraphDraw.php:204
 #: include/classes/helpers/CSvgGraphHelper.php:236
 msgid "invalid history storage period"
@@ -18484,7 +18484,7 @@ msgstr "无效的主机名称"
 msgid "invalid regular expression"
 msgstr "无效的正则表达式"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:257
+#: include/classes/graphdraw/CLineGraphDraw.php:252
 #: include/classes/graphdraw/CPieGraphDraw.php:214
 #: include/classes/helpers/CSvgGraphHelper.php:248
 msgid "invalid trend storage period"
@@ -18515,7 +18515,7 @@ msgid "item is disabled"
 msgstr "监控项被禁用"
 
 #: include/classes/widgets/CWidgetHelper.php:551
-#: include/classes/widgets/CWidgetHelper.php:919
+#: include/classes/widgets/CWidgetHelper.php:918
 msgid "item pattern"
 msgstr "监控项模式"
 
@@ -18523,7 +18523,7 @@ msgstr "监控项模式"
 msgid "key is empty"
 msgstr "关键字为空"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1842
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18534,7 +18534,7 @@ msgstr "最新"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 最后（最近）的 T 值"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "left"
 msgstr "左"
 
@@ -18572,9 +18572,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
-#: include/classes/graphdraw/CLineGraphDraw.php:1397
-#: include/classes/graphdraw/CLineGraphDraw.php:1404
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
+#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1399
 msgid "m-d"
 msgstr "m-d"
 
@@ -18600,8 +18600,8 @@ msgstr "拓扑图"
 msgid "matches"
 msgstr "匹配"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1845
-#: include/classes/graphdraw/CLineGraphDraw.php:1859
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18622,8 +18622,8 @@ msgstr "达到最大依赖项数"
 msgid "maximum number of dependency levels reached"
 msgstr "达到最大数量的依赖关系"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1843
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18696,7 +18696,7 @@ msgstr "新"
 msgid "new event tag name"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1937
+#: include/classes/graphdraw/CLineGraphDraw.php:1948
 #: include/classes/graphdraw/CPieGraphDraw.php:359
 msgid "no data"
 msgstr "没有数据"
@@ -18705,7 +18705,7 @@ msgstr "没有数据"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr "nodata() - 在周期 T 内没有收到数据（1 - true，0 - false）"
 
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:1032
 msgid "none"
 msgstr "无"
 
@@ -18850,7 +18850,7 @@ msgstr "正则表达式"
 msgid "remember selected"
 msgstr "记住所选的"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "right"
 msgstr "正确"
 
@@ -19036,8 +19036,8 @@ msgid "type here to search"
 msgstr "在此输入搜索"
 
 #: include/classes/validators/CApiInputValidator.php:1577
-msgid "unacceptible URL"
-msgstr "不可接受的 URL"
+msgid "unacceptable URL"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:172
 msgid "unexpected end of key"

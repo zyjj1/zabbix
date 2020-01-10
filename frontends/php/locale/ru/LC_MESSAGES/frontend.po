@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-15 01:43+0200\n"
+"POT-Creation-Date: 2020-01-05 01:43+0200\n"
 "PO-Revision-Date: 2019-12-11 14:18+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -698,7 +698,7 @@ msgstr "Добавить узел сети"
 msgid "Add multiple maps"
 msgstr "Добавить несколько карт"
 
-#: include/classes/widgets/CWidgetHelper.php:1093
+#: include/classes/widgets/CWidgetHelper.php:1092
 msgid "Add new data set"
 msgstr "Добавить новый набор данных"
 
@@ -1367,7 +1367,7 @@ msgid "Base DN"
 msgstr "База для поиска (Base DN)"
 
 #: include/classes/widgets/CWidgetHelper.php:688
-#: include/classes/widgets/CWidgetHelper.php:959
+#: include/classes/widgets/CWidgetHelper.php:958
 msgid "Base colour"
 msgstr "Основной цвет"
 
@@ -3244,7 +3244,7 @@ msgid "Close problem"
 msgstr "Закрыть проблему"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:221
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:221
 #: jsLoader.php:226
 msgid "Collapse"
 msgstr "Свернуть"
@@ -3461,7 +3461,7 @@ msgstr "Настройка макросов"
 msgid "Configuration of maintenance periods"
 msgstr "Настройка периодов обслуживания"
 
-#: app/controllers/CControllerMediatypeEdit.php:215
+#: app/controllers/CControllerMediatypeEdit.php:216
 #: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "Настройка способов оповещения"
@@ -3566,7 +3566,7 @@ msgstr "Подключаться через"
 
 #: include/classes/widgets/CWidgetHelper.php:668
 #: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:1016
+#: include/classes/widgets/CWidgetHelper.php:1015
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "Соединение"
@@ -4199,7 +4199,7 @@ msgstr "Данные"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика кэша данных. Кэш - одно из значений (режимы: all, float, uint, str, log, text), history (режимы: pfree, total, used, free), trends (режимы: pfree, total, used, free), text (режимы: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2735
+#: include/classes/graphdraw/CLineGraphDraw.php:2694
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4412,7 +4412,7 @@ msgstr "Задерживается на"
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:579
-#: include/classes/widgets/CWidgetHelper.php:946 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:945 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -5197,7 +5197,7 @@ msgstr "Недоступен"
 #: include/classes/widgets/CWidgetHelper.php:702
 #: include/classes/widgets/CWidgetHelper.php:703
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:963
+#: include/classes/widgets/CWidgetHelper.php:962
 msgid "Draw"
 msgstr "Отрисовка"
 
@@ -5868,7 +5868,7 @@ msgid "Execution confirmation"
 msgstr "Подтверждение выполнения"
 
 #: include/classes/html/CCollapsibleUiWidget.php:59
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:222
+#: include/classes/widgets/CWidgetHelper.php:892 jsLoader.php:222
 #: jsLoader.php:225
 msgid "Expand"
 msgstr "Раскрыть"
@@ -6154,7 +6154,7 @@ msgstr "Информация времени файла. Возвращает ц�
 #: include/classes/widgets/CWidgetHelper.php:726
 #: include/classes/widgets/CWidgetHelper.php:727
 #: include/classes/widgets/CWidgetHelper.php:728
-#: include/classes/widgets/CWidgetHelper.php:996
+#: include/classes/widgets/CWidgetHelper.php:995
 msgid "Fill"
 msgstr "Заполнение"
 
@@ -6745,8 +6745,8 @@ msgstr "Группы"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1421
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1416
+#: include/classes/graphdraw/CLineGraphDraw.php:1423
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -8679,9 +8679,9 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
-#: include/classes/graphdraw/CLineGraphDraw.php:118
-#: include/classes/graphdraw/CLineGraphDraw.php:246
-#: include/classes/graphdraw/CLineGraphDraw.php:256
+#: include/classes/graphdraw/CLineGraphDraw.php:113
+#: include/classes/graphdraw/CLineGraphDraw.php:241
+#: include/classes/graphdraw/CLineGraphDraw.php:251
 #: include/classes/graphdraw/CPieGraphDraw.php:203
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
@@ -9812,7 +9812,7 @@ msgstr "Латышский (lv_LV)"
 
 #: include/classes/widgets/CWidgetHelper.php:671
 #: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:1027
+#: include/classes/widgets/CWidgetHelper.php:1026
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -9846,7 +9846,7 @@ msgstr "Лимит элементов в результатах поиска и 
 
 #: include/classes/widgets/CWidgetHelper.php:660
 #: include/classes/widgets/CWidgetHelper.php:702
-#: include/classes/widgets/CWidgetHelper.php:965 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:964 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:351
 #: include/views/js/monitoring.sysmaps.js.php:695
@@ -10055,7 +10055,7 @@ msgstr "Потерян"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Правило низкоуровневого обнаружения в \"неподдерживаемом\" состоянии"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
 msgid "M"
 msgstr "M"
 
@@ -10286,8 +10286,8 @@ msgid "Map element label type"
 msgstr "Тип подписи к элементам карты"
 
 #: sysmap.php:102
-msgid "Map is updated! Return?"
-msgstr "Карта сети обновлена! Вернуться?"
+msgid "Map is updated! Return to map list?"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:176
 msgid "Map label type"
@@ -10659,7 +10659,7 @@ msgstr "Пропущенное поле \"name\" для графика."
 #: include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:742
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1011
+#: include/classes/widgets/CWidgetHelper.php:1010
 msgid "Missing data"
 msgstr "Отсутствующие данные"
 
@@ -11604,7 +11604,7 @@ msgstr "Не-логические флаги устарели."
 #: app/views/monitoring.problem.view.php:276
 #: include/classes/widgets/CWidgetHelper.php:667
 #: include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:1015
+#: include/classes/widgets/CWidgetHelper.php:1014
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -12758,13 +12758,13 @@ msgstr "Пожалуйста, выберите два элемента"
 #: include/classes/widgets/CWidgetHelper.php:737
 #: include/classes/widgets/CWidgetHelper.php:738
 #: include/classes/widgets/CWidgetHelper.php:739
-#: include/classes/widgets/CWidgetHelper.php:979
+#: include/classes/widgets/CWidgetHelper.php:978
 msgid "Point size"
 msgstr "Размер точек"
 
 #: include/classes/widgets/CWidgetHelper.php:661
 #: include/classes/widgets/CWidgetHelper.php:703
-#: include/classes/widgets/CWidgetHelper.php:966
+#: include/classes/widgets/CWidgetHelper.php:965
 #: include/views/js/monitoring.sysmaps.js.php:371
 msgid "Points"
 msgstr "Точки"
@@ -13751,7 +13751,7 @@ msgstr "Возвращает процент потерянных ICMP ping па�
 
 #: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1028
+#: include/classes/widgets/CWidgetHelper.php:1027
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14309,8 +14309,8 @@ msgstr "Имя безопасности"
 #: include/classes/widgets/CWidgetHelper.php:485
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:555
-#: include/classes/widgets/CWidgetHelper.php:902
-#: include/classes/widgets/CWidgetHelper.php:923 include/forms.inc.php:411
+#: include/classes/widgets/CWidgetHelper.php:901
+#: include/classes/widgets/CWidgetHelper.php:922 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
@@ -15044,7 +15044,7 @@ msgstr "Стэкируемый"
 
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:966
 msgid "Staircase"
 msgstr "Лестница"
 
@@ -15865,7 +15865,7 @@ msgstr "Период времени"
 #: app/controllers/CControllerPopupTriggerExpr.php:198
 #: include/classes/widgets/CWidgetHelper.php:673
 #: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:1031
+#: include/classes/widgets/CWidgetHelper.php:1030
 msgid "Time shift"
 msgstr "Сдвиг по времени"
 
@@ -15969,7 +15969,7 @@ msgstr "Преобразование результата SQL запроса в 
 #: include/classes/widgets/CWidgetHelper.php:714
 #: include/classes/widgets/CWidgetHelper.php:715
 #: include/classes/widgets/CWidgetHelper.php:716
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:986
 msgid "Transparency"
 msgstr "Прозрачность"
 
@@ -15979,7 +15979,7 @@ msgstr "Транспортная ошибка."
 
 #: include/classes/widgets/CWidgetHelper.php:669
 #: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:1018
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "В виде 0"
@@ -16011,7 +16011,7 @@ msgstr "Динамика изменений"
 #: app/controllers/CControllerPopupTriggerWizard.php:216
 #: app/controllers/CControllerPopupTriggerWizard.php:287
 #: app/views/popup.services.php:44 include/actions.inc.php:44
-#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:488
+#: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:483
 #: include/events.inc.php:229 include/maps.inc.php:26
 #: include/triggers.inc.php:1250
 #: include/views/configuration.services.edit.php:87
@@ -17656,7 +17656,7 @@ msgstr "Когда активен"
 #: include/classes/widgets/CWidgetHelper.php:698
 #: include/classes/widgets/CWidgetHelper.php:699
 #: include/classes/widgets/CWidgetHelper.php:700
-#: include/classes/widgets/CWidgetHelper.php:971
+#: include/classes/widgets/CWidgetHelper.php:970
 #: include/views/configuration.graph.edit.php:84
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -17815,7 +17815,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:716
+#: include/classes/graphdraw/CLineGraphDraw.php:711
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y."
 
@@ -17830,7 +17830,7 @@ msgstr "Расположение оси"
 #: include/classes/widgets/CWidgetHelper.php:670
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:1025
+#: include/classes/widgets/CWidgetHelper.php:1024
 msgid "Y-axis"
 msgstr "Ось Y"
 
@@ -18194,7 +18194,7 @@ msgstr "влияет только на отфильтрованные данны
 msgid "agent"
 msgstr "агент"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1862
+#: include/classes/graphdraw/CLineGraphDraw.php:1873
 #: include/classes/html/CSeverity.php:80
 #: include/classes/pagefilter/CPageFilter.php:772
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
@@ -18294,8 +18294,8 @@ msgstr "авторегистрация"
 msgid "auto-registered host"
 msgstr "автоматически зарегистрированный узел сети"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
-#: include/classes/graphdraw/CLineGraphDraw.php:1866
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
+#: include/classes/graphdraw/CLineGraphDraw.php:1877
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18597,7 +18597,7 @@ msgid "host is not monitored"
 msgstr "узел сети без наблюдения"
 
 #: include/classes/widgets/CWidgetHelper.php:529
-#: include/classes/widgets/CWidgetHelper.php:898
+#: include/classes/widgets/CWidgetHelper.php:897
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr "шаблон узла сети"
@@ -18650,11 +18650,11 @@ msgid "invalid byte sequence in UTF-8"
 msgstr "ошибочная последовательность байт в UTF-8"
 
 #: include/classes/api/services/CItemGeneral.php:336
-#: include/classes/graphdraw/CLineGraphDraw.php:118
+#: include/classes/graphdraw/CLineGraphDraw.php:113
 msgid "invalid delay"
 msgstr "ошибочная задержка"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:247
+#: include/classes/graphdraw/CLineGraphDraw.php:242
 #: include/classes/graphdraw/CPieGraphDraw.php:204
 #: include/classes/helpers/CSvgGraphHelper.php:236
 msgid "invalid history storage period"
@@ -18672,7 +18672,7 @@ msgstr "ошибочное имя узла сети"
 msgid "invalid regular expression"
 msgstr "ошибочное регулярное выражение"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:257
+#: include/classes/graphdraw/CLineGraphDraw.php:252
 #: include/classes/graphdraw/CPieGraphDraw.php:214
 #: include/classes/helpers/CSvgGraphHelper.php:248
 msgid "invalid trend storage period"
@@ -18703,7 +18703,7 @@ msgid "item is disabled"
 msgstr "элемент данных деактивирован"
 
 #: include/classes/widgets/CWidgetHelper.php:551
-#: include/classes/widgets/CWidgetHelper.php:919
+#: include/classes/widgets/CWidgetHelper.php:918
 msgid "item pattern"
 msgstr "шаблон элемента данных"
 
@@ -18711,7 +18711,7 @@ msgstr "шаблон элемента данных"
 msgid "key is empty"
 msgstr "ключ пустой"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1842
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18722,7 +18722,7 @@ msgstr "посл"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Последнее (наиболее новое) значение Т"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "left"
 msgstr "слева"
 
@@ -18760,9 +18760,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "м"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1389
-#: include/classes/graphdraw/CLineGraphDraw.php:1397
-#: include/classes/graphdraw/CLineGraphDraw.php:1404
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
+#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1399
 msgid "m-d"
 msgstr "m-d"
 
@@ -18788,8 +18788,8 @@ msgstr "карта сети"
 msgid "matches"
 msgstr "соответствует"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1845
-#: include/classes/graphdraw/CLineGraphDraw.php:1859
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18810,8 +18810,8 @@ msgstr "достигнуто максимальное количество за�
 msgid "maximum number of dependency levels reached"
 msgstr "достигнуто максимальное количество уровней зависимостей"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1843
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18884,7 +18884,7 @@ msgstr "новый"
 msgid "new event tag name"
 msgstr "имя тега нового события"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1937
+#: include/classes/graphdraw/CLineGraphDraw.php:1948
 #: include/classes/graphdraw/CPieGraphDraw.php:359
 msgid "no data"
 msgstr "нет данных"
@@ -18893,7 +18893,7 @@ msgstr "нет данных"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr "nodata() - Отсутствие полученных данных за период времени Т (1 - ложь, 0 - правда)"
 
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:1032
 msgid "none"
 msgstr "нет"
 
@@ -19038,7 +19038,7 @@ msgstr "регулярное выражение"
 msgid "remember selected"
 msgstr "запоминать выбранное"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1979
+#: include/classes/graphdraw/CLineGraphDraw.php:1990
 msgid "right"
 msgstr "справа"
 
@@ -19224,8 +19224,8 @@ msgid "type here to search"
 msgstr "начните печатать для поиска"
 
 #: include/classes/validators/CApiInputValidator.php:1577
-msgid "unacceptible URL"
-msgstr "неприемлемый URL"
+msgid "unacceptable URL"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:172
 msgid "unexpected end of key"

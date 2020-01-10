@@ -3,6 +3,10 @@ Changes for 4.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+.......... [ZBX-1977] reverted fix for axis labels calculation (rlataria)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.16
@@ -17,7 +21,7 @@ A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported templ
 
 Bug fixes:
 ..F....... [ZBX-17101] fixed url validation before output (miks)
-.......PS. [ZBX-16929] fixed detection of invalid sender data request (mabele)
+.......PS. [ZBX-16929] fixed history data processing responding with "success", when received only invalid data from proxy/agent/sender (mabele)
 ..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
 ..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
 ..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
