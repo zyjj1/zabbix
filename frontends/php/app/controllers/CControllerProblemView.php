@@ -60,9 +60,7 @@ class CControllerProblemView extends CController {
 			'filter_highlight_row' =>		'in 1',
 			'filter_show_latest_values' =>	'in 1',
 			'filter_tag_name_format' =>		'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
-			'filter_tag_priority' =>		'string',
-			'from' =>						'range_time',
-			'to' =>							'range_time'
+			'filter_tag_priority' =>		'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -335,8 +333,8 @@ class CControllerProblemView extends CController {
 			$timeselector_options = [
 				'profileIdx' => 'web.problem.filter',
 				'profileIdx2' => 0,
-				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+				'from' => null,
+				'to' => null
 			];
 			updateTimeSelectorPeriod($timeselector_options);
 
