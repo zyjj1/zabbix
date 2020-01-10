@@ -382,8 +382,10 @@ class CMaintenance extends CApiService {
 				check_db_fields($dbFields, $timeperiod);
 
 				if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect maintenance period: every='
-						.$timeperiod['every'].' should be > 0'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for unsigned int field "%2$s".',
+							$timeperiod['every'], 'every')
+						);
 				}
 
 				if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
