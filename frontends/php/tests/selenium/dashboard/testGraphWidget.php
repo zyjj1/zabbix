@@ -83,6 +83,42 @@ class testGraphWidget extends CWebTest {
 	}
 
 	/**
+	 * Check screenshots of graph widget form.
+	 */
+	public function testGraphWidget_FormLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$overlay = $dashboard->addWidget();
+		$form = $overlay->asForm();
+		$form->fill(['Type' => 'Graph']);
+		$form->waitUntilReloaded();
+		$element = $overlay->query('id:svg-graph-preview')->one();
+
+		$errors = [];
+		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
+		foreach ($tabs as $tab) {
+			$form->selectTab($tab);
+			if ($tab === 'Overrides') {
+				$button = $form->query('button:Add new override')->one()->click();
+				// Remove border radius from button element.
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+			}
+
+			$this->page->removeFocus();
+			// Collect all screenshot errors.
+			try {
+				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+			} catch (Exception $ex) {
+				$errors[] = $ex->getMessage();
+			}
+		}
+
+		if ($errors) {
+			$this->fail(implode("\n", $errors));
+		}
+	}
+
+	/**
 	 * Check validation of graph widget fields.
 	 */
 	private function validate($data, $tab) {
@@ -2081,8 +2117,8 @@ class testGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false) === null);
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -2098,7 +2134,7 @@ class testGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertEquals(true, $widget->isEditable());
-		$widget->delete();
+		$dashboard->deleteWidget($name);
 
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -2107,7 +2143,7 @@ class testGraphWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue($dashboard->getWidget($name, false) === null);
+		$this->assertTrue(!$dashboard->getWidget($name, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
