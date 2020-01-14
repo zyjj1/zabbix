@@ -689,6 +689,19 @@ static void	vc_warn_low_memory(void)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_release_unused_items                                          *
+ *                                                                            *
+ * Purpose: frees space in cache by dropping items not accessed for more than *
+ *          24 hours                                                          *
+ *                                                                            *
+ * Parameters: source_item - [IN] the item requesting more space to store its *
+ *                                data                                        *
+ *                                                                            *
+ * Return value:  number of bytes freed                                       *
+ *                                                                            *
+ ******************************************************************************/
 static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 {
 	int			timestamp;
@@ -712,6 +725,17 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 	return freed;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_housekeeping_value_cache                                      *
+ *                                                                            *
+ * Purpose: release unused items from value cache                             *
+ *                                                                            *
+ * Comments: If unused items are not cleared from value cache periodically    *
+ *           then they will only be cleared when value cache is full, see     *
+ *           vc_release_space().                                              *
+ *                                                                            *
+ ******************************************************************************/
 void	vc_housekeeping_value_cache(void)
 {
 	vc_try_lock();
