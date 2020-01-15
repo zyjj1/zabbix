@@ -727,7 +727,7 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_housekeeping_value_cache                                      *
+ * Function: zbx_vc_housekeeping_value_cache                                  *
  *                                                                            *
  * Purpose: release unused items from value cache                             *
  *                                                                            *
@@ -736,7 +736,7 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
  *           vc_release_space().                                              *
  *                                                                            *
  ******************************************************************************/
-void	vc_housekeeping_value_cache(void)
+void	zbx_vc_housekeeping_value_cache(void)
 {
 	vc_try_lock();
 	vc_release_unused_items(NULL);

@@ -105,6 +105,6 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 
-void	vc_housekeeping_value_cache(void);
+void	zbx_vc_housekeeping_value_cache(void);
 
 #endif	/* ZABBIX_VALUECACHE_H */
