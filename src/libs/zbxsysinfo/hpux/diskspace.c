@@ -265,7 +265,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
 		zbx_strlcpy(mntpoint->fsname, mpoint, MAX_STRING_LEN);
-		zbx_strlcpy(mntpoint->fstype, zmt->mnt_type, MAX_STRING_LEN);
+		zbx_strlcpy(mntpoint->fstype, mt->mnt_type, MAX_STRING_LEN);
 		mntpoint->total = total;
 		mntpoint->used = used;
 		mntpoint->not_used = not_used;
