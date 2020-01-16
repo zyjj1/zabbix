@@ -174,7 +174,10 @@ static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
 
 	time->modification_time = buf.st_mtime;
 	time->access_time = buf.st_atime;
-	time->change_time = buf.st_ctime;
+
+	/* On Windows st_ctime stores file creation time, not the last change timestamp. */
+	/* Assigning st_atime to change_time as the closest one.                         */
+	time->change_time = buf.st_atime;
 
 	return SUCCEED;
 }
