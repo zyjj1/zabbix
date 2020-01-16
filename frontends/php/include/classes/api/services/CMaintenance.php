@@ -306,8 +306,6 @@ class CMaintenance extends CApiService {
 			}
 		}
 
-		$this->removeSecondsFromTimes($maintenances);
-
 		$tid = 0;
 		$insert = [];
 		$timeperiods = [];
@@ -369,6 +367,9 @@ class CMaintenance extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
+			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+
 			foreach ($maintenance['timeperiods'] as $timeperiod) {
 				if (!is_array($timeperiod)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
@@ -390,6 +391,14 @@ class CMaintenance extends CApiService {
 
 				if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
 					$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
+				}
+				else if (!validateUnixTime($timeperiod['start_date'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.',
+						_('Date'))
+					);
+				}
+				else {
+					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
 				}
 
 				$tid++;
@@ -576,6 +585,8 @@ class CMaintenance extends CApiService {
 						_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since'))
 					);
 				}
+
+				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
 			}
 			else {
 				$active_since = $db_maintenance['active_since'];
@@ -590,6 +601,8 @@ class CMaintenance extends CApiService {
 						_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till'))
 					);
 				}
+
+				$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
 			}
 			else {
 				$active_till = $db_maintenance['active_till'];
@@ -651,6 +664,15 @@ class CMaintenance extends CApiService {
 					// Reset "start_date" to default value in case "timeperiod_type" is not one time only.
 					if ($timeperiod_type != TIMEPERIOD_TYPE_ONETIME) {
 						$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
+					}
+					else if (array_key_exists('start_date', $timeperiod)
+							&& !validateUnixTime($timeperiod['start_date'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Date'))
+						);
+					}
+					else {
+						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
 					}
 				}
 				unset($timeperiod);
@@ -744,8 +766,6 @@ class CMaintenance extends CApiService {
 				}
 			}
 		}
-
-		$this->removeSecondsFromTimes($maintenances);
 
 		$update_maintenances = [];
 		foreach ($maintenances as $mnum => $maintenance) {
@@ -986,34 +1006,6 @@ class CMaintenance extends CApiService {
 		}
 
 		return ['maintenanceids' => $maintenanceids];
-	}
-
-	/**
-	 * Reset seconds to zero in maintenace time values.
-	 *
-	 * @param array $maintenances passed by reference
-	 */
-	protected function removeSecondsFromTimes(array &$maintenances) {
-		foreach ($maintenances as &$maintenance) {
-			if (isset($maintenance['active_since'])) {
-				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
-			}
-
-			if (isset($maintenance['active_till'])) {
-				$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
-			}
-
-
-			if (isset($maintenance['timeperiods'])) {
-				foreach ($maintenance['timeperiods'] as &$timeperiod) {
-					if (isset($timeperiod['start_date'])) {
-						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
-					}
-				}
-				unset($timeperiod);
-			}
-		}
-		unset($maintenance);
 	}
 
 	/**

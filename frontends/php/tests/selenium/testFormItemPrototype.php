@@ -2667,7 +2667,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Add item prototype wiht all preprocessing',
+					'name' => 'Add item prototype with all preprocessing',
 					'key' => 'item.prototype.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],

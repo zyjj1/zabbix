@@ -35,6 +35,7 @@
 #	include <strsafe.h>
 
 #	define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
 #	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
 
 #	ifndef __UINT64_C
@@ -77,6 +78,7 @@ typedef __int64	zbx_offset_t;
 #else	/* _WINDOWS */
 
 #	define zbx_stat(path, buf)		stat(path, buf)
+#	define zbx_fstat(fd, buf)		fstat(fd, buf)
 #	define zbx_open(pathname, flags)	open(pathname, flags)
 
 #	ifndef __UINT64_C
