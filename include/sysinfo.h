@@ -308,14 +308,14 @@ typedef struct
 	double		pfree;
 	double		pused;
 }
-zbx_mpoint_metric_t;
+zbx_fs_metrics_t;
 
 typedef struct
 {
 	char			fsname[MAX_STRING_LEN];
 	char			fstype[MAX_STRING_LEN];
-	zbx_mpoint_metric_t	bytes;
-	zbx_mpoint_metric_t	inodes;
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
 }
 zbx_mpoint_t;
 
