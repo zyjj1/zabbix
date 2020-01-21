@@ -73,8 +73,8 @@ class MysqlDbBackend extends DbBackend {
 
 		if ($tables) {
 			$tables = array_unique($tables);
-			$this->setWarning(_n('Unsupported charset or collation for table: %s',
-				'Unsupported charset or collation for tables: %s',
+			$this->setWarning(_n('Unsupported charset or collation for table: %1$s',
+				'Unsupported charset or collation for tables: %1$s',
 				implode(', ', $tables), implode(', ', $tables), count($tables)
 			));
 			return false;
