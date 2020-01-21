@@ -62,8 +62,6 @@ class OracleDbBackend extends DbBackend {
 	}
 
 	public function checkEncoding() {
-		global $DB;
-
 		return $this->checkDatabaseEncoding();
 	}
 
