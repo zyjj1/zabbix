@@ -1122,12 +1122,10 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 		return FAIL;
 	}
 
-	if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags) && 0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log.count */
-		max_parameter_num = 6;
-	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* logrt */
-		max_parameter_num = 8;
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags))
+		max_parameter_num = 7;	/* log.count or logrt.count */
 	else
-		max_parameter_num = 7;	/* log or logrt.count */
+		max_parameter_num = 8;	/* log or logrt */
 
 	if (max_parameter_num < parameter_num)
 	{
@@ -1197,35 +1195,56 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 
 static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request, int *rotation_type, char **error)
 {
-	if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))
+	char	*options;
+	int	options_par_nr, ret = SUCCEED;
+
+	if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log, logrt */
+		options_par_nr = 7;
+	else						/* log.count, logrt.count */
+		options_par_nr = 6;
+
+	options = get_rparam(request, options_par_nr);
+
+	if (NULL == options || '\0' == *options)	/* default options */
 	{
-		char	*options;
-		int	options_par_nr;
-
-		if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* logrt */
-			options_par_nr = 7;
-		else						/* logrt.count */
-			options_par_nr = 6;
-
-		if (NULL != (options = get_rparam(request, options_par_nr)) && '\0' != *options)
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))
+			*rotation_type = ZBX_LOG_ROTATION_LOGRT;
+		else
+			*rotation_type = ZBX_LOG_ROTATION_REREAD;
+	}
+	else
+	{
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))	/* logrt, logrt.count */
 		{
 			if (0 == strcmp(options, "copytruncate"))
-			{
 				*rotation_type = ZBX_LOG_ROTATION_LOGCPT;
-				return SUCCEED;
-			}
-
-			if (0 != strcmp(options, "rotate"))
+			else if (0 == strcmp(options, "rotate"))
+				*rotation_type = ZBX_LOG_ROTATION_LOGRT;
+			else if (0 == strcmp(options, "mtime-reread"))	/* mtime-reread is an alias for rotate */
+				*rotation_type = ZBX_LOG_ROTATION_LOGRT;
+			else if (0 == strcmp(options, "mtime-noreread"))
+				*rotation_type = ZBX_LOG_ROTATION_NO_REREAD;
+			else
 			{
-				*error = zbx_dsprintf(*error, "Invalid %s parameter.", (6 == options_par_nr) ?
-						"seventh" : "eighth");
-				return FAIL;
+				*error = zbx_dsprintf(*error, "Invalid value \"%s\" for options parameter.", options);
+				ret = FAIL;
+			}
+		}
+		else	/* log, log.count */
+		{
+			if (0 == strcmp(options, "mtime-reread"))
+				*rotation_type = ZBX_LOG_ROTATION_REREAD;
+			else if (0 == strcmp(options, "mtime-noreread"))
+				*rotation_type = ZBX_LOG_ROTATION_NO_REREAD;
+			else
+			{
+				*error = zbx_dsprintf(*error, "Invalid value \"%s\" for options parameter.", options);
+				ret = FAIL;
 			}
 		}
 	}
 
-	*rotation_type = ZBX_LOG_ROTATION_LOGRT;	/* default */
-	return SUCCEED;
+	return ret;
 }
 
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,

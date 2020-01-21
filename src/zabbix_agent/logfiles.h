@@ -23,8 +23,14 @@
 #include "zbxregexp.h"
 #include "md5.h"
 
-#define ZBX_LOG_ROTATION_LOGRT	0	/* pure rotation model */
-#define ZBX_LOG_ROTATION_LOGCPT	1	/* copy-truncate rotation model */
+typedef enum
+{
+	ZBX_LOG_ROTATION_LOGRT = 0,	/* pure rotation model */
+	ZBX_LOG_ROTATION_LOGCPT,	/* copy-truncate rotation model */
+	ZBX_LOG_ROTATION_REREAD,	/* reread if modification time changes but size does not */
+	ZBX_LOG_ROTATION_NO_REREAD	/* don't reread if modification time changes but size does not */
+}
+zbx_log_rotation_options_t;
 
 struct	st_logfile
 {
