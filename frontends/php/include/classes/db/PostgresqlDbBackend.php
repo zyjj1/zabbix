@@ -89,8 +89,8 @@ class PostgresqlDbBackend extends DbBackend {
 
 		if ($tables) {
 			$tables = array_unique($tables);
-			$this->setWarning(_n('Unsupported charset or collation for table: %1$s',
-				'Unsupported charset or collation for tables: %1$s',
+			$this->setWarning(_n('Unsupported charset or collation for table: %1$s.',
+				'Unsupported charset or collation for tables: %1$s.',
 				implode(', ', $tables), implode(', ', $tables), count($tables)
 			));
 			return false;
