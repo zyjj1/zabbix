@@ -45,6 +45,11 @@ class Db2DbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
 	public function checkEncoding() {
 		return true;
 	}

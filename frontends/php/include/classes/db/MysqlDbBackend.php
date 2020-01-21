@@ -39,12 +39,23 @@ class MysqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
 	public function checkEncoding() {
 		global $DB;
 
 		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB);
 	}
 
+	/**
+	 * Check database schema encoding. On error will set warning message.
+	 *
+	 * @param array $DB    Array of database settings, same as global $DB.
+	 * @return bool
+	 */
 	protected function checkDatabaseEncoding(array $DB) {
 		$row = DBfetch(DBselect('SELECT default_character_set_name db_charset FROM information_schema.schemata'.
 			' WHERE schema_name='.zbx_dbstr($DB['DATABASE'])
@@ -60,6 +71,12 @@ class MysqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Check tables schema encoding. On error will set warning message.
+	 *
+	 * @param array $DB    Array of database settings, same as global $DB.
+	 * @return bool
+	 */
 	protected function checkTablesEncoding(array $DB) {
 		$tables = DBfetchColumn(DBSelect('SELECT table_name FROM information_schema.columns'.
 			' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).

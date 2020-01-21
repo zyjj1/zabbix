@@ -48,12 +48,23 @@ class PostgresqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
 	public function checkEncoding() {
 		global $DB;
 
 		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB) && $this->checkConversionEncoding();
 	}
 
+	/**
+	 * Check database schema encoding. On error will set warning message.
+	 *
+	 * @param array $DB    Array of database settings, same as global $DB.
+	 * @return bool
+	 */
 	protected function checkDatabaseEncoding(array $DB) {
 		$row = DBfetch(DBselect('SELECT pg_encoding_to_char(encoding) db_charset FROM pg_database'.
 			' WHERE datname='.zbx_dbstr($DB['DATABASE'])
@@ -69,6 +80,12 @@ class PostgresqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Check tables schema encoding. On error will set warning message.
+	 *
+	 * @param array $DB    Array of database settings, same as global $DB.
+	 * @return bool
+	 */
 	protected function checkTablesEncoding(array $DB) {
 		$schema = $DB['SCHEMA'] ? $DB['SCHEMA'] : 'public';
 		$row = DBfetch(DBselect('SELECT oid FROM pg_namespace WHERE nspname='.zbx_dbstr($schema)));
@@ -99,6 +116,11 @@ class PostgresqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Check client and server encoding. On error will set warning message.
+	 *
+	 * @return bool
+	 */
 	protected function checkConversionEncoding() {
 		// PostgreSQL automatic convert data to coincide client encoding.
 		$row = DBfetch(DBselect('show client_encoding;'));

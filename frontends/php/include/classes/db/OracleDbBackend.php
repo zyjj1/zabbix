@@ -61,10 +61,20 @@ class OracleDbBackend extends DbBackend {
 		return $sql;
 	}
 
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
 	public function checkEncoding() {
 		return $this->checkDatabaseEncoding();
 	}
 
+	/**
+	 * Check database schema encoding. On error will set warning message.
+	 *
+	 * @return bool
+	 */
 	protected function checkDatabaseEncoding() {
 		$db_params = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
 			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
