@@ -64,10 +64,10 @@ class OracleDbBackend extends DbBackend {
 	public function checkEncoding() {
 		global $DB;
 
-		return $this->checkDatabaseEncoding($DB);
+		return $this->checkDatabaseEncoding();
 	}
 
-	protected function checkDatabaseEncoding(array $DB) {
+	protected function checkDatabaseEncoding() {
 		$db_params = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
 			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
 				' AND value!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET)
