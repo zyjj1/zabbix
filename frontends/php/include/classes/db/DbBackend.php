@@ -130,7 +130,7 @@ abstract class DbBackend {
 	/**
 	 * Get warning message.
 	 *
-	 * @return ?string
+	 * @return mixed
 	 */
 	public function getWarning() {
 		return $this->warning;

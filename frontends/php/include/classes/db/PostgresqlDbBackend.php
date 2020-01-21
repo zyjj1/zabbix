@@ -62,7 +62,8 @@ class PostgresqlDbBackend extends DbBackend {
 	/**
 	 * Check database schema encoding. On error will set warning message.
 	 *
-	 * @param array $DB    Array of database settings, same as global $DB.
+	 * @param array $DB  Array of database settings, same as global $DB.
+	 *
 	 * @return bool
 	 */
 	protected function checkDatabaseEncoding(array $DB) {
@@ -83,7 +84,8 @@ class PostgresqlDbBackend extends DbBackend {
 	/**
 	 * Check tables schema encoding. On error will set warning message.
 	 *
-	 * @param array $DB    Array of database settings, same as global $DB.
+	 * @param array $DB  Array of database settings, same as global $DB.
+	 *
 	 * @return bool
 	 */
 	protected function checkTablesEncoding(array $DB) {
