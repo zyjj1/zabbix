@@ -111,14 +111,27 @@ abstract class DbBackend {
 		return $this->error;
 	}
 
-	public function checkEncoding() {
-		return true;
-	}
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
+	abstract public function checkEncoding();
 
+	/**
+	 * Set warning message.
+	 *
+	 * @param string $message
+	 */
 	public function setWarning($message) {
 		$this->warning = $message;
 	}
 
+	/**
+	 * Get warning message.
+	 *
+	 * @return ?string
+	 */
 	public function getWarning() {
 		return $this->warning;
 	}

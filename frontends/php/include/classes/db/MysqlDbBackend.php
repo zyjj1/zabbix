@@ -23,12 +23,6 @@
  */
 class MysqlDbBackend extends DbBackend {
 
-	public function checkEncoding() {
-		global $DB;
-
-		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB);
-	}
-
 	/**
 	 * Check if 'dbversion' table exists.
 	 *
@@ -45,9 +39,15 @@ class MysqlDbBackend extends DbBackend {
 		return true;
 	}
 
-	private function checkDatabaseEncoding(array $DB) {
+	public function checkEncoding() {
+		global $DB;
+
+		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB);
+	}
+
+	protected function checkDatabaseEncoding(array $DB) {
 		$row = DBfetch(DBselect('SELECT default_character_set_name db_charset FROM information_schema.schemata'.
-			' WHERE '.dbConditionString('schema_name', [$DB['DATABASE']])
+			' WHERE schema_name='.zbx_dbstr($DB['DATABASE'])
 		));
 
 		if ($row && strtoupper($row['db_charset']) != ZBX_DB_DEFAULT_CHARSET) {
@@ -60,7 +60,7 @@ class MysqlDbBackend extends DbBackend {
 		return true;
 	}
 
-	private function checkTablesEncoding(array $DB) {
+	protected function checkTablesEncoding(array $DB) {
 		$tables = DBfetchColumn(DBSelect('SELECT table_name FROM information_schema.columns'.
 			' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).
 				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
@@ -73,8 +73,8 @@ class MysqlDbBackend extends DbBackend {
 
 		if ($tables) {
 			$tables = array_unique($tables);
-			$this->setWarning(_n('Unsupported character_set or collation for table: %s',
-				'Unsupported character_set or collation for tables: %s',
+			$this->setWarning(_n('Unsupported charset or collation for table: %s',
+				'Unsupported charset or collation for tables: %s',
 				implode(', ', $tables), implode(', ', $tables), count($tables)
 			));
 			return false;

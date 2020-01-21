@@ -44,4 +44,8 @@ class Db2DbBackend extends DbBackend {
 
 		return true;
 	}
+
+	public function checkEncoding() {
+		return true;
+	}
 }

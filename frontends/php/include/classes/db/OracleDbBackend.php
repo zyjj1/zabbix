@@ -24,12 +24,6 @@
  */
 class OracleDbBackend extends DbBackend {
 
-	public function checkEncoding() {
-		global $DB;
-
-		return $this->checkDatabaseEncoding($DB);
-	}
-
 	/**
 	 * Check if 'dbversion' table exists.
 	 *
@@ -67,7 +61,13 @@ class OracleDbBackend extends DbBackend {
 		return $sql;
 	}
 
-	private function checkDatabaseEncoding(array $DB) {
+	public function checkEncoding() {
+		global $DB;
+
+		return $this->checkDatabaseEncoding($DB);
+	}
+
+	protected function checkDatabaseEncoding(array $DB) {
 		$db_params = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
 			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
 				' AND value!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET)

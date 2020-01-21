@@ -24,12 +24,6 @@
  */
 class PostgresqlDbBackend extends DbBackend {
 
-	public function checkEncoding() {
-		global $DB;
-
-		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB) && $this->checkConversionEncoding();
-	}
-
 	/**
 	 * Check if 'dbversion' table exists.
 	 *
@@ -54,9 +48,15 @@ class PostgresqlDbBackend extends DbBackend {
 		return true;
 	}
 
-	private function checkDatabaseEncoding(array $DB) {
+	public function checkEncoding() {
+		global $DB;
+
+		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB) && $this->checkConversionEncoding();
+	}
+
+	protected function checkDatabaseEncoding(array $DB) {
 		$row = DBfetch(DBselect('SELECT pg_encoding_to_char(encoding) db_charset FROM pg_database'.
-			' WHERE datname='.zbx_dbstr($db_name)
+			' WHERE datname='.zbx_dbstr($DB['DATABASE'])
 		));
 
 		if ($row && $row['db_charset'] != ZBX_DB_DEFAULT_CHARSET) {
@@ -69,9 +69,15 @@ class PostgresqlDbBackend extends DbBackend {
 		return true;
 	}
 
-	private function checkTablesEncoding(array $DB) {
+	protected function checkTablesEncoding(array $DB) {
 		$schema = $DB['SCHEMA'] ? $DB['SCHEMA'] : 'public';
 		$row = DBfetch(DBselect('SELECT oid FROM pg_namespace WHERE nspname='.zbx_dbstr($schema)));
+
+		/**
+		 * Getting all fields in all Zabbix tables to check for collation.
+		 * If collation is not default (its mean collation is the same that was during db creation),
+		 * than we consider it as error.
+		 */
 		$tables = DBfetchColumn(DBSelect('SELECT c.relname AS table_name FROM pg_attribute AS a'.
 			' LEFT JOIN pg_class AS c ON c.relfilenode=a.attrelid'.
 			' LEFT JOIN pg_collation AS l ON l.oid=a.attcollation'.
@@ -79,12 +85,12 @@ class PostgresqlDbBackend extends DbBackend {
 				' AND '.dbConditionInt('c.relnamespace', [$row['oid']]).
 				' AND c.relam=0 AND '.dbConditionString('c.relname', array_keys(DB::getSchema())).
 				' AND l.collname!='.zbx_dbstr('default')
-		),'table_name');
+		), 'table_name');
 
 		if ($tables) {
 			$tables = array_unique($tables);
-			$this->setWarning(_n('Unsupported character_set or collation for table: %s',
-				'Unsupported character_set or collation for tables: %s',
+			$this->setWarning(_n('Unsupported charset or collation for table: %s',
+				'Unsupported charset or collation for tables: %s',
 				implode(', ', $tables), implode(', ', $tables), count($tables)
 			));
 			return false;
@@ -93,7 +99,7 @@ class PostgresqlDbBackend extends DbBackend {
 		return true;
 	}
 
-	private function checkConversionEncoding() {
+	protected function checkConversionEncoding() {
 		// PostgreSQL automatic convert data to coincide client encoding.
 		$row = DBfetch(DBselect('show client_encoding;'));
 
