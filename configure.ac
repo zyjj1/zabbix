@@ -1516,12 +1516,16 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
 	LIBSSH2_CHECK_CONFIG([no])
 	if test "x$want_ssh2" = "xyes"; then
+		if test "x$have_ssh2" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one SSH library (--with-ssh or --with-ssh2).])
+		fi
+
 		if test "x$found_ssh2" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library not found])
 		elif test "x$accept_ssh2_version" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
 		else
-			have_ssh2="yes"
+			have_ssh2="SSH2"
 		fi
 	fi
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $SSH2_LDFLAGS"
@@ -1530,6 +1534,27 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
+	dnl Check for LIBSSH [by default - skip] at least of version 0.7.0.
+	LIBSSH_CHECK_CONFIG([no])
+	if test "x$want_ssh" = "xyes"; then
+		if test "x$have_ssh2" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one SSH library (--with-ssh or --with-ssh2).])
+		fi
+
+		if test "x$found_ssh" != "xyes"; then
+			AC_MSG_ERROR([SSH library not found])
+		elif test "x$accept_ssh_version" != "xyes"; then
+			AC_MSG_ERROR([SSH library version requirement not met (>= 1.0.0)])
+		else
+			have_ssh2="SSH"
+		fi
+	fi
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $SSH_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $SSH_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $SSH_LIBS"
+	
 	AC_SUBST(SSH2_CFLAGS)
 
 	found_openipmi="no"
