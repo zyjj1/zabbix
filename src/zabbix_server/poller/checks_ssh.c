@@ -658,9 +658,8 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 		item->interface.port = ZBX_DEFAULT_SSH_PORT;
 
 	encoding = get_rparam(&request, 3);
-zabbix_increase_log_level();
+
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
-zabbix_decrease_log_level();
 out:
 	free_request(&request);
 
