@@ -340,6 +340,7 @@ close:
 	return ret;
 }
 #elif defined(HAVE_SSH)
+
 /* example ssh.run["ls /"] */
 static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
@@ -350,7 +351,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	char		*publickey = NULL, *privatekey = NULL;
 	ssh_key 	privkey, pubkey;
 	int		priv_free = 0, pub_free = 0;
-	char		buffer[MAX_BUFFER_LEN], buf[16], *output;
+	char		buffer[MAX_BUFFER_LEN], buf[16], *output, userauthlist[64];
+	size_t		offset = 0;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -383,17 +385,36 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error during authentication: %s", ssh_get_error(session)));
 		goto session_close;
 	}
+
+	userauthlist[0] = '\0';
 	if (0 != (userauth = ssh_userauth_list(session, item->username)))
 	{
 		if (0 != (userauth & SSH_AUTH_METHOD_PASSWORD))
+		{
+			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "password, ");
 			auth_pw |= 1;
+
+		}
 		if (0 != (userauth & SSH_AUTH_METHOD_INTERACTIVE))
+		{
+			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset,
+					"keyboard-interactive, ");
 			auth_pw |= 2;
+		}
 		if (0 != (userauth & SSH_AUTH_METHOD_PUBLICKEY))
+		{
+			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "publickey, ");
 			auth_pw |= 4;
+		}
+		if (0 != (SSH_AUTH_METHOD_HOSTBASED & userauth))
+		{
+			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "hostbased, ");
+		}
+		userauthlist[offset-2] = '\0';
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() supported authentication methods: %d, auth_pw: %d",__func__, userauth, auth_pw);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() supported authentication methods: %s", __func__, userauthlist);
+
 	switch (item->authtype)
 	{
 		case ITEM_AUTHTYPE_PASSWORD:
@@ -415,14 +436,19 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			{
 				/* or via keyboard-interactive */
 				rc = ssh_userauth_kbdint(session, item->username, NULL);
-				if (SSH_AUTH_INFO == rc)
+				while (SSH_AUTH_INFO == rc)
 				{
 					if (1 == ssh_userauth_kbdint_getnprompts(session))
 					{
-						if (0 == ssh_userauth_kbdint_setanswer(session, 0, item->password))
-							rc = ssh_userauth_kbdint(session, item->username, NULL);
+						if (0 > ssh_userauth_kbdint_setanswer(session, 0, item->password))
+						{
+							zabbix_log(LOG_LEVEL_DEBUG,"Cannot set answer: %s",
+									ssh_get_error(session));
+						}
 					}
+					rc = ssh_userauth_kbdint(session, item->username, NULL);
 				}
+
 				if (SSH_AUTH_SUCCESS != rc)
 				{
 					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Keyboard-interactive authentication"
@@ -438,7 +464,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			else
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
-						" Supported methods: %d", userauth));
+						" Supported methods: %s", userauthlist));
 				goto session_close;
 			}
 			break;
@@ -505,7 +531,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			else
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
-						" Supported methods: %d", userauth));
+						" Supported methods: %s", userauthlist));
 				goto session_close;
 			}
 			break;
