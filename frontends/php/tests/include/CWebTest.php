@@ -47,6 +47,8 @@ class CWebTest extends CTest {
 	private $screenshot = null;
 	// Failed test URL.
 	private $current_url = null;
+	// Browser errors captured during test.
+	private $browser_errors = null;
 
 	// Shared page instance.
 	private static $shared_page = null;
@@ -65,6 +67,10 @@ class CWebTest extends CTest {
 	 * @inheritdoc
 	 */
 	protected function onNotSuccessfulTest($exception) {
+		if ($this->browser_errors !== null && $exception instanceof Exception) {
+			CExceptionHelper::setMessage($exception, $exception->getMessage()."\n\n".$this->browser_errors);
+		}
+
 		if ($this->screenshot !== null && $exception instanceof Exception) {
 			$screenshot_name = md5(microtime(true)).'.png';
 
@@ -94,21 +100,33 @@ class CWebTest extends CTest {
 	 */
 	protected function tearDown() {
 		// Check for JS errors.
-		if (!$this->hasFailed() && $this->getStatus() !== null) {
-			if (self::$shared_page !== null) {
-				$errors = [];
-
+		$errors = [];
+		if (self::$shared_page !== null) {
 				foreach (self::$shared_page->getBrowserLog() as $log) {
+					// Workaround for ID duplicates.
+					if (strpos($log['message'], 'elements with non-unique id') !== false) {
+						continue;
+					}
+
 					$errors[] = $log['message'];
 				}
+		}
 
-				if (!$this->supress_case_errors && $errors) {
+		if ($errors) {
+			$errors = "Severe browser errors:\n".implode("\n", array_unique($errors));
+
+			if (!$this->hasFailed() && $this->getStatus() !== null) {
+				if (!$this->supress_case_errors) {
 					$this->captureScreenshot();
-					$this->fail("Severe browser errors:\n" . implode("\n", array_unique($errors)));
+					$this->fail($errors);
 				}
 			}
+			else {
+				$this->browser_errors = $errors;
+			}
 		}
-		else {
+
+		if ($this->hasFailed() || $this->getStatus() !== null || $errors) {
 			$this->captureScreenshot();
 		}
 	}
@@ -143,6 +161,24 @@ class CWebTest extends CTest {
 		// Suppress browser error on a test case level.
 		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignore-browser-errors');
 		self::$supress_suite_errors = ($supress_suite_errors !== null);
+
+		// Browsers supported by test suite.
+		$browsers = $this->getAnnotationTokensByName($class_annotations, 'browsers');
+		if ($browsers) {
+			$mapping = [
+				'MicrosoftEdge' => 'edge'
+			];
+
+			$browser = defined('PHPUNIT_BROWSER_NAME') ? PHPUNIT_BROWSER_NAME : 'chrome';
+			if (array_key_exists($browser, $mapping)) {
+				$browser = $mapping[$browser];
+			}
+
+			if (!in_array($browser, $browsers)) {
+				self::markTestSuiteSkipped();
+				return;
+			}
+		}
 	}
 
 	/**
@@ -171,6 +207,24 @@ class CWebTest extends CTest {
 		// Errors on a test case level should be suppressed if suite level error suppression is enabled.
 		if (self::$supress_suite_errors) {
 			$this->supress_case_errors = self::$supress_suite_errors;
+		}
+
+		// Browsers supported by test case.
+		$browsers = $this->getAnnotationTokensByName($method_annotations, 'browsers');
+		if ($browsers) {
+			$mapping = [
+				'MicrosoftEdge' => 'edge'
+			];
+
+			$browser = defined('PHPUNIT_BROWSER_NAME') ? PHPUNIT_BROWSER_NAME : 'chrome';
+			if (array_key_exists($browser, $mapping)) {
+				$browser = $mapping[$browser];
+			}
+
+			if (!in_array($browser, $browsers)) {
+				self::markTestSkipped('Test case is not supported in this browser.');
+				return;
+			}
 		}
 	}
 
