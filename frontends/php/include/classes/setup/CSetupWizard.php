@@ -433,13 +433,13 @@ class CSetupWizard extends CForm {
 				$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
 				$result &= DBexecute('DROP TABLE zabbix_installation_test');
 			}
-		}
 
-		$db = DB::getDbBackend();
+			$db = DB::getDbBackend();
 
-		if (!$db->checkEncoding()) {
-			error($db->getWarning());
-			return false;
+			if (!$db->checkEncoding()) {
+				error($db->getWarning());
+				return false;
+			}
 		}
 
 		DBclose();
