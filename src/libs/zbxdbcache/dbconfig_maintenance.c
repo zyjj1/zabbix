@@ -509,6 +509,36 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_substract_time                                                *
+ *                                                                            *
+ * Purpose: substract two times with DST correction                           *
+ *                                                                            *
+ * Parameter: minuend       - [IN] the minuend time                           *
+ *            subtrahend    - [IN] the subtrahend time                        *
+ *            tm            - [IN] the struct tm                              *
+ *                                 current time                               *
+ *                                                                            *
+ * Return value: the resulting time                                           *
+ *                                                                            *
+ ******************************************************************************/
+static time_t dc_substract_time(time_t minuend, time_t subtrahend, struct tm *tm)
+{
+	int 		dst_min, dst_diff;
+	time_t 		diff;
+
+	tm = localtime(&minuend);
+	dst_min = tm->tm_isdst;
+	diff = minuend - subtrahend;
+	tm = localtime(&diff);
+	dst_diff = tm->tm_isdst;
+	diff -=  (dst_diff - dst_min) * SEC_PER_HOUR;
+
+	return diff;
+
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_calculate_maintenance_period                                  *
  *                                                                            *
  * Purpose: calculate start time for the specified maintenance period         *
@@ -549,11 +579,11 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 				return FAIL;
 
 			tm = localtime(&active_since);
-			active_since = active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN +
-					tm->tm_sec);
+			active_since = dc_substract_time(active_since,
+					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec,tm);
 
 			day = (start_date - active_since) / SEC_PER_DAY;
-			start_date -= SEC_PER_DAY * (day % period->every);
+			start_date = dc_substract_time(start_date, SEC_PER_DAY * (day % period->every), tm);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
 			if (start_date < active_since)
@@ -561,10 +591,10 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 
 			tm = localtime(&active_since);
 			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR +
-					tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+			active_since = dc_substract_time(active_since, (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR
+					+tm->tm_min * SEC_PER_MIN + tm->tm_sec), tm);
 
-			for (; start_date >= active_since; start_date -= SEC_PER_DAY)
+			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, tm))
 			{
 				/* check for every x week(s) */
 				week = (start_date - active_since) / SEC_PER_WEEK;
@@ -581,7 +611,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			}
 			break;
 		case TIMEPERIOD_TYPE_MONTHLY:
-			for (; start_date >= active_since; start_date -= SEC_PER_DAY)
+			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, tm))
 			{
 				/* check for month */
 				tm = localtime(&start_date);
@@ -799,10 +829,10 @@ int	zbx_dc_update_maintenances(void)
 			for (i = 0; i < maintenance->periods.values_num; i++)
 			{
 				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
-
-				period_start = now - seconds + period->start_time;
+				period_start = dc_substract_time(now, seconds, tm);
+				period_start = dc_substract_time(period_start,-period->start_time,tm);
 				if (seconds < period->start_time)
-					period_start -= SEC_PER_DAY;
+					period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
 
 				rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
 						&period_end);
