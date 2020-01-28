@@ -346,14 +346,11 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	ssh_session	session;
 	ssh_channel	channel;
-	int		auth_pw = 0, rc, ret = NOTSUPPORTED, bytecount = 0;
-	int		userauth;
-	char		*publickey = NULL, *privatekey = NULL;
 	ssh_key 	privkey, pubkey;
-	int		priv_free = 0, pub_free = 0;
-	char		buffer[MAX_BUFFER_LEN], buf[16], *output, userauthlist[64];
-	size_t		offset = 0;
-	size_t		sz;
+	int		rc, userauth, auth_pw = 0, ret = NOTSUPPORTED, bytecount = 0, key_free = 0;
+	char		*output, *publickey = NULL, *privatekey = NULL;
+	char		buffer[MAX_BUFFER_LEN], buf[16], userauthlist[64];
+	size_t		sz, offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -369,17 +366,22 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	/* set blocking mode on session */
 	ssh_set_blocking(session, 1);
 
-	/* Create a session instance and start it up */
-	ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr);
-	ssh_options_set(session, SSH_OPTIONS_PORT, &item->interface.port);
-	ssh_options_set(session, SSH_OPTIONS_USER, item->username);
+	/* create a session instance and start it up */
+	if (0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
+			0 != ssh_options_set(session, SSH_OPTIONS_PORT, &item->interface.port) ||
+			0 != ssh_options_set(session, SSH_OPTIONS_USER, item->username))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssh_get_error(session)));
+		goto close;
+	}
+
 	if (SSH_OK != ssh_connect(session))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssh_get_error(session)));
 		goto session_free;
 	}
 
-	/* check what authentication methods are available */
+	/* check which authentication methods are available */
 	if (SSH_AUTH_ERROR == ssh_userauth_none(session, item->username))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error during authentication: %s", ssh_get_error(session)));
@@ -387,30 +389,22 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	userauthlist[0] = '\0';
+
 	if (0 != (userauth = ssh_userauth_list(session, item->username)))
 	{
+		if (0 != (userauth & SSH_AUTH_METHOD_NONE))
+			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "none, ");
 		if (0 != (userauth & SSH_AUTH_METHOD_PASSWORD))
-		{
 			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "password, ");
-			auth_pw |= 1;
-
-		}
 		if (0 != (userauth & SSH_AUTH_METHOD_INTERACTIVE))
-		{
 			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset,
 					"keyboard-interactive, ");
-			auth_pw |= 2;
-		}
 		if (0 != (userauth & SSH_AUTH_METHOD_PUBLICKEY))
-		{
 			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "publickey, ");
-			auth_pw |= 4;
-		}
-		if (0 != (SSH_AUTH_METHOD_HOSTBASED & userauth))
-		{
+		if (0 != (userauth & SSH_AUTH_METHOD_HOSTBASED))
 			offset += zbx_snprintf(userauthlist + offset, sizeof(userauthlist) - offset, "hostbased, ");
-		}
-		userauthlist[offset-2] = '\0';
+		if (2 <= offset)
+			userauthlist[offset-2] = '\0';
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() supported authentication methods: %s", __func__, userauthlist);
@@ -418,35 +412,29 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	switch (item->authtype)
 	{
 		case ITEM_AUTHTYPE_PASSWORD:
-			if (auth_pw & 1)
+			if (0 != (userauth & SSH_AUTH_METHOD_PASSWORD))
 			{
 				/* we could authenticate via password */
 				if (SSH_AUTH_SUCCESS != ssh_userauth_password(session, item->username, item->password))
 				{
-
 					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Password authentication failed: %s",
 							ssh_get_error(session)));
 					goto session_close;
 				}
 				else
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() password authentication succeeded", __func__);
-
 			}
-			else if (auth_pw & 2)
+			else if (0 != (userauth & SSH_AUTH_METHOD_INTERACTIVE))
 			{
 				/* or via keyboard-interactive */
-				rc = ssh_userauth_kbdint(session, item->username, NULL);
-				while (SSH_AUTH_INFO == rc)
+				while (SSH_AUTH_INFO == (rc = ssh_userauth_kbdint(session, item->username, NULL)))
 				{
-					if (1 == ssh_userauth_kbdint_getnprompts(session))
+					if (1 == ssh_userauth_kbdint_getnprompts(session) &&
+							0 != ssh_userauth_kbdint_setanswer(session, 0, item->password))
 					{
-						if (0 > ssh_userauth_kbdint_setanswer(session, 0, item->password))
-						{
-							zabbix_log(LOG_LEVEL_DEBUG,"Cannot set answer: %s",
-									ssh_get_error(session));
-						}
+						zabbix_log(LOG_LEVEL_DEBUG,"Cannot set answer: %s",
+								ssh_get_error(session));
 					}
-					rc = ssh_userauth_kbdint(session, item->username, NULL);
 				}
 
 				if (SSH_AUTH_SUCCESS != rc)
@@ -456,10 +444,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 					goto session_close;
 				}
 				else
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication succeeded",
-							__func__);
-				}
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication"
+							" succeeded", __func__);
 			}
 			else
 			{
@@ -469,13 +455,13 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			}
 			break;
 		case ITEM_AUTHTYPE_PUBLICKEY:
-			if (auth_pw & 4)
+			if (0 != (userauth & SSH_AUTH_METHOD_PUBLICKEY))
 			{
 				if (NULL == CONFIG_SSH_KEY_LOCATION)
 				{
 					SET_MSG_RESULT(result, zbx_strdup(NULL, "Authentication by public key failed."
 							" SSHKeyLocation option is not set"));
-						goto session_close;
+					goto session_close;
 				}
 
 				/* or by public key */
@@ -499,10 +485,11 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				if (SSH_OK != ssh_pki_import_pubkey_file(publickey, &pubkey))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Public key import failed:"));
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to import public key: %s",
+							ssh_get_error(session)));
 					goto session_close;
 				}
-				pub_free = 1;
+				key_free = 1;
 
 				if (SSH_AUTH_SUCCESS != ssh_userauth_try_publickey(session, item->username, pubkey))
 				{
@@ -513,10 +500,11 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				if (SSH_OK != ssh_pki_import_privkey_file(privatekey, NULL, NULL, NULL, &privkey))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Private key impotr failed:"));
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Private key import failed: %s",
+							privatekey));
 					goto session_close;
 				}
-				priv_free = 1;
+				key_free = 2;
 
 				if (SSH_AUTH_SUCCESS != ssh_userauth_publickey(session, item->username, privkey))
 				{
@@ -543,7 +531,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		goto session_close;
 	}
 
-	while (SSH_OK  != (rc = ssh_channel_open_session(channel)))
+	while (SSH_OK != (rc = ssh_channel_open_session(channel)))
 	{
 		if (SSH_ERROR == rc)
 		{
@@ -559,7 +547,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	/* request a shell on a channel and execute command */
 	dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
-	while (SSH_OK  != (rc = ssh_channel_request_exec(channel, item->params)))
+
+	while (SSH_OK != (rc = ssh_channel_request_exec(channel, item->params)))
 	{
 		if (SSH_ERROR == rc)
 		{
@@ -580,6 +569,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			if (0 < (rc = ssh_channel_read(channel, buf, sizeof(buf), 0)))
 			{
 				sz = (size_t)rc;
+
 				if (sz > (size_t)(MAX_BUFFER_LEN - (bytecount + 1)))
 					sz = (size_t)(MAX_BUFFER_LEN - (bytecount + 1));
 				if (0 == sz)
@@ -588,13 +578,10 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				memcpy(buffer + bytecount, buf, sz);
 				bytecount += (int)sz;
 			}
-
 		}
 		while (rc > 0);
 
-		/* this is due to blocking that would occur otherwise so we loop on
-		 * this condition
-		 */
+		/* this is due to blocking that would occur otherwise so we loop on this condition */
 		if (SSH_AGAIN == rc)
 		{
 			continue;
@@ -609,7 +596,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	buffer[bytecount] = '\0';
-
 	output = convert_to_utf8(buffer, (size_t)bytecount, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
 
@@ -623,9 +609,9 @@ channel_close:
 channel_free:
 	ssh_channel_free(channel);
 session_close:
-	if (1 == priv_free)
+	if (2 == key_free)
 		ssh_key_free(privkey);
-	if (1 == pub_free)
+	if (1 <= key_free)
 		ssh_key_free(pubkey);
 	ssh_disconnect(session);
 session_free:
