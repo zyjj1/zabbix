@@ -444,8 +444,10 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 					goto session_close;
 				}
 				else
+				{
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication"
 							" succeeded", __func__);
+				}
 			}
 			else
 			{
@@ -500,7 +502,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				if (SSH_OK != ssh_pki_import_privkey_file(privatekey, NULL, NULL, NULL, &privkey))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Private key import failed: %s",
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to import private key: %s",
 							privatekey));
 					goto session_close;
 				}

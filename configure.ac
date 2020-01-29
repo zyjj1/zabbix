@@ -1297,7 +1297,7 @@ have_jabber="no"
 have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
-have_ssh2="no"
+have_ssh="no"
 have_tls="no"
 
 
@@ -1516,7 +1516,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
 	LIBSSH2_CHECK_CONFIG([no])
 	if test "x$want_ssh2" = "xyes"; then
-		if test "x$have_ssh2" != "xno"; then
+		if test "x$have_ssh" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one SSH library (--with-ssh or --with-ssh2).])
 		fi
 
@@ -1525,7 +1525,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		elif test "x$accept_ssh2_version" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
 		else
-			have_ssh2="SSH2"
+			have_ssh="SSH2"
 		fi
 	fi
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $SSH2_LDFLAGS"
@@ -1537,16 +1537,16 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Check for LIBSSH [by default - skip] at least of version 0.7.0.
 	LIBSSH_CHECK_CONFIG([no])
 	if test "x$want_ssh" = "xyes"; then
-		if test "x$have_ssh2" != "xno"; then
+		if test "x$have_ssh" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one SSH library (--with-ssh or --with-ssh2).])
 		fi
 
 		if test "x$found_ssh" != "xyes"; then
 			AC_MSG_ERROR([SSH library not found])
 		elif test "x$accept_ssh_version" != "xyes"; then
-			AC_MSG_ERROR([SSH library version requirement not met (>= 1.0.0)])
+			AC_MSG_ERROR([SSH library version requirement not met (>= 0.6.0)])
 		else
-			have_ssh2="SSH"
+			have_ssh="SSH"
 		fi
 	fi
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $SSH_LDFLAGS"
@@ -2060,7 +2060,7 @@ fi
 echo "    Native Jabber:         ${have_jabber}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
-    SSH:                   ${have_ssh2}
+    SSH:                   ${have_ssh}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
@@ -2088,7 +2088,7 @@ fi
 
 echo "    SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
-    SSH:                   ${have_ssh2}
+    SSH:                   ${have_ssh}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}

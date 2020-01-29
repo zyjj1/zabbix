@@ -1,4 +1,4 @@
-# LIBSSH2_CHECK_CONFIG ([DEFAULT-ACTION])
+# LIBSSH_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 #    Alexander Vladishev                      Oct-26-2009
 #    Dmitry Borovikov                         Feb-13-2010
@@ -8,10 +8,10 @@
 # specify whether to default to --with-ssh or --without-ssh.
 # If not supplied, DEFAULT-ACTION is no.
 #
-# The minimal supported SSH2 library version is 1.0.0.
+# The minimal supported SSH library version is 0.6.0.
 #
-# This macro #defines HAVE_SSH2 if a required header files are
-# found, and sets @SSH2_LDFLAGS@, @SSH2_CFLAGS@ and @SSH2_LIBS@
+# This macro #defines HAVE_SSH if a required header files are
+# found, and sets @SSH_LDFLAGS@, @SSH_CFLAGS@ and @SSH_LIBS@
 # to the necessary values.
 #
 # Users may override the detected values by doing something like:
@@ -44,14 +44,12 @@ AC_DEFUN([LIBSSH_ACCEPT_VERSION],
 	found_ssh_version_major=`cat $1 | $EGREP \#define.*'LIBSSH_VERSION_MAJOR ' | $AWK '{print @S|@3;}'`
 	found_ssh_version_minor=`cat $1 | $EGREP \#define.*'LIBSSH_VERSION_MINOR ' | $AWK '{print @S|@3;}'`
 
-	if test $((found_ssh_version_major)) -ge $((minimal_libssh_major_version)); then
+	if test $((found_ssh_version_major)) -gt $((minimal_libssh_major_version)); then
 		accept_ssh_version="yes"
 	elif test $((found_ssh_version_major)) -lt $((minimal_libssh_major_version)); then
 		accept_ssh_version="no"
-	elif test $((found_ssh_version_minor)) -gt $((minimal_libssh_minor_version)); then
+	elif test $((found_ssh_version_minor)) -ge $((minimal_libssh_minor_version)); then
 		accept_ssh_version="yes"
-	elif test $((found_ssh_version_minor)) -lt $((minimal_libssh_minor_version)); then
-		accept_ssh_version="no"
 	else
 		accept_ssh_version="no"
 	fi;

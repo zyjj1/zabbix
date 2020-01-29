@@ -935,9 +935,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #	define ODBC_FEATURE_STATUS	" NO"
 #endif
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#	define SSH2_FEATURE_STATUS	"YES"
+#	define SSH_FEATURE_STATUS	"YES"
 #else
-#	define SSH2_FEATURE_STATUS	" NO"
+#	define SSH_FEATURE_STATUS	" NO"
 #endif
 #ifdef HAVE_IPV6
 #	define IPV6_FEATURE_STATUS	"YES"
@@ -962,7 +962,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Jabber notifications:      " JABBER_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Ez Texting notifications:  " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH2_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
