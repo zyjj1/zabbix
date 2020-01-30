@@ -104,6 +104,7 @@ class CWebTest extends CTest {
 		if (self::$shared_page !== null) {
 				foreach (self::$shared_page->getBrowserLog() as $log) {
 					// Workaround for ID duplicates.
+					// TODO: remove workaround after fix ZBX-17220
 					if (strpos($log['message'], 'elements with non-unique id') !== false) {
 						continue;
 					}
@@ -126,7 +127,7 @@ class CWebTest extends CTest {
 			}
 		}
 
-		if ($this->hasFailed() || $this->getStatus() !== null || $errors) {
+		if ($this->hasFailed() || $this->getStatus() === null || $errors) {
 			$this->captureScreenshot();
 		}
 	}
