@@ -296,7 +296,7 @@ channel_close:
 	else
 		exitcode = libssh2_channel_get_exit_status(channel);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __function_name, exitcode, (int)bytecount);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:" ZBX_FS_SIZE_T, __function_name, exitcode, bytecount);
 
 	libssh2_channel_free(channel);
 	channel = NULL;
