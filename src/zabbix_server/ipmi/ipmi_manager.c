@@ -165,7 +165,7 @@ static int	ipmi_request_priority(const zbx_ipmi_request_t *request)
 		case ZBX_IPC_IPMI_SCRIPT_REQUEST:
 			return 0;
 		default:
-			return 2;
+			return INT_MAX;
 	}
 }
 

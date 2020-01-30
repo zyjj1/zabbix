@@ -3211,7 +3211,7 @@ void	zbx_log_sync_history_cache_progress(void)
 
 	LOCK_CACHE;
 
-	if (ZBX_JAN_2038 == cache->history_progress_ts)
+	if (INT_MAX == cache->history_progress_ts)
 	{
 		UNLOCK_CACHE;
 		return;
@@ -3231,7 +3231,7 @@ void	zbx_log_sync_history_cache_progress(void)
 		if (0 != cache->history_num_total)
 			pcnt = 100 * (double)(cache->history_num_total - cache->history_num) / cache->history_num_total;
 
-		cache->history_progress_ts = (0 == cache->history_num ? ZBX_JAN_2038 : sec);
+		cache->history_progress_ts = (0 == cache->history_num ? INT_MAX : sec);
 	}
 
 	ts_next = cache->history_progress_ts;
@@ -3244,7 +3244,7 @@ void	zbx_log_sync_history_cache_progress(void)
 	if (-1.0 != pcnt)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%", pcnt);
 
-	if (ZBX_JAN_2038 == ts_next)
+	if (INT_MAX == ts_next)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 }
 
