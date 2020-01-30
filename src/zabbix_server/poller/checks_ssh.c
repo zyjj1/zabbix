@@ -88,11 +88,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
-	int		auth_pw = 0, rc, ret = NOTSUPPORTED,
-			exitcode, bytecount = 0;
-	char		buffer[MAX_BUFFER_LEN], buf[16], *userauthlist,
-			*publickey = NULL, *privatekey = NULL, *ssherr, *output;
-	size_t		sz;
+	int		auth_pw = 0, rc, ret = NOTSUPPORTED, exitcode;
+	char		buffer[MAX_BUFFER_LEN], *userauthlist, *publickey = NULL, *privatekey = NULL, *ssherr, *output;
+	size_t		bytecount = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -262,41 +260,21 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		}
 	}
 
-	for (;;)
+	while (0 != (rc = libssh2_channel_read(channel, buffer + bytecount, sizeof(buffer) - bytecount - 1)))
 	{
-		/* loop until we block */
-		do
+		if (rc < 0)
 		{
-			if (0 < (rc = libssh2_channel_read(channel, buf, sizeof(buf))))
-			{
-				sz = (size_t)rc;
-				if (sz > (size_t)(MAX_BUFFER_LEN - (bytecount + 1)))
-					sz = (size_t)(MAX_BUFFER_LEN - (bytecount + 1));
-				if (0 == sz)
-					continue;
+			if (LIBSSH2_ERROR_EAGAIN == rc)
+				waitsocket(s.socket, session);
 
-				memcpy(buffer + bytecount, buf, sz);
-				bytecount += sz;
-			}
-		}
-		while (rc > 0);
-
-		/* this is due to blocking that would occur otherwise so we loop on
-		 * this condition
-		 */
-		if (LIBSSH2_ERROR_EAGAIN == rc)
-			waitsocket(s.socket, session);
-		else if (rc < 0)
-		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
-			goto channel_close;
+				goto channel_close;
 		}
-		else
+		bytecount += (size_t)rc;
+		if (sizeof(buffer) - 1 == bytecount)
 			break;
 	}
-
 	buffer[bytecount] = '\0';
-
 	output = convert_to_utf8(buffer, bytecount, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
 
@@ -318,7 +296,7 @@ channel_close:
 	else
 		exitcode = libssh2_channel_get_exit_status(channel);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __function_name, exitcode, bytecount);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __function_name, exitcode, (int)bytecount);
 
 	libssh2_channel_free(channel);
 	channel = NULL;
@@ -346,11 +324,11 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	ssh_session	session;
 	ssh_channel	channel;
-	ssh_key 	privkey, pubkey;
-	int		rc, userauth, auth_pw = 0, ret = NOTSUPPORTED, bytecount = 0, key_free = 0;
+	ssh_key 	privkey = NULL, pubkey = NULL;
+	int		rc, userauth, ret = NOTSUPPORTED;
 	char		*output, *publickey = NULL, *privatekey = NULL;
-	char		buffer[MAX_BUFFER_LEN], buf[16], userauthlist[64];
-	size_t		sz, offset = 0;
+	char		buffer[MAX_BUFFER_LEN], userauthlist[64];
+	size_t		offset = 0, bytecount = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -371,8 +349,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			0 != ssh_options_set(session, SSH_OPTIONS_PORT, &item->interface.port) ||
 			0 != ssh_options_set(session, SSH_OPTIONS_USER, item->username))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssh_get_error(session)));
-		goto close;
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH session options: %s",
+				ssh_get_error(session)));
+		goto session_free;
 	}
 
 	if (SSH_OK != ssh_connect(session))
@@ -491,7 +470,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 							ssh_get_error(session)));
 					goto session_close;
 				}
-				key_free = 1;
 
 				if (SSH_AUTH_SUCCESS != ssh_userauth_try_publickey(session, item->username, pubkey))
 				{
@@ -506,7 +484,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 							privatekey));
 					goto session_close;
 				}
-				key_free = 2;
 
 				if (SSH_AUTH_SUCCESS != ssh_userauth_publickey(session, item->username, privkey))
 				{
@@ -535,15 +512,10 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	while (SSH_OK != (rc = ssh_channel_open_session(channel)))
 	{
-		if (SSH_ERROR == rc)
+		if (SSH_AGAIN != rc)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot establish generic session channel"));
 			goto channel_free;
-		}
-		else if (SSH_AGAIN != rc)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "ssh_channel_open_session: unexpected return code %d", rc);
-			break;
 		}
 	}
 
@@ -552,51 +524,27 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	while (SSH_OK != (rc = ssh_channel_request_exec(channel, item->params)))
 	{
-		if (SSH_ERROR == rc)
+		if (SSH_AGAIN != rc)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot request a shell"));
 			goto channel_free;
 		}
-		else if (SSH_AGAIN != rc)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "ssh_channel_open_session: unexpected return code %d", rc);
-			break;
-		}
 	}
 
-	for (;;)
+	while (0 != (rc = ssh_channel_read(channel, buffer + bytecount, sizeof(buffer) - bytecount - 1, 0)))
 	{
-		do
+		if (rc < 0)
 		{
-			if (0 < (rc = ssh_channel_read(channel, buf, sizeof(buf), 0)))
-			{
-				sz = (size_t)rc;
+			if (SSH_AGAIN == rc)
+				continue;
 
-				if (sz > (size_t)(MAX_BUFFER_LEN - (bytecount + 1)))
-					sz = (size_t)(MAX_BUFFER_LEN - (bytecount + 1));
-				if (0 == sz)
-					continue;
-
-				memcpy(buffer + bytecount, buf, sz);
-				bytecount += (int)sz;
-			}
-		}
-		while (rc > 0);
-
-		/* this is due to blocking that would occur otherwise so we loop on this condition */
-		if (SSH_AGAIN == rc)
-		{
-			continue;
-		}
-		else if (SSH_ERROR == rc)
-		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
 			goto channel_close;
 		}
-		else
+		bytecount += (size_t)rc;
+		if (sizeof(buffer) - 1 == bytecount)
 			break;
 	}
-
 	buffer[bytecount] = '\0';
 	output = convert_to_utf8(buffer, (size_t)bytecount, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
@@ -611,9 +559,9 @@ channel_close:
 channel_free:
 	ssh_channel_free(channel);
 session_close:
-	if (2 == key_free)
+	if (NULL != privkey)
 		ssh_key_free(privkey);
-	if (1 <= key_free)
+	if (NULL != pubkey)
 		ssh_key_free(pubkey);
 	ssh_disconnect(session);
 session_free:
