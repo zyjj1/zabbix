@@ -56,7 +56,7 @@ class PostgresqlDbBackend extends DbBackend {
 	public function checkEncoding() {
 		global $DB;
 
-		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB) && $this->checkConversionEncoding();
+		return $this->checkDatabaseEncoding($DB) && $this->checkTablesEncoding($DB);
 	}
 
 	/**
@@ -111,35 +111,6 @@ class PostgresqlDbBackend extends DbBackend {
 			$this->setWarning(_n('Unsupported charset or collation for table: %1$s.',
 				'Unsupported charset or collation for tables: %1$s.',
 				implode(', ', $tables), implode(', ', $tables), count($tables)
-			));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check client and server encoding. On error will set warning message.
-	 *
-	 * @return bool
-	 */
-	protected function checkConversionEncoding() {
-		// PostgreSQL automatic convert data to coincide client encoding.
-		$row = DBfetch(DBselect('show client_encoding;'));
-
-		if ($row['client_encoding'] != ZBX_DB_DEFAULT_CHARSET) {
-			$this->setWarning(_s('Incorrect client encoding for PostgreSQL: %1$s.',
-				_s('"%1$s" instead "%2$s"', $row['client_encoding'], ZBX_DB_DEFAULT_CHARSET)
-			));
-			return false;
-		}
-
-		// PostgreSQL automatic convert data to coincide server encoding.
-		$row = DBfetch(DBselect('show server_encoding;'));
-
-		if ($row['server_encoding'] != ZBX_DB_DEFAULT_CHARSET) {
-			$this->setWarning(_s('Incorrect server encoding for PostgreSQL: %1$s.',
-				_s('"%1$s" instead "%2$s"', $row['server_encoding'], ZBX_DB_DEFAULT_CHARSET)
 			));
 			return false;
 		}
