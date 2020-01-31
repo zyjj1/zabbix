@@ -1,0 +1,1185 @@
+---
+test case: Period before DST change to summer (0)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 32  #sat
+    day: 1
+    start_time: 0  #00:00
+    period:  90000 #1d 1h
+    start_date: 0
+  times:
+    - 2020-03-06 23:59:00 -06:00
+    - 2020-03-07 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+out:
+  returns:
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Period during DST change to summer (1)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Long period during DST change to summer (2)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 32        #sat
+    day: 1
+    start_time: 82800    #23:00
+    period:  90000       #1d 1h
+    start_date: 0
+  times: 
+    - 2020-03-07 22:00:00 -06:00
+    - 2020-03-07 22:59:00 -06:00
+    - 2020-03-07 23:00:00 -06:00
+    - 2020-03-09 00:59:00 -05:00
+    - 2020-03-09 01:00:00 -05:00
+    - 2020-03-09 02:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Period finishes during DST change to summer (3)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64      #sun
+    day: 1
+    start_time: 3600   #01:00
+    period:  3600      #1h
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Period finishes 1m after DST change to summer (4)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64        #sun
+    day: 1
+    start_time: 3600     #01:00
+    period:  3660        #1h 1m
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:01:00 -05:00
+    - 2020-03-08 04:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Period starts during DST change to summer (5)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64           #sun
+    day: 1
+    start_time: 10800       #03:00
+    period:  3600           #1h
+    start_date: 0
+  times: 
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Period cannot be applied during DST change to summer (6)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64           #sun
+    day: 1
+    start_time: 7200        #02:00
+    period:  3600           #1h
+    start_date: 0
+  times: 
+    - 2020-03-01 01:59:00 -06:00
+    - 2020-03-01 02:00:00 -06:00
+    - 2020-03-01 02:59:00 -06:00
+    - 2020-03-01 03:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-15 01:59:00 -05:00
+    - 2020-03-15 02:00:00 -05:00
+    - 2020-03-15 02:59:00 -05:00
+    - 2020-03-15 03:00:00 -05:00
+out:
+  returns:
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+---
+test case: Daily period during DST change to summer (7)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Daily period finishes during DST change to summer (8)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 1
+    month: 0
+    dayofweek: 64      #sun
+    day: 1
+    start_time: 3600   #01:00
+    period:  3600      #1h
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Daily period starts during DST change to summer (9)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 1
+    month: 0
+    dayofweek: 64           #sun
+    day: 1
+    start_time: 10800       #03:00
+    period:  3600           #1h
+    start_date: 0
+  times: 
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Monthly period during DST change to summer (10)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 4
+    every: 1
+    month: 4          #marth
+    dayofweek: 0     
+    day: 8
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Monthly period finishes during DST change to summer (11)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 4
+    every: 1
+    month: 4           #marth
+    dayofweek: 0      
+    day: 8
+    start_time: 3600   #01:00
+    period:  3600      #1h
+    start_date: 0
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Mondhly period starts during DST change to summer (12)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 4
+    every: 1
+    month: 4           #marth
+    dayofweek: 0      
+    day: 8
+    start_time: 10800       #03:00
+    period:  3600           #1h
+    start_date: 0
+  times: 
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Maintenance activity limited during DST change to summer (13)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-03-08 01:00:00 -06:00
+    active_until: 2020-03-08 04:00:00 -05:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 0     #00:00
+    period:  14400    #4h
+    start_date: 0
+  times: 
+    - 2020-03-07 23:59:00 -06:00
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 04:59:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Maintenance activity limited during DST change to summer (14)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-03-08 00:00:00 -06:00
+    active_until: 2020-03-08 04:00:00 -05:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 0     #00:00
+    period:  14400    #4h
+    start_date: 0
+  times: 
+    - 2020-03-07 23:59:00 -06:00
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 04:59:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Period before DST change to winter (15)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 32  #sat
+    day: 1
+    start_time: 0  #00:00
+    period:  90000 #1d 1h
+    start_date: 0
+  times:
+    - 2020-10-30 23:59:00 -05:00
+    - 2020-10-31 00:00:00 -05:00
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+out:
+  returns:
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Period during DST change to winter (16)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-11-01 00:00:00 -05:00
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Long period during DST change to winter (17)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 32        #sat
+    day: 1
+    start_time: 82800    #23:00
+    period:  90000       #1d 1h
+    start_date: 0
+  times: 
+    - 2020-10-31 22:00:00 -05:00
+    - 2020-10-31 22:59:00 -05:00
+    - 2020-10-31 23:00:00 -06:00
+    - 2020-11-01 22:59:00 -06:00
+    - 2020-11-01 23:00:00 -06:00
+    - 2020-11-02 00:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Period finishes during DST change to winter (18)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64      #sun
+    day: 1
+    start_time: 3600   #01:00
+    period:  3600      #1h
+    start_date: 0
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Period finishes 1m after DST change to winter (19)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64        #sun
+    day: 1
+    start_time: 3600     #01:00
+    period:  3660        #1h 1m
+    start_date: 0
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:01:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Period starts after DST change to winter (20)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64           #sun
+    day: 1
+    start_time: 7200        #02:00
+    period:  3600           #1h
+    start_date: 0
+  times: 
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+    - 2020-11-01 03:59:00 -06:00
+    - 2020-11-01 04:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Daily period during DST change to winter (21)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Daily period finishes during DST change to winter (22)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 1
+    month: 0
+    dayofweek: 64      #sun
+    day: 1
+    start_time: 3600   #01:00
+    period:  3600      #1h
+    start_date: 0
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Daily period starts after DST change to winter (23)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 1
+    month: 0
+    dayofweek: 64           #sun
+    day: 1
+    start_time: 7200        #02:00
+    period:  3600           #1h
+    start_date: 0
+  times: 
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+---
+test case: Monthly period during DST change to winter (24)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 4
+    every: 1
+    month: 1024       #november
+    dayofweek: 0     
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Monthly period finishes during DST change to winter (25)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 4
+    every: 1
+    month: 1024       #november
+    dayofweek: 0     
+    day: 1
+    start_time: 3600  #01:00
+    period:  3600     #1h
+    start_date: 0
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Monthly period starts after DST change to winter (26)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 4
+    every: 1
+    month: 1024       #november
+    dayofweek: 0     
+    day: 1
+    start_time: 7200  #02:00
+    period:  3600     #1h
+    start_date: 0
+  times: 
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+---
+test case: Maintenance activity limited during DST change to winter (27)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-11-01 01:00:00 -05:00
+    active_until: 2020-11-01 02:00:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 0     #00:00
+    period:  14400    #4h
+    start_date: 0
+  times: 
+    - 2020-10-31 23:59:00 -05:00
+    - 2020-11-01 00:00:00 -05:00
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Maintenance activity limited during DST change to winter (28)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-11-01 00:00:00 -05:00
+    active_until: 2020-11-01 02:00:00 -06:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 0     #00:00
+    period:  14400    #4h
+    start_date: 0
+  times: 
+    - 2020-10-31 23:59:00 -05:00
+    - 2020-11-01 00:00:00 -05:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+    - 2020-11-01 03:59:00 -06:00
+    - 2020-11-01 04:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: One time period during DST change to summer (29)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 0
+    every: 1
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 0  
+    period:  7200     #2h
+    start_date: 2020-03-08 01:00:00 -06:00
+  times: 
+    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: One time period finishes during DST change to summer (30)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 0
+    every: 1
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 0  
+    period:  3600     #1h
+    start_date: 2020-03-08 01:00:00 -06:00
+  times: 
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: One time period starts during DST change to summer (31)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 0
+    every: 1
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 0  
+    period:  3600     #1h
+    start_date: 2020-03-08 03:00:00 -05:00
+  times: 
+    - 2020-03-08 01:59:00 -06:00
+    - 2020-03-08 03:00:00 -05:00
+    - 2020-03-08 03:59:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+    - 2020-03-08 04:59:00 -05:00
+    - 2020-03-08 05:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: One time period during DST change to winter (32)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 0
+    every: 1
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 0  
+    period:  7200     #2h
+    start_date: 2020-11-01 01:00:00 -05:00
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: One time period finishes during DST change to winter (33)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 0
+    every: 1
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 0  
+    period:  3600     #1h
+    start_date: 2020-11-01 01:00:00 -05:00
+  times: 
+    - 2020-11-01 00:59:00 -05:00
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: One time period starts after DST change to winter (34)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 0
+    every: 1
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 0  
+    period:  3600     #1h
+    start_date: 2020-11-01 02:00:00 -06:00
+  times: 
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
+    - 2020-11-01 01:59:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+    - 2020-11-01 02:59:00 -06:00
+    - 2020-11-01 03:00:00 -06:00
+    - 2020-11-01 04:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Long daily period during DST change to winter (35)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 2
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 82800  #23:00
+    period:  90000     #1d 1h
+    start_date: 0
+  times: 
+    - 2020-10-31 22:59:00 -05:00
+    - 2020-10-31 23:00:00 -05:00
+    - 2020-11-01 22:59:00 -06:00
+    - 2020-11-01 23:00:00 -06:00
+    - 2020-11-02 00:00:00 -06:00
+    - 2020-11-02 01:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Long daily period during DST change to summer (36)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 -06:00
+    active_until: 2020-12-31 23:59:00 -06:00
+  period:
+    type: 2
+    every: 2
+    month: 0
+    dayofweek: 0     
+    day: 1
+    start_time: 82800  #23:00
+    period:  90000     #1d 1h
+    start_date: 0
+  times: 
+    - 2020-03-07 22:59:00 -06:00
+    - 2020-03-07 23:00:00 -06:00
+    - 2020-03-09 00:59:00 -05:00
+    - 2020-03-09 01:00:00 -05:00
+    - 2020-03-09 02:00:00 -05:00
+    - 2020-03-09 03:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+    - FAIL
+...
+
+
+

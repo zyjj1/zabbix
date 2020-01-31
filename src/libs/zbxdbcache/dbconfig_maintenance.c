@@ -665,6 +665,50 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_check_maintenance_period                                      *
+ *                                                                            *
+ * Purpose: calculate start time for the specified maintenance period and     *
+ *          and checks are we inside the maintenance period                   *
+ *                                                                            *
+ * Parameter: maintenance   - [IN] the maintenance                            *
+ *            period        - [IN] the maintenance period                     *
+ *            now           - [IN] current time                               *
+ *            running_since - [OUT] the actual period starting timestamp      *
+ *            running_since - [OUT] the actual period ending timestamp        *
+ *                                                                            *
+ * Return value: SUCCEED - current time is inside valid maintenance period    *
+ *               FAIL    - current time is outside valid maintenance period   *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
+		const zbx_dc_maintenance_period_t *period, time_t now, time_t *running_since, time_t *running_until)
+{
+	struct tm	*tm;
+	int 		seconds, rc, ret = FAIL;
+	time_t		period_start, period_end;
+
+	tm = localtime(&now);
+	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
+	period_start = dc_substract_time(now, seconds, tm);
+	period_start = dc_substract_time(period_start,-period->start_time,tm);
+	if (seconds < period->start_time)
+		period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
+
+	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
+			&period_end);
+
+	if (SUCCEED == rc && period_start <= now && now < period_end)
+	{
+		*running_since = period_start;
+		*running_until = period_end;
+		ret = SUCCEED;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dc_maintenance_set_update_flags                              *
  *                                                                            *
  * Purpose: sets maintenance update flags for all timers                      *
@@ -829,15 +873,9 @@ int	zbx_dc_update_maintenances(void)
 			for (i = 0; i < maintenance->periods.values_num; i++)
 			{
 				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
-				period_start = dc_substract_time(now, seconds, tm);
-				period_start = dc_substract_time(period_start,-period->start_time,tm);
-				if (seconds < period->start_time)
-					period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
 
-				rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
-						&period_end);
-
-				if (SUCCEED == rc && period_start <= now && now < period_end)
+				if (SUCCEED == dc_check_maintenance_period(maintenance, period, now, &period_start,
+						&period_end))
 				{
 					state = ZBX_MAINTENANCE_RUNNING;
 					if (period_end > running_until)
