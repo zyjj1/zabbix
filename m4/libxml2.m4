@@ -25,7 +25,7 @@ AC_DEFUN([LIBXML2_CHECK_CONFIG],
         [
 If you want to use XML library:
 AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
-    [use libxml2 client library @<:@default=no@:>@, optionally set PKG_CONFIG_PATH environment variable to .pc file location]
+    [use libxml2 client library @<:@default=no@:>@, see PKG_CONFIG_PATH environment variable to specify .pc file location]
         )],
         [
         if test "$withval" = "no"; then
