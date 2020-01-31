@@ -2127,7 +2127,7 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only " ZBX_DB_DEFAULT_CHARACTER_SET " character set."
+	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_DB_DEFAULT_CHARACTER_SET "\" character set."
 		" Database \"%s\" has default character set \"%s\"", db_name, char_set);
 }
 
@@ -2165,8 +2165,8 @@ void	DBcheck_character_set(void)
 
 		if (0 != zbx_strncasecmp(collation, ZBX_DB_DEFAULT_COLLATION, sizeof(ZBX_DB_DEFAULT_COLLATION)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Zabbix support only \"%s\" collation."
-					"Database \"%s\" has default collation \"%s\"", ZBX_DB_DEFAULT_COLLATION,
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation."
+					" Database \"%s\" has default collation \"%s\"", ZBX_DB_DEFAULT_COLLATION,
 					CONFIG_DBNAME, collation);
 		}
 	}
@@ -2186,8 +2186,8 @@ void	DBcheck_character_set(void)
 	}
 	else if (0 != strcmp("0", row[0]))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s column(s) in \"%s\" has character_set_name or collation_name "
-				"that is not supported by Zabbix", row[0], CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "character_set_name or collation_name that is not supported by Zabbix"
+			" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
 				"database", ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_COLLATION);
 	}
@@ -2199,6 +2199,8 @@ void	DBcheck_character_set(void)
 	char		*database_name_esc = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
@@ -2214,19 +2216,19 @@ void	DBcheck_character_set(void)
 	{
 		while (NULL != (row = DBfetch(result)))
 		{
-			char	*parameter = row[0];
-			char	*value = row[1];
+			const char	*parameter = row[0];
+			const char	*value = row[1];
 
 			if (0 != strcasecmp(value, ZBX_DB_DEFAULT_CHARACTER_SET))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "database %s has incorrect parameter %s value: "
-						"%s instead of %s. Zabbix supports only %s character set.",
-						CONFIG_DBNAME, parameter, value, ZBX_DB_DEFAULT_CHARACTER_SET,
-						ZBX_DB_DEFAULT_CHARACTER_SET);
+				zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
+						" \"%s\". Zabbix supports only \"%s\" character set",
+						database_name_esc, parameter, value, ZBX_DB_DEFAULT_CHARACTER_SET);
 			}
 		}
 	}
 
+	zbx_free(database_name_esc);
 	DBfree_result(result);
 	DBclose();
 #elif defined(HAVE_POSTGRESQL)
@@ -2243,7 +2245,7 @@ void	DBcheck_character_set(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
-			"SELECT pg_encoding_to_char(encoding) FROM pg_database WHERE datname = '%s';",
+			"SELECT pg_encoding_to_char(encoding) FROM pg_database WHERE datname = '%s'",
 			database_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
@@ -2284,13 +2286,12 @@ void	DBcheck_character_set(void)
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about character set of database fields");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
 	}
 	else if (0 != strcmp("0", row[0]))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "database has \"%s\" fields set to character set different from "
-				"default \"%s\". Zabbix supports only \"%s\" character set",
-				row[0], ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_CHARACTER_SET);
+		zabbix_log(LOG_LEVEL_WARNING, "database has %s fields with unsupported character set. Zabbix supports"
+				" only \"%s\" character set", row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
 	}
 
 	DBfree_result(result);
@@ -2303,8 +2304,8 @@ void	DBcheck_character_set(void)
 	}
 	else if (0 != strcasecmp(row[0], ZBX_DB_DEFAULT_CHARACTER_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "incorrect client_encoding for \"%s\": %s instead of %s", CONFIG_DBNAME,
-				row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
+		zabbix_log(LOG_LEVEL_WARNING, "client_encoding for database \"%s\" is \"%s\". Zabbix supports only"
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
 	}
 
 	DBfree_result(result);
@@ -2317,10 +2318,9 @@ void	DBcheck_character_set(void)
 	}
 	else if (0 != strcasecmp(row[0], ZBX_DB_DEFAULT_CHARACTER_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "incorrect server_encoding for \"%s\": %s instead of %s", CONFIG_DBNAME,
-				row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
+		zabbix_log(LOG_LEVEL_WARNING, "server_encoding for database \"%s\" is \"%s\". Zabbix supports only"
+			" \"%s\"", CONFIG_DBNAME, row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
 	}
-
 out:
 	DBfree_result(result);
 	DBclose();
