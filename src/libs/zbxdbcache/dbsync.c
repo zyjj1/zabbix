@@ -2302,8 +2302,7 @@ static int	dbsync_compare_action(const zbx_dc_action_t *action, const DB_ROW dbr
  *                                                                            *
  * Purpose: compares actions table with cached configuration data             *
  *                                                                            *
- * Parameter: cache - [IN] the configuration cache                            *
- *            sync  - [OUT] the changeset                                     *
+ * Parameter: sync - [OUT] the changeset                                      *
  *                                                                            *
  * Return value: SUCCEED - the changeset was successfully calculated          *
  *               FAIL    - otherwise                                          *
