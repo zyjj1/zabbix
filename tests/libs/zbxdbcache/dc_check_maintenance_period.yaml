@@ -205,6 +205,8 @@ in:
     - 2020-03-01 02:00:00 -06:00
     - 2020-03-01 02:59:00 -06:00
     - 2020-03-01 03:00:00 -06:00
+    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 03:59:00 -05:00
@@ -220,6 +222,8 @@ out:
     - SUCCEED
     - FAIL
     - FAIL
+    - SUCCEED
+    - SUCCEED
     - FAIL
     - FAIL
     - FAIL
@@ -534,6 +538,8 @@ in:
     - 2020-11-01 00:00:00 -05:00
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:59:00 -05:00
+    - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
     - 2020-11-01 03:00:00 -06:00
@@ -541,6 +547,8 @@ out:
   returns: 
     - FAIL
     - FAIL
+    - SUCCEED
+    - SUCCEED
     - SUCCEED
     - SUCCEED
     - FAIL
@@ -1177,6 +1185,192 @@ out:
     - SUCCEED
     - SUCCEED
     - FAIL
+    - FAIL
+    - FAIL
+---
+test case: Long daily period during exotic DST change to summer (37)
+in:
+  timezone: :Australia/Lord_Howe
+  maintenance:
+    active_since: 2020-01-01 00:00:00 +11:00
+    active_until: 2020-12-31 23:59:00 +11:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-04-05 00:00:00 +11:00
+    - 2020-04-05 00:59:00 +11:00
+    - 2020-04-05 01:00:00 +11:00
+    - 2020-04-05 02:29:00 +10:30
+    - 2020-04-05 02:30:00 +10:30
+    - 2020-04-05 03:00:00 +10:30
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Long daily period during exotic DST change to winter (38)
+in:
+  timezone: :Australia/Lord_Howe
+  maintenance:
+    active_since: 2020-01-01 00:00:00 +11:00
+    active_until: 2020-12-31 23:59:00 +11:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 3600  #01:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-10-04 00:00:00 +10:30
+    - 2020-10-04 00:59:00 +10:30
+    - 2020-10-04 01:00:00 +10:30
+    - 2020-10-04 03:29:00 +11:00
+    - 2020-10-04 03:30:00 +11:00
+    - 2020-10-04 04:00:00 +11:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Long daily period during exotic DST change to summer (39)
+in:
+  timezone: :Antarctica/Troll
+  maintenance:
+    active_since: 2020-01-01 00:00:00 +00:00
+    active_until: 2020-12-31 23:59:00 +00:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 0     #00:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-03-14 23:00:00 +00:00
+    - 2020-03-14 23:59:00 +00:00
+    - 2020-03-15 00:00:00 +00:00
+    - 2020-03-15 03:59:00 +02:00
+    - 2020-03-15 04:00:00 +02:00
+    - 2020-03-15 05:00:00 +02:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Long daily period during exotic DST change to winter (40)
+in:
+  timezone: :Antarctica/Troll
+  maintenance:
+    active_since: 2020-01-01 00:00:00 +00:00
+    active_until: 2020-12-31 23:59:00 +00:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 7200  #02:00
+    period:  7200     #2h
+    start_date: 0
+  times: 
+    - 2020-10-25 01:00:00 +02:00
+    - 2020-10-25 01:59:00 +02:00
+    - 2020-10-25 02:00:00 +02:00
+    - 2020-10-25 01:59:00 +00:00
+    - 2020-10-25 02:00:00 +00:00
+    - 2020-10-25 03:00:00 +00:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Short period during DST change to summer (41)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 +00:00
+    active_until: 2020-12-31 23:59:00 +00:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 6600  #01:50
+    period:  1200     #20m
+    start_date: 0
+  times: 
+    - 2020-03-08 01:00:00 -06:00
+    - 2020-03-08 01:49:00 -06:00
+    - 2020-03-08 01:50:00 -06:00
+    - 2020-03-08 03:09:00 -05:00
+    - 2020-03-08 03:10:00 -05:00
+    - 2020-03-08 04:00:00 -05:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Short period during DST change to winter (42)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-01-01 00:00:00 +00:00
+    active_until: 2020-12-31 23:59:00 +00:00
+  period:
+    type: 3
+    every: 1
+    month: 0
+    dayofweek: 64     #sun
+    day: 1
+    start_time: 6600  #01:50
+    period:  1200     #20m
+    start_date: 0
+  times: 
+    - 2020-11-01 01:00:00 -05:00
+    - 2020-11-01 01:49:00 -05:00
+    - 2020-11-01 01:50:00 -05:00
+    - 2020-11-01 01:09:00 -06:00
+    - 2020-11-01 01:10:00 -06:00
+    - 2020-11-01 02:00:00 -06:00
+out:
+  returns: 
+    - FAIL
+    - FAIL
+    - SUCCEED
+    - SUCCEED
     - FAIL
     - FAIL
 ...

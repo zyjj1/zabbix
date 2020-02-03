@@ -515,26 +515,22 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Parameter: minuend       - [IN] the minuend time                           *
  *            subtrahend    - [IN] the subtrahend time                        *
- *            tm            - [IN] the struct tm                              *
- *                                 current time                               *
+ *            tm            - [OUT] the struct tm                             *
  *                                                                            *
  * Return value: the resulting time                                           *
  *                                                                            *
  ******************************************************************************/
-static time_t dc_substract_time(time_t minuend, time_t subtrahend, struct tm *tm)
+static time_t dc_substract_time(time_t minuend, int subtrahend, struct tm *tm)
 {
-	int 		dst_min, dst_diff;
 	time_t 		diff;
+	time_t		offset_min, offset_diff;
 
-	tm = localtime(&minuend);
-	dst_min = tm->tm_isdst;
+	offset_min = zbx_get_timezone_offset(tm, minuend);
 	diff = minuend - subtrahend;
-	tm = localtime(&diff);
-	dst_diff = tm->tm_isdst;
-	diff -=  (dst_diff - dst_min) * SEC_PER_HOUR;
+	offset_diff = zbx_get_timezone_offset(tm, diff);
+	diff -= (offset_diff-offset_min);
 
 	return diff;
-
 }
 
 /******************************************************************************
@@ -691,7 +687,7 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
 	period_start = dc_substract_time(now, seconds, tm);
 	period_start = dc_substract_time(period_start,-period->start_time,tm);
-	if (seconds < period->start_time)
+	if ( now < period_start)
 		period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
 
 	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
@@ -841,16 +837,13 @@ int	zbx_dc_update_maintenances(void)
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, running_num = 0, seconds, rc, started_num = 0, stopped_num = 0, ret = FAIL;
+	int				i, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
 	unsigned char			state;
-	struct tm			*tm;
 	time_t				now, period_start, period_end, running_since, running_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	now = time(NULL);
-	tm = localtime(&now);
-	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
 
 	WRLOCK_CACHE;
 

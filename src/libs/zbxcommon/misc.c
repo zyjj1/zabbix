@@ -388,6 +388,49 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 #undef ZBX_UTC_OFF
 	}
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_timezone_offset                                          *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     get current time offset from UTC                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     tm           - [OUT] broken-down representation of the current time    *
+ *     t            - [IN] input time to calculate offset                     *
+ *                                                                            *
+ * Return value: Time offset from UTCin seconds                               *
+ *                                                                            *
+ ******************************************************************************/
+#ifndef _WINDOWS
+long	zbx_get_timezone_offset(struct tm *tm, time_t t)
+{
+	localtime_r(&t, tm);
+#ifdef HAVE_TM_TM_GMTOFF
+#	define ZBX_UTC_OFF	tm->tm_gmtoff
+#else
+#	define ZBX_UTC_OFF	offset
+	{
+		long		offset;
+		struct tm	tm_utc;
+
+		gmtime_r(&t, &tm_utc);
+		offset = (tm->tm_yday - tm_utc.tm_yday) * SEC_PER_DAY + (tm->tm_hour - tm_utc.tm_hour) * SEC_PER_HOUR +
+				(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
+
+		while (tm->tm_year > tm_utc.tm_year)
+			offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+
+		while (tm->tm_year < tm_utc.tm_year)
+			offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+	}
+#endif
+	return ZBX_UTC_OFF;
+#undef ZBX_UTC_OFF
+
+}
+#endif /* _WINDOWS */
+
 
 /******************************************************************************
  *                                                                            *
