@@ -3697,14 +3697,13 @@ out:
  *               FAIL    - item-application link should be removed            *
  *                                                                            *
  * Comments: Undiscovered item-application link must be removed if item was   *
- *           discovered.                                                     *
+ *           discovered.                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	lld_item_application_validate(const zbx_lld_item_application_t *item_application,
 		const zbx_vector_ptr_t *items)
 {
-	const zbx_lld_item_t	*item;
-	int			index;
+	int	index;
 
 	if (FAIL == (index = zbx_vector_ptr_bsearch(items, &item_application->item_ref.itemid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -3713,12 +3712,7 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 		return FAIL;
 	}
 
-	item = (zbx_lld_item_t *)items->values[index];
-
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-		return FAIL;
-
-	return SUCCEED;
+	return 0 != (((zbx_lld_item_t *)items->values[index])->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) ? FAIL : SUCCEED;
 }
 
 /******************************************************************************
