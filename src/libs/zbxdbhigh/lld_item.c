@@ -3691,7 +3691,6 @@ out:
  *                                                                            *
  * Parameters: items_application - [IN] an item-application link to validate  *
  *             items             - [IN] the related items                     *
- *             applications      - [IN] the related applications              *
  *                                                                            *
  * Return value: SUCCEED - item-application link should not be removed        *
  *               FAIL    - item-application link should be removed            *
