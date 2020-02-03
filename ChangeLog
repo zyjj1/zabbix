@@ -1,3 +1,15 @@
+Changes for 4.0.18rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.17
+
+4.0.17rc1 was released as 4.0.17 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.17rc1
 
 New features:
@@ -2763,6 +2775,7 @@ Changes for 3.0.30rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.29
