@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,6 +46,8 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t);
+
+extern int	CONFIG_CONFSYNCER_FORKS;
 
 typedef struct
 {
@@ -1265,6 +1267,13 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	/* configuration sync is performed by trappers on passive Zabbix proxy */
+	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
+	{
+		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+		DCsync_configuration(ZBX_DBSYNC_INIT);
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
