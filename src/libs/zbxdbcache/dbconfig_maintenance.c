@@ -689,8 +689,11 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 	period_start = dc_substract_time(period_start,-period->start_time,tm);
 
 	tm = localtime(&period_start);
-	if (period->start_time != (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec))
+	if (TIMEPERIOD_TYPE_ONETIME != period->type &&
+			period->start_time != (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec))
+	{
 		goto out;
+	}
 
 	if (now < period_start)
 		period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
