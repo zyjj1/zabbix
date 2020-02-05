@@ -26,6 +26,11 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
+#define ZBX_DB_DEFAULT_CHARACTER_SET	"utf8"
+#define ZBX_DB_DEFAULT_COLLATION	"utf8_bin"
+#define ZBX_ORACLE_CHARSET_LIST		"UTF8,UTFE,AL32UTF8,AL16UTF16"
+#define ZBX_ORACLE_NCHAR_CHARSET	"UTF8"
+
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
@@ -2219,11 +2224,29 @@ void	DBcheck_character_set(void)
 			const char	*parameter = row[0];
 			const char	*value = row[1];
 
-			if (0 != strcasecmp(value, ZBX_DB_DEFAULT_CHARACTER_SET))
+			if (NULL == parameter || NULL == value)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
-						" \"%s\". Zabbix supports only \"%s\" character set",
-						database_name_esc, parameter, value, ZBX_DB_DEFAULT_CHARACTER_SET);
+				continue;
+			}
+			else if (0 == strcmp("NLS_CHARACTERSET", parameter))
+			{
+				if (SUCCEED != str_in_list(ZBX_ORACLE_CHARSET_LIST, value, ','))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
+							" \"%s\". Zabbix supports only \"%s\" database character sets",
+							CONFIG_DBNAME, parameter, value,
+							ZBX_ORACLE_CHARSET_LIST);
+				}
+			}
+			else if((0 == strcmp("NLS_NCHAR_CHARACTERSET", parameter)))
+			{
+				if (0 != strcmp(ZBX_ORACLE_NCHAR_CHARSET, value))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
+							" \"%s\". Zabbix supports only \"%s\" national character set",
+							CONFIG_DBNAME, parameter, value,
+							ZBX_ORACLE_NCHAR_CHARSET);
+				}
 			}
 		}
 	}
