@@ -32,11 +32,30 @@
 #include "dbconfig.h"
 #include "dbconfig_maintenance_test.h"
 
+static zbx_timeperiod_type_t	get_period_type(const char *path)
+{
+	zbx_mock_error_t	err;
+	const char		*data;
+
+	data = zbx_mock_get_parameter_string(path);
+
+	if (0 == strcmp(data, "onetime"))
+		return TIMEPERIOD_TYPE_ONETIME;
+	if (0 == strcmp(data, "daily"))
+		return TIMEPERIOD_TYPE_DAILY;
+	if (0 == strcmp(data, "weekly"))
+		return TIMEPERIOD_TYPE_WEEKLY;
+	if (0 == strcmp(data, "monthly"))
+		return TIMEPERIOD_TYPE_MONTHLY;
+
+	return TIMEPERIOD_TYPE_ONETIME;
+}
+
 static void	get_period(zbx_dc_maintenance_period_t *period)
 {
-	zbx_timespec_t			ts;
+	zbx_timespec_t	ts;
 
-	period->type = zbx_mock_get_parameter_uint64("in.period.type");
+	period->type = get_period_type("in.period.type");
 	period->every = zbx_mock_get_parameter_uint64("in.period.every");
 	period->dayofweek = zbx_mock_get_parameter_uint64("in.period.dayofweek");
 	period->day = zbx_mock_get_parameter_uint64("in.period.day");
@@ -48,25 +67,23 @@ static void	get_period(zbx_dc_maintenance_period_t *period)
 		period->start_date = 0;
 	else
 		period->start_date = ts.sec;
-
-
 }
 
 static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 {
-	zbx_timespec_t			ts;
+	zbx_timespec_t	ts;
 
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.maintenance.active_since"),
 			&ts))
 	{
-		fail_msg("Invalid 'at' format");
+		fail_msg("Invalid 'active_since' format");
 	}
 	maintenance->active_since = (int)ts.sec;
 
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.maintenance.active_until"),
 				&ts))
 	{
-		fail_msg("Invalid 'at' format");
+		fail_msg("Invalid 'active_until' format");
 	}
 	maintenance->active_until = (int)ts.sec;
 }
@@ -80,8 +97,8 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_dc_maintenance_period_t	period;
 	zbx_dc_maintenance_t		maintenance;
-	int				expected_ret, step = 1;
-	int				returned_rets[128];
+	int				expected_ret, step;
+	int				actual_rets[128];
 	time_t				running_since, running_until;
 	zbx_timespec_t			ts;
 	zbx_mock_handle_t		times, returns, handle;
@@ -101,43 +118,51 @@ void	zbx_mock_test_entry(void **state)
 
 	times = zbx_mock_get_parameter_handle("in.times");
 
-	while (ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(times, &handle))))
+	for(step = 1; ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(times, &handle))); step++)
 	{
 		if (ZBX_MOCK_SUCCESS != mock_err)
-			fail_msg("Cannot read 'nows' element #%d: %s", step, zbx_mock_error_string(mock_err));
+		{
+			fail_msg("Cannot read 'times' element #%d: %s", step, zbx_mock_error_string(mock_err));
+			continue;
+		}
 
 		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_mock_string(handle, &now)))
 		{
-			fail_msg("Cannot read 'nows' element #%d value: %s", step, zbx_mock_error_string(mock_err));
+			fail_msg("Cannot read 'times' element #%d value: %s", step, zbx_mock_error_string(mock_err));
+			continue;
 		}
 
 		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_strtime_to_timespec(now, &ts)))
 		{
-			fail_msg("Cannot convert 'checks' element #%d value to time: %s", step,
+			fail_msg("Cannot convert 'times' element #%d value to time: %s", step,
 					zbx_mock_error_string(mock_err));
+			continue;
 		}
 
-		returned_rets[step-1] = dc_check_maintenance_period_test(&maintenance, &period, ts.sec, &running_since,
+		actual_rets[step-1] = dc_check_maintenance_period_test(&maintenance, &period, ts.sec, &running_since,
 				&running_until);
-		step++;
 	}
 
 	step = 1;
 	returns = zbx_mock_get_parameter_handle("out.returns");
-	while (ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(returns, &handle))))
+
+	for(step = 1; ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(returns, &handle))); step++)
 	{
 		if (ZBX_MOCK_SUCCESS != mock_err)
+		{
 			fail_msg("Cannot read 'returns' element #%d: %s", step, zbx_mock_error_string(mock_err));
+			continue;
+		}
 
 		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_mock_string(handle, &return_str)))
 		{
 			fail_msg("Cannot read 'returns' element #%d value: %s", step, zbx_mock_error_string(mock_err));
+			continue;
 		}
 
 		expected_ret = zbx_mock_str_to_return_code(return_str);
 		zbx_snprintf(msg, sizeof(msg), "Invalid return code step %d", step);
 
-		zbx_mock_assert_int_eq("dc_check_maintenance_period return value", expected_ret, returned_rets[step-1]);
-		step++;
+		zbx_mock_assert_int_eq("dc_check_maintenance_period return value", expected_ret, actual_rets[step-1]);
 	}
 }

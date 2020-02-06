@@ -6,7 +6,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 32  #sat
@@ -15,7 +15,7 @@ in:
     period:  90000 #1d 1h
     start_date: 0
   times:
-    - 2020-03-06 23:59:00 -06:00
+    - 2020-03-06 23:59:00 -06:00 #fri
     - 2020-03-07 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -37,7 +37,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -46,14 +46,14 @@ in:
     period:  7200     #2h
     start_date: 0
   times: 
-    - 2020-03-08 00:00:00 -06:00
+    - 2020-03-08 00:00:00 -06:00 #sun
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 03:59:00 -05:00
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -68,7 +68,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 32        #sat
@@ -76,15 +76,15 @@ in:
     start_time: 82800    #23:00
     period:  90000       #1d 1h
     start_date: 0
-  times: 
-    - 2020-03-07 22:00:00 -06:00
+  times:
+    - 2020-03-07 22:00:00 -06:00 #sat
     - 2020-03-07 22:59:00 -06:00
     - 2020-03-07 23:00:00 -06:00
     - 2020-03-09 00:59:00 -05:00
     - 2020-03-09 01:00:00 -05:00
     - 2020-03-09 02:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -99,7 +99,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64      #sun
@@ -107,15 +107,15 @@ in:
     start_time: 3600   #01:00
     period:  3600      #1h
     start_date: 0
-  times: 
-    - 2020-03-08 00:00:00 -06:00
+  times:
+    - 2020-03-08 00:00:00 -06:00 #sun
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 04:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -130,7 +130,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64        #sun
@@ -138,15 +138,15 @@ in:
     start_time: 3600     #01:00
     period:  3660        #1h 1m
     start_date: 0
-  times: 
-    - 2020-03-08 00:00:00 -06:00
+  times:
+    - 2020-03-08 00:00:00 -06:00 #sun
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 03:01:00 -05:00
-    - 2020-03-08 04:00:00 -06:00
+    - 2020-03-08 04:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -161,7 +161,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64           #sun
@@ -169,15 +169,15 @@ in:
     start_time: 10800       #03:00
     period:  3600           #1h
     start_date: 0
-  times: 
-    - 2020-03-08 01:00:00 -06:00
+  times:
+    - 2020-03-08 01:00:00 -06:00 #sun
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 03:59:00 -05:00
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -192,7 +192,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64           #sun
@@ -200,18 +200,18 @@ in:
     start_time: 7200        #02:00
     period:  3600           #1h
     start_date: 0
-  times: 
-    - 2020-03-01 01:59:00 -06:00
+  times:
+    - 2020-03-01 01:59:00 -06:00 #sun
     - 2020-03-01 02:00:00 -06:00
     - 2020-03-01 02:59:00 -06:00
     - 2020-03-01 03:00:00 -06:00
-    - 2020-03-08 00:59:00 -06:00
+    - 2020-03-08 00:59:00 -06:00 #sun
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 03:59:00 -05:00
     - 2020-03-08 04:00:00 -05:00
-    - 2020-03-15 01:59:00 -05:00
+    - 2020-03-15 01:59:00 -05:00 #sun
     - 2020-03-15 02:00:00 -05:00
     - 2020-03-15 02:59:00 -05:00
     - 2020-03-15 03:00:00 -05:00
@@ -239,15 +239,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 1
     month: 0
-    dayofweek: 64     #sun
+    dayofweek: 0
     day: 1
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
+  times:
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -255,7 +255,7 @@ in:
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -270,15 +270,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 1
     month: 0
-    dayofweek: 64      #sun
+    dayofweek: 0
     day: 1
     start_time: 3600   #01:00
     period:  3600      #1h
     start_date: 0
-  times: 
+  times:
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -286,7 +286,7 @@ in:
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 04:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -301,15 +301,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 1
     month: 0
-    dayofweek: 64           #sun
+    dayofweek: 0
     day: 1
     start_time: 10800       #03:00
     period:  3600           #1h
     start_date: 0
-  times: 
+  times:
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
@@ -317,7 +317,7 @@ in:
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -332,15 +332,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 4
+    type: monthly
     every: 1
-    month: 4          #marth
-    dayofweek: 0     
+    month: 4          #march
+    dayofweek: 0
     day: 8
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
+  times:
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -348,7 +348,7 @@ in:
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -363,15 +363,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 4
+    type: monthly
     every: 1
-    month: 4           #marth
-    dayofweek: 0      
+    month: 4           #march
+    dayofweek: 0
     day: 8
     start_time: 3600   #01:00
     period:  3600      #1h
     start_date: 0
-  times: 
+  times:
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -379,7 +379,7 @@ in:
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 04:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -387,22 +387,22 @@ out:
     - FAIL
     - FAIL
 ---
-test case: Mondhly period starts during DST change to summer (12)
+test case: Monthly period starts during DST change to summer (12)
 in:
   timezone: :America/Chicago
   maintenance:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 4
+    type: monthly
     every: 1
-    month: 4           #marth
-    dayofweek: 0      
+    month: 4           #march
+    dayofweek: 0
     day: 8
     start_time: 10800       #03:00
     period:  3600           #1h
     start_date: 0
-  times: 
+  times:
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
@@ -410,7 +410,7 @@ in:
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -425,7 +425,7 @@ in:
     active_since: 2020-03-08 01:00:00 -06:00
     active_until: 2020-03-08 04:00:00 -05:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -433,8 +433,8 @@ in:
     start_time: 0     #00:00
     period:  14400    #4h
     start_date: 0
-  times: 
-    - 2020-03-07 23:59:00 -06:00
+  times:
+    - 2020-03-07 23:59:00 -06:00 #sat
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -443,7 +443,7 @@ in:
     - 2020-03-08 04:59:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - FAIL
@@ -460,7 +460,7 @@ in:
     active_since: 2020-03-08 00:00:00 -06:00
     active_until: 2020-03-08 04:00:00 -05:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -468,8 +468,8 @@ in:
     start_time: 0     #00:00
     period:  14400    #4h
     start_date: 0
-  times: 
-    - 2020-03-07 23:59:00 -06:00
+  times:
+    - 2020-03-07 23:59:00 -06:00 #sat
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -478,7 +478,7 @@ in:
     - 2020-03-08 04:59:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -495,7 +495,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 32  #sat
@@ -504,7 +504,7 @@ in:
     period:  90000 #1d 1h
     start_date: 0
   times:
-    - 2020-10-30 23:59:00 -05:00
+    - 2020-10-30 23:59:00 -05:00 #fri
     - 2020-10-31 00:00:00 -05:00
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
@@ -526,7 +526,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -534,8 +534,8 @@ in:
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
-    - 2020-11-01 00:00:00 -05:00
+  times:
+    - 2020-11-01 00:00:00 -05:00 #sun
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -05:00
@@ -544,7 +544,7 @@ in:
     - 2020-11-01 02:00:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -561,7 +561,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 32        #sat
@@ -569,15 +569,15 @@ in:
     start_time: 82800    #23:00
     period:  90000       #1d 1h
     start_date: 0
-  times: 
-    - 2020-10-31 22:00:00 -05:00
+  times:
+    - 2020-10-31 22:00:00 -05:00 #sat
     - 2020-10-31 22:59:00 -05:00
     - 2020-10-31 23:00:00 -06:00
     - 2020-11-01 22:59:00 -06:00
     - 2020-11-01 23:00:00 -06:00
     - 2020-11-02 00:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -592,7 +592,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64      #sun
@@ -600,15 +600,15 @@ in:
     start_time: 3600   #01:00
     period:  3600      #1h
     start_date: 0
-  times: 
-    - 2020-11-01 00:59:00 -05:00
+  times:
+    - 2020-11-01 00:59:00 -05:00 #sun
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -05:00
     - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -623,7 +623,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64        #sun
@@ -631,15 +631,15 @@ in:
     start_time: 3600     #01:00
     period:  3660        #1h 1m
     start_date: 0
-  times: 
-    - 2020-11-01 00:59:00 -05:00
+  times:
+    - 2020-11-01 00:59:00 -05:00 #sun
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:01:00 -06:00
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -654,7 +654,7 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64           #sun
@@ -662,8 +662,8 @@ in:
     start_time: 7200        #02:00
     period:  3600           #1h
     start_date: 0
-  times: 
-    - 2020-11-01 01:59:00 -05:00
+  times:
+    - 2020-11-01 01:59:00 -05:00 #sun
     - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
@@ -672,7 +672,7 @@ in:
     - 2020-11-01 03:59:00 -06:00
     - 2020-11-01 04:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - FAIL
@@ -689,15 +689,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 1
     month: 0
-    dayofweek: 64     #sun
+    dayofweek: 0
     day: 1
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
+  times:
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -06:00
@@ -705,7 +705,7 @@ in:
     - 2020-11-01 02:59:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -720,15 +720,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 1
     month: 0
-    dayofweek: 64      #sun
+    dayofweek: 0
     day: 1
     start_time: 3600   #01:00
     period:  3600      #1h
     start_date: 0
-  times: 
+  times:
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -05:00
@@ -736,7 +736,7 @@ in:
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -751,15 +751,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 1
     month: 0
-    dayofweek: 64           #sun
+    dayofweek: 0
     day: 1
     start_time: 7200        #02:00
     period:  3600           #1h
     start_date: 0
-  times: 
+  times:
     - 2020-11-01 01:59:00 -05:00
     - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:59:00 -06:00
@@ -767,7 +767,7 @@ in:
     - 2020-11-01 02:59:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - FAIL
@@ -782,15 +782,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 4
+    type: monthly
     every: 1
     month: 1024       #november
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
+  times:
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -06:00
@@ -798,7 +798,7 @@ in:
     - 2020-11-01 02:59:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -813,15 +813,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 4
+    type: monthly
     every: 1
     month: 1024       #november
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
     start_time: 3600  #01:00
     period:  3600     #1h
     start_date: 0
-  times: 
+  times:
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -05:00
@@ -829,7 +829,7 @@ in:
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -844,15 +844,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 4
+    type: monthly
     every: 1
     month: 1024       #november
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
     start_time: 7200  #02:00
     period:  3600     #1h
     start_date: 0
-  times: 
+  times:
     - 2020-11-01 01:59:00 -05:00
     - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:59:00 -06:00
@@ -860,7 +860,7 @@ in:
     - 2020-11-01 02:59:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - FAIL
@@ -875,7 +875,7 @@ in:
     active_since: 2020-11-01 01:00:00 -05:00
     active_until: 2020-11-01 02:00:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -883,8 +883,8 @@ in:
     start_time: 0     #00:00
     period:  14400    #4h
     start_date: 0
-  times: 
-    - 2020-10-31 23:59:00 -05:00
+  times:
+    - 2020-10-31 23:59:00 -05:00 #sat
     - 2020-11-01 00:00:00 -05:00
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
@@ -893,7 +893,7 @@ in:
     - 2020-11-01 02:59:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - FAIL
@@ -910,7 +910,7 @@ in:
     active_since: 2020-11-01 00:00:00 -05:00
     active_until: 2020-11-01 02:00:00 -06:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -918,8 +918,8 @@ in:
     start_time: 0     #00:00
     period:  14400    #4h
     start_date: 0
-  times: 
-    - 2020-10-31 23:59:00 -05:00
+  times:
+    - 2020-10-31 23:59:00 -05:00 #sat
     - 2020-11-01 00:00:00 -05:00
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
@@ -928,7 +928,7 @@ in:
     - 2020-11-01 03:59:00 -06:00
     - 2020-11-01 04:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -945,15 +945,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 0
+    type: onetime
     every: 1
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
-    start_time: 0  
+    start_time: 0
     period:  7200     #2h
     start_date: 2020-03-08 01:00:00 -06:00
-  times: 
+  times:
     - 2020-03-08 00:00:00 -06:00
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
@@ -961,7 +961,7 @@ in:
     - 2020-03-08 04:00:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -976,15 +976,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 0
+    type: onetime
     every: 1
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
-    start_time: 0  
+    start_time: 0
     period:  3600     #1h
     start_date: 2020-03-08 01:00:00 -06:00
-  times: 
+  times:
     - 2020-03-08 00:59:00 -06:00
     - 2020-03-08 01:00:00 -06:00
     - 2020-03-08 01:59:00 -06:00
@@ -992,7 +992,7 @@ in:
     - 2020-03-08 03:59:00 -05:00
     - 2020-03-08 04:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -1007,15 +1007,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 0
+    type: onetime
     every: 1
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
-    start_time: 0  
+    start_time: 0
     period:  3600     #1h
     start_date: 2020-03-08 03:00:00 -05:00
-  times: 
+  times:
     - 2020-03-08 01:59:00 -06:00
     - 2020-03-08 03:00:00 -05:00
     - 2020-03-08 03:59:00 -05:00
@@ -1023,7 +1023,7 @@ in:
     - 2020-03-08 04:59:00 -05:00
     - 2020-03-08 05:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -1038,15 +1038,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 0
+    type: onetime
     every: 1
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
-    start_time: 0  
+    start_time: 0
     period:  7200     #2h
     start_date: 2020-11-01 01:00:00 -05:00
-  times: 
+  times:
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -06:00
@@ -1054,7 +1054,7 @@ in:
     - 2020-11-01 02:59:00 -06:00
     - 2020-11-01 03:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -1069,15 +1069,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 0
+    type: onetime
     every: 1
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
-    start_time: 0  
+    start_time: 0
     period:  3600     #1h
     start_date: 2020-11-01 01:00:00 -05:00
-  times: 
+  times:
     - 2020-11-01 00:59:00 -05:00
     - 2020-11-01 01:00:00 -05:00
     - 2020-11-01 01:59:00 -05:00
@@ -1085,7 +1085,7 @@ in:
     - 2020-11-01 01:59:00 -06:00
     - 2020-11-01 02:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -1100,15 +1100,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 0
+    type: onetime
     every: 1
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
-    start_time: 0  
+    start_time: 0
     period:  3600     #1h
     start_date: 2020-11-01 02:00:00 -06:00
-  times: 
+  times:
     - 2020-11-01 01:59:00 -05:00
     - 2020-11-01 01:00:00 -06:00
     - 2020-11-01 01:59:00 -06:00
@@ -1117,7 +1117,7 @@ in:
     - 2020-11-01 03:00:00 -06:00
     - 2020-11-01 04:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - FAIL
@@ -1133,15 +1133,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 2
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
     start_time: 82800  #23:00
     period:  90000     #1d 1h
     start_date: 0
-  times: 
+  times:
     - 2020-10-31 22:59:00 -05:00
     - 2020-10-31 23:00:00 -05:00
     - 2020-11-01 22:59:00 -06:00
@@ -1149,7 +1149,7 @@ in:
     - 2020-11-02 00:00:00 -06:00
     - 2020-11-02 01:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -1164,15 +1164,15 @@ in:
     active_since: 2020-01-01 00:00:00 -06:00
     active_until: 2020-12-31 23:59:00 -06:00
   period:
-    type: 2
+    type: daily
     every: 2
     month: 0
-    dayofweek: 0     
+    dayofweek: 0
     day: 1
     start_time: 82800  #23:00
     period:  90000     #1d 1h
     start_date: 0
-  times: 
+  times:
     - 2020-03-07 22:59:00 -06:00
     - 2020-03-07 23:00:00 -06:00
     - 2020-03-09 00:59:00 -05:00
@@ -1180,7 +1180,7 @@ in:
     - 2020-03-09 02:00:00 -05:00
     - 2020-03-09 03:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - SUCCEED
     - SUCCEED
@@ -1195,7 +1195,7 @@ in:
     active_since: 2020-01-01 00:00:00 +11:00
     active_until: 2020-12-31 23:59:00 +11:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -1203,15 +1203,15 @@ in:
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
-    - 2020-04-05 00:00:00 +11:00
+  times:
+    - 2020-04-05 00:00:00 +11:00 #sun
     - 2020-04-05 00:59:00 +11:00
     - 2020-04-05 01:00:00 +11:00
     - 2020-04-05 02:29:00 +10:30
     - 2020-04-05 02:30:00 +10:30
     - 2020-04-05 03:00:00 +10:30
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -1226,7 +1226,7 @@ in:
     active_since: 2020-01-01 00:00:00 +11:00
     active_until: 2020-12-31 23:59:00 +11:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -1234,15 +1234,15 @@ in:
     start_time: 3600  #01:00
     period:  7200     #2h
     start_date: 0
-  times: 
-    - 2020-10-04 00:00:00 +10:30
+  times:
+    - 2020-10-04 00:00:00 +10:30 #sun
     - 2020-10-04 00:59:00 +10:30
     - 2020-10-04 01:00:00 +10:30
     - 2020-10-04 03:29:00 +11:00
     - 2020-10-04 03:30:00 +11:00
     - 2020-10-04 04:00:00 +11:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -1250,14 +1250,14 @@ out:
     - FAIL
     - FAIL
 ---
-test case: Long daily period during exotic DST change to summer (39)
+test case: Long weekly period during exotic DST change to summer (39)
 in:
   timezone: :Antarctica/Troll
   maintenance:
     active_since: 2020-01-01 00:00:00 +00:00
     active_until: 2020-12-31 23:59:00 +00:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -1265,15 +1265,15 @@ in:
     start_time: 0     #00:00
     period:  7200     #2h
     start_date: 0
-  times: 
-    - 2020-03-14 23:00:00 +00:00
+  times:
+    - 2020-03-14 23:00:00 +00:00 #sat
     - 2020-03-14 23:59:00 +00:00
     - 2020-03-15 00:00:00 +00:00
     - 2020-03-15 03:59:00 +02:00
     - 2020-03-15 04:00:00 +02:00
     - 2020-03-15 05:00:00 +02:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -1281,14 +1281,14 @@ out:
     - FAIL
     - FAIL
 ---
-test case: Long daily period during exotic DST change to winter (40)
+test case: Long weekly period during exotic DST change to winter (40)
 in:
   timezone: :Antarctica/Troll
   maintenance:
     active_since: 2020-01-01 00:00:00 +00:00
     active_until: 2020-12-31 23:59:00 +00:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -1296,15 +1296,15 @@ in:
     start_time: 7200  #02:00
     period:  7200     #2h
     start_date: 0
-  times: 
-    - 2020-10-25 01:00:00 +02:00
+  times:
+    - 2020-10-25 01:00:00 +02:00 #sun
     - 2020-10-25 01:59:00 +02:00
     - 2020-10-25 02:00:00 +02:00
     - 2020-10-25 01:59:00 +00:00
     - 2020-10-25 02:00:00 +00:00
     - 2020-10-25 03:00:00 +00:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -1319,7 +1319,7 @@ in:
     active_since: 2020-01-01 00:00:00 +00:00
     active_until: 2020-12-31 23:59:00 +00:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -1327,15 +1327,15 @@ in:
     start_time: 6600  #01:50
     period:  1200     #20m
     start_date: 0
-  times: 
-    - 2020-03-08 01:00:00 -06:00
+  times:
+    - 2020-03-08 01:00:00 -06:00 #sun
     - 2020-03-08 01:49:00 -06:00
     - 2020-03-08 01:50:00 -06:00
     - 2020-03-08 03:09:00 -05:00
     - 2020-03-08 03:10:00 -05:00
     - 2020-03-08 04:00:00 -05:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
@@ -1350,7 +1350,7 @@ in:
     active_since: 2020-01-01 00:00:00 +00:00
     active_until: 2020-12-31 23:59:00 +00:00
   period:
-    type: 3
+    type: weekly
     every: 1
     month: 0
     dayofweek: 64     #sun
@@ -1358,22 +1358,48 @@ in:
     start_time: 6600  #01:50
     period:  1200     #20m
     start_date: 0
-  times: 
-    - 2020-11-01 01:00:00 -05:00
+  times:
+    - 2020-11-01 01:00:00 -05:00 #sun
     - 2020-11-01 01:49:00 -05:00
     - 2020-11-01 01:50:00 -05:00
     - 2020-11-01 01:09:00 -06:00
     - 2020-11-01 01:10:00 -06:00
     - 2020-11-01 02:00:00 -06:00
 out:
-  returns: 
+  returns:
     - FAIL
     - FAIL
     - SUCCEED
     - SUCCEED
+    - FAIL
+    - FAIL
+---
+test case: Maintenance activity limited out of DST (43)
+in:
+  timezone: :America/Chicago
+  maintenance:
+    active_since: 2020-02-12 13:00:00 +06:00
+    active_until: 2020-02-12 23:59:00 +06:00
+  period:
+    type: weekly
+    every: 1
+    month: 0
+    dayofweek: 64     #wed
+    day: 1
+    start_time: 6600  #12:50
+    period:  3600     #1h
+    start_date: 0
+  times:
+    - 2020-02-12 12:30:00 -06:00 #wed
+    - 2020-02-12 12:50:00 -06:00
+    - 2020-02-12 13:00:00 -06:00
+    - 2020-02-12 13:59:00 -06:00
+    - 2020-02-12 14:00:00 -06:00
+out:
+  returns:
+    - FAIL
+    - FAIL
+    - FAIL
     - FAIL
     - FAIL
 ...
-
-
-

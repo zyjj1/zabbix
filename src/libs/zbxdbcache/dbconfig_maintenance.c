@@ -514,21 +514,20 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
  * Purpose: substract two times with DST correction                           *
  *                                                                            *
  * Parameter: minuend       - [IN] the minuend time                           *
- *            subtrahend    - [IN] the subtrahend time                        *
+ *            subtrahend    - [IN] the subtrahend time (may be negative)      *
  *            tm            - [OUT] the struct tm                             *
  *                                                                            *
- * Return value: the resulting time                                           *
+ * Return value: the resulting time difference in seconds                     *
  *                                                                            *
  ******************************************************************************/
 static time_t dc_substract_time(time_t minuend, int subtrahend, struct tm *tm)
 {
-	time_t 		diff;
-	time_t		offset_min, offset_diff;
+	time_t	diff, offset_min, offset_diff;
 
 	offset_min = zbx_get_timezone_offset(tm, minuend);
 	diff = minuend - subtrahend;
 	offset_diff = zbx_get_timezone_offset(tm, diff);
-	diff -= (offset_diff-offset_min);
+	diff -= (offset_diff - offset_min);
 
 	return diff;
 }
@@ -543,8 +542,8 @@ static time_t dc_substract_time(time_t minuend, int subtrahend, struct tm *tm)
  *            period        - [IN] the maintenance period                     *
  *            start_date    - [IN] the period starting timestamp based on     *
  *                                 current time                               *
- *            running_since - [IN] the actual period starting timestamp       *
- *            running_since - [IN] the actual period ending timestamp         *
+ *            running_since - [OUT] the actual period starting timestamp      *
+ *            running_until - [OUT] the actual period ending timestamp        *
  *                                                                            *
  * Return value: SUCCEED - a valid period was found                           *
  *               FAIL    - period started before maintenance activation time  *
@@ -576,7 +575,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 
 			tm = localtime(&active_since);
 			active_since = dc_substract_time(active_since,
-					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec,tm);
+					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec, tm);
 
 			day = (start_date - active_since) / SEC_PER_DAY;
 			start_date = dc_substract_time(start_date, SEC_PER_DAY * (day % period->every), tm);
@@ -587,8 +586,8 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 
 			tm = localtime(&active_since);
 			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = dc_substract_time(active_since, (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR
-					+tm->tm_min * SEC_PER_MIN + tm->tm_sec), tm);
+			active_since = dc_substract_time(active_since, (wday * SEC_PER_DAY +
+					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec), tm);
 
 			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, tm))
 			{
@@ -663,14 +662,14 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
  *                                                                            *
  * Function: dc_check_maintenance_period                                      *
  *                                                                            *
- * Purpose: calculate start time for the specified maintenance period and     *
- *          and checks are we inside the maintenance period                   *
+ * Purpose: calculates start time for the specified maintenance period and    *
+ *          checks if we are inside the maintenance period                    *
  *                                                                            *
  * Parameter: maintenance   - [IN] the maintenance                            *
  *            period        - [IN] the maintenance period                     *
  *            now           - [IN] current time                               *
  *            running_since - [OUT] the actual period starting timestamp      *
- *            running_since - [OUT] the actual period ending timestamp        *
+ *            running_until - [OUT] the actual period ending timestamp        *
  *                                                                            *
  * Return value: SUCCEED - current time is inside valid maintenance period    *
  *               FAIL    - current time is outside valid maintenance period   *
@@ -680,15 +679,16 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 		const zbx_dc_maintenance_period_t *period, time_t now, time_t *running_since, time_t *running_until)
 {
 	struct tm	*tm;
-	int 		seconds, rc, ret = FAIL;
+	int		seconds, rc, ret = FAIL;
 	time_t		period_start, period_end;
 
 	tm = localtime(&now);
 	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
 	period_start = dc_substract_time(now, seconds, tm);
-	period_start = dc_substract_time(period_start,-period->start_time,tm);
+	period_start = dc_substract_time(period_start, -period->start_time, tm);
 
 	tm = localtime(&period_start);
+
 	if (TIMEPERIOD_TYPE_ONETIME != period->type &&
 			period->start_time != (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec))
 	{
@@ -698,8 +698,7 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 	if (now < period_start)
 		period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
 
-	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
-			&period_end);
+	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start, &period_end);
 
 	if (SUCCEED == rc && period_start <= now && now < period_end)
 	{
