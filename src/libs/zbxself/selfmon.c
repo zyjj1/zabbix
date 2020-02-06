@@ -375,20 +375,20 @@ void	update_selfmon_counter(unsigned char state)
 
 	process = &collector->process[process_type][process_num - 1];
 
-	LOCK_SM;
-
 	if (-1 == (ticks = times(&buf)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
 		process->last_state = state;
-		goto unlock;
+		return;
 	}
+
+	LOCK_SM;
 
 	if (ticks > process->last_ticks)
 		process->counter[process->last_state] += ticks - process->last_ticks;
 	process->last_ticks = ticks;
 	process->last_state = state;
-unlock:
+
 	UNLOCK_SM;
 }
 
