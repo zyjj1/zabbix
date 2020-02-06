@@ -264,7 +264,7 @@ int	init_selfmon_collector(char **error)
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
 			collector->process[proc_type][proc_num].cache.ticks = collector->ticks_sync;
-			collector->process[proc_type][proc_num].cache.state = ZBX_PROCESS_STATE_BUSY;
+			collector->process[proc_type][proc_num].cache.state = ZBX_PROCESS_STATE_IDLE;
 			collector->process[proc_type][proc_num].cache.ticks_flush = collector->ticks_sync;
 		}
 	}
