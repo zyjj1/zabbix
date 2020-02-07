@@ -2205,8 +2205,6 @@ void	DBcheck_character_set(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
 			"SELECT parameter, value "
@@ -2251,7 +2249,6 @@ void	DBcheck_character_set(void)
 		}
 	}
 
-	zbx_free(database_name_esc);
 	DBfree_result(result);
 	DBclose();
 #elif defined(HAVE_POSTGRESQL)
