@@ -2191,7 +2191,7 @@ void	DBcheck_character_set(void)
 	}
 	else if (0 != strcmp("0", row[0]))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "character_set_name or collation_name that is not supported by Zabbix"
+		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
 			" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
 				"database", ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_COLLATION);
@@ -2201,7 +2201,6 @@ void	DBcheck_character_set(void)
 	DBclose();
 	zbx_free(database_name_esc);
 #elif defined(HAVE_ORACLE)
-	char		*database_name_esc = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
