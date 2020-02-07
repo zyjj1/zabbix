@@ -2235,7 +2235,7 @@ void	DBcheck_character_set(void)
 							ZBX_ORACLE_CHARSET_LIST);
 				}
 			}
-			else if((0 == strcmp("NLS_NCHAR_CHARACTERSET", parameter)))
+			else if (0 == strcmp("NLS_NCHAR_CHARACTERSET", parameter))
 			{
 				if (0 != strcmp(ZBX_ORACLE_NCHAR_CHARSET, value))
 				{
