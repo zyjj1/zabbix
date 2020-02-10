@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 01:43+0200\n"
-"PO-Revision-Date: 2019-12-09 09:43+0300\n"
+"POT-Creation-Date: 2020-02-10 10:14+0200\n"
+"PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
@@ -13,7 +13,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1575877420.000000\n"
+"X-POOTLE-MTIME: 1581198494.000000\n"
+
+#: include/classes/db/MysqlDbBackend.php:67
+#: include/classes/db/OracleDbBackend.php:87
+#: include/classes/db/PostgresqlDbBackend.php:76
+#, c-format
+msgid "\"%1$s\" instead \"%2$s\""
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -329,7 +336,7 @@ msgstr[0] "Hesap %1$s saniyeliğine bloke edildi."
 msgstr[1] "Hesap %1$s saniyeliğine bloke edildi."
 
 #: app/views/monitoring.widget.problems.view.php:62
-#: include/actions.inc.php:155 include/blocks.inc.php:551
+#: include/actions.inc.php:155 include/blocks.inc.php:559
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:918
@@ -480,7 +487,7 @@ msgid "Action updated"
 msgstr "Eylem güncellendi"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:552
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:919
@@ -5259,7 +5266,7 @@ msgstr "\"%2$s\" haritası için kullanıcı gruplarında \"%1$s\" usrgrpid'si m
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "\"%2$s\" ekranı için kullanıcı gruplarında \"%1$s\" usrgrpid'si mükerrer."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:550
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:249
@@ -6889,7 +6896,7 @@ msgstr "Yatay hizalama"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:500
 #: include/actions.inc.php:48 include/audit.inc.php:27
-#: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:555 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7950,6 +7957,12 @@ msgstr "\"%1$s\" keşif kuralı için yanlış özel ifade \"%2$s\": %3$s."
 msgid "Incorrect data."
 msgstr "Yanlış veri."
 
+#: include/classes/db/MysqlDbBackend.php:66
+#: include/classes/db/PostgresqlDbBackend.php:75
+#, c-format
+msgid "Incorrect default charset for Zabbix database: %1$s."
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:594
 #: include/classes/api/services/CProblem.php:393
 msgid "Incorrect evaltype value."
@@ -8183,6 +8196,11 @@ msgstr "Yanlış yöntem \"%1$s.%2$s\"."
 #: include/classes/api/services/CProblem.php:381
 msgid "Incorrect object value."
 msgstr "Yanlış nesne değeri."
+
+#: include/classes/db/OracleDbBackend.php:86
+#, c-format
+msgid "Incorrect parameter \"%1$s\" value: %2$s."
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2820
 #, c-format
@@ -8673,7 +8691,7 @@ msgstr "Endonezyaca (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
-#: include/blocks.inc.php:546 include/classes/screens/CScreenActions.php:117
+#: include/blocks.inc.php:554 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:889
 #: include/classes/screens/CScreenProblem.php:913
@@ -9735,7 +9753,7 @@ msgstr "Son haftanın grafiği"
 msgid "Latest data"
 msgstr "En Son Veriler"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:549
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:916 jsLoader.php:269
 msgid "Latest values"
 msgstr "En son değerler"
@@ -10966,7 +10984,7 @@ msgstr "Sonraki adım"
 
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:33 include/blocks.inc.php:434
-#: include/blocks.inc.php:625
+#: include/blocks.inc.php:633
 #: include/classes/screens/CScreenHostTriggers.php:273
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
@@ -12850,7 +12868,7 @@ msgid "Privilege level"
 msgstr "Öncelik seviyesi"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:548
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:556
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1049
@@ -15354,7 +15372,7 @@ msgid "Tag value"
 msgstr "Etiket değeri"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:553
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:561
 #: include/classes/screens/CScreenProblem.php:866
 #: include/classes/screens/CScreenProblem.php:920
 #: include/classes/screens/CScreenProblem.php:1137
@@ -15606,7 +15624,7 @@ msgstr "Uygulama artık keşfedilemiyor ve keşif kuralı bir sonraki sefer işl
 msgid "The frontend does not match Zabbix database."
 msgstr "Önyüz, Zabbix veritabanına uymuyor."
 
-#: include/classes/db/DbBackend.php:48
+#: include/classes/db/DbBackend.php:50
 #, c-format
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
 msgstr "Önyüz, Zabbix veritabanına uymuyor. Mevcut veritabanı sürümü (zorunlu/isteğe bağlı): %d/%d. Gerekli zorunlu sürüm: %d. Sistem yöneticinize başvurun."
@@ -15741,7 +15759,7 @@ msgstr "Kadar"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1746 include/actions.inc.php:1800
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
-#: include/actions.inc.php:2015 include/blocks.inc.php:528
+#: include/actions.inc.php:2015 include/blocks.inc.php:536
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:843
@@ -16391,7 +16409,7 @@ msgstr "Yapılandırma dosyası oluşturulamadı."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Varolan yapılandırma dosyasının üzerine yazılamadı."
 
-#: include/classes/db/DbBackend.php:63
+#: include/classes/db/DbBackend.php:65
 msgid "Unable to select configuration."
 msgstr "Yapılandırma seçilemiyor."
 
@@ -16559,6 +16577,13 @@ msgstr "Bağlantı kaldırıldı: \"%2$s\" üzerindeki \"%1$s\" web senaryosu."
 #: jsLoader.php:210
 msgid "Unmute"
 msgstr "Sesi Aç"
+
+#: include/classes/db/MysqlDbBackend.php:95
+#: include/classes/db/PostgresqlDbBackend.php:111
+#, c-format
+msgid "Unsupported charset or collation for table: %1$s."
+msgid_plural "Unsupported charset or collation for tables: %1$s."
+msgstr[0] ""
 
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, c-format
@@ -17798,7 +17823,7 @@ msgstr "Yıllık"
 
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:32 include/blocks.inc.php:434
-#: include/blocks.inc.php:625
+#: include/blocks.inc.php:633
 #: include/classes/screens/CScreenHostTriggers.php:273
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
