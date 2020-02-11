@@ -26,10 +26,8 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
-#define ZBX_DB_DEFAULT_CHARACTER_SET	"utf8"
-#define ZBX_DB_DEFAULT_COLLATION	"utf8_bin"
-#define ZBX_ORACLE_CHARSET_LIST		"UTF8,UTFE,AL32UTF8,AL16UTF16"
-#define ZBX_ORACLE_NCHAR_CHARSET	"UTF8"
+#define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin"
 
 typedef struct
 {
@@ -2132,7 +2130,7 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_DB_DEFAULT_CHARACTER_SET "\" character set."
+	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
 		" Database \"%s\" has default character set \"%s\"", db_name, char_set);
 }
 
@@ -2165,13 +2163,13 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (0 != strcasecmp(char_set, ZBX_DB_DEFAULT_CHARACTER_SET))
+		if (0 != strcasecmp(char_set, ZBX_SUPPORTED_DB_CHARACTER_SET))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
 
-		if (0 != zbx_strncasecmp(collation, ZBX_DB_DEFAULT_COLLATION, sizeof(ZBX_DB_DEFAULT_COLLATION)))
+		if (0 != zbx_strncasecmp(collation, ZBX_SUPPORTED_DB_COLLATION, sizeof(ZBX_SUPPORTED_DB_COLLATION)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation."
-					" Database \"%s\" has default collation \"%s\"", ZBX_DB_DEFAULT_COLLATION,
+					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
 					CONFIG_DBNAME, collation);
 		}
 	}
@@ -2183,7 +2181,7 @@ void	DBcheck_character_set(void)
 			"FROM information_schema.`COLUMNS` "
 			"WHERE table_schema = '%s' AND data_type IN ('text', 'varchar', 'longtext') AND "
 			"(character_set_name != '%s' OR collation_name != '%s')",
-			database_name_esc, ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_COLLATION);
+			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
 	{
@@ -2194,7 +2192,7 @@ void	DBcheck_character_set(void)
 		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
 			" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
-				"database", ZBX_DB_DEFAULT_CHARACTER_SET, ZBX_DB_DEFAULT_COLLATION);
+				"database", ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
 	}
 
 	DBfree_result(result);
@@ -2225,24 +2223,15 @@ void	DBcheck_character_set(void)
 			{
 				continue;
 			}
-			else if (0 == strcmp("NLS_CHARACTERSET", parameter))
+			else if (0 == strcasecmp("NLS_CHARACTERSET", parameter) ||
+					(0 == strcasecmp("NLS_NCHAR_CHARACTERSET", parameter)))
 			{
-				if (SUCCEED != str_in_list(ZBX_ORACLE_CHARSET_LIST, value, ','))
+				if (0 != strcasecmp(ZBX_SUPPORTED_DB_CHARACTER_SET, value))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
-							" \"%s\". Zabbix supports only \"%s\" database character sets",
+							" \"%s\". Zabbix supports only \"%s\" character set",
 							CONFIG_DBNAME, parameter, value,
-							ZBX_ORACLE_CHARSET_LIST);
-				}
-			}
-			else if (0 == strcmp("NLS_NCHAR_CHARACTERSET", parameter))
-			{
-				if (0 != strcmp(ZBX_ORACLE_NCHAR_CHARSET, value))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
-							" \"%s\". Zabbix supports only \"%s\" national character set",
-							CONFIG_DBNAME, parameter, value,
-							ZBX_ORACLE_NCHAR_CHARSET);
+							ZBX_SUPPORTED_DB_CHARACTER_SET);
 				}
 			}
 		}
@@ -2272,7 +2261,7 @@ void	DBcheck_character_set(void)
 		zbx_warn_no_charset_info(CONFIG_DBNAME);
 		goto out;
 	}
-	else if (strcasecmp(row[0], ZBX_DB_DEFAULT_CHARACTER_SET))
+	else if (strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
 		zbx_warn_char_set(CONFIG_DBNAME, row[0]);
 		goto out;
@@ -2310,7 +2299,7 @@ void	DBcheck_character_set(void)
 	else if (0 != strcmp("0", row[0]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "database has %s fields with unsupported character set. Zabbix supports"
-				" only \"%s\" character set", row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
+				" only \"%s\" character set", row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 
 	DBfree_result(result);
@@ -2321,10 +2310,10 @@ void	DBcheck_character_set(void)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" client encoding", CONFIG_DBNAME);
 	}
-	else if (0 != strcasecmp(row[0], ZBX_DB_DEFAULT_CHARACTER_SET))
+	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "client_encoding for database \"%s\" is \"%s\". Zabbix supports only"
-				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 
 	DBfree_result(result);
@@ -2335,10 +2324,10 @@ void	DBcheck_character_set(void)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" server encoding", CONFIG_DBNAME);
 	}
-	else if (0 != strcasecmp(row[0], ZBX_DB_DEFAULT_CHARACTER_SET))
+	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server_encoding for database \"%s\" is \"%s\". Zabbix supports only"
-			" \"%s\"", CONFIG_DBNAME, row[0], ZBX_DB_DEFAULT_CHARACTER_SET);
+			" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 out:
 	DBfree_result(result);
