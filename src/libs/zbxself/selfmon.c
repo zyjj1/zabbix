@@ -253,7 +253,7 @@ int	init_selfmon_collector(char **error)
 	collector = (zbx_selfmon_collector_t *)p; p += sz;
 	collector->process = (zbx_stat_process_t **)p; p += sz_array;
 	collector->ticks_per_sec = sysconf(_SC_CLK_TCK);
-	collector->ticks_sync = times(&buf);
+	collector->ticks_sync = 0;
 
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
 	{
@@ -263,9 +263,7 @@ int	init_selfmon_collector(char **error)
 		process_forks = get_process_type_forks(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
-			collector->process[proc_type][proc_num].cache.ticks = collector->ticks_sync;
 			collector->process[proc_type][proc_num].cache.state = ZBX_PROCESS_STATE_IDLE;
-			collector->process[proc_type][proc_num].cache.ticks_flush = collector->ticks_sync;
 		}
 	}
 
@@ -333,8 +331,17 @@ void	update_selfmon_counter(unsigned char state)
 	process = &collector->process[process_type][process_num - 1];
 	ticks = times(&buf);
 
+	if (0 == process->cache.ticks_flush)
+	{
+		process->cache.ticks_flush = ticks;
+		process->cache.state = state;
+		process->cache.ticks = ticks;
+		return;
+	}
+
 	/* update process statistics in local cache */
 	process->cache.counter[process->cache.state] += ticks - process->cache.ticks;
+
 
 	if (ZBX_SELFMON_FLUSH_DELAY < (double)(ticks - process->cache.ticks_flush) / collector->ticks_per_sec)
 	{
@@ -400,6 +407,14 @@ void	collect_selfmon_stats(void)
 	LOCK_SM;
 
 	ticks = times(&buf);
+
+	if (0 == collector->ticks_sync)
+	{
+		collector->ticks_sync = ticks;
+		UNLOCK_SM;
+		return;
+	}
+
 	ticks_done = ticks - collector->ticks_sync;
 
 	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
@@ -409,7 +424,7 @@ void	collect_selfmon_stats(void)
 		{
 			process = &collector->process[proc_type][proc_num];
 
-			if (process->cache.ticks_flush < collector->ticks_sync)
+			if (0 != process->cache.ticks_flush && process->cache.ticks_flush < collector->ticks_sync)
 			{
 				/* If the process local cache was not flushed during the last self monitoring  */
 				/* data collection interval update the process statistics based on the current */
