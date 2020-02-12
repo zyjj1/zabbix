@@ -2131,7 +2131,7 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
-		" Database \"%s\" has default character set \"%s\"", db_name, char_set);
+			" Database \"%s\" has default character set \"%s\"", db_name, char_set);
 }
 
 static void	zbx_warn_no_charset_info(const char *db_name)
@@ -2190,7 +2190,7 @@ void	DBcheck_character_set(void)
 	else if (0 != strcmp("0", row[0]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
-			" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
+				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
 				"database", ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
 	}
@@ -2327,7 +2327,7 @@ void	DBcheck_character_set(void)
 	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server_encoding for database \"%s\" is \"%s\". Zabbix supports only"
-			" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 out:
 	DBfree_result(result);
