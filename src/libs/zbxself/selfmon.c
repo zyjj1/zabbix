@@ -342,7 +342,6 @@ void	update_selfmon_counter(unsigned char state)
 	/* update process statistics in local cache */
 	process->cache.counter[process->cache.state] += ticks - process->cache.ticks;
 
-
 	if (ZBX_SELFMON_FLUSH_DELAY < (double)(ticks - process->cache.ticks_flush) / collector->ticks_per_sec)
 	{
 		LOCK_SM;
