@@ -3258,8 +3258,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 	if (0 != upd_items)
 	{
-		zbx_lld_item_prototype_t	*item_prototype;
-		int				index;
+		int	index;
 
 		sql_offset = 0;
 
