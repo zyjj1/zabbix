@@ -1789,7 +1789,7 @@ class testGraphWidget extends CWebTest {
 			$form->selectTab($tab);
 			switch ($tab) {
 				case 'Problems':
-					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT_MULTIPLE);
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 
