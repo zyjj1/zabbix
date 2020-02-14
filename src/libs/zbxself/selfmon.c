@@ -298,7 +298,11 @@ void	init_selfmon_collector(void)
 	collector = (zbx_selfmon_collector_t *)p; p += sz;
 	collector->process = (zbx_stat_process_t **)p; p += sz_array;
 
-	ticks = times(&buf);
+	if (-1 == (ticks = times(&buf)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot get process times: %s", zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
 	{
@@ -370,7 +374,13 @@ void	update_selfmon_counter(unsigned char state)
 		return;
 
 	process = &collector->process[process_type][process_num - 1];
-	ticks = times(&buf);
+
+	if (-1 == (ticks = times(&buf)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
+		process->last_state = state;
+		return;
+	}
 
 	LOCK_SM;
 
@@ -400,9 +410,13 @@ void	collect_selfmon_stats(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ticks = times(&buf);
-
 	LOCK_SM;
+
+	if (-1 == (ticks = times(&buf)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
+		goto unlock;
+	}
 
 	if (MAX_HISTORY <= (index = collector->first + collector->count))
 		index -= MAX_HISTORY;
@@ -424,7 +438,7 @@ void	collect_selfmon_stats(void)
 				process->h_counter[process->last_state][index] += ticks - process->last_ticks;
 		}
 	}
-
+unlock:
 	UNLOCK_SM;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
