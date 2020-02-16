@@ -1,8 +1,7 @@
 Changes for 4.0.18rc1
 
 New features:
-.......PS. [ZBXNEXT-5626] added database character set check (mabele)
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
