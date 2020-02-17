@@ -2128,16 +2128,21 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 	return ret;
 }
 
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
 			" Database \"%s\" has default character set \"%s\"", db_name, char_set);
 }
+#endif
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE)
 static void	zbx_warn_no_charset_info(const char *db_name)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "Cannot get database \"%s\" character set", db_name);
 }
+#endif
 
 void	DBcheck_character_set(void)
 {
