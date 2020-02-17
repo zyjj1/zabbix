@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-10 10:14+0200\n"
+"POT-Creation-Date: 2020-02-17 12:01+0200\n"
 "PO-Revision-Date: 2019-12-11 14:18+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -220,7 +220,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, выбрано"
 
-#: app/views/layout.htmlpage.php:106 include/page_header.php:284
+#: app/views/layout.htmlpage.php:106 include/page_header.php:263
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -4306,7 +4306,7 @@ msgstr "Дата покупки HW"
 msgid "Day"
 msgstr "День"
 
-#: include/func.inc.php:2699
+#: include/func.inc.php:2690
 msgid "Day before yesterday"
 msgstr "За день до вчера"
 
@@ -9720,7 +9720,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Последняя"
 
-#: include/func.inc.php:2752
+#: include/func.inc.php:2743
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -9728,7 +9728,7 @@ msgstr[0] "Последний %1$d день"
 msgstr[1] "Последние %1$d дня"
 msgstr[2] "Последние %1$d дней"
 
-#: include/func.inc.php:2746
+#: include/func.inc.php:2737
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -9736,7 +9736,7 @@ msgstr[0] "Последний %1$d час"
 msgstr[1] "Последние %1$d часа"
 msgstr[2] "Последние %1$d часов"
 
-#: include/func.inc.php:2739
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -9744,7 +9744,7 @@ msgstr[0] "Последняя %1$d минута"
 msgstr[1] "Последние %1$d минуты"
 msgstr[2] "Последние %1$d минут"
 
-#: include/func.inc.php:2755
+#: include/func.inc.php:2746
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -9752,7 +9752,7 @@ msgstr[0] "Последний %1$d месяц"
 msgstr[1] "Последние %1$d месяца"
 msgstr[2] "Последние %1$d месяцев"
 
-#: include/func.inc.php:2732
+#: include/func.inc.php:2723
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -9760,7 +9760,7 @@ msgstr[0] "Последняя %1$d секунда"
 msgstr[1] "Последние %1$d секунды"
 msgstr[2] "Последние %1$d секунд"
 
-#: include/func.inc.php:2758
+#: include/func.inc.php:2749
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -12876,15 +12876,15 @@ msgstr "Шаги предобработки"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: include/func.inc.php:2702
+#: include/func.inc.php:2693
 msgid "Previous month"
 msgstr "Предыдущий месяц"
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2692
 msgid "Previous week"
 msgstr "Предыдущая неделя"
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2694
 msgid "Previous year"
 msgstr "Предыдущий год"
 
@@ -15782,7 +15782,7 @@ msgstr "Группа элементов данных веб-сценария п�
 msgid "Theme"
 msgstr "Тема"
 
-#: include/func.inc.php:2700
+#: include/func.inc.php:2691
 msgid "This day last week"
 msgstr "Этот день прошлой недели"
 
@@ -15791,11 +15791,11 @@ msgstr "Этот день прошлой недели"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Это поле автоматически заполняется элементом данных \"%s\"."
 
-#: include/func.inc.php:2708 srv_status.php:41
+#: include/func.inc.php:2699 srv_status.php:41
 msgid "This month"
 msgstr "Этот месяц"
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2700
 msgid "This month so far"
 msgstr "В этом месяце"
 
@@ -15807,19 +15807,19 @@ msgstr "Колонка комплексного экрана не пустая. 
 msgid "This screen row is not empty. Delete it?"
 msgstr "Строка комплексного экрана не пустая. Удалить её?"
 
-#: include/func.inc.php:2706 srv_status.php:40
+#: include/func.inc.php:2697 srv_status.php:40
 msgid "This week"
 msgstr "Эта неделя"
 
-#: include/func.inc.php:2707
+#: include/func.inc.php:2698
 msgid "This week so far"
 msgstr "На этой неделе"
 
-#: include/func.inc.php:2710 srv_status.php:42
+#: include/func.inc.php:2701 srv_status.php:42
 msgid "This year"
 msgstr "Этот год"
 
-#: include/func.inc.php:2711
+#: include/func.inc.php:2702
 msgid "This year so far"
 msgstr "В этом году"
 
@@ -15939,12 +15939,12 @@ msgstr "К"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Чтобы задать интерфейс узла сети выберите один тип элемента данных из всех элементов данных"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2704
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2695
 #: srv_status.php:39
 msgid "Today"
 msgstr "Сегодня"
 
-#: include/func.inc.php:2705
+#: include/func.inc.php:2696
 msgid "Today so far"
 msgstr "Сегодня до сих пор"
 
@@ -17939,7 +17939,7 @@ msgstr "Ежегодно"
 msgid "Yes"
 msgstr "Да"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2698
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2689
 msgid "Yesterday"
 msgstr "Вчера"
 
@@ -18029,7 +18029,7 @@ msgstr "Ваша база данных работает некорректно. 
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
-#: include/page_header.php:156
+#: include/page_header.php:135
 msgid "Zabbix"
 msgstr "Zabbix"
 
@@ -18213,7 +18213,7 @@ msgstr "ожидался период времени"
 
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: include/classes/validators/CApiInputValidator.php:1354
-#: include/validate.inc.php:227 include/validate.inc.php:590
+#: include/validate.inc.php:227 include/validate.inc.php:591
 msgid "a time unit is expected"
 msgstr "ожидается единица времени"
 
@@ -19059,7 +19059,7 @@ msgstr "prev() - Предыдущее значение"
 msgid "problem pattern"
 msgstr "шаблон проблем"
 
-#: include/page_header.php:159 include/views/general.warning.php:21
+#: include/page_header.php:138 include/views/general.warning.php:21
 #, c-format
 msgid "refreshed every %1$s sec."
 msgstr "обновление каждые %1$s сек."
@@ -19394,7 +19394,7 @@ msgstr "значение слишком длинное"
 #: include/classes/api/services/CMap.php:1135
 #: include/classes/validators/CApiInputValidator.php:348
 #: include/classes/validators/CApiInputValidator.php:656
-#: include/validate.inc.php:583
+#: include/validate.inc.php:584
 #, c-format
 msgid "value must be one of %1$s"
 msgstr "значение должно быть одним из %1$s"
