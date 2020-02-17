@@ -591,19 +591,22 @@ int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 		for (proc_num = 0; proc_num < stats[proc_type].count; proc_num++)
 		{
 			zbx_stat_process_t	*process;
-			unsigned short		one_total = 0, busy_counter, idle_counter;
+			unsigned int		one_total = 0, busy_counter, idle_counter;
 			unsigned char		s;
 
 			process = &collector->process[proc_type][proc_num];
 
 			for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
-				one_total += process->h_counter[s][current] - process->h_counter[s][collector->first];
+			{
+				one_total += (unsigned short)(process->h_counter[s][current] -
+						process->h_counter[s][collector->first]);
+			}
 
-			busy_counter = process->h_counter[ZBX_PROCESS_STATE_BUSY][current] -
-					process->h_counter[ZBX_PROCESS_STATE_BUSY][collector->first];
+			busy_counter = (unsigned short)(process->h_counter[ZBX_PROCESS_STATE_BUSY][current] -
+					process->h_counter[ZBX_PROCESS_STATE_BUSY][collector->first]);
 
-			idle_counter = process->h_counter[ZBX_PROCESS_STATE_IDLE][current] -
-					process->h_counter[ZBX_PROCESS_STATE_IDLE][collector->first];
+			idle_counter = (unsigned short)(process->h_counter[ZBX_PROCESS_STATE_IDLE][current] -
+					process->h_counter[ZBX_PROCESS_STATE_IDLE][collector->first]);
 
 			total_avg += one_total;
 			counter_avg_busy += busy_counter;
