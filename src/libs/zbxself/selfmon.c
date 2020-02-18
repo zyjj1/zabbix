@@ -391,6 +391,12 @@ void	collect_selfmon_stats(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (0 == collector->ticks_sync)
+	{
+		collector->ticks_sync = times(&buf);
+		goto out;
+	}
+
 	if (MAX_HISTORY <= (index = collector->first + collector->count))
 		index -= MAX_HISTORY;
 
@@ -402,17 +408,10 @@ void	collect_selfmon_stats(void)
 	if (0 > (last = index - 1))
 		last += MAX_HISTORY;
 
+
 	LOCK_SM;
 
 	ticks = times(&buf);
-
-	if (0 == collector->ticks_sync)
-	{
-		collector->ticks_sync = ticks;
-		UNLOCK_SM;
-		return;
-	}
-
 	ticks_done = ticks - collector->ticks_sync;
 
 	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
@@ -448,7 +447,7 @@ void	collect_selfmon_stats(void)
 	collector->ticks_sync = ticks;
 
 	UNLOCK_SM;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
