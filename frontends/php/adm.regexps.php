@@ -68,19 +68,44 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
 		]);
 
-		foreach ($ajaxData['expressions'] as $id => $expression) {
-			if (!in_array($expression['expression_type'], [EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE]) ||
-				$validator->validate($expression['expression'])
-			) {
-				$match = CGlobalRegexp::matchExpression($expression, $ajaxData['testString']);
+		$match = true;
 
-				$result['expressions'][$id] = $match;
-			} else {
-				$match = false;
-				$result['errors'][$id] = $validator->getError();
+		if (array_key_exists('expressions', $ajaxData)) {
+			foreach ($ajaxData['expressions'] as $id => $expression) {
+				switch ($expression['expression_type']) {
+					case EXPRESSION_TYPE_TRUE:
+					case EXPRESSION_TYPE_FALSE:
+						if (!$validator->validate($expression['expression'])) {
+							$match = false;
+							$result['errors'][$id] = $validator->getError();
+						}
+						break;
+
+					case EXPRESSION_TYPE_INCLUDED:
+					case EXPRESSION_TYPE_NOT_INCLUDED:
+						if ($expression['expression'] === '') {
+							$match = false;
+							$result['errors'][$id] = _('Expression cannot be empty');
+						}
+						break;
+
+					case EXPRESSION_TYPE_ANY_INCLUDED:
+						foreach (explode($expression['exp_delimiter'], $expression['expression']) as $string) {
+							if ($expression['expression'] === '') {
+								$match = false;
+								$result['errors'][$id] = _('Expression cannot be empty');
+							}
+						}
+						break;
+				}
+
+				if ($match) {
+					$match = CGlobalRegexp::matchExpression($expression, $ajaxData['testString']);
+					$result['expressions'][$id] = $match;
+				}
+
+				$result['final'] = $result['final'] && $match;
 			}
-
-			$result['final'] = $result['final'] && $match;
 		}
 
 		$ajaxResponse->success($result);
