@@ -659,6 +659,13 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_compare_items_by_total_values                                 *
+ *                                                                            *
+ * Purpose: is used to sort items by value count in descending order          *
+ *                                                                            *
+ ******************************************************************************/
 static int	vc_compare_items_by_total_values(const void *d1, const void *d2)
 {
 	zbx_vc_item_t	*c1 = *(zbx_vc_item_t **)d1;
@@ -669,14 +676,21 @@ static int	vc_compare_items_by_total_values(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	vc_dump_item_top(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_dump_items_statistics                                         *
+ *                                                                            *
+ * Purpose: find out items responsible for low memory                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_dump_items_statistics(void)
 {
 	zbx_vc_item_t		*item;
 	zbx_hashset_iter_t	iter;
 	int			i, total = 0, limit;
 	zbx_vector_ptr_t	items;
 
-	zabbix_log(LOG_LEVEL_WARNING, "=== items with most values in value cache ===");
+	zabbix_log(LOG_LEVEL_WARNING, "=== most used items statistics for value cache ===");
 
 	zbx_vector_ptr_create(&items);
 
@@ -701,7 +715,7 @@ static void	vc_dump_item_top(void)
 
 	zbx_vector_ptr_destroy(&items);
 
-	zabbix_log(LOG_LEVEL_WARNING, "=============================================");
+	zabbix_log(LOG_LEVEL_WARNING, "==================================================");
 }
 
 /******************************************************************************
@@ -730,7 +744,7 @@ static void	vc_warn_low_memory(void)
 	else if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
 		vc_cache->last_warning_time = now;
-		vc_dump_item_top();
+		vc_dump_items_statistics();
 		zbx_mem_dump_stats(LOG_LEVEL_WARNING, vc_mem);
 
 		zabbix_log(LOG_LEVEL_WARNING, "value cache is fully used: please increase ValueCacheSize"
