@@ -694,9 +694,10 @@ static void	vc_dump_item_top(void)
 	{
 		item = (zbx_vc_item_t *)items.values[i];
 
-		zabbix_log(LOG_LEVEL_WARNING, "itemid:" ZBX_FS_UI64 " active range:%d cached from:%d hits:" ZBX_FS_UI64 " count:%d"
-				" perc:" ZBX_FS_DBL "%%", item->itemid, item->active_range, item->db_cached_from,
-				item->hits, item->values_total, 100 * (double)item->values_total / total);
+		zabbix_log(LOG_LEVEL_WARNING, "itemid:" ZBX_FS_UI64 " cached from:%d active range:%d hits:"
+				ZBX_FS_UI64 " count:%d perc:" ZBX_FS_DBL "%%", item->itemid, item->db_cached_from,
+				item->active_range, item->hits, item->values_total,
+				100 * (double)item->values_total / total);
 	}
 
 	zbx_vector_ptr_destroy(&items);
