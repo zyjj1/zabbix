@@ -60,6 +60,8 @@
 /* time period after which value cache will switch back to normal mode */
 #define ZBX_VC_LOW_MEMORY_RESET_PERIOD		SEC_PER_DAY
 
+#define ZBX_VC_LOW_MEMORY_ITEM_PRINT_LIMIT	25
+
 static zbx_mem_info_t	*vc_mem = NULL;
 
 static zbx_mutex_t	vc_lock = ZBX_MUTEX_NULL;
@@ -657,42 +659,49 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 	}
 }
 
+static int	vc_compare_items_by_total_values(const void *d1, const void *d2)
+{
+	zbx_vc_item_t	*c1 = *(zbx_vc_item_t **)d1;
+	zbx_vc_item_t	*c2 = *(zbx_vc_item_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(c2->values_total, c1->values_total);
+
+	return 0;
+}
+
 static void	vc_dump_item_top(void)
 {
-	zbx_vc_item_t			*item;
-	zbx_hashset_iter_t		iter;
-	int				i, total = 0, limit = 10;
-	zbx_vector_uint64_pair_t	items;
+	zbx_vc_item_t		*item;
+	zbx_hashset_iter_t	iter;
+	int			i, total = 0, limit;
+	zbx_vector_ptr_t	items;
 
-	zbx_vector_uint64_pair_create(&items);
+	zbx_vector_ptr_create(&items);
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_uint64_pair_t	pair;
-
-		pair.first = item->values_total;
-		pair.second = item->itemid;
-
-		zbx_vector_uint64_pair_append(&items, pair);
+		zbx_vector_ptr_append(&items, item);
 		total += item->values_total;
 	}
 
-	zbx_vector_uint64_pair_sort(&items, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_ptr_sort(&items, vc_compare_items_by_total_values);
 
 	zabbix_log(LOG_LEVEL_WARNING, "=== items with most values in value cache ===");
 
-	for (i = items.values_num - 1; i >= 0 && limit > 0; i--, limit--)
+	for (i = 0, limit = MIN(items.values_num, ZBX_VC_LOW_MEMORY_ITEM_PRINT_LIMIT); i < limit; i++)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "itemid:" ZBX_FS_UI64 " count:" ZBX_FS_UI64
-				" perc:" ZBX_FS_DBL "%%", items.values[i].second, items.values[i].first,
-				100 * (double)items.values[i].first / total);
+		item = (zbx_vc_item_t *)items.values[i];
+
+		zabbix_log(LOG_LEVEL_WARNING, "itemid:" ZBX_FS_UI64 " active range:%d hits:" ZBX_FS_UI64 " count:%d"
+				" perc:" ZBX_FS_DBL "%%", item->itemid, item->active_range, item->hits,
+				item->values_total, 100 * (double)item->values_total / total);
 	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "=============================================");
 
-	zbx_vector_uint64_pair_destroy(&items);
+	zbx_vector_ptr_destroy(&items);
 }
 
 /******************************************************************************
