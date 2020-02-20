@@ -676,6 +676,8 @@ static void	vc_dump_item_top(void)
 	int			i, total = 0, limit;
 	zbx_vector_ptr_t	items;
 
+	zabbix_log(LOG_LEVEL_WARNING, "=== items with most values in value cache ===");
+
 	zbx_vector_ptr_create(&items);
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
@@ -688,8 +690,6 @@ static void	vc_dump_item_top(void)
 
 	zbx_vector_ptr_sort(&items, vc_compare_items_by_total_values);
 
-	zabbix_log(LOG_LEVEL_WARNING, "=== items with most values in value cache ===");
-
 	for (i = 0, limit = MIN(items.values_num, ZBX_VC_LOW_MEMORY_ITEM_PRINT_LIMIT); i < limit; i++)
 	{
 		item = (zbx_vc_item_t *)items.values[i];
@@ -699,9 +699,9 @@ static void	vc_dump_item_top(void)
 				item->values_total, 100 * (double)item->values_total / total);
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "=============================================");
-
 	zbx_vector_ptr_destroy(&items);
+
+	zabbix_log(LOG_LEVEL_WARNING, "=============================================");
 }
 
 /******************************************************************************
