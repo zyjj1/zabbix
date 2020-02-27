@@ -3529,8 +3529,39 @@ void	zbx_tls_init_child(void)
 		else
 			ciphers = ZBX_CIPHERS_CERT;
 
-		/* set up ciphersuites */
-		if (1 != SSL_CTX_set_cipher_list(ctx_cert, ciphers))
+		/* override TLS 1.3 certificate ciphersuites with user-defined settings */
+		if (NULL != CONFIG_TLS_CIPHER_CERT13 || NULL != CONFIG_TLS_CIPHER_CMD13)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+			if (1 != SSL_CTX_set_ciphersuites(ctx_cert, (NULL != CONFIG_TLS_CIPHER_CERT13) ?
+						CONFIG_TLS_CIPHER_CERT13 : CONFIG_TLS_CIPHER_CMD13))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
+						" certificate ciphersuites from \"TLSCipherCert13\" or"
+						" \"--tls-cipher13\" parameter:");
+				goto out;
+			}
+#else
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
+					" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1."
+					" Consider not using parameters \"TLSCipherCert13\" or \"--tls-cipher13\"");
+			goto out1;
+#endif
+		}
+
+		/* override TLS 1.2 certificate ciphersuites with user-defined settings */
+		if (NULL != CONFIG_TLS_CIPHER_CERT || NULL != CONFIG_TLS_CIPHER_CMD)
+		{
+			if (1 != SSL_CTX_set_cipher_list(ctx_cert, (NULL != CONFIG_TLS_CIPHER_CERT) ?
+						CONFIG_TLS_CIPHER_CERT : CONFIG_TLS_CIPHER_CMD))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.2"
+						" certificate ciphersuites from \"TLSCipherCert\" or \"--tls-cipher\""
+						" parameter:");
+				goto out;
+			}
+		}
+		else if (1 != SSL_CTX_set_cipher_list(ctx_cert, ciphers))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of certificate"
 					" ciphersuites:");
@@ -3565,15 +3596,46 @@ void	zbx_tls_init_child(void)
 		else
 			ciphers = ZBX_CIPHERS_PSK;
 
+		/* override TLS 1.3 PSK ciphersuites with user-defined settings */
+		if (NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != CONFIG_TLS_CIPHER_CMD13)
+		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
-		if (1 != SSL_CTX_set_ciphersuites(ctx_psk, ZBX_CIPHERS_PSK_TLS13))
+			if (1 != SSL_CTX_set_ciphersuites(ctx_psk, (NULL != CONFIG_TLS_CIPHER_PSK13) ?
+						CONFIG_TLS_CIPHER_PSK13 : CONFIG_TLS_CIPHER_CMD13))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
+						" PSK ciphersuites from \"TLSCipherPSK13\" or \"--tls-cipher13\""
+						" parameter:");
+				goto out;
+			}
+#else
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
+					" PSK ciphersuites: compiled with OpenSSL version older than 1.1.1."
+					" Consider not using parameters \"TLSCipherPSK13\" or \"--tls-cipher13\"");
+			goto out1;
+#endif
+		}
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+		else if (1 != SSL_CTX_set_ciphersuites(ctx_psk, ZBX_CIPHERS_PSK_TLS13))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK TLS 1.3"
 					"  ciphersuites:");
 			goto out;
 		}
 #endif
-		if (1 != SSL_CTX_set_cipher_list(ctx_psk, ciphers))
+		/* override TLS 1.2 PSK ciphersuites with user-defined settings */
+		if (NULL != CONFIG_TLS_CIPHER_PSK || NULL != CONFIG_TLS_CIPHER_CMD)
+		{
+			if (1 != SSL_CTX_set_cipher_list(ctx_psk, (NULL != CONFIG_TLS_CIPHER_PSK) ?
+						CONFIG_TLS_CIPHER_PSK : CONFIG_TLS_CIPHER_CMD))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.2"
+						" PSK ciphersuites from \"TLSCipherCert\" or \"--tls-cipher\""
+						" parameter:");
+				goto out;
+			}
+		}
+		else if (1 != SSL_CTX_set_cipher_list(ctx_psk, ciphers))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
 			goto out;
@@ -3601,7 +3663,35 @@ void	zbx_tls_init_child(void)
 		else
 			ciphers = ZBX_CIPHERS_CERT ":" ZBX_CIPHERS_PSK;
 
-		if (1 != SSL_CTX_set_cipher_list(ctx_all, ciphers))
+		/* override TLS 1.3 ciphersuites with user-defined setting */
+		if (NULL != CONFIG_TLS_CIPHER_ALL13)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+			if (1 != SSL_CTX_set_ciphersuites(ctx_all, CONFIG_TLS_CIPHER_ALL13))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
+						" ciphersuites from \"TLSCipherAll13\" parameter:");
+				goto out;
+			}
+#else
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
+					" ciphersuites: compiled with OpenSSL version older than 1.1.1."
+					" Consider not using parameter \"TLSCipherAll13\"");
+			goto out1;
+#endif
+		}
+
+		/* override TLS 1.2 ciphersuites with user-defined setting */
+		if (NULL != CONFIG_TLS_CIPHER_ALL)
+		{
+			if (1 != SSL_CTX_set_cipher_list(ctx_all, CONFIG_TLS_CIPHER_ALL))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.2"
+						" ciphersuites from \"TLSCipherAll\" parameter:");
+				goto out;
+			}
+		}
+		else if (1 != SSL_CTX_set_cipher_list(ctx_all, ciphers))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of all ciphersuites:");
 			goto out;
@@ -3621,7 +3711,7 @@ out_method:
 	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot initialize TLS method:");
 out:
 	zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-#if defined(HAVE_OPENSSL_WITH_PSK)
+#if defined(HAVE_OPENSSL_WITH_PSK) || OPENSSL_VERSION_NUMBER < 0x1010100fL	/* older than OpenSSL 1.1.1 */
 out1:
 #endif
 	zabbix_log(LOG_LEVEL_CRIT, "%s", error);
