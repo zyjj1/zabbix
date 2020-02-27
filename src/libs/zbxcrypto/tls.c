@@ -206,6 +206,15 @@ extern char				*CONFIG_TLS_KEY_FILE;
 extern char				*CONFIG_TLS_PSK_IDENTITY;
 extern char				*CONFIG_TLS_PSK_FILE;
 
+extern char	*CONFIG_TLS_CIPHER_CERT13;	/* parameter 'TLSCipherCert13' from server/proxy/agent config file */
+extern char	*CONFIG_TLS_CIPHER_CERT;	/* parameter 'TLSCipherCert' from server/proxy/agent config file */
+extern char	*CONFIG_TLS_CIPHER_PSK13;	/* parameter 'TLSCipherPSK13' from server/proxy/agent config file */
+extern char	*CONFIG_TLS_CIPHER_PSK;		/* parameter 'TLSCipherPSK' from server/proxy/agent config file */
+extern char	*CONFIG_TLS_CIPHER_ALL13;	/* parameter 'TLSCipherAll13' from server/proxy/agent config file */
+extern char	*CONFIG_TLS_CIPHER_ALL;		/* parameter 'TLSCipherAll' from server/proxy/agent config file */
+extern char	*CONFIG_TLS_CIPHER_CMD13;	/* parameter '--tls-cipher13' from sender or zabbix_get command line */
+extern char	*CONFIG_TLS_CIPHER_CMD;		/* parameter '--tls-cipher' from sender or zabbix_get command line */
+
 ZBX_THREAD_LOCAL static char		*my_psk_identity	= NULL;
 ZBX_THREAD_LOCAL static size_t		my_psk_identity_len	= 0;
 ZBX_THREAD_LOCAL static char		*my_psk			= NULL;
@@ -2914,6 +2923,21 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 #elif defined(HAVE_GNUTLS)
+static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, const char *priority_str,
+		const char *err_msg)
+{
+	const char	*err_pos;
+	int		res;
+
+	if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(ciphersuites, priority_str, &err_pos)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for %s failed: %d: %s: error occurred at position:"
+				" \"%s\"", err_msg, res, gnutls_strerror(res), ZBX_NULL2STR(err_pos));
+		zbx_tls_free();
+		exit(EXIT_FAILURE);
+	}
+}
+
 void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
@@ -3082,15 +3106,23 @@ void	zbx_tls_init_child(void)
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert_creds)
 	{
-		/* this should work with GnuTLS 3.1.18 - 3.3.16 */
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_cert, "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
-				"+RSA:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:"
-				"+CTYPE-X.509", NULL)))
+		const char	*priority_str;
+
+		if (NULL == CONFIG_TLS_CIPHER_CERT)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_cert' failed: %d: %s",
-					res, gnutls_strerror(res));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			/* for GnuTLS 3.1.18 and up */
+			priority_str = "NONE:+VERS-TLS1.2:+ECDHE-RSA:+RSA:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:"
+					"+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509";
+
+			zbx_gnutls_priority_init_or_exit(&ciphersuites_cert, priority_str,
+					"\"ciphersuites_cert\" with built-in default value");
+		}
+		else
+		{
+			priority_str = CONFIG_TLS_CIPHER_CERT;
+
+			zbx_gnutls_priority_init_or_exit(&ciphersuites_cert, priority_str,
+					"\"ciphersuites_cert\" with TLSCipherCert or --tls-cipher parameter");
 		}
 
 		zbx_log_ciphersuites(__function_name, "certificate", ciphersuites_cert);
@@ -3101,15 +3133,23 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
-		/* this should work with GnuTLS 3.1.18 - 3.3.16 */
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_psk, "NONE:+VERS-TLS1.2:+ECDHE-PSK:"
-				"+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL",
-				NULL)))
+		const char	*priority_str;
+
+		if (NULL == CONFIG_TLS_CIPHER_PSK)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_psk' failed: %d: %s",
-					res, gnutls_strerror(res));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			/* for GnuTLS 3.1.18 and up */
+			priority_str = "NONE:+VERS-TLS1.2:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:"
+					"+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL";
+
+			zbx_gnutls_priority_init_or_exit(&ciphersuites_psk, priority_str,
+					"\"ciphersuites_psk\" with built-in default value");
+		}
+		else
+		{
+			priority_str = CONFIG_TLS_CIPHER_PSK;
+
+			zbx_gnutls_priority_init_or_exit(&ciphersuites_psk, priority_str,
+					"\"ciphersuites_psk\" with TLSCipherPSK or --tls-cipher parameter");
 		}
 
 		zbx_log_ciphersuites(__function_name, "PSK", ciphersuites_psk);
@@ -3120,15 +3160,24 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_cert_creds && (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))))
 	{
-		/* this should work with GnuTLS 3.1.18 - 3.3.16 */
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_all, "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
-				"+RSA:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:"
-				"+COMP-NULL:+SIGN-ALL:+CTYPE-X.509", NULL)))
+		const char	*priority_str;
+
+		if (NULL == CONFIG_TLS_CIPHER_ALL)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_all' failed: %d: %s",
-					res, gnutls_strerror(res));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			/* for GnuTLS 3.1.18 and up */
+			priority_str = "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
+				"+RSA:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:"
+				"+COMP-NULL:+SIGN-ALL:+CTYPE-X.509";
+
+			zbx_gnutls_priority_init_or_exit(&ciphersuites_all, priority_str,
+					"\"ciphersuites_all\" with built-in default value");
+		}
+		else
+		{
+			priority_str = CONFIG_TLS_CIPHER_ALL;
+
+			zbx_gnutls_priority_init_or_exit(&ciphersuites_all, priority_str,
+					"\"ciphersuites_all\" with TLSCipherAll parameter");
 		}
 
 		zbx_log_ciphersuites(__function_name, "certificate and PSK", ciphersuites_all);
