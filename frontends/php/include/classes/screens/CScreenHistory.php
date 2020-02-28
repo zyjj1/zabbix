@@ -304,7 +304,7 @@ class CScreenHistory extends CScreenBase {
 
 				$url = (new CUrl($this->page_file))->formatGetArguments();
 				// Array $history_data will be modified according page and rows on page.
-				$pagination = getPagingLine($history_data, [], $url);
+				$pagination = getPagingLine($history_data, ZBX_SORT_UP, $url);
 
 				foreach ($history_data as $data) {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
@@ -492,7 +492,7 @@ class CScreenHistory extends CScreenBase {
 
 				$url = (new CUrl($this->page_file))->formatGetArguments();
 				// Array $history_data will be modified according page and rows on page.
-				$pagination = getPagingLine($history_data, [], $url);
+				$pagination = getPagingLine($history_data, ZBX_SORT_UP, $url);
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
 
 				foreach ($history_data as $history_data_row) {
