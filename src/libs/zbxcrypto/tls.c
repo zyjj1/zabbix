@@ -3866,6 +3866,63 @@ void	zbx_tls_init_child(void)
 		zbx_log_ciphersuites(__function_name, "certificate and PSK", ctx_all);
 	}
 #endif /* defined(HAVE_OPENSSL_WITH_PSK) */
+
+	if (NULL == ctx_psk)
+	{
+		/* cannot override TLS 1.3 PSK ciphersuites */
+		if (NULL != CONFIG_TLS_CIPHER_PSK13)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
+					" be applied: the list of PSK ciphersuites is not used");
+			goto out1;
+#else
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
+					" be applied: compiled with OpenSSL version older than 1.1.1, or is compiled"
+					" without PSK support, and the list of PSK ciphersuites is not used");
+			goto out1;
+#endif
+		}
+
+		/* cannot override TLS 1.2 PSK ciphersuites */
+		if (NULL != CONFIG_TLS_CIPHER_PSK)
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK\" cannot be"
+					" be applied: the list of PSK ciphersuites is not used");
+			goto out1;
+		}
+	}
+
+	if (NULL == ctx_all)
+	{
+		/* cannot override TLS 1.3 ciphersuites */
+		if (NULL != CONFIG_TLS_CIPHER_ALL13)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll13\" cannot"
+					" be applied: the combined list of certificate and PSK ciphersuites is"
+					" not used. Most likely parameters \"TLSCipherCert13\" and/or \"TLSCipherPSK13\""
+					" are sufficient");
+			goto out1;
+#else
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll13\" cannot"
+					" be applied: compiled with OpenSSL version older than 1.1.1, or is compiled"
+					" without PSK support, and the combined list of certificate and PSK"
+					" ciphersuites is not used");
+			goto out1;
+#endif
+		}
+
+		/* cannot override TLS 1.2 ciphersuites */
+		if (NULL != CONFIG_TLS_CIPHER_ALL)
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll\" cannot be"
+					" be applied: the combined list of certificate and PSK ciphersuites is"
+					" not used. Most likely parameters \"TLSCipherCert\" and/or \"TLSCipherPSK\""
+					" are sufficient");
+			goto out1;
+		}
+	}
 #ifndef _WINDOWS
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
@@ -3877,9 +3934,7 @@ out_method:
 	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot initialize TLS method:");
 out:
 	zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-#if defined(HAVE_OPENSSL_WITH_PSK) || OPENSSL_VERSION_NUMBER < 0x1010100fL	/* older than OpenSSL 1.1.1 */
 out1:
-#endif
 	zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 	zbx_free(error);
 	zbx_tls_free();
