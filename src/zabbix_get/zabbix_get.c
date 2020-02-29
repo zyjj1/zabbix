@@ -40,19 +40,19 @@ const char	*usage_message[] = {
 	"[--tls-crl-file CRL-file]", "[--tls-agent-cert-issuer cert-issuer]", "[--tls-agent-cert-subject cert-subject]",
 	"--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"-k item-key", NULL,
 	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"-k item-key", NULL,
 #endif
@@ -120,7 +120,7 @@ const char	*help_message[] = {
 	"  --tls-cipher               GnuTLS priority string (for TLS 1.2 and up) or",
 	"                             OpenSSL cipher string (only for TLS 1.2).",
 	"                             Override the default ciphersuite selection",
-	"                             criteria.",
+	"                             criteria",
 #endif
 #else
 	"  Not available. This 'zabbix_get' was compiled without TLS support",

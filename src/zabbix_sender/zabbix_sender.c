@@ -47,76 +47,76 @@ const char	*usage_message[] = {
 	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert", "--tls-ca-file CA-file",
 	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13] cipher-string",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
-	"[--tls-cipher13]",
+	"[--tls-cipher13 cipher-string]",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[--tls-cipher]",
+	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-r]", "-i input-file", NULL,
 #endif
@@ -220,7 +220,7 @@ const char	*help_message[] = {
 	"  --tls-cipher               GnuTLS priority string (for TLS 1.2 and up) or",
 	"                             OpenSSL cipher string (only for TLS 1.2).",
 	"                             Override the default ciphersuite selection",
-	"                             criteria.",
+	"                             criteria",
 #endif
 #else
 	"  Not available. This Zabbix sender was compiled without TLS support",
