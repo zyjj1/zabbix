@@ -112,7 +112,8 @@ const char	*help_message[] = {
 	"",
 	"  --tls-cipher13             Cipher string for OpenSSL 1.1.1 or newer for",
 	"                             TLS 1.3. Override the default ciphersuite",
-	"                             selection criteria.",
+	"                             selection criteria. This option is not available",
+	"                             if OpenSSL version is less than 1.1.1",
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"",
@@ -406,11 +407,11 @@ int	main(int argc, char **argv)
 #if defined(HAVE_OPENSSL)
 				CONFIG_TLS_CIPHER_CMD13 = zbx_strdup(CONFIG_TLS_CIPHER_CMD13, zbx_optarg);
 #elif defined(HAVE_GNUTLS)
-				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL."
+				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" zabbix_get was compiled with GnuTLS");
 				exit(EXIT_FAILURE);
 #elif defined(HAVE_POLARSSL)
-				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL."
+				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" zabbix_get was compiled with mbedTLS (PolarSSL)");
 				exit(EXIT_FAILURE);
 #endif
