@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -329,7 +329,13 @@ void	update_selfmon_counter(unsigned char state)
 		return;
 
 	process = &collector->process[process_type][process_num - 1];
-	ticks = times(&buf);
+
+	if (-1 == (ticks = times(&buf)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
+		process->cache.state = state;
+		return;
+	}
 
 	if (0 == process->cache.ticks_flush)
 	{
@@ -405,13 +411,16 @@ void	collect_selfmon_stats(void)
 
 	LOCK_SM;
 
-	ticks = times(&buf);
+	if (-1 == (ticks = times(&buf)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
+		goto unlock;
+	}
 
 	if (0 == collector->ticks_sync)
 	{
 		collector->ticks_sync = ticks;
-		UNLOCK_SM;
-		return;
+		goto unlock;
 	}
 
 	ticks_done = ticks - collector->ticks_sync;
@@ -447,7 +456,7 @@ void	collect_selfmon_stats(void)
 	}
 
 	collector->ticks_sync = ticks;
-
+unlock:
 	UNLOCK_SM;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
