@@ -214,7 +214,6 @@ int	init_selfmon_collector(char **error)
 	const char	*__function_name = "init_selfmon_collector";
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	char		*p;
-	struct tms	buf;
 	unsigned char	proc_type;
 	int		proc_num, process_forks, ret = FAIL;
 
@@ -398,6 +397,12 @@ void	collect_selfmon_stats(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (0 == collector->ticks_sync)
+	{
+		collector->ticks_sync = times(&buf);
+		goto out;
+	}
+
 	if (MAX_HISTORY <= (index = collector->first + collector->count))
 		index -= MAX_HISTORY;
 
@@ -432,7 +437,7 @@ void	collect_selfmon_stats(void)
 		{
 			process = &collector->process[proc_type][proc_num];
 
-			if (0 != process->cache.ticks_flush && process->cache.ticks_flush < collector->ticks_sync)
+			if (process->cache.ticks_flush < collector->ticks_sync)
 			{
 				/* If the process local cache was not flushed during the last self monitoring  */
 				/* data collection interval update the process statistics based on the current */
@@ -458,7 +463,7 @@ void	collect_selfmon_stats(void)
 	collector->ticks_sync = ticks;
 unlock:
 	UNLOCK_SM;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
