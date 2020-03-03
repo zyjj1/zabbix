@@ -397,9 +397,15 @@ void	collect_selfmon_stats(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (-1 == (ticks = times(&buf)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
+		goto out;
+	}
+
 	if (0 == collector->ticks_sync)
 	{
-		collector->ticks_sync = times(&buf);
+		collector->ticks_sync = ticks;
 		goto out;
 	}
 
@@ -415,18 +421,6 @@ void	collect_selfmon_stats(void)
 		last += MAX_HISTORY;
 
 	LOCK_SM;
-
-	if (-1 == (ticks = times(&buf)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
-		goto unlock;
-	}
-
-	if (0 == collector->ticks_sync)
-	{
-		collector->ticks_sync = ticks;
-		goto unlock;
-	}
 
 	ticks_done = ticks - collector->ticks_sync;
 
@@ -461,7 +455,7 @@ void	collect_selfmon_stats(void)
 	}
 
 	collector->ticks_sync = ticks;
-unlock:
+
 	UNLOCK_SM;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
