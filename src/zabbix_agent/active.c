@@ -1196,7 +1196,7 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request, int *rotation_type, char **error)
 {
 	char	*options;
-	int	options_par_nr, ret = SUCCEED;
+	int	options_par_nr;
 
 	if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log, logrt */
 		options_par_nr = 7;
@@ -1218,17 +1218,12 @@ static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request,
 		{
 			if (0 == strcmp(options, "copytruncate"))
 				*rotation_type = ZBX_LOG_ROTATION_LOGCPT;
-			else if (0 == strcmp(options, "rotate"))
-				*rotation_type = ZBX_LOG_ROTATION_LOGRT;
-			else if (0 == strcmp(options, "mtime-reread"))	/* mtime-reread is an alias for rotate */
+			else if (0 == strcmp(options, "rotate") || 0 == strcmp(options, "mtime-reread"))
 				*rotation_type = ZBX_LOG_ROTATION_LOGRT;
 			else if (0 == strcmp(options, "mtime-noreread"))
 				*rotation_type = ZBX_LOG_ROTATION_NO_REREAD;
 			else
-			{
-				*error = zbx_dsprintf(*error, "Invalid value \"%s\" for options parameter.", options);
-				ret = FAIL;
-			}
+				goto err;
 		}
 		else	/* log, log.count */
 		{
@@ -1237,14 +1232,15 @@ static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request,
 			else if (0 == strcmp(options, "mtime-noreread"))
 				*rotation_type = ZBX_LOG_ROTATION_NO_REREAD;
 			else
-			{
-				*error = zbx_dsprintf(*error, "Invalid value \"%s\" for options parameter.", options);
-				ret = FAIL;
-			}
+				goto err;
 		}
 	}
 
-	return ret;
+	return SUCCEED;
+err:
+	*error = zbx_strdup(*error, "Invalid parameter \"options\".");
+
+	return FAIL;
 }
 
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
@@ -1267,8 +1263,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	init_request(&request);
 
 	/* Expected parameters by item: */
-	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>]            7 params */
-	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>]            6 params */
+	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
+	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
 	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
 	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
 
