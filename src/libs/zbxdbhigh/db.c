@@ -2155,9 +2155,9 @@ void	DBcheck_character_set(void)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	result = DBselect(
-			"SELECT default_character_set_name, default_collation_name "
-			"FROM information_schema.SCHEMATA "
-			"WHERE schema_name = '%s'", database_name_esc);
+			"select default_character_set_name, default_collation_name"
+			" from information_schema.SCHEMATA"
+			" where schema_name = '%s'", database_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
 	{
@@ -2182,10 +2182,11 @@ void	DBcheck_character_set(void)
 	DBfree_result(result);
 
 	result = DBselect(
-			"SELECT COUNT(*) "
-			"FROM information_schema.`COLUMNS` "
-			"WHERE table_schema = '%s' AND data_type IN ('text', 'varchar', 'longtext') AND "
-			"(character_set_name != '%s' OR collation_name != '%s')",
+			"select count(*)"
+			" from information_schema.`COLUMNS`"
+			" where table_schema = '%s'"
+				" and data_type in ('text', 'varchar', 'longtext')"
+				" and (character_set_name != '%s' or collation_name != '%s')",
 			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
@@ -2209,9 +2210,9 @@ void	DBcheck_character_set(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
-			"SELECT parameter, value "
-			"FROM NLS_DATABASE_PARAMETERS "
-			"WHERE parameter IN ('NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET')");
+			"select parameter, value"
+			" from NLS_DATABASE_PARAMETERS"
+			" where parameter in ('NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET')");
 
 	if (NULL == result)
 	{
@@ -2258,7 +2259,9 @@ void	DBcheck_character_set(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
-			"SELECT pg_encoding_to_char(encoding) FROM pg_database WHERE datname = '%s'",
+			"select pg_encoding_to_char(encoding)"
+			" from pg_database"
+			" where datname = '%s'",
 			database_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
@@ -2276,8 +2279,9 @@ void	DBcheck_character_set(void)
 	DBfree_result(result);
 
 	result = DBselect(
-			"SELECT oid FROM pg_namespace "
-			"WHERE nspname = '%s'",
+			"select oid"
+			" from pg_namespace"
+			" where nspname = '%s'",
 			schema_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)) || 0 >= zbx_strlcpy(oid, row[0], sizeof(oid)))
@@ -2289,12 +2293,16 @@ void	DBcheck_character_set(void)
 	DBfree_result(result);
 
 	result = DBselect(
-			"SELECT COUNT(*) "
-			"FROM pg_attribute AS a "
-			"LEFT JOIN pg_class AS c ON c.relfilenode = a.attrelid "
-			"LEFT JOIN pg_collation AS l ON l.oid = a.attcollation "
-			"WHERE atttypid IN (25,1043) AND c.relnamespace = %s AND c.relam = 0 "
-			"AND l.collname != 'default'",
+			"select count(*)"
+				" from pg_attribute as a"
+					" left join pg_class as c"
+						" on c.relfilenode = a.attrelid"
+					" left join pg_collation as l"
+						" on l.oid = a.attcollation"
+			" where atttypid in (25,1043)"
+				" and c.relnamespace = %s "
+				" and c.relam = 0 "
+				" and l.collname != 'default'",
 			oid);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
