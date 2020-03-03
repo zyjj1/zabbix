@@ -19,7 +19,7 @@
 **/
 
 
-class CApiInputValidatorTest extends PHPUnit\Framework\TestCase {
+class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 
 	public function dataProviderInput() {
 		return [
