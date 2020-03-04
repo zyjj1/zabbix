@@ -696,7 +696,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
  *                                                                            *
  ******************************************************************************/
 static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
-		int options, char **err_msg)
+		zbx_log_rotation_options_t options, char **err_msg)
 {
 	if (ZBX_LOG_ROTATION_LOGCPT == options)
 		return is_same_file_logcpt(old_file, new_file, use_ino, err_msg);
@@ -1169,8 +1169,8 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
  *                             file                                           *
  *                                                                            *
  ******************************************************************************/
-static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *old_files, int num_old,
-		struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
+static char	*create_old2new_and_copy_of(zbx_log_rotation_options_t rotation_type, struct st_logfile *old_files,
+		int num_old, struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
 {
 	const char	*__function_name = "create_old2new_and_copy_of";
 	int		i, j;
@@ -2862,9 +2862,9 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 	}
 }
 
-static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfiles_old, int logfiles_num_old,
-		struct st_logfile *logfiles, int logfiles_num, int use_ino, int *seq, int *start_idx,
-		zbx_uint64_t *lastlogsize, char **err_msg)
+static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, struct st_logfile *logfiles_old,
+		int logfiles_num_old, struct st_logfile *logfiles, int logfiles_num, int use_ino, int *seq,
+		int *start_idx, zbx_uint64_t *lastlogsize, char **err_msg)
 {
 	char	*old2new;
 	int	i, max_old_seq = 0, old_last;
@@ -2964,7 +2964,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		int rotation_type)
+		zbx_log_rotation_options_t rotation_type)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,

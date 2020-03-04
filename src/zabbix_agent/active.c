@@ -1193,7 +1193,8 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 	return SUCCEED;
 }
 
-static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request, int *rotation_type, char **error)
+static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request,
+		zbx_log_rotation_options_t *rotation_type, char **error)
 {
 	char	*options;
 	int	options_par_nr;
@@ -1246,14 +1247,15 @@ err:
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
-	AGENT_REQUEST		request;
-	const char		*filename, *regexp, *encoding, *skip, *output_template;
-	char			*encoding_uc = NULL;
-	int			max_lines_per_sec, ret = FAIL, s_count, p_count, s_count_orig, is_count_item,
-				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0, rotation_type;
-	zbx_uint64_t		lastlogsize_orig;
-	float			max_delay;
-	struct st_logfile	*logfiles_new = NULL;
+	AGENT_REQUEST			request;
+	const char			*filename, *regexp, *encoding, *skip, *output_template;
+	char				*encoding_uc = NULL;
+	int				max_lines_per_sec, ret = FAIL, s_count, p_count, s_count_orig, is_count_item,
+					mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
+	zbx_log_rotation_options_t	rotation_type;
+	zbx_uint64_t			lastlogsize_orig;
+	float				max_delay;
+	struct st_logfile		*logfiles_new = NULL;
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
 		is_count_item = 1;
