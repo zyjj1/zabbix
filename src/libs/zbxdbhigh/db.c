@@ -2128,7 +2128,6 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 	return ret;
 }
 
-
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
