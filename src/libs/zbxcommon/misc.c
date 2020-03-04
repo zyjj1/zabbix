@@ -363,9 +363,9 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 	{
 		long	offset;
 #ifdef _WINDOWS
-		offset = zbx_get_timezone_offset(tm, current_time.time);
+		offset = zbx_get_timezone_offset(current_time.time, tm);
 #else
-		offset = zbx_get_timezone_offset(tm, current_time.tv_sec);
+		offset = zbx_get_timezone_offset(current_time.tv_sec, tm);
 #endif
 		tz->tz_sign = (0 <= offset ? '+' : '-');
 		tz->tz_hour = labs(offset) / SEC_PER_HOUR;
@@ -380,13 +380,13 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
  *                                                                            *
  * Purpose: get time offset from UTC                                          *
  *                                                                            *
- * Parameters: tm - [OUT] broken-down representation of the current time      *
- *             t  - [IN] input time to calculate offset with                  *
+ * Parameters: t  - [IN] input time to calculate offset with                  *
+ *             tm - [OUT] broken-down representation of the current time      *
  *                                                                            *
  * Return value: Time offset from UTC in seconds                              *
  *                                                                            *
  ******************************************************************************/
-long	zbx_get_timezone_offset(struct tm *tm, time_t t)
+long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 {
 	long		offset;
 #ifndef HAVE_TM_TM_GMTOFF

@@ -524,9 +524,9 @@ static time_t dc_substract_time(time_t minuend, int subtrahend, struct tm *tm)
 {
 	time_t	diff, offset_min, offset_diff;
 
-	offset_min = zbx_get_timezone_offset(tm, minuend);
+	offset_min = zbx_get_timezone_offset(minuend, tm);
 	diff = minuend - subtrahend;
-	offset_diff = zbx_get_timezone_offset(tm, diff);
+	offset_diff = zbx_get_timezone_offset(diff, tm);
 	diff -= (offset_diff - offset_min);
 
 	return diff;
