@@ -586,8 +586,8 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 
 			tm = localtime(&active_since);
 			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = dc_substract_time(active_since, (wday * SEC_PER_DAY +
-					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec), tm);
+			active_since = dc_substract_time(active_since, wday * SEC_PER_DAY +
+					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec, tm);
 
 			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, tm))
 			{
