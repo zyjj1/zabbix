@@ -2156,7 +2156,7 @@ void	DBcheck_character_set(void)
 	result = DBselect(
 			"select default_character_set_name, default_collation_name"
 			" from information_schema.SCHEMATA"
-			" where schema_name = '%s'", database_name_esc);
+			" where schema_name='%s'", database_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
 	{
@@ -2183,9 +2183,9 @@ void	DBcheck_character_set(void)
 	result = DBselect(
 			"select count(*)"
 			" from information_schema.`COLUMNS`"
-			" where table_schema = '%s'"
+			" where table_schema='%s'"
 				" and data_type in ('text', 'varchar', 'longtext')"
-				" and (character_set_name != '%s' or collation_name != '%s')",
+				" and (character_set_name<>'%s' or collation_name<>'%s')",
 			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
@@ -2260,7 +2260,7 @@ void	DBcheck_character_set(void)
 	result = DBselect(
 			"select pg_encoding_to_char(encoding)"
 			" from pg_database"
-			" where datname = '%s'",
+			" where datname='%s'",
 			database_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
@@ -2280,7 +2280,7 @@ void	DBcheck_character_set(void)
 	result = DBselect(
 			"select oid"
 			" from pg_namespace"
-			" where nspname = '%s'",
+			" where nspname='%s'",
 			schema_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)) || 0 >= zbx_strlcpy(oid, row[0], sizeof(oid)))
@@ -2295,13 +2295,13 @@ void	DBcheck_character_set(void)
 			"select count(*)"
 				" from pg_attribute as a"
 					" left join pg_class as c"
-						" on c.relfilenode = a.attrelid"
+						" on c.relfilenode=a.attrelid"
 					" left join pg_collation as l"
-						" on l.oid = a.attcollation"
+						" on l.oid=a.attcollation"
 			" where atttypid in (25,1043)"
-				" and c.relnamespace = %s "
-				" and c.relam = 0 "
-				" and l.collname != 'default'",
+				" and c.relnamespace=%s"
+				" and c.relam=0"
+				" and l.collname<>'default'",
 			oid);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
