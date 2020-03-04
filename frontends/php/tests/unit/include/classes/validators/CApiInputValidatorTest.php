@@ -2823,12 +2823,6 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/chart_bar.php?a=1&b=2'
 			],
 			[
-				['type' => API_URL],
-				'{$URL}',
-				'/1/url',
-				'{$URL}'
-			],
-			[
 				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
 				'{$URL}',
 				'/1/url',
