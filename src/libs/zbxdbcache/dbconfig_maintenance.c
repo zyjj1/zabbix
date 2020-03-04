@@ -511,7 +511,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: dc_substract_time                                                *
  *                                                                            *
- * Purpose: substract two times with DST correction                           *
+ * Purpose: substract two local times with DST correction                     *
  *                                                                            *
  * Parameter: minuend       - [IN] the minuend time                           *
  *            subtrahend    - [IN] the subtrahend time (may be negative)      *
