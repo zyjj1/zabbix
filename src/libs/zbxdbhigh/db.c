@@ -2161,7 +2161,7 @@ void	DBcheck_character_set(void)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	result = DBselect(
-			"select default_character_set_name, default_collation_name"
+			"select default_character_set_name,default_collation_name"
 			" from information_schema.SCHEMATA"
 			" where schema_name='%s'", database_name_esc);
 
@@ -2191,7 +2191,7 @@ void	DBcheck_character_set(void)
 			"select count(*)"
 			" from information_schema.`COLUMNS`"
 			" where table_schema='%s'"
-				" and data_type in ('text', 'varchar', 'longtext')"
+				" and data_type in ('text','varchar','longtext')"
 				" and (character_set_name<>'%s' or collation_name<>'%s')",
 			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
 
@@ -2216,9 +2216,9 @@ void	DBcheck_character_set(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
-			"select parameter, value"
+			"select parameter,value"
 			" from NLS_DATABASE_PARAMETERS"
-			" where parameter in ('NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET')");
+			" where parameter in ('NLS_CHARACTERSET','NLS_NCHAR_CHARACTERSET')");
 
 	if (NULL == result)
 	{
@@ -2254,9 +2254,7 @@ void	DBcheck_character_set(void)
 #elif defined(HAVE_POSTGRESQL)
 #define OID_LENGTH_MAX		20
 
-	char		*database_name_esc = NULL;
-	char		*schema_name_esc = NULL;
-	char		oid[OID_LENGTH_MAX] = "";
+	char		*database_name_esc, *schema_name_esc, oid[OID_LENGTH_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -2290,21 +2288,23 @@ void	DBcheck_character_set(void)
 			" where nspname='%s'",
 			schema_name_esc);
 
-	if (NULL == result || NULL == (row = DBfetch(result)) || 0 >= zbx_strlcpy(oid, row[0], sizeof(oid)))
+	if (NULL == result || NULL == (row = DBfetch(result)) || '\0' == **row)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
 		goto out;
 	}
 
+	strscpy(oid, *row);
+
 	DBfree_result(result);
 
 	result = DBselect(
 			"select count(*)"
-				" from pg_attribute as a"
-					" left join pg_class as c"
-						" on c.relfilenode=a.attrelid"
-					" left join pg_collation as l"
-						" on l.oid=a.attcollation"
+			" from pg_attribute as a"
+				" left join pg_class as c"
+					" on c.relfilenode=a.attrelid"
+				" left join pg_collation as l"
+					" on l.oid=a.attcollation"
 			" where atttypid in (25,1043)"
 				" and c.relnamespace=%s"
 				" and c.relam=0"
