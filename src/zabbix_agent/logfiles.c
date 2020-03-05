@@ -735,7 +735,7 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 			if (ZBX_LOG_ROTATION_NO_REREAD != options)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "the modification time of log file \"%s\" has been"
-						"updated without changing its size, try checking again later",
+						" updated without changing its size, try checking again later",
 						old_file->filename);
 			}
 
