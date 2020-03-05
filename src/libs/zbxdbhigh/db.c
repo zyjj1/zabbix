@@ -26,8 +26,12 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL)
 #define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#endif
+#if defined(HAVE_MYSQL)
 #define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin"
+#endif
 
 typedef struct
 {
@@ -42,7 +46,7 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#if HAVE_POSTGRESQL
+#if defined(HAVE_POSTGRESQL)
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
 
@@ -482,7 +486,7 @@ static size_t	get_string_field_size(unsigned char type)
 			exit(EXIT_FAILURE);
 	}
 }
-#elif HAVE_ORACLE
+#elif defined(HAVE_ORACLE)
 static size_t	get_string_field_size(unsigned char type)
 {
 	switch(type)
@@ -507,7 +511,7 @@ static size_t	get_string_field_size(unsigned char type)
  ******************************************************************************/
 char	*DBdyn_escape_string_len(const char *src, size_t length)
 {
-#if HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
+#if defined(HAVE_IBM_DB2)	/* IBM DB2 fields are limited by bytes rather than characters */
 	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 #else
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
@@ -540,7 +544,7 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
 	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
-#elif HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
+#elif defined(HAVE_IBM_DB2)	/* IBM DB2 fields are limited by bytes rather than characters */
 	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, flag);
 #else
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
@@ -734,9 +738,10 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 }
 
 #define MAX_EXPRESSIONS	950
-#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
 
 #ifdef HAVE_ORACLE
+#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
+
 /******************************************************************************
  *                                                                            *
  * Function: DBadd_condition_alloc_btw                                        *
@@ -961,7 +966,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
+#ifdef HAVE_ORACLE
 #undef MIN_NUM_BETWEEN
+#endif
 }
 
 /******************************************************************************
