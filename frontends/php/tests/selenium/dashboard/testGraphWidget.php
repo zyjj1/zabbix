@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,6 +84,7 @@ class testGraphWidget extends CWebTest {
 
 	/**
 	 * Check screenshots of graph widget form.
+	 * @browsers chrome
 	 */
 	public function testGraphWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
@@ -94,6 +95,7 @@ class testGraphWidget extends CWebTest {
 		$form->waitUntilReloaded();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 
+		$errors = [];
 		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
@@ -104,7 +106,16 @@ class testGraphWidget extends CWebTest {
 			}
 
 			$this->page->removeFocus();
-			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+			// Collect all screenshot errors.
+			try {
+				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+			} catch (Exception $ex) {
+				$errors[] = $ex->getMessage();
+			}
+		}
+
+		if ($errors) {
+			$this->fail(implode("\n", $errors));
 		}
 	}
 
@@ -1778,7 +1789,7 @@ class testGraphWidget extends CWebTest {
 			$form->selectTab($tab);
 			switch ($tab) {
 				case 'Problems':
-					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT_MULTIPLE);
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 
