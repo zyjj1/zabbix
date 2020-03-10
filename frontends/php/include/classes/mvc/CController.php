@@ -180,33 +180,36 @@ abstract class CController {
 	/**
 	 * Validate "from" and "to" parameters for allowed period.
 	 *
+	 * @param string $key_from  Start date parameter name.
+	 * @param string $key_to    End date parameter name.
+	 *
 	 * @return bool
 	 */
-	public function validateTimeSelectorPeriod() {
-		if (!$this->hasInput('from') || !$this->hasInput('to')) {
+	public function validateTimeSelectorPeriod($key_from = 'from', $key_to = 'to') {
+		if (!$this->hasInput($key_from) || !$this->hasInput($key_to)) {
 			return true;
 		}
 
 		$ts = [];
 		$range_time_parser = new CRangeTimeParser();
 
-		foreach (['from', 'to'] as $field) {
+		foreach ([$key_from, $key_to] as $field) {
 			$range_time_parser->parse($this->getInput($field));
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			$ts[$field] = $range_time_parser->getDateTime($field === $key_from)->getTimestamp();
 		}
 
-		$period = $ts['to'] - $ts['from'] + 1;
+		$period = $ts[$key_to] - $ts[$key_from] + 1;
 
 		if ($period < ZBX_MIN_PERIOD) {
 			info(_n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			));
 
 			return false;
 		}
 		elseif ($period > ZBX_MAX_PERIOD) {
 			info(_n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
 			));
 
 			return false;
