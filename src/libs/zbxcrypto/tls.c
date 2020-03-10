@@ -914,8 +914,11 @@ void	zbx_tls_validate_config(void)
 	zbx_tls_parameter_not_empty(&CONFIG_TLS_PSK_IDENTITY);
 	zbx_tls_parameter_not_empty(&CONFIG_TLS_PSK_FILE);
 
-	/* CONFIG_TLS_CIPHER_CERT13, CONFIG_TLS_CIPHER_PSK13, CONFIG_TLS_CIPHER_ALL13 and CONFIG_TLS_CIPHER_CMD13 */
-	/* are not validated here, they can be empty to disable TLS 1.3 ciphersuites */
+	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_CERT13);
+	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_PSK13);
+	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_ALL13);
+	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_CMD13);
+
 	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_CERT);
 	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_PSK);
 	zbx_tls_parameter_not_empty(&CONFIG_TLS_CIPHER_ALL);
