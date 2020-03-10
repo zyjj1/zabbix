@@ -84,7 +84,7 @@ var CSuggest = Class.create({
 			return true;
 		}
 
-		this.userNeedle = needle;
+		this.userNeedle = target.value;
 		this.needles[needle] = {'needle': needle, 'list': {}};
 
 		var found = false;
