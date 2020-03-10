@@ -560,7 +560,7 @@ static const char	*zbx_tls_parameter_name(int type, char **param)
 		return ZBX_TLS_PARAMETER_CONFIG_FILE == type ? "TLSConnect" : "--tls-connect";
 
 	if (&CONFIG_TLS_ACCEPT == param)
-		return ZBX_TLS_PARAMETER_CONFIG_FILE == type ? "TLSAccept" : "--tls-accept";
+		return "TLSAccept";
 
 	if (&CONFIG_TLS_CA_FILE == param)
 		return ZBX_TLS_PARAMETER_CONFIG_FILE == type ? "TLSCAFile" : "--tls-ca-file";
