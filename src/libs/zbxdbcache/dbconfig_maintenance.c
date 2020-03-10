@@ -554,7 +554,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 		time_t *running_until)
 {
 	int		day, wday, week;
-	struct tm	*tm;
+	struct tm	tm;
 	time_t		active_since = maintenance->active_since;
 
 	if (TIMEPERIOD_TYPE_ONETIME == period->type)
@@ -573,23 +573,23 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			if (start_date < active_since)
 				return FAIL;
 
-			tm = localtime(&active_since);
+			tm = *localtime(&active_since);
 			active_since = dc_substract_time(active_since,
-					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec, tm);
+					tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec, &tm);
 
 			day = (start_date - active_since) / SEC_PER_DAY;
-			start_date = dc_substract_time(start_date, SEC_PER_DAY * (day % period->every), tm);
+			start_date = dc_substract_time(start_date, SEC_PER_DAY * (day % period->every), &tm);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
 			if (start_date < active_since)
 				return FAIL;
 
-			tm = localtime(&active_since);
-			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+			tm = *localtime(&active_since);
+			wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 			active_since = dc_substract_time(active_since, wday * SEC_PER_DAY +
-					tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec, tm);
+					tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec, &tm);
 
-			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, tm))
+			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, &tm))
 			{
 				/* check for every x week(s) */
 				week = (start_date - active_since) / SEC_PER_WEEK;
@@ -597,8 +597,8 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 					continue;
 
 				/* check for day of the week */
-				tm = localtime(&start_date);
-				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+				tm = *localtime(&start_date);
+				wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 				if (0 == (period->dayofweek & (1 << wday)))
 					continue;
 
@@ -606,32 +606,32 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			}
 			break;
 		case TIMEPERIOD_TYPE_MONTHLY:
-			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, tm))
+			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, &tm))
 			{
 				/* check for month */
-				tm = localtime(&start_date);
-				if (0 == (period->month & (1 << tm->tm_mon)))
+				tm = *localtime(&start_date);
+				if (0 == (period->month & (1 << tm.tm_mon)))
 					continue;
 
 				if (0 != period->day)
 				{
 					/* check for day of the month */
-					if (period->day != tm->tm_mday)
+					if (period->day != tm.tm_mday)
 						continue;
 				}
 				else
 				{
 					/* check for day of the week */
-					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+					wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 					if (0 == (period->dayofweek & (1 << wday)))
 						continue;
 
 					/* check for number of day (first, second, third, fourth or last) */
-					day = (tm->tm_mday - 1) / 7 + 1;
+					day = (tm.tm_mday - 1) / 7 + 1;
 					if (5 == period->every && 4 == day)
 					{
-						if (tm->tm_mday + 7 <= zbx_day_in_month(1900 + tm->tm_year,
-								tm->tm_mon + 1))
+						if (tm.tm_mday + 7 <= zbx_day_in_month(1900 + tm.tm_year,
+								tm.tm_mon + 1))
 						{
 							continue;
 						}
@@ -678,25 +678,25 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 		const zbx_dc_maintenance_period_t *period, time_t now, time_t *running_since, time_t *running_until)
 {
-	struct tm	*tm;
+	struct tm	tm;
 	int		seconds, rc, ret = FAIL;
 	time_t		period_start, period_end;
 
-	tm = localtime(&now);
-	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
-	period_start = dc_substract_time(now, seconds, tm);
-	period_start = dc_substract_time(period_start, -period->start_time, tm);
+	tm = *localtime(&now);
+	seconds = tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec;
+	period_start = dc_substract_time(now, seconds, &tm);
+	period_start = dc_substract_time(period_start, -period->start_time, &tm);
 
-	tm = localtime(&period_start);
+	tm = *localtime(&period_start);
 
-	if (TIMEPERIOD_TYPE_ONETIME != period->type &&
-			period->start_time != (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec))
+	/* skip maintenance if the time does not exist due to DST */
+	if (period->start_time != (tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec))
 	{
 		goto out;
 	}
 
 	if (now < period_start)
-		period_start = dc_substract_time(period_start, SEC_PER_DAY, tm);
+		period_start = dc_substract_time(period_start, SEC_PER_DAY, &tm);
 
 	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start, &period_end);
 

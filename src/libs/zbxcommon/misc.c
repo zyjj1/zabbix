@@ -391,11 +391,9 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	long		offset;
 #ifndef HAVE_TM_TM_GMTOFF
 	struct tm	tm_utc;
+#endif
 
 	*tm = *localtime(&t);
-#else
-	localtime_r(&t, tm);
-#endif
 
 #ifdef HAVE_TM_TM_GMTOFF
 	offset = tm->tm_gmtoff;
