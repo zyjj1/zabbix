@@ -1,3 +1,47 @@
+Changes for 4.0.19rc1
+
+New features:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
+
+Bug fixes:
+..F....... [ZBX-17075] fixed "Problems" page validation to ignore invalid date format in filter (vasilijs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+..F....... [ZBX-17185] fixed non-disappearing messages of failed login attempts (Ivo)
+........S. [ZBX-17322] fixed deadlock between server and frontend when updating multiple hosts (vso)
+..F.I..... [ZBX-9057] fixed duplicate entries being written into in profiles table (talbergs)
+..F....... [ZBX-17159] fixed overlay dialogue instantiation (talbergs)
+.......PS. [ZBX-17108] improved process utilization calculation (mabele)
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.18
+
+4.0.18rc1 was released as 4.0.18 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.18rc1
+
+New features:
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
+.......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
+....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
+
+Bug fixes:
+.......P.. [ZBX-17213] fixed Zabbix proxy not to execute remote commands on Zabbix agent with timeout and not to wait for execution result (vso)
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
+A.F....... [ZBX-17220] fixed several PHP 7.4 compatibility issues (miks)
+........S. [ZBX-16827] fixed applications being unlinked from items when both items and applications are not discovered anymore (vso)
+........S. [ZBX-17035] internal events are not created if there is no enabled internal actions (atumilovics)
+........S. [ZBX-16965] fixed link/unlink template operation execution order (atumilovics)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.17
+
+4.0.17rc1 was released as 4.0.17 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.17rc1
 
 New features:
@@ -2758,11 +2802,26 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.30rc1
+Changes for 3.0.31rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.30
+
+3.0.30rc1 was released as 3.0.30 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.30rc1
+
+New features:
+....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
+
+Bug fixes:
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
+........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.29
