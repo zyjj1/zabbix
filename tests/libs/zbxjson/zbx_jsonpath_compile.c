@@ -174,7 +174,6 @@ static char	*segment_data_to_str(const zbx_jsonpath_segment_t *segment)
 			}
 			break;
 		case ZBX_JSONPATH_SEGMENT_FUNCTION:
-			printf("FUNCTION: %d\n", segment->data.function.type);
 			zbx_strcpy_alloc(&data, &data_alloc, &data_offset, functions[segment->data.function.type]);
 			break;
 		default:

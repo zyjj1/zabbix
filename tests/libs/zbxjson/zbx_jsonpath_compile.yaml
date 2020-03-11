@@ -1040,7 +1040,7 @@ test case: Compile success $.sum()
 in:
   path: $.sum()
 out:
-  result: SUCCEED 
+  result: SUCCEED
   definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
@@ -1050,7 +1050,7 @@ test case: Compile success $.*~
 in:
   path: $.*~
 out:
-  result: SUCCEED 
+  result: SUCCEED
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
@@ -1062,7 +1062,7 @@ test case: Compile success $.*~.first()
 in:
   path: $.*~.first()
 out:
-  result: SUCCEED 
+  result: SUCCEED
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
