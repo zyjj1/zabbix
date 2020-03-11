@@ -1137,8 +1137,9 @@ void	zbx_tls_validate_config(void)
 		}
 	}
 
-	/* Parameters 'TLSCipherAll13' and 'TLSCipherAll' are used only for incoming connections. They may be defined */
-	/* without other TLS parameters on server and proxy (at least some hosts may be connecting with PSK). */
+	/* Parameters 'TLSCipherAll13' and 'TLSCipherAll' are used only for incoming connections if a combined list */
+	/* of certificate- and PSK-based ciphersuites is used. They may be defined without other TLS parameters on */
+	/* server and proxy (at least some hosts may be connecting with PSK). */
 	/* 'zabbix_get' and sender do not use these parameters. Validate only in case of agent. */
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) &&
@@ -3702,8 +3703,12 @@ void	zbx_tls_init_child(void)
 		if (NULL != CONFIG_TLS_CIPHER_CERT13 || NULL != CONFIG_TLS_CIPHER_CMD13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
-			if (1 != SSL_CTX_set_ciphersuites(ctx_cert, (NULL != CONFIG_TLS_CIPHER_CERT13) ?
-						CONFIG_TLS_CIPHER_CERT13 : CONFIG_TLS_CIPHER_CMD13))
+			const char	*override_ciphers = CONFIG_TLS_CIPHER_CERT13;	/* can be NULL */
+
+			if (NULL != CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+				override_ciphers = CONFIG_TLS_CIPHER_CMD13;
+
+			if (NULL != override_ciphers && 1 != SSL_CTX_set_ciphersuites(ctx_cert, override_ciphers))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
 						" certificate ciphersuites from \"TLSCipherCert13\" or"
@@ -3721,8 +3726,12 @@ void	zbx_tls_init_child(void)
 		/* override TLS 1.2 certificate ciphersuites with user-defined settings */
 		if (NULL != CONFIG_TLS_CIPHER_CERT || NULL != CONFIG_TLS_CIPHER_CMD)
 		{
-			if (1 != SSL_CTX_set_cipher_list(ctx_cert, (NULL != CONFIG_TLS_CIPHER_CERT) ?
-						CONFIG_TLS_CIPHER_CERT : CONFIG_TLS_CIPHER_CMD))
+			const char	*override_ciphers = CONFIG_TLS_CIPHER_CERT;	/* can be NULL */
+
+			if (NULL != CONFIG_TLS_CIPHER_CMD && ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+				override_ciphers = CONFIG_TLS_CIPHER_CMD;
+
+			if (NULL != override_ciphers && 1 != SSL_CTX_set_cipher_list(ctx_cert, override_ciphers))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.2"
 						" certificate ciphersuites from \"TLSCipherCert\" or \"--tls-cipher\""
@@ -3769,8 +3778,12 @@ void	zbx_tls_init_child(void)
 		if (NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != CONFIG_TLS_CIPHER_CMD13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
-			if (1 != SSL_CTX_set_ciphersuites(ctx_psk, (NULL != CONFIG_TLS_CIPHER_PSK13) ?
-						CONFIG_TLS_CIPHER_PSK13 : CONFIG_TLS_CIPHER_CMD13))
+			const char	*override_ciphers = CONFIG_TLS_CIPHER_PSK13;	/* can be NULL */
+
+			if (NULL != CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+				override_ciphers = CONFIG_TLS_CIPHER_CMD13;
+
+			if (NULL != override_ciphers && 1 != SSL_CTX_set_ciphersuites(ctx_psk, override_ciphers))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
 						" PSK ciphersuites from \"TLSCipherPSK13\" or \"--tls-cipher13\""
@@ -3795,11 +3808,15 @@ void	zbx_tls_init_child(void)
 		/* override TLS 1.2 PSK ciphersuites with user-defined settings */
 		if (NULL != CONFIG_TLS_CIPHER_PSK || NULL != CONFIG_TLS_CIPHER_CMD)
 		{
-			if (1 != SSL_CTX_set_cipher_list(ctx_psk, (NULL != CONFIG_TLS_CIPHER_PSK) ?
-						CONFIG_TLS_CIPHER_PSK : CONFIG_TLS_CIPHER_CMD))
+			const char	*override_ciphers = CONFIG_TLS_CIPHER_PSK;	/* can be NULL */
+
+			if (NULL != CONFIG_TLS_CIPHER_CMD && ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+				override_ciphers = CONFIG_TLS_CIPHER_CMD;
+
+			if (NULL != override_ciphers && 1 != SSL_CTX_set_cipher_list(ctx_psk, override_ciphers))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.2"
-						" PSK ciphersuites from \"TLSCipherCert\" or \"--tls-cipher\""
+						" PSK ciphersuites from \"TLSCipherPSK\" or \"--tls-cipher\""
 						" parameter:");
 				goto out;
 			}
