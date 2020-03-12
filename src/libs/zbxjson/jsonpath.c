@@ -1301,8 +1301,7 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
  *             next      - [OUT] a pointer to the next character after parsed *
  *                               segment                                      *
  *                                                                            *
- * Return value: SUCCEED - the segment was parsed successfully                *
- *               FAIL    - otherwise                                          *
+ * Return value: SUCCEED - the name reference was parsed                      *
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_parse_name_reference(zbx_jsonpath_t *jsonpath, const char **next)
@@ -1427,7 +1426,6 @@ static int	jsonpath_query_next_segment(const struct zbx_json_parse *jp_root, con
  *                               name                                         *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
- *             name       - [IN] the object value name                        *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - no errors, failed match is not an error            *
@@ -1437,10 +1435,8 @@ static int	jsonpath_query_next_segment(const struct zbx_json_parse *jp_root, con
 static int	jsonpath_match_name(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
 {
-	zbx_jsonpath_segment_t		*segment;
-	zbx_jsonpath_list_node_t	*node;
-
-	segment = &jsonpath->segments[path_depth];
+	const zbx_jsonpath_segment_t	*segment = &jsonpath->segments[path_depth];
+	const zbx_jsonpath_list_node_t	*node;
 
 	/* object contents can match only name list */
 	if (ZBX_JSONPATH_LIST_NAME != segment->data.list.type)
@@ -1928,10 +1924,10 @@ out:
 static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
 {
-	const char		*pnext = NULL;
-	char			name[MAX_STRING_LEN];
-	zbx_jsonpath_segment_t	*segment;
-	int			ret = SUCCEED;
+	const char			*pnext = NULL;
+	char				name[MAX_STRING_LEN];
+	const zbx_jsonpath_segment_t	*segment;
+	int				ret = SUCCEED;
 
 	segment = &jsonpath->segments[path_depth];
 
@@ -1981,10 +1977,8 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
 static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_json_t *objects)
 {
-	zbx_jsonpath_segment_t		*segment;
-	zbx_jsonpath_list_node_t	*node;
-
-	segment = &jsonpath->segments[path_depth];
+	const zbx_jsonpath_segment_t	*segment = &jsonpath->segments[path_depth];
+	const zbx_jsonpath_list_node_t	*node;
 
 	/* array contents can match only index list */
 	if (ZBX_JSONPATH_LIST_INDEX != segment->data.list.type)
@@ -2029,10 +2023,8 @@ static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char
 static int	jsonpath_match_range(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_json_t *objects)
 {
-	int			start_index, end_index;
-	zbx_jsonpath_segment_t	*segment;
-
-	segment = &jsonpath->segments[path_depth];
+	int				start_index, end_index;
+	const zbx_jsonpath_segment_t	*segment = &jsonpath->segments[path_depth];
 
 	start_index = (0 != (segment->data.range.flags & 0x01) ? segment->data.range.start : 0);
 	end_index = (0 != (segment->data.range.flags & 0x02) ? segment->data.range.end : elements_num);
@@ -2228,7 +2220,6 @@ static int	jsonpath_apply_function(const zbx_vector_json_t *objects, zbx_jsonpat
 		ret = SUCCEED;
 		goto out;
 	}
-
 
 	/* convert definite path result to object array if possible */
 	if (0 != definite_path)
