@@ -2206,6 +2206,7 @@ static int	jsonpath_apply_function(const zbx_vector_json_t *objects, zbx_jsonpat
 		{
 			struct zbx_json	j;
 
+			/* reserve some space for output json, 1k being large enough to satisfy most queries */
 			zbx_json_initarray(&j, 1024);
 			for (i = 0; i < objects->values_num; i++)
 				zbx_json_addstring(&j, NULL, objects->values[i].name, ZBX_JSON_TYPE_STRING);
@@ -2241,7 +2242,7 @@ static int	jsonpath_apply_function(const zbx_vector_json_t *objects, zbx_jsonpat
 
 		for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
 		{
-			char	name[MAX_STRING_LEN];
+			char	name[MAX_ID_LEN + 1];
 
 			zbx_snprintf(name, sizeof(name), "%d", index++);
 			zbx_vector_json_add_element(&objects_tmp, name, pnext);
@@ -2342,7 +2343,7 @@ static int	jsonpath_apply_functions(const struct zbx_json_parse *jp_root, const 
 {
 	int			ret, definite_path;
 	zbx_vector_json_t	input;
-	char			*tmp_output = NULL;
+	char			*input_json = NULL;
 
 	zbx_vector_json_create(&input);
 
@@ -2355,30 +2356,28 @@ static int	jsonpath_apply_functions(const struct zbx_json_parse *jp_root, const 
 
 	definite_path = jsonpath->definite;
 
-	while (SUCCEED == (ret = jsonpath_apply_function(&input, jsonpath->segments[path_depth].data.function.type,
-			definite_path, output)))
+	for (;;)
 	{
-		if (++path_depth == jsonpath->segments_num)
-			break;
+		ret = jsonpath_apply_function(&input, jsonpath->segments[path_depth++].data.function.type,
+				definite_path, output);
 
 		zbx_vector_json_clear_ext(&input);
+		zbx_free(input_json);
+
+		if (SUCCEED != ret || path_depth == jsonpath->segments_num)
+			break;
 
 		if (NULL != *output)
 		{
 			zbx_vector_json_add_element(&input, "", *output);
-			zbx_free(tmp_output);
-			tmp_output = *output;
+			input_json = *output;
+			*output = NULL;
 		}
-
-		*output = NULL;
-
 
 		/* functions return single value, so for the next functions path becomes definite */
 		definite_path = 1;
 	}
 
-	zbx_free(tmp_output);
-	zbx_vector_json_clear_ext(&input);
 	zbx_vector_json_destroy(&input);
 
 	return ret;
@@ -2607,4 +2606,3 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 
 	return ret;
 }
-
