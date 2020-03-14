@@ -3895,13 +3895,12 @@ void	zbx_tls_init_child(void)
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
 					" be applied: the list of PSK ciphersuites is not used");
-			goto out1;
 #else
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
 					" be applied: compiled with OpenSSL version older than 1.1.1, or is compiled"
 					" without PSK support, and the list of PSK ciphersuites is not used");
-			goto out1;
 #endif
+			goto out1;
 		}
 
 		/* cannot override TLS 1.2 PSK ciphersuites */
@@ -3923,14 +3922,13 @@ void	zbx_tls_init_child(void)
 					" be applied: the combined list of certificate and PSK ciphersuites is"
 					" not used. Most likely parameters \"TLSCipherCert13\" and/or \"TLSCipherPSK13\""
 					" are sufficient");
-			goto out1;
 #else
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll13\" cannot"
 					" be applied: compiled with OpenSSL version older than 1.1.1, or is compiled"
 					" without PSK support, and the combined list of certificate and PSK"
 					" ciphersuites is not used");
-			goto out1;
 #endif
+			goto out1;
 		}
 
 		/* cannot override TLS 1.2 ciphersuites */
