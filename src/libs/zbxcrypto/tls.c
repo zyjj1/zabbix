@@ -145,8 +145,6 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();
-#elif defined(LIBRESSL_VERSION_NUMBER)
-	OPENSSL_init_ssl(opts, settings);
 #endif
 #ifdef _WINDOWS
 	ZBX_UNUSED(opts);
@@ -2835,12 +2833,13 @@ static void	zbx_tls_library_init(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
+#if !defined(LIBRESSL_VERSION_NUMBER)	/* LibreSSL does not require initialization */
 	if (1 != zbx_openssl_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize OpenSSL library");
 		exit(EXIT_FAILURE);
 	}
-
+#endif
 	init_done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
