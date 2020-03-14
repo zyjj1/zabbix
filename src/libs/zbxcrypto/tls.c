@@ -3907,7 +3907,7 @@ void	zbx_tls_init_child(void)
 		/* cannot override TLS 1.2 PSK ciphersuites */
 		if (NULL != CONFIG_TLS_CIPHER_PSK)
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK\" cannot be"
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK\" cannot"
 					" be applied: the list of PSK ciphersuites is not used");
 			goto out1;
 		}
@@ -3936,7 +3936,7 @@ void	zbx_tls_init_child(void)
 		/* cannot override TLS 1.2 ciphersuites */
 		if (NULL != CONFIG_TLS_CIPHER_ALL)
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll\" cannot be"
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll\" cannot"
 					" be applied: the combined list of certificate and PSK ciphersuites is"
 					" not used. Most likely parameters \"TLSCipherCert\" and/or \"TLSCipherPSK\""
 					" are sufficient");
