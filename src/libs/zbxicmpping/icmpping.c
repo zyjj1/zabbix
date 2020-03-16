@@ -99,7 +99,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  * Comments: starting with fping (4.x), the packets interval can be 0ms, 1ms, *
  *           otherwise minimum value is 10ms                                  *
  ******************************************************************************/
-static int	get_interval_option(const char * fping, const char *dst, int *value, char *error, int max_error_len)
+static int	get_interval_option(const char * fping, const char *dst, int *value, char *error, size_t max_error_len)
 {
 	int	ret_exec, ret = FAIL;
 	char	tmp[MAX_STRING_LEN], err[255], *out = NULL;
@@ -190,7 +190,7 @@ static int	get_ipv6_support(const char * fping, const char *dst)
 #endif	/* HAVE_IPV6 */
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
-		char *error, int max_error_len)
+		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "process_ping";
 	const int	response_time_chars_max = 20;
@@ -344,7 +344,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
 	{
-		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
+		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, (int)max_error_len))
 			goto out;
 
 		if (family == PF_INET)
@@ -428,8 +428,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		for (i = 0; i < hosts_count; i++)
 		{
-			hosts[i].status = (char *)zbx_malloc(NULL, count);
-			memset(hosts[i].status, 0, count);
+			hosts[i].status = (char *)zbx_malloc(NULL, (size_t)count);
+			memset(hosts[i].status, 0, (size_t)count);
 		}
 
 		do
@@ -515,7 +515,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 					0 != (fping_existence & FPING_EXISTS) &&
 					0 != (fping_existence & FPING6_EXISTS))
 			{
-				memset(host->status, 0, count);	/* reset response statuses for IPv6 */
+				memset(host->status, 0, (size_t)count);	/* reset response statuses for IPv6 */
 			}
 #endif
 			ret = SUCCEED;
@@ -554,7 +554,8 @@ out:
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
-int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len)
+int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error,
+		size_t max_error_len)
 {
 	const char	*__function_name = "do_ping";
 
