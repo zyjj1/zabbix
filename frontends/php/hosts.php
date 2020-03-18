@@ -656,9 +656,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'editable' => true
 			]);
 			$dbHostNew = reset($dbHostNew);
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $dbHostNew['hostid'], $dbHostNew['host'], 'hosts',
-				$dbHost, $dbHostNew);
 		}
 
 		// full clone
