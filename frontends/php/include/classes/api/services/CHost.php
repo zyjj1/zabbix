@@ -752,7 +752,7 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host'],
+			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1105,6 +1105,15 @@ class CHost extends CHostGeneral {
 					'groupids' => $groupIdsToDelete
 				]);
 			}
+		}
+
+		if (isset($updateStatus)) {
+			$data['status'] = $updateStatus;
+		}
+
+		foreach ($db_hosts as $hostid => $db_host) {
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostid, $db_host['host'], $this->tableName,
+				$db_host, $data);
 		}
 
 		return ['hostids' => $inputHostIds];

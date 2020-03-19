@@ -550,7 +550,6 @@ function updateHostStatus($hostids, $status) {
 
 		$host_new = $host;
 		$host_new['status'] = $status;
-		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 		info(_s('Updated status of host "%1$s".', $host['host']));
 	}
 
