@@ -559,6 +559,8 @@ class CHost extends CHostGeneral {
 				$hostInventory['hostid'] = $hostid;
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
+
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['name'], null, null, null);
 		}
 
 		return ['hostids' => $hostids];
