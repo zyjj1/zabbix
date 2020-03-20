@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 01:43+0200\n"
-"PO-Revision-Date: 2019-12-09 09:42+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"PO-Revision-Date: 2020-02-17 09:52+0300\n"
+"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1575877347.000000\n"
+"X-POOTLE-MTIME: 1581925935.000000\n"
+
+#: include/classes/db/MysqlDbBackend.php:67
+#: include/classes/db/OracleDbBackend.php:87
+#: include/classes/db/PostgresqlDbBackend.php:76
+#, c-format
+msgid "\"%1$s\" instead \"%2$s\""
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -213,7 +220,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr ""
 
-#: app/views/layout.htmlpage.php:106 include/page_header.php:284
+#: app/views/layout.htmlpage.php:106 include/page_header.php:263
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -290,7 +297,7 @@ msgstr "5 minut"
 msgid "5 seconds"
 msgstr "5 sekund"
 
-#: include/views/monitoring.history.php:68
+#: include/views/monitoring.history.php:73
 msgid "500 latest values"
 msgstr "500 ostatnich wartości"
 
@@ -343,7 +350,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: app/views/monitoring.widget.problems.view.php:62
-#: include/actions.inc.php:155 include/blocks.inc.php:551
+#: include/actions.inc.php:155 include/blocks.inc.php:559
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:918
@@ -496,7 +503,7 @@ msgid "Action updated"
 msgstr "Zaktualizowano akcję"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:552
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:919
@@ -649,12 +656,12 @@ msgstr "Aktywne do"
 #: include/views/configuration.triggers.massupdate.php:139
 #: include/views/hostmacros.php:169
 #: include/views/js/administration.general.valuemapping.edit.js.php:26
-#: include/views/js/adm.regexprs.edit.js.php:193
+#: include/views/js/adm.regexprs.edit.js.php:198
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
 #: include/views/js/configuration.discovery.edit.js.php:123
-#: include/views/js/configuration.discovery.edit.js.php:704
+#: include/views/js/configuration.discovery.edit.js.php:710
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -954,7 +961,7 @@ msgstr "I/Lub"
 msgid "Any"
 msgstr "Dowolny"
 
-#: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:137
+#: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:140
 msgid "Any character string included"
 msgstr "Dowolny ciąg znaków zawiera"
 
@@ -1095,7 +1102,7 @@ msgstr ""
 msgid "As is"
 msgstr "Tak jak jest"
 
-#: include/views/monitoring.history.php:86
+#: include/views/monitoring.history.php:91
 msgid "As plain text"
 msgstr "Jako zwykły tekst"
 
@@ -1538,9 +1545,9 @@ msgstr "Kanada (136 znaków)"
 #: include/views/js/administration.general.trigseverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
 #: include/views/js/configuration.discovery.edit.js.php:124
-#: include/views/js/configuration.discovery.edit.js.php:566
-#: include/views/js/configuration.discovery.edit.js.php:637
-#: include/views/js/configuration.discovery.edit.js.php:667
+#: include/views/js/configuration.discovery.edit.js.php:572
+#: include/views/js/configuration.discovery.edit.js.php:643
+#: include/views/js/configuration.discovery.edit.js.php:673
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:117
 #: jsLoader.php:131 jsLoader.php:301 jsLoader.php:313
@@ -1684,7 +1691,7 @@ msgstr "Nie można dodać nowej aplikacji \"%1$s\"."
 msgid "Cannot add proxy"
 msgstr "Nie można dodać proxy"
 
-#: adm.regexps.php:153
+#: adm.regexps.php:147
 msgid "Cannot add regular expression"
 msgstr "Nie można dodać wyrażenia regularnego"
 
@@ -1783,7 +1790,7 @@ msgstr "Nie można powielić prototypów wyzwalaczy."
 #: include/classes/api/services/CEvent.php:875
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr "Problem z zamknięciem: %1$s"
+msgstr "Problem z zamknięciem: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:70
 msgid "Cannot connect to LDAP server."
@@ -2016,7 +2023,7 @@ msgstr[0] "Nie można usunąć proxy"
 msgstr[1] "Nie można usunąć proxy"
 msgstr[2] "Nie można usunąć proxy"
 
-#: adm.regexps.php:203
+#: adm.regexps.php:197
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Nie można usunąć wyrażenia regularnego"
@@ -2870,7 +2877,7 @@ msgstr "Nie można zaktualizować proxy"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Nie można zaktualizować proxy na wykrytym hoście \"%1$s\"."
 
-#: adm.regexps.php:147
+#: adm.regexps.php:141
 msgid "Cannot update regular expression"
 msgstr "Nie można zaktualizować wyrażenia regularnego"
 
@@ -2953,7 +2960,7 @@ msgstr "Nie można zaktualizować mapy wartości"
 msgid "Cannot update web scenario"
 msgstr "Nie można zaktualizować scenariusza sieci www"
 
-#: include/views/js/configuration.discovery.edit.js.php:633
+#: include/views/js/configuration.discovery.edit.js.php:639
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "Nie można skontrolować testów wykrywania: nieprawidłowe zapytanie lub błąd połączenia z serwerem Zabbix."
 
@@ -3029,11 +3036,11 @@ msgstr ""
 msgid "Character"
 msgstr "Znak"
 
-#: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:133
+#: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:136
 msgid "Character string included"
 msgstr "Zawiera podany ciąg znaków"
 
-#: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:141
+#: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:144
 msgid "Character string not included"
 msgstr "Nie zawiera podanego ciągu znaków"
 
@@ -3046,7 +3053,7 @@ msgstr "Obudowa"
 msgid "Chassis information. Returns string"
 msgstr "Informacje o obudowie. Zwraca ciąg znaków"
 
-#: include/views/js/configuration.discovery.edit.js.php:563
+#: include/views/js/configuration.discovery.edit.js.php:569
 msgid "Check already exists."
 msgstr "Test już istnieje."
 
@@ -3708,7 +3715,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.list.php:31
 #: include/views/configuration.triggers.list.php:142
 #: include/views/monitoring.charts.php:58
-#: include/views/monitoring.history.php:209
+#: include/views/monitoring.history.php:214
 #: include/views/monitoring.hostscreen.php:63
 #: include/views/monitoring.overview.items.php:73
 #: include/views/monitoring.overview.triggers.php:110
@@ -4294,7 +4301,7 @@ msgstr "Data zakupu sprzętu"
 msgid "Day"
 msgstr "Dzień"
 
-#: include/func.inc.php:2699
+#: include/func.inc.php:2690
 msgid "Day before yesterday"
 msgstr ""
 
@@ -5006,9 +5013,9 @@ msgstr "Wykrywanie przez proxy"
 msgid "Discovery check"
 msgstr "Test wykrywania"
 
-#: include/views/js/configuration.discovery.edit.js.php:562
-#: include/views/js/configuration.discovery.edit.js.php:631
-#: include/views/js/configuration.discovery.edit.js.php:663
+#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:637
+#: include/views/js/configuration.discovery.edit.js.php:669
 msgid "Discovery check error"
 msgstr "Błąd testu wykrywania"
 
@@ -5318,7 +5325,7 @@ msgstr "Powtórzone usrgrpid (id grupy użytkowników) \"%1$s\" w grupie użytko
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Powtórzone usrgrpid (id grupy użytkowników) \"%1$s\" w grupie użytkowników dla ekranu \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:550
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:249
@@ -5756,7 +5763,7 @@ msgstr "Błąd: %1$s"
 msgid "Event"
 msgstr "Zdarzenie"
 
-#: include/classes/screens/CScreenHistory.php:261
+#: include/classes/screens/CScreenHistory.php:278
 msgid "Event ID"
 msgstr "ID zdarzenia"
 
@@ -5978,8 +5985,8 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "P"
 
-#: include/views/js/adm.regexprs.edit.js.php:128
-#: include/views/js/adm.regexprs.edit.js.php:173
+#: include/views/js/adm.regexprs.edit.js.php:131
+#: include/views/js/adm.regexprs.edit.js.php:178
 msgid "FALSE"
 msgstr "FAŁSZ"
 
@@ -6193,7 +6200,7 @@ msgstr "Obszar wypełniony"
 #: include/views/configuration.template.list.php:25
 #: include/views/configuration.triggers.list.php:114
 #: include/views/inventory.host.list.php:48
-#: include/views/monitoring.history.php:237
+#: include/views/monitoring.history.php:242
 #: include/views/monitoring.overview.items.php:81
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
@@ -6448,7 +6455,7 @@ msgstr "Linia gradientu"
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:435
 #: include/views/monitoring.charts.php:38
-#: include/views/monitoring.history.php:66
+#: include/views/monitoring.history.php:71
 #: include/views/monitoring.screen.constructor.edit.php:156 latest.php:539
 #: latest.php:691 report2.php:455
 msgid "Graph"
@@ -6589,7 +6596,7 @@ msgstr "Suma wykresu"
 #: app/controllers/CControllerPopupGeneric.php:248
 #: include/views/configuration.graph.edit.php:94
 #: include/views/configuration.graph.list.php:90
-#: include/views/monitoring.history.php:222
+#: include/views/monitoring.history.php:227
 msgid "Graph type"
 msgstr "Typ wykresu"
 
@@ -6861,7 +6868,7 @@ msgstr "Ukryj śledzenie"
 msgid "Hide groups without problems"
 msgstr ""
 
-#: include/views/monitoring.history.php:153
+#: include/views/monitoring.history.php:158
 msgid "Hide selected"
 msgstr "Ukryj wybrane"
 
@@ -6951,7 +6958,7 @@ msgstr "Ułożenie poziome"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:500
 #: include/actions.inc.php:48 include/audit.inc.php:27
-#: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:555 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7748,12 +7755,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "Błędne API \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:543
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:606
 msgid "Incorrect SNMP OID."
 msgstr "Błędny OID SNMP."
 
 #: include/classes/api/services/CDRule.php:537
-#: include/views/js/configuration.discovery.edit.js.php:596
+#: include/views/js/configuration.discovery.edit.js.php:602
 msgid "Incorrect SNMP community."
 msgstr "Błędne hasło SNMP."
 
@@ -8016,6 +8023,12 @@ msgstr "Błędne wyrażenie użytkownika \"%2$s\" dla reguły wykrywania \"%1$s\
 msgid "Incorrect data."
 msgstr ""
 
+#: include/classes/db/MysqlDbBackend.php:66
+#: include/classes/db/PostgresqlDbBackend.php:75
+#, c-format
+msgid "Incorrect default charset for Zabbix database: %1$s."
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:594
 #: include/classes/api/services/CProblem.php:393
 msgid "Incorrect evaltype value."
@@ -8250,6 +8263,11 @@ msgstr "Błędna metoda \"%1$s.%2$s\"."
 msgid "Incorrect object value."
 msgstr "Błędna wartość obiektu."
 
+#: include/classes/db/OracleDbBackend.php:86
+#, c-format
+msgid "Incorrect parameter \"%1$s\" value: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2820
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
@@ -8291,7 +8309,7 @@ msgstr "Błędny zakres portów."
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Błędny protokół prywatności dla pozycji \"%1$s\"."
 
-#: adm.regexps.php:68 include/regexp.inc.php:120
+#: include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "Błędne wyrażenie regularne \"%1$s\": \"%2$s\""
@@ -8739,7 +8757,7 @@ msgstr "Indonezyjski (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
-#: include/blocks.inc.php:546 include/classes/screens/CScreenActions.php:117
+#: include/blocks.inc.php:554 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:889
 #: include/classes/screens/CScreenProblem.php:913
@@ -9241,7 +9259,7 @@ msgid "Italian (it_IT)"
 msgstr "Włoski (it_IT)"
 
 #: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:82
-#: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:252
+#: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:269
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
@@ -9489,7 +9507,7 @@ msgstr "Pozycje"
 msgid "Items deleted"
 msgstr "Usunięto pozycje"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:134
 msgid "Items list"
 msgstr "Lista pozycji"
 
@@ -9697,7 +9715,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Ostatnia"
 
-#: include/func.inc.php:2752
+#: include/func.inc.php:2743
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -9705,7 +9723,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2746
+#: include/func.inc.php:2737
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -9713,7 +9731,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2739
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -9721,7 +9739,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2755
+#: include/func.inc.php:2746
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -9729,7 +9747,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2732
+#: include/func.inc.php:2723
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -9737,7 +9755,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2758
+#: include/func.inc.php:2749
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9811,7 +9829,7 @@ msgstr "Wykres z ostatniego tygodnia"
 msgid "Latest data"
 msgstr "Ostatnie dane"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:549
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:916 jsLoader.php:269
 msgid "Latest values"
 msgstr "Ostatnie wartości"
@@ -9992,9 +10010,9 @@ msgstr "Czas ładowania całej strony www (w sekundach). Zwraca liczbę zmiennop
 msgid "Local"
 msgstr "Lokalny"
 
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:270
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
-#: include/views/monitoring.history.php:261
+#: include/views/monitoring.history.php:266
 #: include/views/monitoring.screen.constructor.edit.php:766
 msgid "Local time"
 msgstr "Czas lokalny"
@@ -10359,11 +10377,11 @@ msgstr "Marzec"
 msgid "Mark elements on trigger status change"
 msgstr "Zaznacz elementy po zmianie stanu wyzwalacza"
 
-#: include/views/monitoring.history.php:155
+#: include/views/monitoring.history.php:160
 msgid "Mark others"
 msgstr "Zaznacz inne"
 
-#: include/views/monitoring.history.php:154
+#: include/views/monitoring.history.php:159
 msgid "Mark selected"
 msgstr "Zaznacz wybrane"
 
@@ -10786,8 +10804,8 @@ msgstr "NNTP"
 msgid "NTLM"
 msgstr "NTLM"
 
-#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:158
-#: adm.regexps.php:189 app/controllers/CControllerPopupGeneric.php:71
+#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:152
+#: adm.regexps.php:183 app/controllers/CControllerPopupGeneric.php:71
 #: app/controllers/CControllerPopupGeneric.php:83
 #: app/controllers/CControllerPopupGeneric.php:95
 #: app/controllers/CControllerPopupGeneric.php:107
@@ -11047,7 +11065,7 @@ msgstr "Następny krok"
 
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:33 include/blocks.inc.php:434
-#: include/blocks.inc.php:625
+#: include/blocks.inc.php:633
 #: include/classes/screens/CScreenHostTriggers.php:273
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
@@ -11388,7 +11406,7 @@ msgstr "Nie podano typu operacji dla współzależności \"%1$s\"."
 msgid "No permissions for system access."
 msgstr "Brak uprawnień dla dostępu do systemu."
 
-#: adm.regexps.php:117
+#: adm.regexps.php:111
 #: app/controllers/CControllerDashboardPropertiesCheck.php:62
 #: app/controllers/CControllerDashboardPropertiesEdit.php:99
 #: app/controllers/CControllerDashboardShareEdit.php:74
@@ -11643,7 +11661,7 @@ msgstr "Brak"
 #: app/views/popup.generic.php:538 include/graphs.inc.php:24
 #: include/items.inc.php:160 include/triggers.inc.php:1278
 #: include/views/configuration.triggers.list.php:42
-#: include/views/monitoring.history.php:224
+#: include/views/monitoring.history.php:229
 msgid "Normal"
 msgstr "Normalny"
 
@@ -12853,15 +12871,15 @@ msgstr ""
 msgid "Preview"
 msgstr "Podgląd"
 
-#: include/func.inc.php:2702
+#: include/func.inc.php:2693
 msgid "Previous month"
 msgstr ""
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2692
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2694
 msgid "Previous year"
 msgstr ""
 
@@ -12932,7 +12950,7 @@ msgid "Privilege level"
 msgstr "Poziom uprawnień"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:548
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:556
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1049
@@ -13321,11 +13339,11 @@ msgstr "Wyrażenie regularne"
 msgid "Regular expression \"%s\" already exists."
 msgstr "Wyrażenie regularne \"%s\" już istnieje."
 
-#: adm.regexps.php:152
+#: adm.regexps.php:146
 msgid "Regular expression added"
 msgstr "Dodano wyrażenie regularne"
 
-#: adm.regexps.php:202
+#: adm.regexps.php:196
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Usunięto wyrażenie regularne"
@@ -13336,11 +13354,11 @@ msgstr[2] "Usunięto wyrażeń regularnych"
 msgid "Regular expression does not exist."
 msgstr "Wyrażenie regularne nie istnieje."
 
-#: adm.regexps.php:67 include/regexp.inc.php:119
+#: include/regexp.inc.php:119
 msgid "Regular expression must be a string"
 msgstr "Wyrażenie regularne musi być ciągiem znaków"
 
-#: adm.regexps.php:146
+#: adm.regexps.php:140
 msgid "Regular expression updated"
 msgstr "Zaktualizowano wyrażenie regularne"
 
@@ -13686,11 +13704,11 @@ msgstr "Czas odpowiedzi"
 msgid "Result"
 msgstr "Wynik"
 
-#: include/regexp.inc.php:226 include/views/js/adm.regexprs.edit.js.php:149
+#: include/regexp.inc.php:226 include/views/js/adm.regexprs.edit.js.php:152
 msgid "Result is FALSE"
 msgstr "Wynik jest NIEPRAWDZIWY"
 
-#: include/regexp.inc.php:225 include/views/js/adm.regexprs.edit.js.php:145
+#: include/regexp.inc.php:225 include/views/js/adm.regexprs.edit.js.php:148
 msgid "Result is TRUE"
 msgstr "Wynik jest PRAWDZIWY"
 
@@ -14362,7 +14380,7 @@ msgid "Select widget"
 msgstr ""
 
 #: app/views/administration.script.edit.php:80
-#: include/views/monitoring.history.php:167
+#: include/views/monitoring.history.php:172
 msgid "Selected"
 msgstr "Wybrane"
 
@@ -14615,7 +14633,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.triggerwizard.php:83
 #: include/classes/screens/CScreenEvents.php:33
-#: include/classes/screens/CScreenHistory.php:258
+#: include/classes/screens/CScreenHistory.php:275
 #: include/classes/screens/CScreenProblem.php:884
 #: include/classes/screens/CScreenProblem.php:906
 #: include/classes/screens/CScreenProblem.php:1128
@@ -14743,7 +14761,7 @@ msgstr "Wyświetl linie"
 msgid "Show problems"
 msgstr ""
 
-#: include/views/monitoring.history.php:152
+#: include/views/monitoring.history.php:157
 msgid "Show selected"
 msgstr "Wyświetl wybrane"
 
@@ -15018,7 +15036,7 @@ msgstr "Sortowanie wyzwalaczy wg"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Sortowanie według pola \"%1$s\" jest zabronione."
 
-#: include/classes/screens/CScreenHistory.php:255
+#: include/classes/screens/CScreenHistory.php:272
 #: include/classes/widgets/forms/CWidgetFormGraph.php:31
 msgid "Source"
 msgstr "Źródło"
@@ -15039,7 +15057,7 @@ msgstr "Podany skrypt nie istnieje lub brak uprawnień dla polecenia operacji ak
 msgid "Specify some filter condition to see the items."
 msgstr "Określ jakieś warunki filtra, żeby zobaczyć pozycje."
 
-#: include/views/monitoring.history.php:264 latest.php:386
+#: include/views/monitoring.history.php:269 latest.php:386
 msgid "Specify some filter condition to see the values."
 msgstr "Określ jakieś warunki filtra, żeby zobaczyć wartości."
 
@@ -15048,7 +15066,7 @@ msgid "Speed"
 msgstr "Prędkość"
 
 #: app/views/popup.generic.php:529 include/graphs.inc.php:25
-#: include/views/monitoring.history.php:225
+#: include/views/monitoring.history.php:230
 msgid "Stacked"
 msgstr "Warstwowy"
 
@@ -15389,8 +15407,8 @@ msgstr "Agent TELNET"
 msgid "TOTAL"
 msgstr "OGÓŁEM"
 
-#: include/views/js/adm.regexprs.edit.js.php:128
-#: include/views/js/adm.regexprs.edit.js.php:173
+#: include/views/js/adm.regexprs.edit.js.php:131
+#: include/views/js/adm.regexprs.edit.js.php:177
 msgid "TRUE"
 msgstr "PRAWDA"
 
@@ -15438,7 +15456,7 @@ msgid "Tag value"
 msgstr "Wartość znacznika"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:553
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:561
 #: include/classes/screens/CScreenProblem.php:866
 #: include/classes/screens/CScreenProblem.php:920
 #: include/classes/screens/CScreenProblem.php:1137
@@ -15690,7 +15708,7 @@ msgstr "Aplikacja nie jest już wykrywana i zostanie usunięta przy następnym p
 msgid "The frontend does not match Zabbix database."
 msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix."
 
-#: include/classes/db/DbBackend.php:48
+#: include/classes/db/DbBackend.php:50
 #, c-format
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
 msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix. Aktualna wersja bazy (wymagan/opcjonalna): %d/%d. Wymagana jest wersja: %d. Skontaktuj się z administratorem systemu."
@@ -15759,7 +15777,7 @@ msgstr "Aplikacja scenariusza sieci www należy do innego hosta niż host scenar
 msgid "Theme"
 msgstr "Motyw"
 
-#: include/func.inc.php:2700
+#: include/func.inc.php:2691
 msgid "This day last week"
 msgstr ""
 
@@ -15768,11 +15786,11 @@ msgstr ""
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "To pole jest automatycznie uzupełniane przez pozycję \"%s\"."
 
-#: include/func.inc.php:2708 srv_status.php:41
+#: include/func.inc.php:2699 srv_status.php:41
 msgid "This month"
 msgstr "Bieżący miesiąc"
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2700
 msgid "This month so far"
 msgstr ""
 
@@ -15784,19 +15802,19 @@ msgstr "Ta kolumna ekranu nie jest pusta. Usunąć ją?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Ten wiersz ekranu nie jest pusty. Usunąć go?"
 
-#: include/func.inc.php:2706 srv_status.php:40
+#: include/func.inc.php:2697 srv_status.php:40
 msgid "This week"
 msgstr "Ten tydzień"
 
-#: include/func.inc.php:2707
+#: include/func.inc.php:2698
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2710 srv_status.php:42
+#: include/func.inc.php:2701 srv_status.php:42
 msgid "This year"
 msgstr "Ten rok"
 
-#: include/func.inc.php:2711
+#: include/func.inc.php:2702
 msgid "This year so far"
 msgstr ""
 
@@ -15827,7 +15845,7 @@ msgstr "Do"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1746 include/actions.inc.php:1800
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
-#: include/actions.inc.php:2015 include/blocks.inc.php:528
+#: include/actions.inc.php:2015 include/blocks.inc.php:536
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:843
@@ -15897,12 +15915,12 @@ msgid "Timeout"
 msgstr "Przekroczenie czasu"
 
 #: app/views/monitoring.widget.plaintext.view.php:28
-#: include/classes/screens/CScreenHistory.php:251
-#: include/classes/screens/CScreenHistory.php:358
-#: include/classes/screens/CScreenHistory.php:398
+#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:393
+#: include/classes/screens/CScreenHistory.php:448
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
-#: include/views/monitoring.history.php:260
+#: include/views/monitoring.history.php:265
 msgid "Timestamp"
 msgstr "Odcisk czasowy"
 
@@ -15916,12 +15934,12 @@ msgstr "Do"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Aby ustawić interfejs hosta wybierz odpowiedni typ pozycji dla każdej pozycji"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2704
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2695
 #: srv_status.php:39
 msgid "Today"
 msgstr "Dziś"
 
-#: include/func.inc.php:2705
+#: include/func.inc.php:2696
 msgid "Today so far"
 msgstr ""
 
@@ -16397,7 +16415,7 @@ msgid "Types"
 msgstr "Typy"
 
 #: include/translateDefines.inc.php:25
-#: include/views/js/adm.regexprs.edit.js.php:167
+#: include/views/js/adm.regexprs.edit.js.php:170
 msgid "UNKNOWN"
 msgstr "NIEZNANE"
 
@@ -16481,7 +16499,7 @@ msgstr "Nie można utworzyć pliku konfiguracji."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
-#: include/classes/db/DbBackend.php:63
+#: include/classes/db/DbBackend.php:65
 msgid "Unable to select configuration."
 msgstr "Nie można wybrać konfiguracji."
 
@@ -16648,6 +16666,13 @@ msgstr "Odłączono: Scenariusz sieci www \"%1$s\" w \"%2$s\"."
 #: jsLoader.php:210
 msgid "Unmute"
 msgstr "Włącz głos"
+
+#: include/classes/db/MysqlDbBackend.php:95
+#: include/classes/db/PostgresqlDbBackend.php:111
+#, c-format
+msgid "Unsupported charset or collation for table: %1$s."
+msgid_plural "Unsupported charset or collation for tables: %1$s."
+msgstr[0] ""
 
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, c-format
@@ -17325,8 +17350,8 @@ msgstr "Czas działania maszyny wirtualnej VMware, <url> - URL usługi VMware, <
 #: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:427
 #: include/classes/graphdraw/CPieGraphDraw.php:346
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenHistory.php:263
-#: include/classes/screens/CScreenHistory.php:360
+#: include/classes/screens/CScreenHistory.php:280
+#: include/classes/screens/CScreenHistory.php:393
 #: include/classes/screens/CScreenPlainText.php:53
 #: include/views/administration.general.macros.edit.php:38
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -17341,8 +17366,8 @@ msgstr "Czas działania maszyny wirtualnej VMware, <url> - URL usługi VMware, <
 #: include/views/configuration.item.prototype.edit.php:225
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:167
-#: include/views/hostmacros.php:50 include/views/monitoring.history.php:145
-#: include/views/monitoring.history.php:262
+#: include/views/hostmacros.php:50 include/views/monitoring.history.php:150
+#: include/views/monitoring.history.php:267
 #, c-format
 msgid "Value"
 msgstr "Wartość"
@@ -17460,7 +17485,7 @@ msgstr ""
 msgid "Value: no data"
 msgstr "Wartość: brak danych"
 
-#: charts.php:100 include/views/monitoring.history.php:67
+#: charts.php:100 include/views/monitoring.history.php:72
 msgid "Values"
 msgstr "Wartości"
 
@@ -17506,7 +17531,7 @@ msgid "Vietnamese (vi_VN)"
 msgstr "Wietnamski (vi_VN)"
 
 #: include/views/monitoring.charts.php:43
-#: include/views/monitoring.history.php:80
+#: include/views/monitoring.history.php:85
 msgid "View as"
 msgstr ""
 
@@ -17892,7 +17917,7 @@ msgstr "Rocznie"
 
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:32 include/blocks.inc.php:434
-#: include/blocks.inc.php:625
+#: include/blocks.inc.php:633
 #: include/classes/screens/CScreenHostTriggers.php:273
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
@@ -17909,7 +17934,7 @@ msgstr "Rocznie"
 msgid "Yes"
 msgstr "Tak"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2698
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2689
 msgid "Yesterday"
 msgstr "Wczoraj"
 
@@ -17999,7 +18024,7 @@ msgstr ""
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
-#: include/page_header.php:156
+#: include/page_header.php:135
 msgid "Zabbix"
 msgstr "Zabbix"
 
@@ -18183,7 +18208,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: include/classes/validators/CApiInputValidator.php:1354
-#: include/validate.inc.php:227 include/validate.inc.php:590
+#: include/validate.inc.php:227 include/validate.inc.php:591
 msgid "a time unit is expected"
 msgstr ""
 
@@ -18268,15 +18293,15 @@ msgstr ""
 msgid "an unsigned integer is expected"
 msgstr ""
 
-#: include/views/monitoring.history.php:163
+#: include/views/monitoring.history.php:168
 msgid "as Blue"
 msgstr "jako Niebieskie"
 
-#: include/views/monitoring.history.php:162
+#: include/views/monitoring.history.php:167
 msgid "as Green"
 msgstr "jako Zielone"
 
-#: include/views/monitoring.history.php:161
+#: include/views/monitoring.history.php:166
 msgid "as Red"
 msgstr "jako Czerwone"
 
@@ -19029,7 +19054,7 @@ msgstr ""
 msgid "problem pattern"
 msgstr ""
 
-#: include/page_header.php:159 include/views/general.warning.php:21
+#: include/page_header.php:138 include/views/general.warning.php:21
 #, c-format
 msgid "refreshed every %1$s sec."
 msgstr "odświeżanie co %1$s sek."
@@ -19364,7 +19389,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1135
 #: include/classes/validators/CApiInputValidator.php:348
 #: include/classes/validators/CApiInputValidator.php:656
-#: include/validate.inc.php:583
+#: include/validate.inc.php:584
 #, c-format
 msgid "value must be one of %1$s"
 msgstr ""

@@ -46,8 +46,8 @@ class testPageReportsActionLog extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allAuditActions
-	*/
+	 * @dataProvider allAuditActions
+	 */
 	public function testPageReportsActionLog_CheckValues($auditactions) {
 		$time = $auditactions['clock'];
 		$today = date("Y-m-d H:i:s", $time);
@@ -94,7 +94,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->zbxTestTextPresent(
 				[
 					$today,
-					$type['description'],
+					CTestArrayHelper::get($type, 'description'),
 					$status,
 					$retries,
 					$auditactions['sendto'],

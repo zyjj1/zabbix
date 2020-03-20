@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 01:43+0200\n"
-"PO-Revision-Date: 2019-12-09 09:44+0300\n"
+"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
@@ -16,7 +16,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1575877465.000000\n"
+"X-POOTLE-MTIME: 1581198538.000000\n"
+
+#: include/classes/db/MysqlDbBackend.php:67
+#: include/classes/db/OracleDbBackend.php:87
+#: include/classes/db/PostgresqlDbBackend.php:76
+#, c-format
+msgid "\"%1$s\" instead \"%2$s\""
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -190,7 +197,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr ""
 
-#: app/views/layout.htmlpage.php:106 include/page_header.php:284
+#: app/views/layout.htmlpage.php:106 include/page_header.php:263
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -263,7 +270,7 @@ msgstr "5分"
 msgid "5 seconds"
 msgstr "5秒"
 
-#: include/views/monitoring.history.php:68
+#: include/views/monitoring.history.php:73
 msgid "500 latest values"
 msgstr "最近500個值"
 
@@ -314,7 +321,7 @@ msgid_plural "Account is blocked for %1$s seconds."
 msgstr[0] ""
 
 #: app/views/monitoring.widget.problems.view.php:62
-#: include/actions.inc.php:155 include/blocks.inc.php:551
+#: include/actions.inc.php:155 include/blocks.inc.php:559
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:918
@@ -463,7 +470,7 @@ msgid "Action updated"
 msgstr "動作已更新"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:552
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:919
@@ -616,12 +623,12 @@ msgstr "作用中直到"
 #: include/views/configuration.triggers.massupdate.php:139
 #: include/views/hostmacros.php:169
 #: include/views/js/administration.general.valuemapping.edit.js.php:26
-#: include/views/js/adm.regexprs.edit.js.php:193
+#: include/views/js/adm.regexprs.edit.js.php:198
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
 #: include/views/js/configuration.discovery.edit.js.php:123
-#: include/views/js/configuration.discovery.edit.js.php:704
+#: include/views/js/configuration.discovery.edit.js.php:710
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -921,7 +928,7 @@ msgstr "且/或"
 msgid "Any"
 msgstr "任何"
 
-#: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:137
+#: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:140
 msgid "Any character string included"
 msgstr "包括任何字元字串"
 
@@ -1061,7 +1068,7 @@ msgstr ""
 msgid "As is"
 msgstr "不變"
 
-#: include/views/monitoring.history.php:86
+#: include/views/monitoring.history.php:91
 msgid "As plain text"
 msgstr "純文字"
 
@@ -1504,9 +1511,9 @@ msgstr "加拿大 (136 字元)"
 #: include/views/js/administration.general.trigseverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
 #: include/views/js/configuration.discovery.edit.js.php:124
-#: include/views/js/configuration.discovery.edit.js.php:566
-#: include/views/js/configuration.discovery.edit.js.php:637
-#: include/views/js/configuration.discovery.edit.js.php:667
+#: include/views/js/configuration.discovery.edit.js.php:572
+#: include/views/js/configuration.discovery.edit.js.php:643
+#: include/views/js/configuration.discovery.edit.js.php:673
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:117
 #: jsLoader.php:131 jsLoader.php:301 jsLoader.php:313
@@ -1650,7 +1657,7 @@ msgstr "無法新增新應用集 \"%1$s\""
 msgid "Cannot add proxy"
 msgstr "無法新增系統代理程式"
 
-#: adm.regexps.php:153
+#: adm.regexps.php:147
 msgid "Cannot add regular expression"
 msgstr "無法新增正規表示式"
 
@@ -1964,7 +1971,7 @@ msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "無法刪除系統代理程式"
 
-#: adm.regexps.php:203
+#: adm.regexps.php:197
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "無法删除正規表示式 "
@@ -2768,7 +2775,7 @@ msgstr "無法更新系統代理程式"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr ""
 
-#: adm.regexps.php:147
+#: adm.regexps.php:141
 msgid "Cannot update regular expression"
 msgstr "無法更新正規表示式"
 
@@ -2849,7 +2856,7 @@ msgstr "無法更新值對應"
 msgid "Cannot update web scenario"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:633
+#: include/views/js/configuration.discovery.edit.js.php:639
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr ""
 
@@ -2925,11 +2932,11 @@ msgstr ""
 msgid "Character"
 msgstr "字元"
 
-#: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:133
+#: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:136
 msgid "Character string included"
 msgstr "字元字串已包含"
 
-#: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:141
+#: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:144
 msgid "Character string not included"
 msgstr "字元字串未包含"
 
@@ -2942,7 +2949,7 @@ msgstr "機殼"
 msgid "Chassis information. Returns string"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:563
+#: include/views/js/configuration.discovery.edit.js.php:569
 msgid "Check already exists."
 msgstr "檢查已存在."
 
@@ -3604,7 +3611,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.list.php:31
 #: include/views/configuration.triggers.list.php:142
 #: include/views/monitoring.charts.php:58
-#: include/views/monitoring.history.php:209
+#: include/views/monitoring.history.php:214
 #: include/views/monitoring.hostscreen.php:63
 #: include/views/monitoring.overview.items.php:73
 #: include/views/monitoring.overview.triggers.php:110
@@ -4184,7 +4191,7 @@ msgstr "硬體購買日期"
 msgid "Day"
 msgstr "日"
 
-#: include/func.inc.php:2699
+#: include/func.inc.php:2690
 msgid "Day before yesterday"
 msgstr ""
 
@@ -4894,9 +4901,9 @@ msgstr "由系統代理程式探索"
 msgid "Discovery check"
 msgstr "探索檢查"
 
-#: include/views/js/configuration.discovery.edit.js.php:562
-#: include/views/js/configuration.discovery.edit.js.php:631
-#: include/views/js/configuration.discovery.edit.js.php:663
+#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:637
+#: include/views/js/configuration.discovery.edit.js.php:669
 msgid "Discovery check error"
 msgstr "探索檢查錯誤"
 
@@ -5202,7 +5209,7 @@ msgstr ""
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:550
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:249
@@ -5640,7 +5647,7 @@ msgstr "錯誤: %1$s"
 msgid "Event"
 msgstr "事件"
 
-#: include/classes/screens/CScreenHistory.php:261
+#: include/classes/screens/CScreenHistory.php:278
 msgid "Event ID"
 msgstr "事件ID"
 
@@ -5860,8 +5867,8 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "F"
 
-#: include/views/js/adm.regexprs.edit.js.php:128
-#: include/views/js/adm.regexprs.edit.js.php:173
+#: include/views/js/adm.regexprs.edit.js.php:131
+#: include/views/js/adm.regexprs.edit.js.php:178
 msgid "FALSE"
 msgstr "偽"
 
@@ -6075,7 +6082,7 @@ msgstr "填滿的區域"
 #: include/views/configuration.template.list.php:25
 #: include/views/configuration.triggers.list.php:114
 #: include/views/inventory.host.list.php:48
-#: include/views/monitoring.history.php:237
+#: include/views/monitoring.history.php:242
 #: include/views/monitoring.overview.items.php:81
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
@@ -6330,7 +6337,7 @@ msgstr "漸層線"
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:435
 #: include/views/monitoring.charts.php:38
-#: include/views/monitoring.history.php:66
+#: include/views/monitoring.history.php:71
 #: include/views/monitoring.screen.constructor.edit.php:156 latest.php:539
 #: latest.php:691 report2.php:455
 msgid "Graph"
@@ -6469,7 +6476,7 @@ msgstr "圖形總合"
 #: app/controllers/CControllerPopupGeneric.php:248
 #: include/views/configuration.graph.edit.php:94
 #: include/views/configuration.graph.list.php:90
-#: include/views/monitoring.history.php:222
+#: include/views/monitoring.history.php:227
 msgid "Graph type"
 msgstr "圖形類別"
 
@@ -6740,7 +6747,7 @@ msgstr ""
 msgid "Hide groups without problems"
 msgstr ""
 
-#: include/views/monitoring.history.php:153
+#: include/views/monitoring.history.php:158
 msgid "Hide selected"
 msgstr "隱藏所選的"
 
@@ -6830,7 +6837,7 @@ msgstr "横向對齊"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:500
 #: include/actions.inc.php:48 include/audit.inc.php:27
-#: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:555 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7620,12 +7627,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "不正確的 API \"%1$s\""
 
 #: include/classes/api/services/CDRule.php:543
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:606
 msgid "Incorrect SNMP OID."
 msgstr "不正確的SNMP OID"
 
 #: include/classes/api/services/CDRule.php:537
-#: include/views/js/configuration.discovery.edit.js.php:596
+#: include/views/js/configuration.discovery.edit.js.php:602
 msgid "Incorrect SNMP community."
 msgstr "不正確的SNMP community."
 
@@ -7888,6 +7895,12 @@ msgstr ""
 msgid "Incorrect data."
 msgstr ""
 
+#: include/classes/db/MysqlDbBackend.php:66
+#: include/classes/db/PostgresqlDbBackend.php:75
+#, c-format
+msgid "Incorrect default charset for Zabbix database: %1$s."
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:594
 #: include/classes/api/services/CProblem.php:393
 msgid "Incorrect evaltype value."
@@ -8122,6 +8135,11 @@ msgstr ""
 msgid "Incorrect object value."
 msgstr ""
 
+#: include/classes/db/OracleDbBackend.php:86
+#, c-format
+msgid "Incorrect parameter \"%1$s\" value: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2820
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
@@ -8163,7 +8181,7 @@ msgstr "不正確的埠範圍."
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
 
-#: adm.regexps.php:68 include/regexp.inc.php:120
+#: include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr ""
@@ -8611,7 +8629,7 @@ msgstr "印尼語 (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
-#: include/blocks.inc.php:546 include/classes/screens/CScreenActions.php:117
+#: include/blocks.inc.php:554 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
 #: include/classes/screens/CScreenProblem.php:889
 #: include/classes/screens/CScreenProblem.php:913
@@ -9113,7 +9131,7 @@ msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
 #: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:82
-#: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:252
+#: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:269
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
@@ -9353,7 +9371,7 @@ msgstr "項目"
 msgid "Items deleted"
 msgstr "項目已刪除"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:134
 msgid "Items list"
 msgstr "項目清單"
 
@@ -9561,37 +9579,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:2752
+#: include/func.inc.php:2743
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 
-#: include/func.inc.php:2746
+#: include/func.inc.php:2737
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 
-#: include/func.inc.php:2739
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 
-#: include/func.inc.php:2755
+#: include/func.inc.php:2746
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 
-#: include/func.inc.php:2732
+#: include/func.inc.php:2723
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 
-#: include/func.inc.php:2758
+#: include/func.inc.php:2749
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9663,7 +9681,7 @@ msgstr "仩週圖形"
 msgid "Latest data"
 msgstr "最新數據"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:549
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:916 jsLoader.php:269
 msgid "Latest values"
 msgstr "最新數據"
@@ -9844,9 +9862,9 @@ msgstr ""
 msgid "Local"
 msgstr ""
 
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:270
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
-#: include/views/monitoring.history.php:261
+#: include/views/monitoring.history.php:266
 #: include/views/monitoring.screen.constructor.edit.php:766
 msgid "Local time"
 msgstr "當地時間"
@@ -10211,11 +10229,11 @@ msgstr "三月"
 msgid "Mark elements on trigger status change"
 msgstr "觸發器狀態上的標記組件改變"
 
-#: include/views/monitoring.history.php:155
+#: include/views/monitoring.history.php:160
 msgid "Mark others"
 msgstr "標記其他"
 
-#: include/views/monitoring.history.php:154
+#: include/views/monitoring.history.php:159
 msgid "Mark selected"
 msgstr "標記所選"
 
@@ -10630,8 +10648,8 @@ msgstr "NNTP"
 msgid "NTLM"
 msgstr ""
 
-#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:158
-#: adm.regexps.php:189 app/controllers/CControllerPopupGeneric.php:71
+#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:152
+#: adm.regexps.php:183 app/controllers/CControllerPopupGeneric.php:71
 #: app/controllers/CControllerPopupGeneric.php:83
 #: app/controllers/CControllerPopupGeneric.php:95
 #: app/controllers/CControllerPopupGeneric.php:107
@@ -10891,7 +10909,7 @@ msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:33 include/blocks.inc.php:434
-#: include/blocks.inc.php:625
+#: include/blocks.inc.php:633
 #: include/classes/screens/CScreenHostTriggers.php:273
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
@@ -11232,7 +11250,7 @@ msgstr ""
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
-#: adm.regexps.php:117
+#: adm.regexps.php:111
 #: app/controllers/CControllerDashboardPropertiesCheck.php:62
 #: app/controllers/CControllerDashboardPropertiesEdit.php:99
 #: app/controllers/CControllerDashboardShareEdit.php:74
@@ -11487,7 +11505,7 @@ msgstr "無"
 #: app/views/popup.generic.php:538 include/graphs.inc.php:24
 #: include/items.inc.php:160 include/triggers.inc.php:1278
 #: include/views/configuration.triggers.list.php:42
-#: include/views/monitoring.history.php:224
+#: include/views/monitoring.history.php:229
 msgid "Normal"
 msgstr "正常"
 
@@ -12695,15 +12713,15 @@ msgstr ""
 msgid "Preview"
 msgstr "預覽"
 
-#: include/func.inc.php:2702
+#: include/func.inc.php:2693
 msgid "Previous month"
 msgstr ""
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2692
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2694
 msgid "Previous year"
 msgstr ""
 
@@ -12774,7 +12792,7 @@ msgid "Privilege level"
 msgstr "優先權層級"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:548
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:556
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1049
@@ -13161,11 +13179,11 @@ msgstr "正規表示式"
 msgid "Regular expression \"%s\" already exists."
 msgstr "正規表示式\"%s\"已存在."
 
-#: adm.regexps.php:152
+#: adm.regexps.php:146
 msgid "Regular expression added"
 msgstr "正規表示式已新增"
 
-#: adm.regexps.php:202
+#: adm.regexps.php:196
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "正規表示式已删除"
@@ -13174,11 +13192,11 @@ msgstr[0] "正規表示式已删除"
 msgid "Regular expression does not exist."
 msgstr "正規表示式不存在"
 
-#: adm.regexps.php:67 include/regexp.inc.php:119
+#: include/regexp.inc.php:119
 msgid "Regular expression must be a string"
 msgstr ""
 
-#: adm.regexps.php:146
+#: adm.regexps.php:140
 msgid "Regular expression updated"
 msgstr "正規表示式已更新"
 
@@ -13524,11 +13542,11 @@ msgstr "回應時間"
 msgid "Result"
 msgstr "結果"
 
-#: include/regexp.inc.php:226 include/views/js/adm.regexprs.edit.js.php:149
+#: include/regexp.inc.php:226 include/views/js/adm.regexprs.edit.js.php:152
 msgid "Result is FALSE"
 msgstr "結果為偽"
 
-#: include/regexp.inc.php:225 include/views/js/adm.regexprs.edit.js.php:145
+#: include/regexp.inc.php:225 include/views/js/adm.regexprs.edit.js.php:148
 msgid "Result is TRUE"
 msgstr "結果為真"
 
@@ -14198,7 +14216,7 @@ msgid "Select widget"
 msgstr ""
 
 #: app/views/administration.script.edit.php:80
-#: include/views/monitoring.history.php:167
+#: include/views/monitoring.history.php:172
 msgid "Selected"
 msgstr "選擇的"
 
@@ -14451,7 +14469,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.triggerwizard.php:83
 #: include/classes/screens/CScreenEvents.php:33
-#: include/classes/screens/CScreenHistory.php:258
+#: include/classes/screens/CScreenHistory.php:275
 #: include/classes/screens/CScreenProblem.php:884
 #: include/classes/screens/CScreenProblem.php:906
 #: include/classes/screens/CScreenProblem.php:1128
@@ -14579,7 +14597,7 @@ msgstr "展示線條"
 msgid "Show problems"
 msgstr ""
 
-#: include/views/monitoring.history.php:152
+#: include/views/monitoring.history.php:157
 msgid "Show selected"
 msgstr "展示所選的"
 
@@ -14854,7 +14872,7 @@ msgstr "依此排序觸發器:"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "依欄位\"%1$s\"排序是不允許的."
 
-#: include/classes/screens/CScreenHistory.php:255
+#: include/classes/screens/CScreenHistory.php:272
 #: include/classes/widgets/forms/CWidgetFormGraph.php:31
 msgid "Source"
 msgstr "來源 "
@@ -14875,7 +14893,7 @@ msgstr "指定的腳本不存在或您沒有對動作操作命令的此腳本的
 msgid "Specify some filter condition to see the items."
 msgstr ""
 
-#: include/views/monitoring.history.php:264 latest.php:386
+#: include/views/monitoring.history.php:269 latest.php:386
 msgid "Specify some filter condition to see the values."
 msgstr ""
 
@@ -14884,7 +14902,7 @@ msgid "Speed"
 msgstr "速度"
 
 #: app/views/popup.generic.php:529 include/graphs.inc.php:25
-#: include/views/monitoring.history.php:225
+#: include/views/monitoring.history.php:230
 msgid "Stacked"
 msgstr "層積的"
 
@@ -15225,8 +15243,8 @@ msgstr "TELNET端點代理程式"
 msgid "TOTAL"
 msgstr "總合"
 
-#: include/views/js/adm.regexprs.edit.js.php:128
-#: include/views/js/adm.regexprs.edit.js.php:173
+#: include/views/js/adm.regexprs.edit.js.php:131
+#: include/views/js/adm.regexprs.edit.js.php:177
 msgid "TRUE"
 msgstr "真"
 
@@ -15274,7 +15292,7 @@ msgid "Tag value"
 msgstr ""
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:553
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:561
 #: include/classes/screens/CScreenProblem.php:866
 #: include/classes/screens/CScreenProblem.php:920
 #: include/classes/screens/CScreenProblem.php:1137
@@ -15526,7 +15544,7 @@ msgstr ""
 msgid "The frontend does not match Zabbix database."
 msgstr ""
 
-#: include/classes/db/DbBackend.php:48
+#: include/classes/db/DbBackend.php:50
 #, c-format
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
 msgstr ""
@@ -15591,7 +15609,7 @@ msgstr ""
 msgid "Theme"
 msgstr "背景主題"
 
-#: include/func.inc.php:2700
+#: include/func.inc.php:2691
 msgid "This day last week"
 msgstr ""
 
@@ -15600,11 +15618,11 @@ msgstr ""
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "這欄位是由項目\"%s\"自動填入的."
 
-#: include/func.inc.php:2708 srv_status.php:41
+#: include/func.inc.php:2699 srv_status.php:41
 msgid "This month"
 msgstr "本月"
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2700
 msgid "This month so far"
 msgstr ""
 
@@ -15616,19 +15634,19 @@ msgstr "這篩選-列不是空白. 刪除它?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "這篩選-行不是空白. 刪除它?"
 
-#: include/func.inc.php:2706 srv_status.php:40
+#: include/func.inc.php:2697 srv_status.php:40
 msgid "This week"
 msgstr "本周"
 
-#: include/func.inc.php:2707
+#: include/func.inc.php:2698
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2710 srv_status.php:42
+#: include/func.inc.php:2701 srv_status.php:42
 msgid "This year"
 msgstr "本年"
 
-#: include/func.inc.php:2711
+#: include/func.inc.php:2702
 msgid "This year so far"
 msgstr ""
 
@@ -15659,7 +15677,7 @@ msgstr "直到"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1746 include/actions.inc.php:1800
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
-#: include/actions.inc.php:2015 include/blocks.inc.php:528
+#: include/actions.inc.php:2015 include/blocks.inc.php:536
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:843
@@ -15729,12 +15747,12 @@ msgid "Timeout"
 msgstr "逾時"
 
 #: app/views/monitoring.widget.plaintext.view.php:28
-#: include/classes/screens/CScreenHistory.php:251
-#: include/classes/screens/CScreenHistory.php:358
-#: include/classes/screens/CScreenHistory.php:398
+#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:393
+#: include/classes/screens/CScreenHistory.php:448
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
-#: include/views/monitoring.history.php:260
+#: include/views/monitoring.history.php:265
 msgid "Timestamp"
 msgstr "時間戳"
 
@@ -15748,12 +15766,12 @@ msgstr "到"
 msgid "To set a host interface select a single item type for all items"
 msgstr "要設定一個主機介面, 選擇一個單一的項目類型給所有的項目"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2704
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2695
 #: srv_status.php:39
 msgid "Today"
 msgstr "今天"
 
-#: include/func.inc.php:2705
+#: include/func.inc.php:2696
 msgid "Today so far"
 msgstr ""
 
@@ -16221,7 +16239,7 @@ msgid "Types"
 msgstr "類型 "
 
 #: include/translateDefines.inc.php:25
-#: include/views/js/adm.regexprs.edit.js.php:167
+#: include/views/js/adm.regexprs.edit.js.php:170
 msgid "UNKNOWN"
 msgstr "未知的"
 
@@ -16305,7 +16323,7 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr ""
 
-#: include/classes/db/DbBackend.php:63
+#: include/classes/db/DbBackend.php:65
 msgid "Unable to select configuration."
 msgstr "不能選擇組態."
 
@@ -16472,6 +16490,13 @@ msgstr ""
 #: jsLoader.php:210
 msgid "Unmute"
 msgstr "開聲音"
+
+#: include/classes/db/MysqlDbBackend.php:95
+#: include/classes/db/PostgresqlDbBackend.php:111
+#, c-format
+msgid "Unsupported charset or collation for table: %1$s."
+msgid_plural "Unsupported charset or collation for tables: %1$s."
+msgstr[0] ""
 
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, c-format
@@ -17145,8 +17170,8 @@ msgstr ""
 #: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:427
 #: include/classes/graphdraw/CPieGraphDraw.php:346
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenHistory.php:263
-#: include/classes/screens/CScreenHistory.php:360
+#: include/classes/screens/CScreenHistory.php:280
+#: include/classes/screens/CScreenHistory.php:393
 #: include/classes/screens/CScreenPlainText.php:53
 #: include/views/administration.general.macros.edit.php:38
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -17161,8 +17186,8 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:225
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:167
-#: include/views/hostmacros.php:50 include/views/monitoring.history.php:145
-#: include/views/monitoring.history.php:262
+#: include/views/hostmacros.php:50 include/views/monitoring.history.php:150
+#: include/views/monitoring.history.php:267
 #, c-format
 msgid "Value"
 msgstr "ֵ值"
@@ -17278,7 +17303,7 @@ msgstr ""
 msgid "Value: no data"
 msgstr "值: 無資料"
 
-#: charts.php:100 include/views/monitoring.history.php:67
+#: charts.php:100 include/views/monitoring.history.php:72
 msgid "Values"
 msgstr "值"
 
@@ -17324,7 +17349,7 @@ msgid "Vietnamese (vi_VN)"
 msgstr ""
 
 #: include/views/monitoring.charts.php:43
-#: include/views/monitoring.history.php:80
+#: include/views/monitoring.history.php:85
 msgid "View as"
 msgstr ""
 
@@ -17706,7 +17731,7 @@ msgstr "每年"
 
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:32 include/blocks.inc.php:434
-#: include/blocks.inc.php:625
+#: include/blocks.inc.php:633
 #: include/classes/screens/CScreenHostTriggers.php:273
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
@@ -17723,7 +17748,7 @@ msgstr "每年"
 msgid "Yes"
 msgstr "是"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2698
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2689
 msgid "Yesterday"
 msgstr ""
 
@@ -17813,7 +17838,7 @@ msgstr ""
 msgid "ZABBIX"
 msgstr "Zabbix"
 
-#: include/page_header.php:156
+#: include/page_header.php:135
 msgid "Zabbix"
 msgstr "Zabbix"
 
@@ -17997,7 +18022,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: include/classes/validators/CApiInputValidator.php:1354
-#: include/validate.inc.php:227 include/validate.inc.php:590
+#: include/validate.inc.php:227 include/validate.inc.php:591
 msgid "a time unit is expected"
 msgstr ""
 
@@ -18082,15 +18107,15 @@ msgstr ""
 msgid "an unsigned integer is expected"
 msgstr ""
 
-#: include/views/monitoring.history.php:163
+#: include/views/monitoring.history.php:168
 msgid "as Blue"
 msgstr "成藍"
 
-#: include/views/monitoring.history.php:162
+#: include/views/monitoring.history.php:167
 msgid "as Green"
 msgstr "成綠"
 
-#: include/views/monitoring.history.php:161
+#: include/views/monitoring.history.php:166
 msgid "as Red"
 msgstr "成紅"
 
@@ -18843,7 +18868,7 @@ msgstr ""
 msgid "problem pattern"
 msgstr ""
 
-#: include/page_header.php:159 include/views/general.warning.php:21
+#: include/page_header.php:138 include/views/general.warning.php:21
 #, c-format
 msgid "refreshed every %1$s sec."
 msgstr "每 %1$s 秒更新"
@@ -19178,7 +19203,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1135
 #: include/classes/validators/CApiInputValidator.php:348
 #: include/classes/validators/CApiInputValidator.php:656
-#: include/validate.inc.php:583
+#: include/validate.inc.php:584
 #, c-format
 msgid "value must be one of %1$s"
 msgstr ""
