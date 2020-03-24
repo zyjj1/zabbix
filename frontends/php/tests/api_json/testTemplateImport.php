@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testTemplateImport extends CAPITest {
 
 	public function testDeleteMissingForLinkedTemplateApplication() {
-		$import_tmpl = file_get_contents('./xml/testDeleteMissingForLinkedTemplateApplication.xml');
+		$import_tmpl = file_get_contents(dirname(__FILE__).'/xml/testDeleteMissingForLinkedTemplateApplication.xml');
 		$import1 = strtr($import_tmpl, ['@application' => 'App X']);
 		$import2 = strtr($import_tmpl, ['@application' => 'App Y']);
 
