@@ -67,7 +67,6 @@ $filter_column = (new CFormList())
 		(new CTable())
 			->addRow($severity_columns[0])
 			->addRow($severity_columns[1])
-			->addStyle('margin-top: 4px;')
 	);
 
 $filterForm
