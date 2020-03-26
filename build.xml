@@ -56,6 +56,7 @@
 			<arg line="--quiet"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
@@ -73,10 +74,12 @@
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
@@ -86,6 +89,7 @@
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -93,6 +97,7 @@
 		</exec>
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -100,6 +105,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -108,6 +114,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/images.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -116,6 +123,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/data.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -128,6 +136,7 @@
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -135,6 +144,7 @@
 		</exec>
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -142,6 +152,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -153,6 +164,7 @@
 	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -164,6 +176,7 @@
 	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -175,6 +188,7 @@
 	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -195,10 +209,12 @@
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
