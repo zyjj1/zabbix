@@ -2820,13 +2820,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_URL],
 				'/chart_bar.php?a=1&b=2',
 				'/1/url',
-				'Invalid parameter "/1/url": unacceptable URL.'
-			],
-			[
-				['type' => API_URL],
-				'{$URL}',
-				'/1/url',
-				'Invalid parameter "/1/url": unacceptable URL.'
+				'/chart_bar.php?a=1&b=2'
 			],
 			[
 				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
