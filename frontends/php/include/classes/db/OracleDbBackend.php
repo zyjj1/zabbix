@@ -76,17 +76,17 @@ class OracleDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDatabaseEncoding() {
-		$db_param = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
+		$row = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
 			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
 				' AND value!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET)
 		));
 
-		if ($db_param) {
+		if ($row) {
 			$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
-				$db_param['parameter'], _s('"%1$s" instead "%2$s"', $db_param['value'], ZBX_DB_DEFAULT_CHARSET)
+				$row['parameter'], _s('"%1$s" instead "%2$s"', $row['value'], ZBX_DB_DEFAULT_CHARSET)
 			)));
 		}
 
-		return !$db_param;
+		return !$row;
 	}
 }
