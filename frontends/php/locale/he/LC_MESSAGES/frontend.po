@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 12:01+0200\n"
+"POT-Creation-Date: 2020-03-16 17:12+0200\n"
 "PO-Revision-Date: 2018-11-30 14:01+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -281,7 +281,7 @@ msgstr "5 דקות"
 msgid "5 seconds"
 msgstr "5 שניות"
 
-#: include/views/monitoring.history.php:68
+#: include/views/monitoring.history.php:73
 msgid "500 latest values"
 msgstr "500 הערכים האחרונים"
 
@@ -637,12 +637,12 @@ msgstr "פעיל עד"
 #: include/views/configuration.triggers.massupdate.php:139
 #: include/views/hostmacros.php:169
 #: include/views/js/administration.general.valuemapping.edit.js.php:26
-#: include/views/js/adm.regexprs.edit.js.php:193
+#: include/views/js/adm.regexprs.edit.js.php:198
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
 #: include/views/js/configuration.discovery.edit.js.php:123
-#: include/views/js/configuration.discovery.edit.js.php:704
+#: include/views/js/configuration.discovery.edit.js.php:710
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -942,7 +942,7 @@ msgstr "וגם/או"
 msgid "Any"
 msgstr "כלשהו"
 
-#: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:137
+#: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:140
 msgid "Any character string included"
 msgstr "כל תו במחרוזת נכלל"
 
@@ -1082,7 +1082,7 @@ msgstr "חשבוני"
 msgid "As is"
 msgstr "כמו שהוא"
 
-#: include/views/monitoring.history.php:86
+#: include/views/monitoring.history.php:91
 msgid "As plain text"
 msgstr "כטקסט פשוט"
 
@@ -1527,9 +1527,9 @@ msgstr "קנדה (136 תווים)"
 #: include/views/js/administration.general.trigseverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
 #: include/views/js/configuration.discovery.edit.js.php:124
-#: include/views/js/configuration.discovery.edit.js.php:566
-#: include/views/js/configuration.discovery.edit.js.php:637
-#: include/views/js/configuration.discovery.edit.js.php:667
+#: include/views/js/configuration.discovery.edit.js.php:572
+#: include/views/js/configuration.discovery.edit.js.php:643
+#: include/views/js/configuration.discovery.edit.js.php:673
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:117
 #: jsLoader.php:131 jsLoader.php:301 jsLoader.php:313
@@ -1673,7 +1673,7 @@ msgstr "לא ניתן להוסיף יישום חדש „%1$s”."
 msgid "Cannot add proxy"
 msgstr "לא ניתן להוסיף מתווך"
 
-#: adm.regexps.php:153
+#: adm.regexps.php:147
 msgid "Cannot add regular expression"
 msgstr "לא ניתן להוסיף ביטוי רגולרי"
 
@@ -1995,7 +1995,7 @@ msgid_plural "Cannot delete proxies"
 msgstr[0] "לא ניתן למחוק מתווך"
 msgstr[1] "לא ניתן למחוק מתווכים"
 
-#: adm.regexps.php:203
+#: adm.regexps.php:197
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "לא ניתן למחוק ביטוי רגולרי"
@@ -2823,7 +2823,7 @@ msgstr "לא ניתן לעדכן את המתווך"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "לא ניתן לעדכן את המתווך עבור המארח שהתגלה „%1$s”."
 
-#: adm.regexps.php:147
+#: adm.regexps.php:141
 msgid "Cannot update regular expression"
 msgstr "לא ניתן לעדכן את הביטוי הרגולרי"
 
@@ -2905,7 +2905,7 @@ msgstr "לא ניתן לעדכן מפת ערכים"
 msgid "Cannot update web scenario"
 msgstr "לא ניתן לעדכן תרחישי רשת"
 
-#: include/views/js/configuration.discovery.edit.js.php:633
+#: include/views/js/configuration.discovery.edit.js.php:639
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "לא ניתן לאמת את בדיקת הגילוי: בקשה שגויה או שהחיבור לשרת ה־Zabbix נכשלה."
 
@@ -2981,11 +2981,11 @@ msgstr "שינוי דרגת חומרה"
 msgid "Character"
 msgstr "תו"
 
-#: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:133
+#: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:136
 msgid "Character string included"
 msgstr "מחרוזת תווים כלולה"
 
-#: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:141
+#: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:144
 msgid "Character string not included"
 msgstr "מחרוזת תווים אינה כלולה"
 
@@ -2998,7 +2998,7 @@ msgstr "מארז"
 msgid "Chassis information. Returns string"
 msgstr "פרטי מארז. מחזירה מחרוזת"
 
-#: include/views/js/configuration.discovery.edit.js.php:563
+#: include/views/js/configuration.discovery.edit.js.php:569
 msgid "Check already exists."
 msgstr "הבדיקה כבר קיימת."
 
@@ -3660,7 +3660,7 @@ msgstr "מכיל"
 #: include/views/configuration.trigger.prototype.list.php:31
 #: include/views/configuration.triggers.list.php:142
 #: include/views/monitoring.charts.php:58
-#: include/views/monitoring.history.php:209
+#: include/views/monitoring.history.php:214
 #: include/views/monitoring.hostscreen.php:63
 #: include/views/monitoring.overview.items.php:73
 #: include/views/monitoring.overview.triggers.php:110
@@ -4954,9 +4954,9 @@ msgstr "התגלה על ידי המתווך"
 msgid "Discovery check"
 msgstr "בדיקת גילוי"
 
-#: include/views/js/configuration.discovery.edit.js.php:562
-#: include/views/js/configuration.discovery.edit.js.php:631
-#: include/views/js/configuration.discovery.edit.js.php:663
+#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:637
+#: include/views/js/configuration.discovery.edit.js.php:669
 msgid "Discovery check error"
 msgstr "שגיאת בדיקת גילוי"
 
@@ -5702,7 +5702,7 @@ msgstr "שגיאה: %1$s"
 msgid "Event"
 msgstr "אירוע"
 
-#: include/classes/screens/CScreenHistory.php:261
+#: include/classes/screens/CScreenHistory.php:278
 msgid "Event ID"
 msgstr "מזהה אירוע"
 
@@ -5923,8 +5923,8 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "ו׳"
 
-#: include/views/js/adm.regexprs.edit.js.php:128
-#: include/views/js/adm.regexprs.edit.js.php:173
+#: include/views/js/adm.regexprs.edit.js.php:131
+#: include/views/js/adm.regexprs.edit.js.php:178
 msgid "FALSE"
 msgstr "שקר"
 
@@ -6138,7 +6138,7 @@ msgstr "אזור מלא"
 #: include/views/configuration.template.list.php:25
 #: include/views/configuration.triggers.list.php:114
 #: include/views/inventory.host.list.php:48
-#: include/views/monitoring.history.php:237
+#: include/views/monitoring.history.php:242
 #: include/views/monitoring.overview.items.php:81
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
@@ -6393,7 +6393,7 @@ msgstr "קו מדורג"
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:435
 #: include/views/monitoring.charts.php:38
-#: include/views/monitoring.history.php:66
+#: include/views/monitoring.history.php:71
 #: include/views/monitoring.screen.constructor.edit.php:156 latest.php:539
 #: latest.php:691 report2.php:455
 msgid "Graph"
@@ -6533,7 +6533,7 @@ msgstr "סכום בתרשים"
 #: app/controllers/CControllerPopupGeneric.php:248
 #: include/views/configuration.graph.edit.php:94
 #: include/views/configuration.graph.list.php:90
-#: include/views/monitoring.history.php:222
+#: include/views/monitoring.history.php:227
 msgid "Graph type"
 msgstr "סוג תרשים"
 
@@ -6804,7 +6804,7 @@ msgstr "הסתרת ניפוי שגיאות"
 msgid "Hide groups without problems"
 msgstr "הסתרת קבוצות בלי בעיות"
 
-#: include/views/monitoring.history.php:153
+#: include/views/monitoring.history.php:158
 msgid "Hide selected"
 msgstr "הסתרת הנבחרים"
 
@@ -7687,12 +7687,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "API שגוי „%1$s”."
 
 #: include/classes/api/services/CDRule.php:543
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:606
 msgid "Incorrect SNMP OID."
 msgstr "ה־OID של ה־SNMP שגוי."
 
 #: include/classes/api/services/CDRule.php:537
-#: include/views/js/configuration.discovery.edit.js.php:596
+#: include/views/js/configuration.discovery.edit.js.php:602
 msgid "Incorrect SNMP community."
 msgstr "הקהילה של ה־SNMP שגוי."
 
@@ -8241,7 +8241,7 @@ msgstr "טווח הפתחות שגוי."
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "פרוטוקול הפרטיות עבור הפריט „%1$s” שגוי."
 
-#: adm.regexps.php:68 include/regexp.inc.php:120
+#: include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "הביטוי הרגולרי „%1$s” שגוי: „%2$s”"
@@ -9191,7 +9191,7 @@ msgid "Italian (it_IT)"
 msgstr "איטלקית (it_IT)"
 
 #: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:82
-#: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:252
+#: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:269
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
@@ -9435,7 +9435,7 @@ msgstr "פריטים"
 msgid "Items deleted"
 msgstr "פריטים נמחקו"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:134
 msgid "Items list"
 msgstr "רשימת פריטים"
 
@@ -9932,9 +9932,9 @@ msgstr "זמן הטעינה של עמוד אינטרנט במלואו (בשני�
 msgid "Local"
 msgstr "מקומי"
 
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:270
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
-#: include/views/monitoring.history.php:261
+#: include/views/monitoring.history.php:266
 #: include/views/monitoring.screen.constructor.edit.php:766
 msgid "Local time"
 msgstr "זמן מקומי"
@@ -10299,11 +10299,11 @@ msgstr "מרץ"
 msgid "Mark elements on trigger status change"
 msgstr "סימון רכיבים עם שינוי מצב הקפצה"
 
-#: include/views/monitoring.history.php:155
+#: include/views/monitoring.history.php:160
 msgid "Mark others"
 msgstr "סימון אחרים"
 
-#: include/views/monitoring.history.php:154
+#: include/views/monitoring.history.php:159
 msgid "Mark selected"
 msgstr "סימון הנבחרים"
 
@@ -10721,8 +10721,8 @@ msgstr "NNTP"
 msgid "NTLM"
 msgstr "NTLM"
 
-#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:158
-#: adm.regexps.php:189 app/controllers/CControllerPopupGeneric.php:71
+#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:152
+#: adm.regexps.php:183 app/controllers/CControllerPopupGeneric.php:71
 #: app/controllers/CControllerPopupGeneric.php:83
 #: app/controllers/CControllerPopupGeneric.php:95
 #: app/controllers/CControllerPopupGeneric.php:107
@@ -11323,7 +11323,7 @@ msgstr "לא צוין סוג משימה ליחס „%1$s”."
 msgid "No permissions for system access."
 msgstr "אין הרשאות לגישה למערכת."
 
-#: adm.regexps.php:117
+#: adm.regexps.php:111
 #: app/controllers/CControllerDashboardPropertiesCheck.php:62
 #: app/controllers/CControllerDashboardPropertiesEdit.php:99
 #: app/controllers/CControllerDashboardShareEdit.php:74
@@ -11578,7 +11578,7 @@ msgstr "ללא"
 #: app/views/popup.generic.php:538 include/graphs.inc.php:24
 #: include/items.inc.php:160 include/triggers.inc.php:1278
 #: include/views/configuration.triggers.list.php:42
-#: include/views/monitoring.history.php:224
+#: include/views/monitoring.history.php:229
 msgid "Normal"
 msgstr "רגיל"
 
@@ -13254,11 +13254,11 @@ msgstr "ביטוי רגולרי"
 msgid "Regular expression \"%s\" already exists."
 msgstr "הביטוי הרגולרי „%s“ כבר קיים."
 
-#: adm.regexps.php:152
+#: adm.regexps.php:146
 msgid "Regular expression added"
 msgstr "נוסף ביטוי רגולרי"
 
-#: adm.regexps.php:202
+#: adm.regexps.php:196
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "ביטוי רגולרי נמחק"
@@ -13268,11 +13268,11 @@ msgstr[1] "ביטויים רגולריים נמחקו"
 msgid "Regular expression does not exist."
 msgstr "הביטוי הרגולרי לא קיים."
 
-#: adm.regexps.php:67 include/regexp.inc.php:119
+#: include/regexp.inc.php:119
 msgid "Regular expression must be a string"
 msgstr "הביטוי הרגולרי חייב להיות מחרוזת"
 
-#: adm.regexps.php:146
+#: adm.regexps.php:140
 msgid "Regular expression updated"
 msgstr "הביטוי הרגולרי עודכן"
 
@@ -13618,11 +13618,11 @@ msgstr "זמן משוב"
 msgid "Result"
 msgstr "תוצאה"
 
-#: include/regexp.inc.php:226 include/views/js/adm.regexprs.edit.js.php:149
+#: include/regexp.inc.php:226 include/views/js/adm.regexprs.edit.js.php:152
 msgid "Result is FALSE"
 msgstr "התוצאה היא שקר"
 
-#: include/regexp.inc.php:225 include/views/js/adm.regexprs.edit.js.php:145
+#: include/regexp.inc.php:225 include/views/js/adm.regexprs.edit.js.php:148
 msgid "Result is TRUE"
 msgstr "התוצאה היא אמת"
 
@@ -14293,7 +14293,7 @@ msgid "Select widget"
 msgstr "בחירת וידג׳ט"
 
 #: app/views/administration.script.edit.php:80
-#: include/views/monitoring.history.php:167
+#: include/views/monitoring.history.php:172
 msgid "Selected"
 msgstr "נבחר"
 
@@ -14546,7 +14546,7 @@ msgstr "הגדרת ההפניות ב־LDAP ל„כבוי” נכשלה."
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.triggerwizard.php:83
 #: include/classes/screens/CScreenEvents.php:33
-#: include/classes/screens/CScreenHistory.php:258
+#: include/classes/screens/CScreenHistory.php:275
 #: include/classes/screens/CScreenProblem.php:884
 #: include/classes/screens/CScreenProblem.php:906
 #: include/classes/screens/CScreenProblem.php:1128
@@ -14674,7 +14674,7 @@ msgstr "הצגת קווים"
 msgid "Show problems"
 msgstr "הצגת בעיות"
 
-#: include/views/monitoring.history.php:152
+#: include/views/monitoring.history.php:157
 msgid "Show selected"
 msgstr "הצגת הנבחרים"
 
@@ -14949,7 +14949,7 @@ msgstr "מיון הקפצות לפי"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "המיון לפי השדה „%1$s“ אסור."
 
-#: include/classes/screens/CScreenHistory.php:255
+#: include/classes/screens/CScreenHistory.php:272
 #: include/classes/widgets/forms/CWidgetFormGraph.php:31
 msgid "Source"
 msgstr "מקור"
@@ -14970,7 +14970,7 @@ msgstr "הסקריפט שצוין לא קיים או שאין לך הרשאות 
 msgid "Specify some filter condition to see the items."
 msgstr "יש לציין מספר תנאי סינון כדי לצפות בפריטים."
 
-#: include/views/monitoring.history.php:264 latest.php:386
+#: include/views/monitoring.history.php:269 latest.php:386
 msgid "Specify some filter condition to see the values."
 msgstr "נא לציין מספר תנאי סינון כדי לצפות בערכים."
 
@@ -14979,7 +14979,7 @@ msgid "Speed"
 msgstr "מהירות"
 
 #: app/views/popup.generic.php:529 include/graphs.inc.php:25
-#: include/views/monitoring.history.php:225
+#: include/views/monitoring.history.php:230
 msgid "Stacked"
 msgstr "בערימה"
 
@@ -15320,8 +15320,8 @@ msgstr "סוכן TELNET"
 msgid "TOTAL"
 msgstr "סך הכול"
 
-#: include/views/js/adm.regexprs.edit.js.php:128
-#: include/views/js/adm.regexprs.edit.js.php:173
+#: include/views/js/adm.regexprs.edit.js.php:131
+#: include/views/js/adm.regexprs.edit.js.php:177
 msgid "TRUE"
 msgstr "אמת"
 
@@ -15826,12 +15826,12 @@ msgid "Timeout"
 msgstr "תום הזמן"
 
 #: app/views/monitoring.widget.plaintext.view.php:28
-#: include/classes/screens/CScreenHistory.php:251
-#: include/classes/screens/CScreenHistory.php:358
-#: include/classes/screens/CScreenHistory.php:398
+#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:393
+#: include/classes/screens/CScreenHistory.php:448
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
-#: include/views/monitoring.history.php:260
+#: include/views/monitoring.history.php:265
 msgid "Timestamp"
 msgstr "חותמת זמן"
 
@@ -16322,7 +16322,7 @@ msgid "Types"
 msgstr "סוגים"
 
 #: include/translateDefines.inc.php:25
-#: include/views/js/adm.regexprs.edit.js.php:167
+#: include/views/js/adm.regexprs.edit.js.php:170
 msgid "UNKNOWN"
 msgstr "לא ידוע"
 
@@ -17255,8 +17255,8 @@ msgstr "זמן הפעילות של מכונה וירטואלית של VMware,‏
 #: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:427
 #: include/classes/graphdraw/CPieGraphDraw.php:346
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenHistory.php:263
-#: include/classes/screens/CScreenHistory.php:360
+#: include/classes/screens/CScreenHistory.php:280
+#: include/classes/screens/CScreenHistory.php:393
 #: include/classes/screens/CScreenPlainText.php:53
 #: include/views/administration.general.macros.edit.php:38
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -17271,8 +17271,8 @@ msgstr "זמן הפעילות של מכונה וירטואלית של VMware,‏
 #: include/views/configuration.item.prototype.edit.php:225
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:167
-#: include/views/hostmacros.php:50 include/views/monitoring.history.php:145
-#: include/views/monitoring.history.php:262
+#: include/views/hostmacros.php:50 include/views/monitoring.history.php:150
+#: include/views/monitoring.history.php:267
 #, c-format
 msgid "Value"
 msgstr "ערך"
@@ -17389,7 +17389,7 @@ msgstr ""
 msgid "Value: no data"
 msgstr "ערך: אין נתונים"
 
-#: charts.php:100 include/views/monitoring.history.php:67
+#: charts.php:100 include/views/monitoring.history.php:72
 msgid "Values"
 msgstr "ערכים"
 
@@ -17435,7 +17435,7 @@ msgid "Vietnamese (vi_VN)"
 msgstr "וייטנאמית (vi_VN)"
 
 #: include/views/monitoring.charts.php:43
-#: include/views/monitoring.history.php:80
+#: include/views/monitoring.history.php:85
 msgid "View as"
 msgstr "הצגה בתור"
 
@@ -18195,15 +18195,15 @@ msgstr ""
 msgid "an unsigned integer is expected"
 msgstr ""
 
-#: include/views/monitoring.history.php:163
+#: include/views/monitoring.history.php:168
 msgid "as Blue"
 msgstr "ככחול"
 
-#: include/views/monitoring.history.php:162
+#: include/views/monitoring.history.php:167
 msgid "as Green"
 msgstr "כירוק"
 
-#: include/views/monitoring.history.php:161
+#: include/views/monitoring.history.php:166
 msgid "as Red"
 msgstr "כאדום"
 
