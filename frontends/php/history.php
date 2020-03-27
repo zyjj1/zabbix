@@ -55,9 +55,19 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
 	'form' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
 	'form_copy_to' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'form_refresh' =>	[T_ZBX_INT,			O_OPT, null,	null,	null]
+	'form_refresh' =>	[T_ZBX_INT,			O_OPT, null,	null,	null],
+	// filter
+	'filter_rst' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null]
 ];
 check_fields($fields);
+
+if (getRequest('filter_rst')) {
+	redirect((new CUrl('history.php'))
+		->setArgument('action', 'showvalues')
+		->getUrl()
+	);
+}
+
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
