@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2020-02-12 00:11+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1210,7 +1210,7 @@ msgstr "認証に失敗しました：%1$s。"
 msgid "Authentication method"
 msgstr "認証方式"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr "認証方式を更新しました"
 
@@ -1230,7 +1230,7 @@ msgstr "認証パスフレーズ"
 msgid "Authentication protocol"
 msgstr "認証プロトコル"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr "認証の設定を更新しました"
 
@@ -2342,7 +2342,7 @@ msgstr "JSファイル\"%s\"を読み込めません。"
 msgid "Cannot include view file \"%s\"."
 msgstr "ビューファイル\"%s\"を読み込めません。"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr "トリガー条件式を追加できません"
 
@@ -2636,7 +2636,7 @@ msgstr "アクションを更新できません"
 msgid "Cannot update application"
 msgstr "アプリケーションを更新できません"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr "認証の設定を更新できません"
 
@@ -3220,7 +3220,7 @@ msgstr "圧縮"
 msgid "Concurrent sessions"
 msgstr "並列実行数"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "トリガー条件式"
 
@@ -8363,7 +8363,7 @@ msgstr "ユーザーグループが正しくありません。"
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません。"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8430,7 +8430,7 @@ msgstr "メディアタイプ\"%3$s\"のためのフィールド\"%2$s\"内の�
 msgid "Incorrect value for \"%1$s\" field."
 msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8595,7 +8595,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "フィールド\"%1$s\": %2$sの値が正しくありません。"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9207,7 +9207,7 @@ msgstr[0] "アイテムを有効にしました"
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr "アイテムが選択されていません"
 
@@ -9528,11 +9528,11 @@ msgstr "LDAP認証"
 msgid "LDAP host"
 msgstr "LDAPホスト"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr "LDAPは設定されていません"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr "LDAPによるログインが成功しました"
 
@@ -16394,7 +16394,7 @@ msgid "Unknown function."
 msgstr "不明な関数。"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr "不明なアイテム。選択したホストにそのようなアイテムは存在しません"

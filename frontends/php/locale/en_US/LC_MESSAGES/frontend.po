@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2019-03-19 11:57+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: \n"
@@ -1230,7 +1230,7 @@ msgstr "Authentication failed: %1$s."
 msgid "Authentication method"
 msgstr "Authentication method"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr "Authentication method changed"
 
@@ -1250,7 +1250,7 @@ msgstr "Authentication passphrase"
 msgid "Authentication protocol"
 msgstr "Authentication protocol"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr "Authentication settings updated"
 
@@ -2395,7 +2395,7 @@ msgstr "Cannot include JS file \"%s\"."
 msgid "Cannot include view file \"%s\"."
 msgstr "Cannot include view file \"%s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr "Cannot insert trigger expression"
 
@@ -2689,7 +2689,7 @@ msgstr "Cannot update action"
 msgid "Cannot update application"
 msgstr "Cannot update application"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr "Cannot update authentication"
 
@@ -3277,7 +3277,7 @@ msgstr "Compression"
 msgid "Concurrent sessions"
 msgstr "Concurrent sessions"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "Condition"
 
@@ -8433,7 +8433,7 @@ msgstr "Incorrect user group."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Incorrect value \"%1$s\" for \"%2$s\" field."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8500,7 +8500,7 @@ msgstr "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgid "Incorrect value for \"%1$s\" field."
 msgstr "Incorrect value for \"%1$s\" field."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8665,7 +8665,7 @@ msgstr "Incorrect value for \"%1$s\" field."
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Incorrect value for field \"%1$s\": %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9280,7 +9280,7 @@ msgstr[1] "Items enabled"
 msgid "Item in \"not supported\" state"
 msgstr "Item in \"not supported\" state"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr "Item not selected"
 
@@ -9602,11 +9602,11 @@ msgstr "LDAP authentication"
 msgid "LDAP host"
 msgstr "LDAP host"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr "LDAP is not configured"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr "LDAP login successful"
 
@@ -16489,7 +16489,7 @@ msgid "Unknown function."
 msgstr "Unknown function."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr "Unknown host item, no such item in selected host"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2019-03-12 09:36+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1214,7 +1214,7 @@ msgstr "Xác thực lỗi: %1$s."
 msgid "Authentication method"
 msgstr "Phương thức xác thực"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr "Phương phác xác thực chuyển đổi"
 
@@ -1234,7 +1234,7 @@ msgstr "Mật mã xác thực"
 msgid "Authentication protocol"
 msgstr "Giao thức xác thực"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr "Cài đặt xác thưc đã được cập nhật"
 
@@ -2350,7 +2350,7 @@ msgstr "Không thể bao gôm tệp tin JS \"%s\"."
 msgid "Cannot include view file \"%s\"."
 msgstr "Không thể xem gộp tập tin \"%s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr "Không thể chèn biểu thức trigger"
 
@@ -2644,7 +2644,7 @@ msgstr "Không thể cập nhật hành động"
 msgid "Cannot update application"
 msgstr "Không thể cập nhật ứng dụng"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr "Không thể cập nhật xác thực"
 
@@ -3228,7 +3228,7 @@ msgstr "Nén"
 msgid "Concurrent sessions"
 msgstr "Các phiên làm việc đồng thời"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "Điều kiện"
 
@@ -8371,7 +8371,7 @@ msgstr "Nhóm người dùng không chính xác."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Giá trị \"%1$s\" không chính xác đối với trường \"%2$s\"."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8438,7 +8438,7 @@ msgstr "Giá trị \"%1$s\" không chính xác trong trường \"%2$s\" cho lo�
 msgid "Incorrect value for \"%1$s\" field."
 msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8603,7 +8603,7 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Giá trị không chính xác cho trường \"%1$s\": %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9215,7 +9215,7 @@ msgstr[0] "Item đã được kích hoạtCác item đã được kích h
 msgid "Item in \"not supported\" state"
 msgstr "Item trong trạng thái \"không được hỗ trợ\""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
 
@@ -9536,11 +9536,11 @@ msgstr "Xác thực LDAP"
 msgid "LDAP host"
 msgstr "LDAP host"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr "LDAP không được cấu hình"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr "Đăng nhập LDAP thành công"
 
@@ -16402,7 +16402,7 @@ msgid "Unknown function."
 msgstr "Hàm không rõ"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr "Host item không rõ, không có item trong host được lựa chọn"

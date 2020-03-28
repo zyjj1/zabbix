@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2020-02-08 23:44+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -1233,7 +1233,7 @@ msgstr ""
 msgid "Authentication method"
 msgstr "Μέθοδος ταυτοποίησης"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr ""
 
@@ -1253,7 +1253,7 @@ msgstr "Σύνθημα ταυτοποίησης"
 msgid "Authentication protocol"
 msgstr "Πρωτόκολλο ταυτοποίησης"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -2402,7 +2402,7 @@ msgstr ""
 msgid "Cannot include view file \"%s\"."
 msgstr "Δεν περιέχει προβολή αρχείου \"%s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr "Αδύνατη η εισαγωγή έκφρασης εναύσματος"
 
@@ -2696,7 +2696,7 @@ msgstr "Αδύνατη η ενημέρωση ενέργειας"
 msgid "Cannot update application"
 msgstr "Αδύνατη η ενημέρωση κατηγορίας"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -3287,7 +3287,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "Συνθήκη"
 
@@ -8446,7 +8446,7 @@ msgstr "Λανθασμένη ομάδα χρήστη."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Λανθασμένη τιμή \"%1$s\" για \"%2$s\" πεδίο."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8513,7 +8513,7 @@ msgstr ""
 msgid "Incorrect value for \"%1$s\" field."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8678,7 +8678,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9293,7 +9293,7 @@ msgstr[1] "Συλλέκτες ενεργοποιημένοι"
 msgid "Item in \"not supported\" state"
 msgstr "Συλλέκτης σε \"ανυποστήρικτη\" κατάσταση"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr "Συλλέκτης μή επιλεγμένος"
 
@@ -9616,11 +9616,11 @@ msgstr "LDAP ταυτοποίηση"
 msgid "LDAP host"
 msgstr "LDAP ξενιστής"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr "Επιτυχής σύνδεση LDAP"
 
@@ -16508,7 +16508,7 @@ msgid "Unknown function."
 msgstr "Άγνωστη λειτουργία."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr "Άγνωστος συλλέκτης ξενιστή, κανένας τέτοιος συλλέκτης σε επιλεγμένο ξενιστή"

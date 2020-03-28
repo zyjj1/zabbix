@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2020-02-08 23:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1230,7 +1230,7 @@ msgstr ""
 msgid "Authentication method"
 msgstr "Autentikációs mód"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr ""
 
@@ -1250,7 +1250,7 @@ msgstr ""
 msgid "Authentication protocol"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -2398,7 +2398,7 @@ msgstr ""
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr ""
 
@@ -2692,7 +2692,7 @@ msgstr "Az eljárást nem lehet frissíteni"
 msgid "Cannot update application"
 msgstr "Alkalmazás frissítése sikertelen"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -3280,7 +3280,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "Feltétel"
 
@@ -8427,7 +8427,7 @@ msgstr ""
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8494,7 +8494,7 @@ msgstr ""
 msgid "Incorrect value for \"%1$s\" field."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8659,7 +8659,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9274,7 +9274,7 @@ msgstr[1] ""
 msgid "Item in \"not supported\" state"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr ""
 
@@ -9596,11 +9596,11 @@ msgstr ""
 msgid "LDAP host"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr ""
 
@@ -16484,7 +16484,7 @@ msgid "Unknown function."
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr ""

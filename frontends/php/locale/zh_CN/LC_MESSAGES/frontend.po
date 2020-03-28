@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2019-01-29 07:38+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1216,7 +1216,7 @@ msgstr "验证失败: %1$s"
 msgid "Authentication method"
 msgstr "认证方法"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr "身份验证已经变更"
 
@@ -1236,7 +1236,7 @@ msgstr "验证口令"
 msgid "Authentication protocol"
 msgstr "验证协议"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr "验证设置已更新"
 
@@ -2348,7 +2348,7 @@ msgstr "导入JS文件失败\"%s\"."
 msgid "Cannot include view file \"%s\"."
 msgstr "不能包含视图文件 \"%s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr "不能插入触发器表达式"
 
@@ -2642,7 +2642,7 @@ msgstr "无法更新动作"
 msgid "Cannot update application"
 msgstr "无法更新应用集"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr "无法更新验证信息"
 
@@ -3226,7 +3226,7 @@ msgstr "压缩"
 msgid "Concurrent sessions"
 msgstr "并发会话"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "条件"
 
@@ -8372,7 +8372,7 @@ msgstr "错误的用户群组."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "字段 \"%2$s\"的值 \"%1$s\"不正确."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8439,7 +8439,7 @@ msgstr "\"%2$s\" 中 媒体值 \"%3$s\" 的 \"%1$s\" 值错误。"
 msgid "Incorrect value for \"%1$s\" field."
 msgstr "\"%1$s\" 字段的值不正确。"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8604,7 +8604,7 @@ msgstr "\"%1$s\" 字段的值不正确。"
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "字段 \"%1$s\": %2$s 值错误。"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9216,7 +9216,7 @@ msgstr[0] "监控项目已启用"
 msgid "Item in \"not supported\" state"
 msgstr "监控项在“不支持”的状态"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr "项目未被选择"
 
@@ -9537,11 +9537,11 @@ msgstr "LDAP认证"
 msgid "LDAP host"
 msgstr "LDAP主机"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr "LDAP 没有配置"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr "LDAP登录成功"
 
@@ -16409,7 +16409,7 @@ msgid "Unknown function."
 msgstr "未知的函数."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主机监控项, 在所选的主机中没有这样的监控项"

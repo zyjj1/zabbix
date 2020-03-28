@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:12+0200\n"
+"POT-Creation-Date: 2020-03-29 01:43+0200\n"
 "PO-Revision-Date: 2020-02-08 23:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1229,7 +1229,7 @@ msgstr ""
 msgid "Authentication method"
 msgstr "Metodo di autenticazione"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Authentication method changed"
 msgstr ""
 
@@ -1249,7 +1249,7 @@ msgstr "Passphrase di autenticazione"
 msgid "Authentication protocol"
 msgstr "Protocollo di autenticazione"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:237
+#: app/controllers/CControllerAuthenticationUpdate.php:240
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -2394,7 +2394,7 @@ msgstr "Non è possibile includere il file JS \"%s\"."
 msgid "Cannot include view file \"%s\"."
 msgstr "Impossibile includere file vista \"%s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "Cannot insert trigger expression"
 msgstr "Impossibile inserire espressione trigger"
 
@@ -2688,7 +2688,7 @@ msgstr "Impossibile aggiornare l'azione"
 msgid "Cannot update application"
 msgstr "Impossibile aggiornare l'applicazione"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:242
+#: app/controllers/CControllerAuthenticationUpdate.php:245
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -3276,7 +3276,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr "Sessioni concorrenti"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:714
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "Condition"
 msgstr "Condizione"
 
@@ -8434,7 +8434,7 @@ msgstr "Gruppo utenti errato."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Valore \"%1$s\" errato per il campo \"%2$s\"."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:134
+#: app/controllers/CControllerAuthenticationUpdate.php:127
 #: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8501,7 +8501,7 @@ msgstr "Valore errato \"%1$s\" nel campo \"%2$s\" per il tipo media \"%3$s\"."
 msgid "Incorrect value for \"%1$s\" field."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:95
+#: app/controllers/CControllerAuthenticationUpdate.php:88
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
@@ -8666,7 +8666,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Valore errato per il campo \"%1$s\": %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:126
+#: app/controllers/CControllerAuthenticationUpdate.php:119
 #: app/controllers/CControllerPopupTriggerWizard.php:133
 #: include/validate.inc.php:346
 #, c-format
@@ -9281,7 +9281,7 @@ msgstr[1] "Item disabilitato"
 msgid "Item in \"not supported\" state"
 msgstr "Item in stato \"non supportato\""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:686
+#: app/controllers/CControllerPopupTriggerExpr.php:693
 msgid "Item not selected"
 msgstr "Item non selezionato"
 
@@ -9603,11 +9603,11 @@ msgstr "Autenticazione LDAP"
 msgid "LDAP host"
 msgstr "Host LDAP"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:96
+#: app/controllers/CControllerAuthenticationUpdate.php:89
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:182
+#: app/controllers/CControllerAuthenticationUpdate.php:185
 msgid "LDAP login successful"
 msgstr "Login LDAP riuscito"
 
@@ -16491,7 +16491,7 @@ msgid "Unknown function."
 msgstr "Funzione sconosciuta."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:542
 #: include/triggers.inc.php:1433
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host sconosciuto, nessun item di questo tipo nell'host selezionato"
