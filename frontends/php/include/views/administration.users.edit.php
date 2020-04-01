@@ -106,17 +106,25 @@ if ($data['userid'] == 0 || $data['change_password']) {
 		$password_box->setAttribute('autofocus', 'autofocus');
 	}
 
+	// Hidden dummy login field for protection against chrome error when password autocomplete.
+	$autocomplete_name = (new CDiv([(new CTextBox(null, null))->setAttribute('tabindex', '-1')->removeId()]))
+		->addStyle('position: absolute; left: -100vw;');
+
 	$userFormList->addRow(
-		(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
-		$password_box
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
+		(new CLabel(_('Password'), 'password1'))->setAsteriskMark(), [
+			$autocomplete_name,
+			$password_box
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
+		]
 	);
 	$userFormList->addRow(
 		(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 		(new CPassBox('password2', $data['password2']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
+			->setAttribute('autocomplete', 'off')
 	);
 
 	if ($data['change_password']) {
