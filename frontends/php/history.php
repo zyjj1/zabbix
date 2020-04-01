@@ -54,13 +54,6 @@ $fields = [
 ];
 check_fields($fields);
 
-if (getRequest('filter_rst')) {
-	redirect((new CUrl('history.php'))
-		->setArgument('action', 'showvalues')
-		->getUrl()
-	);
-}
-
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -76,7 +69,7 @@ $_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
 /*
  * Display
  */
-$itemids = getRequest('itemids', []);
+$itemids = getRequest('filter_rst') ? [] : getRequest('itemids', []);
 $items = [];
 $value_type = '';
 
@@ -114,6 +107,8 @@ $data = [
 	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => true, ITEM_VALUE_TYPE_UINT64 => true],
 	'profileIdx' => 'web.item.graph.filter',
 	'profileIdx2' => 0,
+	'filter_task' => getRequest('filter_rst') ? FILTER_TASK_SHOW : getRequest('filter_task', FILTER_TASK_SHOW),
+	'filter' => getRequest('filter_rst') ? '' : getRequest('filter', ''),
 	'active_tab' => CProfile::get('web.item.graph.filter.active', 1)
 ];
 
