@@ -1111,10 +1111,12 @@ class CHost extends CHostGeneral {
 			$data['status'] = $updateStatus;
 		}
 
+		$new_hosts = [];
 		foreach ($db_hosts as $hostid => $db_host) {
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostid, $db_host['host'], $this->tableName,
-				$db_host, $data);
+			$new_hosts[] = $data + $db_host;
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $new_hosts, $db_hosts);
 
 		return ['hostids' => $inputHostIds];
 	}
