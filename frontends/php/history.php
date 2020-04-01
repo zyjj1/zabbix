@@ -46,16 +46,9 @@ $fields = [
 	'filter_task' =>	[T_ZBX_STR,			O_OPT, null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null],
 	'filter' =>			[T_ZBX_STR,			O_OPT, null,	null,	null],
 	'mark_color' =>		[T_ZBX_STR,			O_OPT, null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null],
-	'cmbitemlist' =>	[T_ZBX_INT,			O_OPT, null,	DB_ID,	null],
 	'plaintext' =>		[T_ZBX_STR,			O_OPT, null,	null,	null],
 	'action' =>			[T_ZBX_STR,			O_OPT, P_SYS,	IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'","'.HISTORY_LATEST.'","'.HISTORY_BATCH_GRAPH.'"'), null],
 	'graphtype' =>		[T_ZBX_INT,			O_OPT, null,   IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
-	// actions
-	'reset' =>			[T_ZBX_STR,			O_OPT, P_SYS|P_ACT, null, null],
-	'cancel' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'form' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'form_copy_to' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'form_refresh' =>	[T_ZBX_INT,			O_OPT, null,	null,	null],
 	// filter
 	'filter_rst' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null]
 ];
