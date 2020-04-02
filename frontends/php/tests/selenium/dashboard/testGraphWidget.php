@@ -93,7 +93,6 @@ class testGraphWidget extends CWebTest {
 		$form = $overlay->asForm();
 		$form->fill(['Type' => 'Graph']);
 		$form->waitUntilReloaded();
-		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 
 		$errors = [];
@@ -107,6 +106,7 @@ class testGraphWidget extends CWebTest {
 			}
 
 			$this->page->removeFocus();
+			sleep(1);
 			// Collect all screenshot errors.
 			try {
 				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
