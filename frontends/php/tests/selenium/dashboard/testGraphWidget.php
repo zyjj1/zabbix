@@ -93,6 +93,7 @@ class testGraphWidget extends CWebTest {
 		$form = $overlay->asForm();
 		$form->fill(['Type' => 'Graph']);
 		$form->waitUntilReloaded();
+		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 
 		$errors = [];
