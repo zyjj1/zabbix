@@ -1220,6 +1220,7 @@ define('API_H_NAME',			25);
 define('API_RANGE_TIME',		26);
 define('API_COLOR',				27);
 define('API_NUMERIC',			28);
+define('API_SORTORDER',			29);
 
 // flags
 define('API_REQUIRED',				0x0001);
