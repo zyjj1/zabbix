@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
 	<target name="init-common">
+		<condition property="phpunit_filter" value=" --filter='${PHPUNIT_FILTER}'" else="">
+			<and>
+				<isset property="PHPUNIT_FILTER" />
+				<length string="${PHPUNIT_FILTER}" when="greater" length="0"/>
+			</and>
+		</condition>
+
 		<!-- Delete build directories from the previous run -->
 		<delete dir="build/logs" failonerror="off"/>
 		<!-- Create the different build directories -->
@@ -137,13 +144,17 @@
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="frontends/php/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="${phpunit_filter}"/>
 			<arg line="include/"/>
 		</exec>
 	</target>
 
 	<target name="test-frontend">
 		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php frontend.php"/>
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="${phpunit_filter}"/>
+			<arg line="frontend.php"/>
 		</exec>
 	</target>
 
