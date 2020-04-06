@@ -522,7 +522,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 {
 	const char		*__function_name = "process_pinger_hosts";
 	int			i, first_index = 0, ping_result;
-	char			error[ITEM_ERROR_LEN_MAX] = "";
+	char			error[ITEM_ERROR_LEN_MAX];
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;

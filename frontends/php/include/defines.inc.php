@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.19rc1');
-define('ZABBIX_API_VERSION',	'4.0.19');
+define('ZABBIX_VERSION',		'4.0.20rc1');
+define('ZABBIX_API_VERSION',	'4.0.20');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -37,7 +37,8 @@ define('ZBX_MEBIBYTE',	'1048576');
 define('ZBX_GIBIBYTE',	'1073741824');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-define('ZBX_MAX_PERIOD',		63158401); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 1
+// the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1
+define('ZBX_MAX_PERIOD',		63162001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MIN_INT64',			'-9223372036854775808');
@@ -1219,6 +1220,7 @@ define('API_H_NAME',			25);
 define('API_RANGE_TIME',		26);
 define('API_COLOR',				27);
 define('API_NUMERIC',			28);
+define('API_SORTORDER',			29);
 
 // flags
 define('API_REQUIRED',				0x0001);

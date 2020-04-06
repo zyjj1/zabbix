@@ -356,7 +356,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": cannot be empty.'
 				]
 			],
-			// URL with a space in the middle.
+			// URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -365,35 +365,7 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'www.zab bix.com'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
-				]
-			],
-			// External URL without protocol.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Alias' => 'Negative_Test17',
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'zabbix.com'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
-				]
-			],
-			// Internal URL without extension.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Alias' => 'Negative_Test18',
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'sysmaps'
+						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
@@ -804,32 +776,12 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": cannot be empty.'
 				]
 			],
-			// URL with a space in the middle.
+			// URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'URL (after login)' => 'www.zab bix.com'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
-				]
-			],
-			// External URL without protocol.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'URL (after login)' => 'zabbix.com'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
-				]
-			],
-			// Internal URL without extension.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'URL (after login)' => 'sysmaps'
+						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
