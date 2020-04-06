@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -424,7 +424,7 @@
 		});
 
 		/**
-		 * Compact affected widgets removing empty space between them when possible. Additionaly built overlap array
+		 * Compact affected widgets removing empty space between them when possible. Additionally buid overlap array
 		 * which will contain maximal coordinate occupied by widgets on every opposite axis line.
 		 */
 		affected.each(function(box) {
@@ -612,7 +612,7 @@
 
 		/**
 		 * When resize failed to fit affected widgets move them into visible area and decrease size of widget
-		 * which started resize operation, additionaly setting 'overflow' property to widget.
+		 * which started resize operation, additionally setting 'overflow' property to widget.
 		 */
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
@@ -1261,6 +1261,11 @@
 		updateWidgetContent($obj, data, widget);
 	}
 
+	/**
+	 * @param {object} $obj
+	 * @param {object} data
+	 * @param {object} widget
+	 */
 	function updateWidgetConfig($obj, data, widget) {
 		var	url = new Curl('zabbix.php'),
 			fields = $('form', data.dialogue['body']).serializeJSON(),
@@ -1323,9 +1328,10 @@
 				.appendTo($obj);
 		}
 
-		$('.dialogue-widget-save', data.dialogue.div).prop('disabled', true);
+		var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
+		$save_btn.prop('disabled', true);
 
-		$.ajax({
+		overlays_stack.getById('widgetConfg').xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
@@ -1335,7 +1341,7 @@
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
-					$('.dialogue-widget-save', data.dialogue.div).prop('disabled', false);
+					$save_btn.prop('disabled', false);
 				}
 				else {
 					// No errors, proceed with update.
@@ -1395,6 +1401,9 @@
 				}
 			}
 		})
+			.fail(function() {
+				$save_btn.prop('disabled', false);
+			})
 			.always(function() {
 				if ($placeholder) {
 					$placeholder.remove();

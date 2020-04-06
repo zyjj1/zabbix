@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,6 +118,9 @@ class CApiInputValidator {
 			case API_OUTPUT:
 				return self::validateOutput($rule, $data, $path, $error);
 
+			case API_SORTORDER:
+				return self::validateSortOrder($rule, $data, $path, $error);
+
 			case API_IDS:
 				return self::validateIds($rule, $data, $path, $error);
 
@@ -191,6 +194,7 @@ class CApiInputValidator {
 			case API_BOOLEAN:
 			case API_FLAG:
 			case API_OUTPUT:
+			case API_SORTORDER:
 			case API_HG_NAME:
 			case API_H_NAME:
 			case API_NUMERIC:
@@ -870,7 +874,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * APPI output validator.
+	 * API output validator.
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL
@@ -907,6 +911,51 @@ class CApiInputValidator {
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
 
 		return false;
+	}
+
+	/**
+	 * API sort order validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSortOrder($rule, &$data, $path, &$error) {
+		$in = ZBX_SORT_UP.','.ZBX_SORT_DOWN;
+
+		if (self::validateStringUtf8(['in' => $in], $data, $path, $e)) {
+			return true;
+		}
+
+		if (is_string($data)) {
+			$error = $e;
+			return false;
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = [
+			'type' => API_STRING_UTF8,
+			'in' => $in
+		];
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
 	}
 
 	/**
@@ -1574,7 +1623,7 @@ class CApiInputValidator {
 		}
 
 		if ($data !== '' && CHtmlUrlValidator::validate($data, ($flags & API_ALLOW_USER_MACRO)) === false) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptible URL'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));
 			return false;
 		}
 

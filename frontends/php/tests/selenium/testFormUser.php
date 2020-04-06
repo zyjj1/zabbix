@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -356,7 +356,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": cannot be empty.'
 				]
 			],
-			// URL with a space in the middle.
+			// URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -365,37 +365,9 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'www.zab bix.com'
+						'URL (after login)' => 'javascript:alert(123);'
 					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
-				]
-			],
-			// External URL without protocol.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Alias' => 'Negative_Test17',
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'zabbix.com'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
-				]
-			],
-			// Internal URL without extention.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Alias' => 'Negative_Test18',
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'sysmaps'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -409,7 +381,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Creating user by specifying only mandatory parameters.
@@ -804,34 +776,14 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": cannot be empty.'
 				]
 			],
-			// URL with a space in the middle.
+			// URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'URL (after login)' => 'www.zab bix.com'
+						'URL (after login)' => 'javascript:alert(123);'
 					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
-				]
-			],
-			// External URL without protocol.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'URL (after login)' => 'zabbix.com'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
-				]
-			],
-			// Internal URL without extention.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'URL (after login)' => 'sysmaps'
-					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -841,7 +793,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Updating all fields (except password) of an existing user.
