@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-05 01:43+0300\n"
+"POT-Creation-Date: 2020-04-06 22:09+0300\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2214,7 +2214,7 @@ msgstr "맵 \"%2$s\"에서 이용되는 호스트 \"%1$s\"를 찾을 수 없습�
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"에서 이용되고 있는 호스트 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1123
+#: include/classes/import/CConfigurationImport.php:1125
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타입 \"%2$s\"를 위한 호스트 그룹 \"%1$s\"를 찾을 수 없습니다."
@@ -2237,32 +2237,32 @@ msgstr "맵 \"%2$s\"에서 이용되는 아이콘 \"%1$s\"를 찾을 수 없습�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "맵 \"%2$s\"에서 이용되는 아이콘 매핑 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1507
+#: include/classes/import/CConfigurationImport.php:1509
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"의 Y축의 최대치로서 이용되는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1276
+#: include/classes/import/CConfigurationImport.php:1278
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최대치로서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1491
+#: include/classes/import/CConfigurationImport.php:1493
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"의 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1256
+#: include/classes/import/CConfigurationImport.php:1258
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1526
+#: include/classes/import/CConfigurationImport.php:1528
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"내에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1296
+#: include/classes/import/CConfigurationImport.php:1298
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\" 에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
@@ -2287,7 +2287,7 @@ msgstr "스크린 \"%2$s\"에서 이용되고 있는 맵 \"%1$s\"를 찾을 수 
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"에서 이용되고 있는 스크린 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1146
+#: include/classes/import/CConfigurationImport.php:1148
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타입 \"%2$s\"를 위한 템플릿 \"%1$s\"를 찾을 수 없습니다."
@@ -2298,12 +2298,12 @@ msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "맵 \"%2$s\"에서 이용되고 있는 트리거 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:749
+#: include/classes/import/CConfigurationImport.php:751
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"상의 아이템 \"%2$s\"에서 이용되고 있는 값의 매핑 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1051
+#: include/classes/import/CConfigurationImport.php:1053
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타입 \"%2$s\"에서 이용되고 있는 값 매핑 \"%1$s\"를 찾을 수 없습니다."
@@ -8576,14 +8576,14 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
 #: include/classes/helpers/CSvgGraphHelper.php:247
-#: include/classes/import/CConfigurationImport.php:840
-#: include/classes/import/CConfigurationImport.php:878
-#: include/classes/import/CConfigurationImport.php:2507
-#: include/classes/import/CConfigurationImport.php:2611
-#: include/classes/import/CConfigurationImport.php:2621
-#: include/classes/import/CConfigurationImport.php:2657
-#: include/classes/import/CConfigurationImport.php:2666
-#: include/classes/import/CConfigurationImport.php:2672
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2509
+#: include/classes/import/CConfigurationImport.php:2613
+#: include/classes/import/CConfigurationImport.php:2623
+#: include/classes/import/CConfigurationImport.php:2659
+#: include/classes/import/CConfigurationImport.php:2668
+#: include/classes/import/CConfigurationImport.php:2674
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:267
@@ -9168,7 +9168,7 @@ msgstr "아이템 \"%1$s\"가 존재하지 않거나 접속권한이 없습니�
 msgid "Item \"%1$s\" has master item and cannot be copied."
 msgstr "아이템 \"%1$s\"는 마스터 아이템을 가지고 있으므로 복사할 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:732
+#: include/classes/import/CConfigurationImport.php:734
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" 상의 아이템 \"%1$s\": 어플리케이션 \"%3$s\"는 존재하지 않습니다."
@@ -15885,7 +15885,7 @@ msgstr "트리거 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "트리거 \"%1$s\"는 링크되어 있는 다른 템플릿에 포함됩니다."
 
-#: include/classes/import/CConfigurationImport.php:1647
+#: include/classes/import/CConfigurationImport.php:1649
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "트리거 \"%1$s\"는 존재하지않는 트리거\"%2$s\"에 의존하고 있습니다."
@@ -16000,7 +16000,7 @@ msgstr "트리거 프로토타입 \"%1$s\"는 링크되어있는 다른 템플�
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "트리거 프로토타입 \"%1$s\"에 복수의 디스커버리 규칙에서의 아이템 프로토타입이 포함되어 있습니다."
 
-#: include/classes/import/CConfigurationImport.php:1369
+#: include/classes/import/CConfigurationImport.php:1371
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "트리거 프로토타입 \"%1$s\"는 트리거 \"%2$s\"에 의존하지만 존재하지 않습니다."
@@ -17423,7 +17423,7 @@ msgstr "Web시나리오 \"%1$s\"는 호스트 \"%2$s\"에 이미 존재합니다
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Web시나리오\"%1$s\"는 이미 존재합니다."
 
-#: include/classes/import/CConfigurationImport.php:1419
+#: include/classes/import/CConfigurationImport.php:1421
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"상의 Web시나리오 \"%1$s\": 어플리케이션 \"%3$s\"이 존재하지 않습니다."
@@ -18249,7 +18249,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "\"%1$s\"에서 시작되는 조건식을 확인해주세요."
 
 #: include/classes/api/services/CItemGeneral.php:1649
-#: include/classes/import/CConfigurationImport.php:2658
+#: include/classes/import/CConfigurationImport.php:2660
 msgid "circular item dependency is not allowed"
 msgstr "모순된 아이템의 의존관계는 허가되지 않습니다."
 
@@ -18645,8 +18645,8 @@ msgid "maximum dependent items count reached"
 msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 
 #: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/import/CConfigurationImport.php:2612
-#: include/classes/import/CConfigurationImport.php:2673
+#: include/classes/import/CConfigurationImport.php:2614
+#: include/classes/import/CConfigurationImport.php:2675
 msgid "maximum number of dependency levels reached"
 msgstr "의존 레벨 수가 최대수에 도달하였습니다"
 
@@ -19155,11 +19155,11 @@ msgstr "지원되지 않는 버전의 번호입니다."
 msgid "value"
 msgstr "값"
 
-#: include/classes/import/CConfigurationImport.php:841
-#: include/classes/import/CConfigurationImport.php:879
-#: include/classes/import/CConfigurationImport.php:2508
-#: include/classes/import/CConfigurationImport.php:2622
-#: include/classes/import/CConfigurationImport.php:2667
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:881
+#: include/classes/import/CConfigurationImport.php:2510
+#: include/classes/import/CConfigurationImport.php:2624
+#: include/classes/import/CConfigurationImport.php:2669
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "값 \"%1$s\"가 존재하지 않습니다"
