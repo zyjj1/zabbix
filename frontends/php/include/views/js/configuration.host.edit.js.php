@@ -78,7 +78,7 @@
 			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true)
 				.trigger('click');
 
-			if (hostInterface.locked > 0) {
+			if (hostInterface.locked) {
 				addNotDraggableIcon(domRow);
 			}
 			else {
