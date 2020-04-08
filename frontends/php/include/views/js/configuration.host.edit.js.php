@@ -190,7 +190,7 @@
 				disabled: ''
 			};
 
-			if (hostInterface.items > 0 || hostInterface.items === 'true') {
+			if (hostInterface.items === 'true') {
 				attrs.disabled = 'disabled="disabled"';
 			}
 
