@@ -1004,7 +1004,7 @@ elseif (hasRequest('form')) {
 					}
 				}
 
-				$interface['items'] = $interface['items'] ? 'true' : 'false';
+				$interface['items'] = (bool) $interface['items'];
 			}
 			unset($interface);
 
