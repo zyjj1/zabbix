@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-05 01:43+0300\n"
+"POT-Creation-Date: 2020-04-06 22:09+0300\n"
 "PO-Revision-Date: 2020-02-08 23:44+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -2272,7 +2272,7 @@ msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμε
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμενο στην οθόνη \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1123
+#: include/classes/import/CConfigurationImport.php:1125
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Δεν βρίσκω ομάδα ξενιστή \"%1$s\" για πρωτότυπο ξενιστή \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
@@ -2295,32 +2295,32 @@ msgstr "Δεν βρίσκω εικόνα \"%1$s\" με χρήση στο χάρ�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Δεν βρίσκω αντιστοίχιση εικονιδίου \"%1$s\" με χρήση στο χάρτη \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1507
+#: include/classes/import/CConfigurationImport.php:1509
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση ως Y άξονα ΜΕΓ τιμής διά γράφημα \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1276
+#: include/classes/import/CConfigurationImport.php:1278
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση ως Y άξονα ΜΕΓ τιμής δια πρωτότυπο γράφημα \"%3$s\" κανόνα εντοπισμού \"%4$s\" σε \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1491
+#: include/classes/import/CConfigurationImport.php:1493
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση ως Y άξονα ΕΛΑΧ τιμής γιά γράφημα \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1256
+#: include/classes/import/CConfigurationImport.php:1258
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση ως Y άξονα ΕΛΑΧ τιμής για πρωτότυπο γράφημα \"%3$s\" κανόνα εντοπισμού \"%4$s\" σε \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1526
+#: include/classes/import/CConfigurationImport.php:1528
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση σε γράφημα \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1296
+#: include/classes/import/CConfigurationImport.php:1298
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση σε πρωτότυπο γράφημα \"%3$s\" κανόνα εντοπισμού \"%4$s\" σε \"%5$s\"."
@@ -2345,7 +2345,7 @@ msgstr "Δεν βρίσκω χάρτη \"%1$s\" χρησιμοποιούμενο
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Δεν βρίσκω οθόνη \"%1$s\" χρησιμοποιούμενη στην οθόνη \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1146
+#: include/classes/import/CConfigurationImport.php:1148
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Δεν βρίσκω σχεδιότυπο \"%1$s\" για πρωτότυπο ξενιστή \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
@@ -2356,12 +2356,12 @@ msgstr "Δεν βρίσκω σχεδιότυπο \"%1$s\" για πρωτότυ�
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Δεν βρίσκω έναυσμα \"%1$s\" με χρήση σε χάρτη \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:749
+#: include/classes/import/CConfigurationImport.php:751
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Δεν βρίσκω αντιστοίχιση τιμής \"%1$s\" με χρήση για συλλέκτη \"%2$s\" σε \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1051
+#: include/classes/import/CConfigurationImport.php:1053
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Δεν βρίσκω αντιστοίχιση τιμής \"%1$s\" με χρήση σε πρωτότυπο συλλέκτη \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
@@ -8658,14 +8658,14 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
 #: include/classes/helpers/CSvgGraphHelper.php:247
-#: include/classes/import/CConfigurationImport.php:840
-#: include/classes/import/CConfigurationImport.php:878
-#: include/classes/import/CConfigurationImport.php:2507
-#: include/classes/import/CConfigurationImport.php:2611
-#: include/classes/import/CConfigurationImport.php:2621
-#: include/classes/import/CConfigurationImport.php:2657
-#: include/classes/import/CConfigurationImport.php:2666
-#: include/classes/import/CConfigurationImport.php:2672
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2509
+#: include/classes/import/CConfigurationImport.php:2613
+#: include/classes/import/CConfigurationImport.php:2623
+#: include/classes/import/CConfigurationImport.php:2659
+#: include/classes/import/CConfigurationImport.php:2668
+#: include/classes/import/CConfigurationImport.php:2674
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:267
@@ -9250,7 +9250,7 @@ msgstr ""
 msgid "Item \"%1$s\" has master item and cannot be copied."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:732
+#: include/classes/import/CConfigurationImport.php:734
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Συλλέκτης \"%1$s\" σε \"%2$s\": κατηγορία \"%3$s\" ανύπαρκτη."
@@ -15993,7 +15993,7 @@ msgstr "Το έναυσμα \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1647
+#: include/classes/import/CConfigurationImport.php:1649
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Έναυσμα \"%1$s\" εξαρτάται με ανύπαρκτο έναυσμα \"%2$s\"."
@@ -16111,7 +16111,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Πρωτότυπο έναυσμα \"%1$s\" περιέχει πρωτότυπους συλλέκτες από πολλαπλούς κανόνες εντοπισμού."
 
-#: include/classes/import/CConfigurationImport.php:1369
+#: include/classes/import/CConfigurationImport.php:1371
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
@@ -17541,7 +17541,7 @@ msgstr "Σενάριο ιστού \"%1$s\" υπάρχει ήδη σε ξενισ
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Σενάριο ιστού \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/import/CConfigurationImport.php:1419
+#: include/classes/import/CConfigurationImport.php:1421
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
@@ -18369,7 +18369,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "έλεγχος έκφρασης κινουμένη από \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1649
-#: include/classes/import/CConfigurationImport.php:2658
+#: include/classes/import/CConfigurationImport.php:2660
 msgid "circular item dependency is not allowed"
 msgstr ""
 
@@ -18765,8 +18765,8 @@ msgid "maximum dependent items count reached"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/import/CConfigurationImport.php:2612
-#: include/classes/import/CConfigurationImport.php:2673
+#: include/classes/import/CConfigurationImport.php:2614
+#: include/classes/import/CConfigurationImport.php:2675
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
@@ -19275,11 +19275,11 @@ msgstr ""
 msgid "value"
 msgstr "τιμή"
 
-#: include/classes/import/CConfigurationImport.php:841
-#: include/classes/import/CConfigurationImport.php:879
-#: include/classes/import/CConfigurationImport.php:2508
-#: include/classes/import/CConfigurationImport.php:2622
-#: include/classes/import/CConfigurationImport.php:2667
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:881
+#: include/classes/import/CConfigurationImport.php:2510
+#: include/classes/import/CConfigurationImport.php:2624
+#: include/classes/import/CConfigurationImport.php:2669
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr ""

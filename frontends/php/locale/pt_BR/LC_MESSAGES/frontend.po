@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-05 01:43+0300\n"
+"POT-Creation-Date: 2020-04-06 22:09+0300\n"
 "PO-Revision-Date: 2019-06-19 12:51+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2267,7 +2267,7 @@ msgstr "Não foi encontrado o host \"%1$s\" usado no mapa \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Não foi encontrado o host \"%1$s\" usado na tela \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1123
+#: include/classes/import/CConfigurationImport.php:1125
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o grupo de host \"%1$s\" para o protótipo de host \"%2$s\" da autobusca \"%3$s\" em \"%4$s\"."
@@ -2290,32 +2290,32 @@ msgstr "Não foi possível encontrar o ícone \"%1$s\" usado no mapa \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" usado no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1507
+#: include/classes/import/CConfigurationImport.php:1509
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Não foi possível localizar o item \"%1$s\" em \"%2$s\" utilizado como limite MÁXIMO para o eixo Y no gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1276
+#: include/classes/import/CConfigurationImport.php:1278
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÁXIMO para o eixo Y no protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1491
+#: include/classes/import/CConfigurationImport.php:1493
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÁXIMO para o eixo Y do gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1256
+#: include/classes/import/CConfigurationImport.php:1258
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÍNIMO para o eixo Y no protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1526
+#: include/classes/import/CConfigurationImport.php:1528
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1296
+#: include/classes/import/CConfigurationImport.php:1298
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
@@ -2340,7 +2340,7 @@ msgstr "Não foi encontrado o mapa \"%1$s\" usado na tela \"%2$s\"."
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Não foi encontrada a tela \"%1$s\" usada na tela \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1146
+#: include/classes/import/CConfigurationImport.php:1148
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o template \"%1$s\" para o protótipo de host \"%2$s\" da autobusca \"%3$s\" em \"%4$s\"."
@@ -2351,12 +2351,12 @@ msgstr "Não foi possível localizar o template \"%1$s\" para o protótipo de ho
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível localizar a trigger \"%1$s\" que é utilizada no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:749
+#: include/classes/import/CConfigurationImport.php:751
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado para o item \"%2$s\" em \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1051
+#: include/classes/import/CConfigurationImport.php:1053
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado para o protótipo de item \"%2$s\" da autobusca \"%3$s\" em \"%4$s\"."
@@ -8650,14 +8650,14 @@ msgstr "Valor incorreto para o campo \"%1$s\"."
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
 #: include/classes/helpers/CSvgGraphHelper.php:247
-#: include/classes/import/CConfigurationImport.php:840
-#: include/classes/import/CConfigurationImport.php:878
-#: include/classes/import/CConfigurationImport.php:2507
-#: include/classes/import/CConfigurationImport.php:2611
-#: include/classes/import/CConfigurationImport.php:2621
-#: include/classes/import/CConfigurationImport.php:2657
-#: include/classes/import/CConfigurationImport.php:2666
-#: include/classes/import/CConfigurationImport.php:2672
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2509
+#: include/classes/import/CConfigurationImport.php:2613
+#: include/classes/import/CConfigurationImport.php:2623
+#: include/classes/import/CConfigurationImport.php:2659
+#: include/classes/import/CConfigurationImport.php:2668
+#: include/classes/import/CConfigurationImport.php:2674
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:267
@@ -9246,7 +9246,7 @@ msgstr "O item \"%1$s\" não existe ou você não tem acesso a ele"
 msgid "Item \"%1$s\" has master item and cannot be copied."
 msgstr "O item \"%1$s\" tem um item mestre e não pode ser copiado."
 
-#: include/classes/import/CConfigurationImport.php:732
+#: include/classes/import/CConfigurationImport.php:734
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Item \"%1$s\" em \"%2$s\": a aplicação \"%3$s\" não existe."
@@ -15988,7 +15988,7 @@ msgstr "A trigger \"%1$s\" já existe em \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "A trigger \"%1$s\" pertence a templates com associações distintas."
 
-#: include/classes/import/CConfigurationImport.php:1647
+#: include/classes/import/CConfigurationImport.php:1649
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "A trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
@@ -16106,7 +16106,7 @@ msgstr "O protótipo de trigger \"%1$s\" pertence a templates com diferentes ass
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "O protótipo de trigger \"%1$s\" contêm protótipos de item de múltiplas regras de descoberta."
 
-#: include/classes/import/CConfigurationImport.php:1369
+#: include/classes/import/CConfigurationImport.php:1371
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "O protótipo de trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
@@ -17537,7 +17537,7 @@ msgstr "Já existe o cenário web \"%1$s\" no host \"%2$s\"."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "O cenário web \"%1$s\" já existe."
 
-#: include/classes/import/CConfigurationImport.php:1419
+#: include/classes/import/CConfigurationImport.php:1421
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "O cenário web \"%1$s\" em \"%2$s\": aplicação \"%3$s\" não existe."
@@ -18365,7 +18365,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "verifique a expressão a partir de \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1649
-#: include/classes/import/CConfigurationImport.php:2658
+#: include/classes/import/CConfigurationImport.php:2660
 msgid "circular item dependency is not allowed"
 msgstr "dependência circular entre itens não é permitida"
 
@@ -18761,8 +18761,8 @@ msgid "maximum dependent items count reached"
 msgstr "o máximo de itens dependentes foi alcançado"
 
 #: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/import/CConfigurationImport.php:2612
-#: include/classes/import/CConfigurationImport.php:2673
+#: include/classes/import/CConfigurationImport.php:2614
+#: include/classes/import/CConfigurationImport.php:2675
 msgid "maximum number of dependency levels reached"
 msgstr "o nível máximo de dependência foi alcançado"
 
@@ -19271,11 +19271,11 @@ msgstr "número de versão não suportado"
 msgid "value"
 msgstr "valor"
 
-#: include/classes/import/CConfigurationImport.php:841
-#: include/classes/import/CConfigurationImport.php:879
-#: include/classes/import/CConfigurationImport.php:2508
-#: include/classes/import/CConfigurationImport.php:2622
-#: include/classes/import/CConfigurationImport.php:2667
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:881
+#: include/classes/import/CConfigurationImport.php:2510
+#: include/classes/import/CConfigurationImport.php:2624
+#: include/classes/import/CConfigurationImport.php:2669
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "o valor \"%1$s\" não foi encontrado"
