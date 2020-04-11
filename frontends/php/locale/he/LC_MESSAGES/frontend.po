@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-06 22:09+0300\n"
+"POT-Creation-Date: 2020-04-12 01:42+0300\n"
 "PO-Revision-Date: 2018-11-30 14:01+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -3660,7 +3660,7 @@ msgstr "מכיל"
 #: include/views/configuration.trigger.prototype.list.php:31
 #: include/views/configuration.triggers.list.php:142
 #: include/views/monitoring.charts.php:58
-#: include/views/monitoring.history.php:216
+#: include/views/monitoring.history.php:214
 #: include/views/monitoring.hostscreen.php:63
 #: include/views/monitoring.overview.items.php:73
 #: include/views/monitoring.overview.triggers.php:110
@@ -6138,7 +6138,7 @@ msgstr "אזור מלא"
 #: include/views/configuration.template.list.php:25
 #: include/views/configuration.triggers.list.php:114
 #: include/views/inventory.host.list.php:48
-#: include/views/monitoring.history.php:244
+#: include/views/monitoring.history.php:242
 #: include/views/monitoring.overview.items.php:81
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
@@ -6533,7 +6533,7 @@ msgstr "סכום בתרשים"
 #: app/controllers/CControllerPopupGeneric.php:248
 #: include/views/configuration.graph.edit.php:94
 #: include/views/configuration.graph.list.php:90
-#: include/views/monitoring.history.php:229
+#: include/views/monitoring.history.php:227
 msgid "Graph type"
 msgstr "סוג תרשים"
 
@@ -6804,7 +6804,7 @@ msgstr "הסתרת ניפוי שגיאות"
 msgid "Hide groups without problems"
 msgstr "הסתרת קבוצות בלי בעיות"
 
-#: include/views/monitoring.history.php:160
+#: include/views/monitoring.history.php:158
 msgid "Hide selected"
 msgstr "הסתרת הנבחרים"
 
@@ -9935,7 +9935,7 @@ msgstr "מקומי"
 
 #: include/classes/screens/CScreenHistory.php:270
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
-#: include/views/monitoring.history.php:268
+#: include/views/monitoring.history.php:266
 #: include/views/monitoring.screen.constructor.edit.php:766
 msgid "Local time"
 msgstr "זמן מקומי"
@@ -10300,11 +10300,11 @@ msgstr "מרץ"
 msgid "Mark elements on trigger status change"
 msgstr "סימון רכיבים עם שינוי מצב הקפצה"
 
-#: include/views/monitoring.history.php:162
+#: include/views/monitoring.history.php:160
 msgid "Mark others"
 msgstr "סימון אחרים"
 
-#: include/views/monitoring.history.php:161
+#: include/views/monitoring.history.php:159
 msgid "Mark selected"
 msgstr "סימון הנבחרים"
 
@@ -11579,7 +11579,7 @@ msgstr "ללא"
 #: app/views/popup.generic.php:538 include/graphs.inc.php:24
 #: include/items.inc.php:160 include/triggers.inc.php:1278
 #: include/views/configuration.triggers.list.php:42
-#: include/views/monitoring.history.php:231
+#: include/views/monitoring.history.php:229
 msgid "Normal"
 msgstr "רגיל"
 
@@ -14294,7 +14294,7 @@ msgid "Select widget"
 msgstr "בחירת וידג׳ט"
 
 #: app/views/administration.script.edit.php:80
-#: include/views/monitoring.history.php:174
+#: include/views/monitoring.history.php:172
 msgid "Selected"
 msgstr "נבחר"
 
@@ -14675,7 +14675,7 @@ msgstr "הצגת קווים"
 msgid "Show problems"
 msgstr "הצגת בעיות"
 
-#: include/views/monitoring.history.php:159
+#: include/views/monitoring.history.php:157
 msgid "Show selected"
 msgstr "הצגת הנבחרים"
 
@@ -14971,7 +14971,7 @@ msgstr "הסקריפט שצוין לא קיים או שאין לך הרשאות 
 msgid "Specify some filter condition to see the items."
 msgstr "יש לציין מספר תנאי סינון כדי לצפות בפריטים."
 
-#: include/views/monitoring.history.php:271 latest.php:386
+#: include/views/monitoring.history.php:269 latest.php:386
 msgid "Specify some filter condition to see the values."
 msgstr "נא לציין מספר תנאי סינון כדי לצפות בערכים."
 
@@ -14980,7 +14980,7 @@ msgid "Speed"
 msgstr "מהירות"
 
 #: app/views/popup.generic.php:529 include/graphs.inc.php:25
-#: include/views/monitoring.history.php:232
+#: include/views/monitoring.history.php:230
 msgid "Stacked"
 msgstr "בערימה"
 
@@ -15832,7 +15832,7 @@ msgstr "תום הזמן"
 #: include/classes/screens/CScreenHistory.php:448
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
-#: include/views/monitoring.history.php:267
+#: include/views/monitoring.history.php:265
 msgid "Timestamp"
 msgstr "חותמת זמן"
 
@@ -17273,7 +17273,7 @@ msgstr "זמן הפעילות של מכונה וירטואלית של VMware,‏
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:167
 #: include/views/hostmacros.php:50 include/views/monitoring.history.php:152
-#: include/views/monitoring.history.php:269
+#: include/views/monitoring.history.php:267
 #, c-format
 msgid "Value"
 msgstr "ערך"
@@ -18197,15 +18197,15 @@ msgstr ""
 msgid "an unsigned integer is expected"
 msgstr ""
 
-#: include/views/monitoring.history.php:170
+#: include/views/monitoring.history.php:168
 msgid "as Blue"
 msgstr "ככחול"
 
-#: include/views/monitoring.history.php:169
+#: include/views/monitoring.history.php:167
 msgid "as Green"
 msgstr "כירוק"
 
-#: include/views/monitoring.history.php:168
+#: include/views/monitoring.history.php:166
 msgid "as Red"
 msgstr "כאדום"
 
