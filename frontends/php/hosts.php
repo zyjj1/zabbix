@@ -994,17 +994,17 @@ elseif (hasRequest('form')) {
 				}
 				else {
 					// check if interface has items that require specific interface type, if so type cannot be changed
-					$interface['locked'] = 0;
+					$interface['locked'] = false;
 					foreach ($interface['items'] as $item) {
 						$type = itemTypeInterface($item['type']);
 						if ($type !== false && $type != INTERFACE_TYPE_ANY) {
-							$interface['locked'] = 1;
+							$interface['locked'] = true;
 							break;
 						}
 					}
 				}
 
-				$interface['items'] = $interface['items'] ? 1: 0;
+				$interface['items'] = (bool) $interface['items'];
 			}
 			unset($interface);
 

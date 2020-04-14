@@ -63,7 +63,10 @@
 			allHostInterfaces = {};
 
 		function renderHostInterfaceRow(hostInterface) {
-			var domAttrs = getDomElementsAttrsForInterface(hostInterface),
+			var domAttrs = getDomElementsAttrsForInterface(jQuery.extend(hostInterface, {
+					locked: Number(hostInterface.locked),
+					items: Number(hostInterface.items)
+				})),
 				domId = getDomIdForRowInsert(hostInterface.type),
 				domRow;
 
