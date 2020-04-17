@@ -1944,14 +1944,12 @@ int	is_ip4(const char *ip)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
- *                                                                            *
  ******************************************************************************/
 int	is_ip6(const char *ip)
 {
 	const char	*__function_name = "is_ip6";
-	const char	*p = ip;
-	int		nums = 0, is_nums = 0, colons = 0, dcolons = 0, res = FAIL;
+	const char	*p = ip, *last_colon;
+	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
@@ -1959,29 +1957,41 @@ int	is_ip6(const char *ip)
 	{
 		if (0 != isxdigit(*p))
 		{
-			nums++;
-			is_nums = 1;
+			xdigits++;
+			only_xdigits = 1;
 		}
 		else if (':' == *p)
 		{
-			if (0 == nums && 0 < colons)
-				dcolons++;
-			if (4 < nums || 1 < dcolons)
+			if (0 == xdigits && 0 < colons)
+			{
+				/* consecutive sections of zeros are replaced with a double colon */
+				only_xdigits = 1;
+				dbl_colons++;
+			}
+
+			if (4 < xdigits || 1 < dbl_colons)
 				break;
-			nums = 0;
+
+			xdigits = 0;
 			colons++;
 		}
 		else
 		{
-			is_nums = 0;
+			only_xdigits = 0;
 			break;
 		}
 
 		p++;
 	}
 
-	if (2 <= colons && colons <= 7 && 4 >= nums && 1 == is_nums)
+	if (2 > colons || 7 < colons || 1 < dbl_colons || 4 < xdigits)
+		res = FAIL;
+	else if (1 == only_xdigits)
 		res = SUCCEED;
+	else if (7 > colons && (last_colon = strrchr(ip, ':')) < p)
+		res = is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
+	else
+		res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
