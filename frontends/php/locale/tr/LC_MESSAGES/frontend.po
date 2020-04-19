@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:42+0300\n"
+"POT-Creation-Date: 2020-04-19 14:11+0300\n"
 "PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -378,7 +378,7 @@ msgstr ""
 #: include/views/administration.general.regularexpressions.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -557,8 +557,8 @@ msgstr "Şu zamana kadar aktif"
 #: include/views/administration.usergroups.edit.php:165
 #: include/views/administration.usergroups.edit.php:255
 #: include/views/administration.usergroups.edit.php:287
-#: include/views/administration.users.edit.php:325
-#: include/views/administration.users.edit.php:532
+#: include/views/administration.users.edit.php:330
+#: include/views/administration.users.edit.php:537
 #: include/views/common.filter.trigger.php:116
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
@@ -845,8 +845,8 @@ msgid "All dashboards"
 msgstr "Tüm panolar"
 
 #: include/views/administration.usergroups.edit.php:109
-#: include/views/administration.users.edit.php:482
-#: include/views/administration.users.edit.php:488
+#: include/views/administration.users.edit.php:487
+#: include/views/administration.users.edit.php:493
 msgid "All groups"
 msgstr "Tüm gruplar"
 
@@ -1266,7 +1266,7 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Otomatik kaydolma"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:217
 msgid "Auto-login"
 msgstr "Otomatik giriş"
 
@@ -1274,7 +1274,7 @@ msgstr "Otomatik giriş"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Otomatik giriş ve otomatik çıkış seçenekleri birlikte etkinleştirilemez."
 
-#: include/views/administration.users.edit.php:213 profile.php:49 users.php:59
+#: include/views/administration.users.edit.php:218 profile.php:49 users.php:59
 msgid "Auto-logout"
 msgstr "Otomatik çıkış"
 
@@ -2964,7 +2964,7 @@ msgstr "Değiştir"
 
 #: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:139
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:134
 msgid "Change password"
 msgstr "Parolayı değiştir"
 
@@ -4626,7 +4626,7 @@ msgstr "Seçili tetikleyici prototipleri silinsin mi?"
 msgid "Delete selected triggers?"
 msgstr "Seçilen tetikleyiciler silinsin mi?"
 
-#: include/views/administration.users.edit.php:520
+#: include/views/administration.users.edit.php:525
 msgid "Delete selected user?"
 msgstr "Seçilen kullanıcı silinsin mi?"
 
@@ -4895,7 +4895,7 @@ msgstr "Seçilen web senaryoları devre dışı bırakılsın mı?"
 #: include/views/administration.usergroups.list.php:75
 #: include/views/administration.usergroups.list.php:100
 #: include/views/administration.usergroups.list.php:109
-#: include/views/administration.users.edit.php:254
+#: include/views/administration.users.edit.php:259
 #: include/views/administration.users.list.php:178
 #: include/views/administration.users.list.php:180
 #: include/views/configuration.action.list.php:56
@@ -5293,7 +5293,7 @@ msgid "Each URL should have a unique name. Please make sure there is only one UR
 msgstr "Her URL tekil bir isme sahip olmalıdır. Lütfen URL'in yalnızca bir isme sahip olduğundan emin olun"
 
 #: app/views/popup.trigdesc.view.php:109
-#: include/views/administration.users.edit.php:310
+#: include/views/administration.users.edit.php:315
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
 #: include/views/configuration.action.edit.php:1306
@@ -5631,7 +5631,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:71
 #: include/views/administration.usergroups.list.php:96
 #: include/views/administration.usergroups.list.php:108
-#: include/views/administration.users.edit.php:248
+#: include/views/administration.users.edit.php:253
 #: include/views/administration.users.list.php:177
 #: include/views/administration.users.list.php:181
 #: include/views/configuration.action.edit.php:402
@@ -6273,7 +6273,7 @@ msgstr "Önyüz erişimi"
 msgid "Frontend access updated"
 msgstr "Önyüz erişimi güncellendi"
 
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:353
 msgid "Frontend messaging"
 msgstr "Önyüz mesajlaşması"
 
@@ -7011,7 +7011,7 @@ msgstr[1] "Ana makineler etkin"
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:103
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:479
+#: include/views/administration.users.edit.php:484
 #: include/views/configuration.hostgroups.edit.php:47
 #: include/views/js/configuration.action.edit.js.php:67
 #: include/views/js/configuration.action.edit.js.php:200
@@ -9632,7 +9632,7 @@ msgstr "Etiket"
 msgid "Label location"
 msgstr "Etiket konumu"
 
-#: include/views/administration.users.edit.php:183
+#: include/views/administration.users.edit.php:188
 msgid "Language"
 msgstr "Dil"
 
@@ -10055,7 +10055,7 @@ msgstr "Dosyanın MD5 özeti. Karakter stringi döndürür (dosyanın MD5 sağla
 msgid "Macro"
 msgstr "Makro"
 
-#: include/classes/api/services/CUserMacro.php:886
+#: include/classes/api/services/CUserMacro.php:892
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%2$s\" üzerinde \"%1$s\" makrosu zaten var."
@@ -10065,12 +10065,12 @@ msgstr "\"%2$s\" üzerinde \"%1$s\" makrosu zaten var."
 msgid "Macro \"%1$s\" already exists."
 msgstr "\"%1$s\" makrosu halihazırda mevcut."
 
-#: include/classes/api/services/CUserMacro.php:802
+#: include/classes/api/services/CUserMacro.php:808
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "\"%1$s\" makrosu benzersiz değil."
 
-#: include/classes/api/services/CUserMacro.php:909
+#: include/classes/api/services/CUserMacro.php:915
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "\"%1$s\" hostmacroid'li makro mevcut değil."
@@ -10398,8 +10398,8 @@ msgid "May"
 msgstr "May"
 
 #: app/controllers/CControllerPopupMedia.php:170 app/views/popup.media.php:54
-#: include/views/administration.users.edit.php:322
-#: include/views/administration.users.edit.php:455
+#: include/views/administration.users.edit.php:327
+#: include/views/administration.users.edit.php:460
 msgid "Media"
 msgstr "Medya"
 
@@ -10497,8 +10497,8 @@ msgstr "Mesaj"
 msgid "Message text limit"
 msgstr "Mesaj metin sınırı"
 
-#: include/views/administration.users.edit.php:353
-#: include/views/administration.users.edit.php:364
+#: include/views/administration.users.edit.php:358
+#: include/views/administration.users.edit.php:369
 msgid "Message timeout"
 msgstr "Mesaj zaman aşımı"
 
@@ -10510,7 +10510,7 @@ msgstr ""
 msgid "Messages"
 msgstr "Mesajlar"
 
-#: include/views/administration.users.edit.php:510
+#: include/views/administration.users.edit.php:515
 msgid "Messaging"
 msgstr "Mesajlaşma"
 
@@ -11469,7 +11469,7 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:373
 #: include/classes/api/services/CUserMacro.php:460
-#: include/classes/api/services/CUserMacro.php:766
+#: include/classes/api/services/CUserMacro.php:772
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
 #: include/classes/api/services/CValueMap.php:240
@@ -11939,7 +11939,7 @@ msgstr "Açık"
 msgid "On status change triggers blink for"
 msgstr "Durum değişikliğinde tetikleyiciler şunun için yanıp söner"
 
-#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:367
 msgid "Once"
 msgstr "Bir kere"
 
@@ -12535,8 +12535,8 @@ msgstr "Pasif"
 #: app/views/administration.mediatype.edit.php:163 disc_prototypes.php:227
 #: host_discovery.php:207 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
-#: include/views/administration.users.edit.php:110
-#: include/views/administration.users.edit.php:141
+#: include/views/administration.users.edit.php:114
+#: include/views/administration.users.edit.php:146
 #: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.edit.php:977
 #: include/views/configuration.action.edit.php:1720
@@ -12562,11 +12562,11 @@ msgstr "Pasif"
 msgid "Password"
 msgstr "Parola"
 
-#: include/views/administration.users.edit.php:116
+#: include/views/administration.users.edit.php:121
 msgid "Password (once again)"
 msgstr "Parola (tekrar)"
 
-#: include/views/administration.users.edit.php:126
+#: include/views/administration.users.edit.php:127
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
 
@@ -12635,9 +12635,9 @@ msgstr "Dönemler"
 #: include/views/administration.usergroups.edit.php:133
 #: include/views/administration.usergroups.edit.php:217
 #: include/views/administration.usergroups.edit.php:269
-#: include/views/administration.users.edit.php:479
-#: include/views/administration.users.edit.php:499
-#: include/views/administration.users.edit.php:506
+#: include/views/administration.users.edit.php:484
+#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:511
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:173
@@ -12647,7 +12647,7 @@ msgstr "Dönemler"
 msgid "Permissions"
 msgstr "İzinler"
 
-#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:509
 msgid "Permissions can be assigned for user groups only."
 msgstr "İzinler yalnızca kullanıcı grupları için atanabilir."
 
@@ -12667,12 +12667,12 @@ msgstr "Yerleştirme algoritması"
 msgid "Plain text"
 msgstr "Düz metin"
 
-#: include/views/administration.users.edit.php:383
-#: include/views/administration.users.edit.php:420
+#: include/views/administration.users.edit.php:388
+#: include/views/administration.users.edit.php:425
 msgid "Play"
 msgstr "Oynat"
 
-#: include/views/administration.users.edit.php:367
+#: include/views/administration.users.edit.php:372
 msgid "Play sound"
 msgstr "Sesi oynat"
 
@@ -13182,7 +13182,7 @@ msgid "Recipient (descending)"
 msgstr "Alıcı (azalan)"
 
 #: include/classes/screens/CScreenProblem.php:1050
-#: include/views/administration.users.edit.php:377
+#: include/views/administration.users.edit.php:382
 #: include/views/configuration.item.list.php:174
 #: include/views/configuration.trigger.prototype.list.php:130
 #: include/views/configuration.triggers.list.php:266
@@ -13221,7 +13221,7 @@ msgstr "Kurtarma zamanı"
 msgid "Rectangle"
 msgstr "Dikdörtgen"
 
-#: include/views/administration.users.edit.php:221 profile.php:52 users.php:62
+#: include/views/administration.users.edit.php:226 profile.php:52 users.php:62
 msgid "Refresh"
 msgstr "Tazele"
 
@@ -13317,7 +13317,7 @@ msgstr "Uzak komut"
 #: include/views/administration.general.regularexpressions.edit.php:77
 #: include/views/administration.general.valuemapping.edit.php:65
 #: include/views/administration.usergroups.edit.php:189
-#: include/views/administration.users.edit.php:313
+#: include/views/administration.users.edit.php:318
 #: include/views/common.filter.trigger.php:106
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
@@ -13734,7 +13734,7 @@ msgstr "Satır genişliği"
 msgid "Rows"
 msgstr "Satır"
 
-#: include/views/administration.users.edit.php:226 profile.php:53 users.php:63
+#: include/views/administration.users.edit.php:231 profile.php:53 users.php:63
 msgid "Rows per page"
 msgstr "Sayfa başına satır"
 
@@ -14223,7 +14223,7 @@ msgstr "İkincili İKK telefon B"
 msgid "Secondary POC screen name"
 msgstr "İkincil İKK ekran adı"
 
-#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:368
 msgid "Seconds"
 msgstr "Saniye"
 
@@ -14355,7 +14355,7 @@ msgid "Send only to"
 msgstr "Yalnızca şuna gönder"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Send to"
 msgstr "Şuna gönder"
 
@@ -14687,7 +14687,7 @@ msgstr "Seçilenleri göster"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:158
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:64
-#: include/views/administration.users.edit.php:438
+#: include/views/administration.users.edit.php:443
 #: include/views/common.filter.trigger.php:129
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
@@ -15141,8 +15141,8 @@ msgstr "\"%1$s\" adına sahip adım halihazırda mevcut."
 msgid "Steps"
 msgstr "Adımlar"
 
-#: include/views/administration.users.edit.php:388
-#: include/views/administration.users.edit.php:425
+#: include/views/administration.users.edit.php:393
+#: include/views/administration.users.edit.php:430
 msgid "Stop"
 msgstr "Dur"
 
@@ -15261,7 +15261,7 @@ msgstr "Kimlik doğrulama yöntemini değiştirmek bu oturum dışındaki bütü
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Sistem önyükleme zamanı. Tam sayı döndürür (Unix zaman damgası)"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:190
+#: include/users.inc.php:83 include/views/administration.users.edit.php:195
 msgid "System default"
 msgstr "Sistem öntanımlısı"
 
@@ -15688,7 +15688,7 @@ msgstr "İstenen uzaktan prosedür mevcut değil / kullanılabilir değil"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Web senaryo uygulaması, web senaryo ana makinesinden farklı bir ana makineye aittir."
 
-#: include/views/administration.users.edit.php:198
+#: include/views/administration.users.edit.php:203
 msgid "Theme"
 msgstr "Tema"
 
@@ -16152,7 +16152,7 @@ msgstr "Tetikleyici kurtarma ifadesi en az bir ana_makine:anahtar başvurusu iç
 msgid "Trigger severities"
 msgstr "Tetikleyici önem dereceleri"
 
-#: include/actions.inc.php:43 include/views/administration.users.edit.php:437
+#: include/actions.inc.php:43 include/views/administration.users.edit.php:442
 msgid "Trigger severity"
 msgstr "Tetikleyici önem derecesi"
 
@@ -16250,7 +16250,7 @@ msgstr ""
 #: include/forms.inc.php:347 include/hosts.inc.php:99
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:916
 #: include/views/configuration.action.edit.php:1696
 #: include/views/configuration.action.edit.php:2145
@@ -16348,7 +16348,7 @@ msgstr "BİLİNMEYEN"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:236
 msgid "URL (after login)"
 msgstr "URL (oturum açtıktan sonra)"
 
@@ -16647,7 +16647,7 @@ msgstr "Açık"
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
-#: include/views/administration.users.edit.php:528
+#: include/views/administration.users.edit.php:533
 #: include/views/configuration.action.edit.php:1238
 #: include/views/configuration.action.edit.php:1835
 #: include/views/configuration.action.edit.php:2317
@@ -16763,7 +16763,7 @@ msgid "Use custom event status colours"
 msgstr ""
 
 #: app/views/popup.media.php:73
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Use if severity"
 msgstr "Önem derecesi ise kullan"
 
@@ -16780,7 +16780,7 @@ msgstr "Öğelerde kullanılır"
 #: include/classes/setup/CSetupWizard.php:245 include/hosts.inc.php:61
 #: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
-#: include/views/administration.users.edit.php:453
+#: include/views/administration.users.edit.php:458
 #: include/views/configuration.action.edit.php:698
 #: include/views/configuration.action.edit.php:1440
 #: include/views/configuration.action.edit.php:1985
@@ -16830,7 +16830,7 @@ msgstr "Kullanıcı eklendi"
 msgid "User agent string"
 msgstr "Kullanıcı aracısı stringi"
 
-#: include/views/administration.users.edit.php:470
+#: include/views/administration.users.edit.php:475
 msgid "User can't change type for himself"
 msgstr "Kullanıcı kendisi için tür değiştiremez"
 
@@ -16989,8 +16989,8 @@ msgstr "Kullanıcı paylaşımında eksik parametreler: \"%2$s\" haritası için
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "Kullanıcı paylaşımında eksik parametreler: \"%2$s\" ekranı için %1$s."
 
-#: include/views/administration.users.edit.php:470
-#: include/views/administration.users.edit.php:474
+#: include/views/administration.users.edit.php:475
+#: include/views/administration.users.edit.php:479
 #: include/views/administration.users.list.php:63
 #: include/views/administration.users.list.php:86
 msgid "User type"
@@ -17582,7 +17582,7 @@ msgid "Welcome to"
 msgstr "Buraya hoş geldiniz"
 
 #: app/controllers/CControllerPopupMedia.php:110 app/views/popup.media.php:68
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "When active"
 msgstr "Aktif olduğunda"
 
@@ -17850,7 +17850,7 @@ msgstr "Dün"
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\" olarak oturum açtınız."
 
-#: include/views/administration.users.edit.php:174
+#: include/views/administration.users.edit.php:179
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Web sunucu üzerinde yerelleştirme ayarları yapılmamış olan bazı diller seçilemeyecektir."
 
@@ -18563,7 +18563,7 @@ msgid "in"
 msgstr "içinde"
 
 #: include/views/administration.usergroups.edit.php:116
-#: include/views/administration.users.edit.php:489
+#: include/views/administration.users.edit.php:494
 msgid "including subgroups"
 msgstr "alt gruplar dahil"
 
@@ -18893,7 +18893,7 @@ msgstr "un"
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:619
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 msgid "off"
 msgstr "kapalı"
 
@@ -18916,7 +18916,7 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:601
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
 msgstr "de"

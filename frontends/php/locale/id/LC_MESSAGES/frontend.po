@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:42+0300\n"
+"POT-Creation-Date: 2020-04-19 14:11+0300\n"
 "PO-Revision-Date: 2020-02-08 23:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -359,7 +359,7 @@ msgstr ""
 #: include/views/administration.general.regularexpressions.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -536,8 +536,8 @@ msgstr "Aktif sampai"
 #: include/views/administration.usergroups.edit.php:165
 #: include/views/administration.usergroups.edit.php:255
 #: include/views/administration.usergroups.edit.php:287
-#: include/views/administration.users.edit.php:325
-#: include/views/administration.users.edit.php:532
+#: include/views/administration.users.edit.php:330
+#: include/views/administration.users.edit.php:537
 #: include/views/common.filter.trigger.php:116
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
@@ -824,8 +824,8 @@ msgid "All dashboards"
 msgstr ""
 
 #: include/views/administration.usergroups.edit.php:109
-#: include/views/administration.users.edit.php:482
-#: include/views/administration.users.edit.php:488
+#: include/views/administration.users.edit.php:487
+#: include/views/administration.users.edit.php:493
 msgid "All groups"
 msgstr ""
 
@@ -1245,7 +1245,7 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Pendaftaran otomatis"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:217
 msgid "Auto-login"
 msgstr "Login-otomatis"
 
@@ -1253,7 +1253,7 @@ msgstr "Login-otomatis"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr ""
 
-#: include/views/administration.users.edit.php:213 profile.php:49 users.php:59
+#: include/views/administration.users.edit.php:218 profile.php:49 users.php:59
 msgid "Auto-logout"
 msgstr ""
 
@@ -2909,7 +2909,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:139
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:134
 msgid "Change password"
 msgstr "Ubah password"
 
@@ -4567,7 +4567,7 @@ msgstr ""
 msgid "Delete selected triggers?"
 msgstr "Hapus trigger yang dipilih?"
 
-#: include/views/administration.users.edit.php:520
+#: include/views/administration.users.edit.php:525
 msgid "Delete selected user?"
 msgstr "Hapus user yang dipilih?"
 
@@ -4835,7 +4835,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:75
 #: include/views/administration.usergroups.list.php:100
 #: include/views/administration.usergroups.list.php:109
-#: include/views/administration.users.edit.php:254
+#: include/views/administration.users.edit.php:259
 #: include/views/administration.users.list.php:178
 #: include/views/administration.users.list.php:180
 #: include/views/configuration.action.list.php:56
@@ -5231,7 +5231,7 @@ msgid "Each URL should have a unique name. Please make sure there is only one UR
 msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernama"
 
 #: app/views/popup.trigdesc.view.php:109
-#: include/views/administration.users.edit.php:310
+#: include/views/administration.users.edit.php:315
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
 #: include/views/configuration.action.edit.php:1306
@@ -5569,7 +5569,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:71
 #: include/views/administration.usergroups.list.php:96
 #: include/views/administration.usergroups.list.php:108
-#: include/views/administration.users.edit.php:248
+#: include/views/administration.users.edit.php:253
 #: include/views/administration.users.list.php:177
 #: include/views/administration.users.list.php:181
 #: include/views/configuration.action.edit.php:402
@@ -6211,7 +6211,7 @@ msgstr "Akses frontend"
 msgid "Frontend access updated"
 msgstr "Akses frontend telah diperbarui"
 
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:353
 msgid "Frontend messaging"
 msgstr "Sistem pesan frontend"
 
@@ -6945,7 +6945,7 @@ msgstr[0] ""
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:103
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:479
+#: include/views/administration.users.edit.php:484
 #: include/views/configuration.hostgroups.edit.php:47
 #: include/views/js/configuration.action.edit.js.php:67
 #: include/views/js/configuration.action.edit.js.php:200
@@ -9561,7 +9561,7 @@ msgstr "Label"
 msgid "Label location"
 msgstr "Label lokasi"
 
-#: include/views/administration.users.edit.php:183
+#: include/views/administration.users.edit.php:188
 msgid "Language"
 msgstr "Bahasa"
 
@@ -9978,7 +9978,7 @@ msgstr ""
 msgid "Macro"
 msgstr "Makro"
 
-#: include/classes/api/services/CUserMacro.php:886
+#: include/classes/api/services/CUserMacro.php:892
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Makro \"%1$s\" sudah ada pada \"%2$s\"."
@@ -9988,12 +9988,12 @@ msgstr "Makro \"%1$s\" sudah ada pada \"%2$s\"."
 msgid "Macro \"%1$s\" already exists."
 msgstr "Makro \"%1$s\" sudah ada."
 
-#: include/classes/api/services/CUserMacro.php:802
+#: include/classes/api/services/CUserMacro.php:808
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "Makro \"%1$s\" tidak unik."
 
-#: include/classes/api/services/CUserMacro.php:909
+#: include/classes/api/services/CUserMacro.php:915
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Makro dengan hostmacroid \"%1$s\" tidak ada."
@@ -10320,8 +10320,8 @@ msgid "May"
 msgstr "Mei"
 
 #: app/controllers/CControllerPopupMedia.php:170 app/views/popup.media.php:54
-#: include/views/administration.users.edit.php:322
-#: include/views/administration.users.edit.php:455
+#: include/views/administration.users.edit.php:327
+#: include/views/administration.users.edit.php:460
 msgid "Media"
 msgstr "Media"
 
@@ -10418,8 +10418,8 @@ msgstr "Pesan"
 msgid "Message text limit"
 msgstr "Batas teks pesan"
 
-#: include/views/administration.users.edit.php:353
-#: include/views/administration.users.edit.php:364
+#: include/views/administration.users.edit.php:358
+#: include/views/administration.users.edit.php:369
 msgid "Message timeout"
 msgstr "Habis waktu pesan"
 
@@ -10431,7 +10431,7 @@ msgstr ""
 msgid "Messages"
 msgstr "Pesan"
 
-#: include/views/administration.users.edit.php:510
+#: include/views/administration.users.edit.php:515
 msgid "Messaging"
 msgstr "Pesan"
 
@@ -11389,7 +11389,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:373
 #: include/classes/api/services/CUserMacro.php:460
-#: include/classes/api/services/CUserMacro.php:766
+#: include/classes/api/services/CUserMacro.php:772
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
 #: include/classes/api/services/CValueMap.php:240
@@ -11859,7 +11859,7 @@ msgstr "Nyala"
 msgid "On status change triggers blink for"
 msgstr "Pada perubahan status trigger berkedip untuk"
 
-#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:367
 msgid "Once"
 msgstr "Sekali"
 
@@ -12454,8 +12454,8 @@ msgstr "Pasif"
 #: app/views/administration.mediatype.edit.php:163 disc_prototypes.php:227
 #: host_discovery.php:207 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
-#: include/views/administration.users.edit.php:110
-#: include/views/administration.users.edit.php:141
+#: include/views/administration.users.edit.php:114
+#: include/views/administration.users.edit.php:146
 #: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.edit.php:977
 #: include/views/configuration.action.edit.php:1720
@@ -12481,11 +12481,11 @@ msgstr "Pasif"
 msgid "Password"
 msgstr "Password"
 
-#: include/views/administration.users.edit.php:116
+#: include/views/administration.users.edit.php:121
 msgid "Password (once again)"
 msgstr "Password (sekali lagi)"
 
-#: include/views/administration.users.edit.php:126
+#: include/views/administration.users.edit.php:127
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
 
@@ -12554,9 +12554,9 @@ msgstr "Periode"
 #: include/views/administration.usergroups.edit.php:133
 #: include/views/administration.usergroups.edit.php:217
 #: include/views/administration.usergroups.edit.php:269
-#: include/views/administration.users.edit.php:479
-#: include/views/administration.users.edit.php:499
-#: include/views/administration.users.edit.php:506
+#: include/views/administration.users.edit.php:484
+#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:511
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:173
@@ -12566,7 +12566,7 @@ msgstr "Periode"
 msgid "Permissions"
 msgstr "Izin"
 
-#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:509
 msgid "Permissions can be assigned for user groups only."
 msgstr "Perizinan dapat diberikan hanya untuk grup user."
 
@@ -12586,12 +12586,12 @@ msgstr "Menempatkan algoritma"
 msgid "Plain text"
 msgstr "Plain text"
 
-#: include/views/administration.users.edit.php:383
-#: include/views/administration.users.edit.php:420
+#: include/views/administration.users.edit.php:388
+#: include/views/administration.users.edit.php:425
 msgid "Play"
 msgstr "Mainkan"
 
-#: include/views/administration.users.edit.php:367
+#: include/views/administration.users.edit.php:372
 msgid "Play sound"
 msgstr "Mainkan suara"
 
@@ -13100,7 +13100,7 @@ msgid "Recipient (descending)"
 msgstr "Penerima (descending)"
 
 #: include/classes/screens/CScreenProblem.php:1050
-#: include/views/administration.users.edit.php:377
+#: include/views/administration.users.edit.php:382
 #: include/views/configuration.item.list.php:174
 #: include/views/configuration.trigger.prototype.list.php:130
 #: include/views/configuration.triggers.list.php:266
@@ -13139,7 +13139,7 @@ msgstr ""
 msgid "Rectangle"
 msgstr ""
 
-#: include/views/administration.users.edit.php:221 profile.php:52 users.php:62
+#: include/views/administration.users.edit.php:226 profile.php:52 users.php:62
 msgid "Refresh"
 msgstr ""
 
@@ -13234,7 +13234,7 @@ msgstr "Perintah jarak jauh"
 #: include/views/administration.general.regularexpressions.edit.php:77
 #: include/views/administration.general.valuemapping.edit.php:65
 #: include/views/administration.usergroups.edit.php:189
-#: include/views/administration.users.edit.php:313
+#: include/views/administration.users.edit.php:318
 #: include/views/common.filter.trigger.php:106
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
@@ -13651,7 +13651,7 @@ msgstr "Jarak baris"
 msgid "Rows"
 msgstr "Baris"
 
-#: include/views/administration.users.edit.php:226 profile.php:53 users.php:63
+#: include/views/administration.users.edit.php:231 profile.php:53 users.php:63
 msgid "Rows per page"
 msgstr "Baris per halaman"
 
@@ -14139,7 +14139,7 @@ msgstr "Telepon B POC kedua"
 msgid "Secondary POC screen name"
 msgstr "Nama layar POC kedua"
 
-#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:368
 msgid "Seconds"
 msgstr "Detik"
 
@@ -14271,7 +14271,7 @@ msgid "Send only to"
 msgstr "Hanya kirim ke"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Send to"
 msgstr "Kirim ke"
 
@@ -14603,7 +14603,7 @@ msgstr "Tampilkan yang dipilih"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:158
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:64
-#: include/views/administration.users.edit.php:438
+#: include/views/administration.users.edit.php:443
 #: include/views/common.filter.trigger.php:129
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
@@ -15056,8 +15056,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Langkah"
 
-#: include/views/administration.users.edit.php:388
-#: include/views/administration.users.edit.php:425
+#: include/views/administration.users.edit.php:393
+#: include/views/administration.users.edit.php:430
 msgid "Stop"
 msgstr "Berhenti"
 
@@ -15176,7 +15176,7 @@ msgstr "Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini!
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr ""
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:190
+#: include/users.inc.php:83 include/views/administration.users.edit.php:195
 msgid "System default"
 msgstr "Standar sistem"
 
@@ -15601,7 +15601,7 @@ msgstr "Remote-procedure yang diminta tidak ada / tidak tersedia"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: include/views/administration.users.edit.php:198
+#: include/views/administration.users.edit.php:203
 msgid "Theme"
 msgstr "Theme"
 
@@ -16061,7 +16061,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr "Trigger tingkat keparahan"
 
-#: include/actions.inc.php:43 include/views/administration.users.edit.php:437
+#: include/actions.inc.php:43 include/views/administration.users.edit.php:442
 msgid "Trigger severity"
 msgstr "Trigger keparahan"
 
@@ -16159,7 +16159,7 @@ msgstr ""
 #: include/forms.inc.php:347 include/hosts.inc.php:99
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:916
 #: include/views/configuration.action.edit.php:1696
 #: include/views/configuration.action.edit.php:2145
@@ -16257,7 +16257,7 @@ msgstr "TIDAK DIKENAL"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:236
 msgid "URL (after login)"
 msgstr "URL (setelah masuk)"
 
@@ -16555,7 +16555,7 @@ msgstr "Nyala"
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
-#: include/views/administration.users.edit.php:528
+#: include/views/administration.users.edit.php:533
 #: include/views/configuration.action.edit.php:1238
 #: include/views/configuration.action.edit.php:1835
 #: include/views/configuration.action.edit.php:2317
@@ -16671,7 +16671,7 @@ msgid "Use custom event status colours"
 msgstr ""
 
 #: app/views/popup.media.php:73
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Use if severity"
 msgstr "Gunakan jika kondisi parah"
 
@@ -16688,7 +16688,7 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:245 include/hosts.inc.php:61
 #: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
-#: include/views/administration.users.edit.php:453
+#: include/views/administration.users.edit.php:458
 #: include/views/configuration.action.edit.php:698
 #: include/views/configuration.action.edit.php:1440
 #: include/views/configuration.action.edit.php:1985
@@ -16738,7 +16738,7 @@ msgstr "User ditambah"
 msgid "User agent string"
 msgstr ""
 
-#: include/views/administration.users.edit.php:470
+#: include/views/administration.users.edit.php:475
 msgid "User can't change type for himself"
 msgstr "User tidak dapat mengganti tipe untuk dirinya sendiri"
 
@@ -16895,8 +16895,8 @@ msgstr ""
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
 
-#: include/views/administration.users.edit.php:470
-#: include/views/administration.users.edit.php:474
+#: include/views/administration.users.edit.php:475
+#: include/views/administration.users.edit.php:479
 #: include/views/administration.users.list.php:63
 #: include/views/administration.users.list.php:86
 msgid "User type"
@@ -17485,7 +17485,7 @@ msgid "Welcome to"
 msgstr ""
 
 #: app/controllers/CControllerPopupMedia.php:110 app/views/popup.media.php:68
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "When active"
 msgstr "Ketidak aktif"
 
@@ -17753,7 +17753,7 @@ msgstr ""
 msgid "You are logged in as \"%1$s\"."
 msgstr ""
 
-#: include/views/administration.users.edit.php:174
+#: include/views/administration.users.edit.php:179
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server."
 
@@ -18466,7 +18466,7 @@ msgid "in"
 msgstr "dalam"
 
 #: include/views/administration.usergroups.edit.php:116
-#: include/views/administration.users.edit.php:489
+#: include/views/administration.users.edit.php:494
 msgid "including subgroups"
 msgstr ""
 
@@ -18796,7 +18796,7 @@ msgstr "dari"
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:619
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 msgid "off"
 msgstr ""
 
@@ -18819,7 +18819,7 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:601
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
 msgstr "pada"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:42+0300\n"
+"POT-Creation-Date: 2020-04-19 14:11+0300\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -360,7 +360,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: include/views/administration.general.regularexpressions.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -537,8 +537,8 @@ msgstr "종료시간"
 #: include/views/administration.usergroups.edit.php:165
 #: include/views/administration.usergroups.edit.php:255
 #: include/views/administration.usergroups.edit.php:287
-#: include/views/administration.users.edit.php:325
-#: include/views/administration.users.edit.php:532
+#: include/views/administration.users.edit.php:330
+#: include/views/administration.users.edit.php:537
 #: include/views/common.filter.trigger.php:116
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
@@ -825,8 +825,8 @@ msgid "All dashboards"
 msgstr "전체 대시보드"
 
 #: include/views/administration.usergroups.edit.php:109
-#: include/views/administration.users.edit.php:482
-#: include/views/administration.users.edit.php:488
+#: include/views/administration.users.edit.php:487
+#: include/views/administration.users.edit.php:493
 msgid "All groups"
 msgstr "모든 그룹"
 
@@ -1245,7 +1245,7 @@ msgstr "자동"
 msgid "Auto registration"
 msgstr "자동 등록"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:217
 msgid "Auto-login"
 msgstr "자동 로그인 (1개월)"
 
@@ -1253,7 +1253,7 @@ msgstr "자동 로그인 (1개월)"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "자동 로그인과 자동 로그아웃을 동시에 활성화 할 수는 없습니다."
 
-#: include/views/administration.users.edit.php:213 profile.php:49 users.php:59
+#: include/views/administration.users.edit.php:218 profile.php:49 users.php:59
 msgid "Auto-logout"
 msgstr "자동 로그아웃"
 
@@ -2905,7 +2905,7 @@ msgstr "변경"
 
 #: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:139
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:134
 msgid "Change password"
 msgstr "암호 변경"
 
@@ -4564,7 +4564,7 @@ msgstr "선택한 트리거 프로토타입을 삭제하시겠습니까?"
 msgid "Delete selected triggers?"
 msgstr "선택한 트리거를 삭제하시겠습니까?"
 
-#: include/views/administration.users.edit.php:520
+#: include/views/administration.users.edit.php:525
 msgid "Delete selected user?"
 msgstr "선택한 사용자를 삭제하시겠습니까?"
 
@@ -4832,7 +4832,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: include/views/administration.usergroups.list.php:75
 #: include/views/administration.usergroups.list.php:100
 #: include/views/administration.usergroups.list.php:109
-#: include/views/administration.users.edit.php:254
+#: include/views/administration.users.edit.php:259
 #: include/views/administration.users.list.php:178
 #: include/views/administration.users.list.php:180
 #: include/views/configuration.action.list.php:56
@@ -5229,7 +5229,7 @@ msgid "Each URL should have a unique name. Please make sure there is only one UR
 msgstr "각URL의 이름은 중복될 수 없습니다. 같은 URL 이름이 이용되지 않는지 확인해 주세요"
 
 #: app/views/popup.trigdesc.view.php:109
-#: include/views/administration.users.edit.php:310
+#: include/views/administration.users.edit.php:315
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
 #: include/views/configuration.action.edit.php:1306
@@ -5567,7 +5567,7 @@ msgstr "트래핑의 활성화"
 #: include/views/administration.usergroups.list.php:71
 #: include/views/administration.usergroups.list.php:96
 #: include/views/administration.usergroups.list.php:108
-#: include/views/administration.users.edit.php:248
+#: include/views/administration.users.edit.php:253
 #: include/views/administration.users.list.php:177
 #: include/views/administration.users.list.php:181
 #: include/views/configuration.action.edit.php:402
@@ -6208,7 +6208,7 @@ msgstr "Web 인터페이스에 액세스"
 msgid "Frontend access updated"
 msgstr "Web 인터페이스에 액세스를 갱신하였습니다"
 
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:353
 msgid "Frontend messaging"
 msgstr "Web 인터페이스 알림 표시"
 
@@ -6941,7 +6941,7 @@ msgstr[0] "호스트를 활성화 하였습니다"
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:103
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:479
+#: include/views/administration.users.edit.php:484
 #: include/views/configuration.hostgroups.edit.php:47
 #: include/views/js/configuration.action.edit.js.php:67
 #: include/views/js/configuration.action.edit.js.php:200
@@ -9557,7 +9557,7 @@ msgstr "라벨"
 msgid "Label location"
 msgstr "라벨 위치"
 
-#: include/views/administration.users.edit.php:183
+#: include/views/administration.users.edit.php:188
 msgid "Language"
 msgstr "언어"
 
@@ -9974,7 +9974,7 @@ msgstr "파일의 MD5 체크섬. 파일의 MD5해시 값을 string값으로 리�
 msgid "Macro"
 msgstr "매크로"
 
-#: include/classes/api/services/CUserMacro.php:886
+#: include/classes/api/services/CUserMacro.php:892
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "매크로 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
@@ -9984,12 +9984,12 @@ msgstr "매크로 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Macro \"%1$s\" already exists."
 msgstr "매크로 \"%1$s\"는 이미 존재합니다."
 
-#: include/classes/api/services/CUserMacro.php:802
+#: include/classes/api/services/CUserMacro.php:808
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "매크로 \"%1$s\"가 유니크가 아닙니다."
 
-#: include/classes/api/services/CUserMacro.php:909
+#: include/classes/api/services/CUserMacro.php:915
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "hostmacroid \"%1$s\"를 가진 매크로는 업습니다."
@@ -10316,8 +10316,8 @@ msgid "May"
 msgstr "5월"
 
 #: app/controllers/CControllerPopupMedia.php:170 app/views/popup.media.php:54
-#: include/views/administration.users.edit.php:322
-#: include/views/administration.users.edit.php:455
+#: include/views/administration.users.edit.php:327
+#: include/views/administration.users.edit.php:460
 msgid "Media"
 msgstr "연락 방법"
 
@@ -10412,8 +10412,8 @@ msgstr "메시지"
 msgid "Message text limit"
 msgstr "메시지의 상한문자수"
 
-#: include/views/administration.users.edit.php:353
-#: include/views/administration.users.edit.php:364
+#: include/views/administration.users.edit.php:358
+#: include/views/administration.users.edit.php:369
 msgid "Message timeout"
 msgstr "표시기간"
 
@@ -10425,7 +10425,7 @@ msgstr "메세지/커맨드"
 msgid "Messages"
 msgstr "메시지"
 
-#: include/views/administration.users.edit.php:510
+#: include/views/administration.users.edit.php:515
 msgid "Messaging"
 msgstr "알림 표시"
 
@@ -11383,7 +11383,7 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:373
 #: include/classes/api/services/CUserMacro.php:460
-#: include/classes/api/services/CUserMacro.php:766
+#: include/classes/api/services/CUserMacro.php:772
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
 #: include/classes/api/services/CValueMap.php:240
@@ -11853,7 +11853,7 @@ msgstr "ON"
 msgid "On status change triggers blink for"
 msgstr "상태가 바뀐 트리거의 점멸기간"
 
-#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:367
 msgid "Once"
 msgstr "한번"
 
@@ -12448,8 +12448,8 @@ msgstr "패시브"
 #: app/views/administration.mediatype.edit.php:163 disc_prototypes.php:227
 #: host_discovery.php:207 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
-#: include/views/administration.users.edit.php:110
-#: include/views/administration.users.edit.php:141
+#: include/views/administration.users.edit.php:114
+#: include/views/administration.users.edit.php:146
 #: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.edit.php:977
 #: include/views/configuration.action.edit.php:1720
@@ -12475,11 +12475,11 @@ msgstr "패시브"
 msgid "Password"
 msgstr "암호"
 
-#: include/views/administration.users.edit.php:116
+#: include/views/administration.users.edit.php:121
 msgid "Password (once again)"
 msgstr "암호 확인"
 
-#: include/views/administration.users.edit.php:126
+#: include/views/administration.users.edit.php:127
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "암호는 내부인증 타입 이외에는 필수가 아닙니다."
 
@@ -12548,9 +12548,9 @@ msgstr "기간"
 #: include/views/administration.usergroups.edit.php:133
 #: include/views/administration.usergroups.edit.php:217
 #: include/views/administration.usergroups.edit.php:269
-#: include/views/administration.users.edit.php:479
-#: include/views/administration.users.edit.php:499
-#: include/views/administration.users.edit.php:506
+#: include/views/administration.users.edit.php:484
+#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:511
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:173
@@ -12560,7 +12560,7 @@ msgstr "기간"
 msgid "Permissions"
 msgstr "권한"
 
-#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:509
 msgid "Permissions can be assigned for user groups only."
 msgstr "권한은 사용자그룹만 할당할 수 있습니다."
 
@@ -12580,12 +12580,12 @@ msgstr "배치 알고리즘"
 msgid "Plain text"
 msgstr "일반 텍스트"
 
-#: include/views/administration.users.edit.php:383
-#: include/views/administration.users.edit.php:420
+#: include/views/administration.users.edit.php:388
+#: include/views/administration.users.edit.php:425
 msgid "Play"
 msgstr "재생"
 
-#: include/views/administration.users.edit.php:367
+#: include/views/administration.users.edit.php:372
 msgid "Play sound"
 msgstr "사운드 재생"
 
@@ -13094,7 +13094,7 @@ msgid "Recipient (descending)"
 msgstr "수신처 (내림차순)"
 
 #: include/classes/screens/CScreenProblem.php:1050
-#: include/views/administration.users.edit.php:377
+#: include/views/administration.users.edit.php:382
 #: include/views/configuration.item.list.php:174
 #: include/views/configuration.trigger.prototype.list.php:130
 #: include/views/configuration.triggers.list.php:266
@@ -13133,7 +13133,7 @@ msgstr "복구시각"
 msgid "Rectangle"
 msgstr "직사각형"
 
-#: include/views/administration.users.edit.php:221 profile.php:52 users.php:62
+#: include/views/administration.users.edit.php:226 profile.php:52 users.php:62
 msgid "Refresh"
 msgstr "새로고침"
 
@@ -13228,7 +13228,7 @@ msgstr "원격 명령"
 #: include/views/administration.general.regularexpressions.edit.php:77
 #: include/views/administration.general.valuemapping.edit.php:65
 #: include/views/administration.usergroups.edit.php:189
-#: include/views/administration.users.edit.php:313
+#: include/views/administration.users.edit.php:318
 #: include/views/common.filter.trigger.php:106
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
@@ -13645,7 +13645,7 @@ msgstr "행 합치기"
 msgid "Rows"
 msgstr "행"
 
-#: include/views/administration.users.edit.php:226 profile.php:53 users.php:63
+#: include/views/administration.users.edit.php:231 profile.php:53 users.php:63
 msgid "Rows per page"
 msgstr "페이지간 표시 행의 수"
 
@@ -14133,7 +14133,7 @@ msgstr "Secondary POC 전화번호B"
 msgid "Secondary POC screen name"
 msgstr "Secondary POC 스크린명"
 
-#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:368
 msgid "Seconds"
 msgstr "초"
 
@@ -14265,7 +14265,7 @@ msgid "Send only to"
 msgstr "다른 미디어만 사용"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Send to"
 msgstr "수신처"
 
@@ -14597,7 +14597,7 @@ msgstr "선택 항목 보이기"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:158
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:64
-#: include/views/administration.users.edit.php:438
+#: include/views/administration.users.edit.php:443
 #: include/views/common.filter.trigger.php:129
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
@@ -15050,8 +15050,8 @@ msgstr "\"%1$s\"의 이름를 지닌 스텝이 이미 존재합니다."
 msgid "Steps"
 msgstr "스텝"
 
-#: include/views/administration.users.edit.php:388
-#: include/views/administration.users.edit.php:425
+#: include/views/administration.users.edit.php:393
+#: include/views/administration.users.edit.php:430
 msgid "Stop"
 msgstr "정지"
 
@@ -15170,7 +15170,7 @@ msgstr "인증방식을 변경하면 현재 세션이외에는 모두 리셋됩�
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "시스템 부팅 시간. UNIX의 타임스탬프로 integer를 리턴."
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:190
+#: include/users.inc.php:83 include/views/administration.users.edit.php:195
 msgid "System default"
 msgstr "시스템 기본"
 
@@ -15595,7 +15595,7 @@ msgstr "수신된 리모트 프로시져는 존재하지 않거나 이용할 수
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Web시나리오가 설정되어있는 호스트와 다른 호스트에 소속한 어플리케이션이 이용되고 있습니다."
 
-#: include/views/administration.users.edit.php:198
+#: include/views/administration.users.edit.php:203
 msgid "Theme"
 msgstr "테마"
 
@@ -16055,7 +16055,7 @@ msgstr "트리거 복구조건식에는 적어도 하나의 host:key에 참조�
 msgid "Trigger severities"
 msgstr "트리거 심각도"
 
-#: include/actions.inc.php:43 include/views/administration.users.edit.php:437
+#: include/actions.inc.php:43 include/views/administration.users.edit.php:442
 msgid "Trigger severity"
 msgstr "트리거 심각도"
 
@@ -16153,7 +16153,7 @@ msgstr "2개의 타입요소를 선택할 필요가 있습니다"
 #: include/forms.inc.php:347 include/hosts.inc.php:99
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:916
 #: include/views/configuration.action.edit.php:1696
 #: include/views/configuration.action.edit.php:2145
@@ -16251,7 +16251,7 @@ msgstr "알 수 없음"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:236
 msgid "URL (after login)"
 msgstr "로그인 후 URL"
 
@@ -16549,7 +16549,7 @@ msgstr "Up"
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
-#: include/views/administration.users.edit.php:528
+#: include/views/administration.users.edit.php:533
 #: include/views/configuration.action.edit.php:1238
 #: include/views/configuration.action.edit.php:1835
 #: include/views/configuration.action.edit.php:2317
@@ -16665,7 +16665,7 @@ msgid "Use custom event status colours"
 msgstr "이벤트 스테이터스 문자 색상의 변경"
 
 #: app/views/popup.media.php:73
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Use if severity"
 msgstr "심각도 선택"
 
@@ -16682,7 +16682,7 @@ msgstr "아이템으로 사용"
 #: include/classes/setup/CSetupWizard.php:245 include/hosts.inc.php:61
 #: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
-#: include/views/administration.users.edit.php:453
+#: include/views/administration.users.edit.php:458
 #: include/views/configuration.action.edit.php:698
 #: include/views/configuration.action.edit.php:1440
 #: include/views/configuration.action.edit.php:1985
@@ -16732,7 +16732,7 @@ msgstr "사용자를 추가하였습니다"
 msgid "User agent string"
 msgstr "유저 에이전트 문자열"
 
-#: include/views/administration.users.edit.php:470
+#: include/views/administration.users.edit.php:475
 msgid "User can't change type for himself"
 msgstr "사용자는 자신의 사용자타입을 변경할 수 없습니다"
 
@@ -16889,8 +16889,8 @@ msgstr "맵 \"%2$s\"의 유저로 공유하기 위해서는 파라미터 :%1$s �
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"의 유저의 공유는 파라미터:%1$s 가 필요합니다."
 
-#: include/views/administration.users.edit.php:470
-#: include/views/administration.users.edit.php:474
+#: include/views/administration.users.edit.php:475
+#: include/views/administration.users.edit.php:479
 #: include/views/administration.users.list.php:63
 #: include/views/administration.users.list.php:86
 msgid "User type"
@@ -17479,7 +17479,7 @@ msgid "Welcome to"
 msgstr "환영합니다"
 
 #: app/controllers/CControllerPopupMedia.php:110 app/views/popup.media.php:68
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "When active"
 msgstr "연락 허용 시간대"
 
@@ -17747,7 +17747,7 @@ msgstr "어제"
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"로 로그인 하였습니다."
 
-#: include/views/administration.users.edit.php:174
+#: include/views/administration.users.edit.php:179
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Web서버의 언어가 인스톨되어있지 않기 때문에 몇 언어를 이용할 수 없습니다."
 
@@ -18461,7 +18461,7 @@ msgid "in"
 msgstr "범위 내"
 
 #: include/views/administration.usergroups.edit.php:116
-#: include/views/administration.users.edit.php:489
+#: include/views/administration.users.edit.php:494
 msgid "including subgroups"
 msgstr "서브 그룹을 포함"
 
@@ -18791,7 +18791,7 @@ msgstr "of"
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:619
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 msgid "off"
 msgstr "off"
 
@@ -18814,7 +18814,7 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:601
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
 msgstr "on"

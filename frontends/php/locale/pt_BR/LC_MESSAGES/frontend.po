@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:42+0300\n"
+"POT-Creation-Date: 2020-04-19 14:11+0300\n"
 "PO-Revision-Date: 2019-06-19 12:51+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -376,7 +376,7 @@ msgstr "Eventos confirmados RESOLVIDOS"
 #: include/views/administration.general.regularexpressions.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -555,8 +555,8 @@ msgstr "Ativo até"
 #: include/views/administration.usergroups.edit.php:165
 #: include/views/administration.usergroups.edit.php:255
 #: include/views/administration.usergroups.edit.php:287
-#: include/views/administration.users.edit.php:325
-#: include/views/administration.users.edit.php:532
+#: include/views/administration.users.edit.php:330
+#: include/views/administration.users.edit.php:537
 #: include/views/common.filter.trigger.php:116
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
@@ -844,8 +844,8 @@ msgid "All dashboards"
 msgstr "Todos os dashboards"
 
 #: include/views/administration.usergroups.edit.php:109
-#: include/views/administration.users.edit.php:482
-#: include/views/administration.users.edit.php:488
+#: include/views/administration.users.edit.php:487
+#: include/views/administration.users.edit.php:493
 msgid "All groups"
 msgstr "Todos os grupos"
 
@@ -1267,7 +1267,7 @@ msgstr "Auto"
 msgid "Auto registration"
 msgstr "Autorregistro"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:217
 msgid "Auto-login"
 msgstr "Login automático"
 
@@ -1275,7 +1275,7 @@ msgstr "Login automático"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Não é possível habilitar as opções de login automático e logout automático ao mesmo tempo."
 
-#: include/views/administration.users.edit.php:213 profile.php:49 users.php:59
+#: include/views/administration.users.edit.php:218 profile.php:49 users.php:59
 msgid "Auto-logout"
 msgstr "Logout automático"
 
@@ -2964,7 +2964,7 @@ msgstr "Modificar"
 
 #: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:139
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:134
 msgid "Change password"
 msgstr "Alterar senha"
 
@@ -4627,7 +4627,7 @@ msgstr "Excluir o protótipos de trigger selecionados?"
 msgid "Delete selected triggers?"
 msgstr "Excluir triggers selecionadas?"
 
-#: include/views/administration.users.edit.php:520
+#: include/views/administration.users.edit.php:525
 msgid "Delete selected user?"
 msgstr "Excluir usuários selecionados?"
 
@@ -4896,7 +4896,7 @@ msgstr "Desativar os cenários web selecionados?"
 #: include/views/administration.usergroups.list.php:75
 #: include/views/administration.usergroups.list.php:100
 #: include/views/administration.usergroups.list.php:109
-#: include/views/administration.users.edit.php:254
+#: include/views/administration.users.edit.php:259
 #: include/views/administration.users.list.php:178
 #: include/views/administration.users.list.php:180
 #: include/views/configuration.action.list.php:56
@@ -5296,7 +5296,7 @@ msgid "Each URL should have a unique name. Please make sure there is only one UR
 msgstr "Cada URL deverá possuir um nome único. Certifique-se que existe um nome único para cada URL"
 
 #: app/views/popup.trigdesc.view.php:109
-#: include/views/administration.users.edit.php:310
+#: include/views/administration.users.edit.php:315
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
 #: include/views/configuration.action.edit.php:1306
@@ -5634,7 +5634,7 @@ msgstr "Ativar traps"
 #: include/views/administration.usergroups.list.php:71
 #: include/views/administration.usergroups.list.php:96
 #: include/views/administration.usergroups.list.php:108
-#: include/views/administration.users.edit.php:248
+#: include/views/administration.users.edit.php:253
 #: include/views/administration.users.list.php:177
 #: include/views/administration.users.list.php:181
 #: include/views/configuration.action.edit.php:402
@@ -6276,7 +6276,7 @@ msgstr "Acesso à interface web"
 msgid "Frontend access updated"
 msgstr "Acesso à interface web atualizado"
 
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:353
 msgid "Frontend messaging"
 msgstr "Ativar mensagens globais"
 
@@ -7014,7 +7014,7 @@ msgstr[1] "Hosts ativados"
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:103
 #: include/views/administration.usergroups.edit.php:184
-#: include/views/administration.users.edit.php:479
+#: include/views/administration.users.edit.php:484
 #: include/views/configuration.hostgroups.edit.php:47
 #: include/views/js/configuration.action.edit.js.php:67
 #: include/views/js/configuration.action.edit.js.php:200
@@ -9639,7 +9639,7 @@ msgstr "Texto"
 msgid "Label location"
 msgstr "Localização do texto"
 
-#: include/views/administration.users.edit.php:183
+#: include/views/administration.users.edit.php:188
 msgid "Language"
 msgstr "Idioma"
 
@@ -10062,7 +10062,7 @@ msgstr "Verificação checksum MD5. Retorna: texto (hash MD5 do arquivo)"
 msgid "Macro"
 msgstr "Macro"
 
-#: include/classes/api/services/CUserMacro.php:886
+#: include/classes/api/services/CUserMacro.php:892
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "A macro \"%1$s\" já existe em \"%2$s\"."
@@ -10072,12 +10072,12 @@ msgstr "A macro \"%1$s\" já existe em \"%2$s\"."
 msgid "Macro \"%1$s\" already exists."
 msgstr "A macro \"%1$s\" já existe."
 
-#: include/classes/api/services/CUserMacro.php:802
+#: include/classes/api/services/CUserMacro.php:808
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "A macro \"%1$s\" não é única."
 
-#: include/classes/api/services/CUserMacro.php:909
+#: include/classes/api/services/CUserMacro.php:915
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "A macro com o ID de host \"%1$s\" (hostmacroid) não existe."
@@ -10405,8 +10405,8 @@ msgid "May"
 msgstr "Maio"
 
 #: app/controllers/CControllerPopupMedia.php:170 app/views/popup.media.php:54
-#: include/views/administration.users.edit.php:322
-#: include/views/administration.users.edit.php:455
+#: include/views/administration.users.edit.php:327
+#: include/views/administration.users.edit.php:460
 msgid "Media"
 msgstr "Mídia"
 
@@ -10504,8 +10504,8 @@ msgstr "Mensagem"
 msgid "Message text limit"
 msgstr "Limite da mensagem de texto"
 
-#: include/views/administration.users.edit.php:353
-#: include/views/administration.users.edit.php:364
+#: include/views/administration.users.edit.php:358
+#: include/views/administration.users.edit.php:369
 msgid "Message timeout"
 msgstr "Enquanto a mensagem estiver visível"
 
@@ -10517,7 +10517,7 @@ msgstr "Mensagem/Comando"
 msgid "Messages"
 msgstr "Mensagens"
 
-#: include/views/administration.users.edit.php:510
+#: include/views/administration.users.edit.php:515
 msgid "Messaging"
 msgstr "Mensagens"
 
@@ -11480,7 +11480,7 @@ msgstr "Sem permissão de acesso ao sistema."
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:373
 #: include/classes/api/services/CUserMacro.php:460
-#: include/classes/api/services/CUserMacro.php:766
+#: include/classes/api/services/CUserMacro.php:772
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
 #: include/classes/api/services/CValueMap.php:240
@@ -11950,7 +11950,7 @@ msgstr "Ativo"
 msgid "On status change triggers blink for"
 msgstr "Ao mudar o status da trigger piscar por"
 
-#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:367
 msgid "Once"
 msgstr "Uma vez"
 
@@ -12546,8 +12546,8 @@ msgstr "Passivo"
 #: app/views/administration.mediatype.edit.php:163 disc_prototypes.php:227
 #: host_discovery.php:207 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
-#: include/views/administration.users.edit.php:110
-#: include/views/administration.users.edit.php:141
+#: include/views/administration.users.edit.php:114
+#: include/views/administration.users.edit.php:146
 #: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.edit.php:977
 #: include/views/configuration.action.edit.php:1720
@@ -12573,11 +12573,11 @@ msgstr "Passivo"
 msgid "Password"
 msgstr "Senha"
 
-#: include/views/administration.users.edit.php:116
+#: include/views/administration.users.edit.php:121
 msgid "Password (once again)"
 msgstr "Senha (novamente)"
 
-#: include/views/administration.users.edit.php:126
+#: include/views/administration.users.edit.php:127
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "A senha é opcional para autenticação externa."
 
@@ -12646,9 +12646,9 @@ msgstr "Períodos"
 #: include/views/administration.usergroups.edit.php:133
 #: include/views/administration.usergroups.edit.php:217
 #: include/views/administration.usergroups.edit.php:269
-#: include/views/administration.users.edit.php:479
-#: include/views/administration.users.edit.php:499
-#: include/views/administration.users.edit.php:506
+#: include/views/administration.users.edit.php:484
+#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:511
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:173
@@ -12658,7 +12658,7 @@ msgstr "Períodos"
 msgid "Permissions"
 msgstr "Permissões"
 
-#: include/views/administration.users.edit.php:504
+#: include/views/administration.users.edit.php:509
 msgid "Permissions can be assigned for user groups only."
 msgstr "Permissões devem ser definidas para grupos de usuários apenas."
 
@@ -12678,12 +12678,12 @@ msgstr "Informar algorítimo"
 msgid "Plain text"
 msgstr "Texto puro"
 
-#: include/views/administration.users.edit.php:383
-#: include/views/administration.users.edit.php:420
+#: include/views/administration.users.edit.php:388
+#: include/views/administration.users.edit.php:425
 msgid "Play"
 msgstr "Executar"
 
-#: include/views/administration.users.edit.php:367
+#: include/views/administration.users.edit.php:372
 msgid "Play sound"
 msgstr "Executar som"
 
@@ -13193,7 +13193,7 @@ msgid "Recipient (descending)"
 msgstr "Recipiente (descendente)"
 
 #: include/classes/screens/CScreenProblem.php:1050
-#: include/views/administration.users.edit.php:377
+#: include/views/administration.users.edit.php:382
 #: include/views/configuration.item.list.php:174
 #: include/views/configuration.trigger.prototype.list.php:130
 #: include/views/configuration.triggers.list.php:266
@@ -13232,7 +13232,7 @@ msgstr "Hora da recuperação"
 msgid "Rectangle"
 msgstr "Retângulo"
 
-#: include/views/administration.users.edit.php:221 profile.php:52 users.php:62
+#: include/views/administration.users.edit.php:226 profile.php:52 users.php:62
 msgid "Refresh"
 msgstr "Atualizar"
 
@@ -13328,7 +13328,7 @@ msgstr "Comando remoto"
 #: include/views/administration.general.regularexpressions.edit.php:77
 #: include/views/administration.general.valuemapping.edit.php:65
 #: include/views/administration.usergroups.edit.php:189
-#: include/views/administration.users.edit.php:313
+#: include/views/administration.users.edit.php:318
 #: include/views/common.filter.trigger.php:106
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
@@ -13745,7 +13745,7 @@ msgstr "Sobrepor linha"
 msgid "Rows"
 msgstr "Linhas"
 
-#: include/views/administration.users.edit.php:226 profile.php:53 users.php:63
+#: include/views/administration.users.edit.php:231 profile.php:53 users.php:63
 msgid "Rows per page"
 msgstr "Registros por página"
 
@@ -14234,7 +14234,7 @@ msgstr "POC - Telefone B secundário"
 msgid "Secondary POC screen name"
 msgstr "POC - Nome secundário da tela"
 
-#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:368
 msgid "Seconds"
 msgstr "Segundos"
 
@@ -14366,7 +14366,7 @@ msgid "Send only to"
 msgstr "Enviar apenas para"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Send to"
 msgstr "Enviar para"
 
@@ -14698,7 +14698,7 @@ msgstr "Mostrar selecionados"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:158
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:64
-#: include/views/administration.users.edit.php:438
+#: include/views/administration.users.edit.php:443
 #: include/views/common.filter.trigger.php:129
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
@@ -15151,8 +15151,8 @@ msgstr "Já existe um passo com o nome \"%1$s\"."
 msgid "Steps"
 msgstr "Passos"
 
-#: include/views/administration.users.edit.php:388
-#: include/views/administration.users.edit.php:425
+#: include/views/administration.users.edit.php:393
+#: include/views/administration.users.edit.php:430
 msgid "Stop"
 msgstr "Parar"
 
@@ -15271,7 +15271,7 @@ msgstr "A mudança do método de autenticação irá invalidar todas as sessões
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Tempo desde a carga do sistema. Retorna: timestamp UNIX (número inteiro)"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:190
+#: include/users.inc.php:83 include/views/administration.users.edit.php:195
 msgid "System default"
 msgstr "Padrão do sistema"
 
@@ -15698,7 +15698,7 @@ msgstr "O procedimento remoto solicitado não existe / não está disponível"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "A aplicação do cenário web pertence à um host diferente do que o do cenário web."
 
-#: include/views/administration.users.edit.php:198
+#: include/views/administration.users.edit.php:203
 msgid "Theme"
 msgstr "Tema"
 
@@ -16162,7 +16162,7 @@ msgstr "A expressão de recuperação da trigger precisa possuir ao menos uma re
 msgid "Trigger severities"
 msgstr "Severidades de trigger"
 
-#: include/actions.inc.php:43 include/views/administration.users.edit.php:437
+#: include/actions.inc.php:43 include/views/administration.users.edit.php:442
 msgid "Trigger severity"
 msgstr "Severidade da trigger"
 
@@ -16260,7 +16260,7 @@ msgstr "Dois elementos do mapa devem ser serlecionados"
 #: include/forms.inc.php:347 include/hosts.inc.php:99
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 #: include/views/configuration.action.edit.php:916
 #: include/views/configuration.action.edit.php:1696
 #: include/views/configuration.action.edit.php:2145
@@ -16358,7 +16358,7 @@ msgstr "DESCONHECIDO"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:236
 msgid "URL (after login)"
 msgstr "URL (após se autenticar)"
 
@@ -16656,7 +16656,7 @@ msgstr "Ligado"
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
-#: include/views/administration.users.edit.php:528
+#: include/views/administration.users.edit.php:533
 #: include/views/configuration.action.edit.php:1238
 #: include/views/configuration.action.edit.php:1835
 #: include/views/configuration.action.edit.php:2317
@@ -16772,7 +16772,7 @@ msgid "Use custom event status colours"
 msgstr "Utilizar cor customizada de evento"
 
 #: app/views/popup.media.php:73
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "Use if severity"
 msgstr "Usar se severidade"
 
@@ -16789,7 +16789,7 @@ msgstr "Utilizado em itens"
 #: include/classes/setup/CSetupWizard.php:245 include/hosts.inc.php:61
 #: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
-#: include/views/administration.users.edit.php:453
+#: include/views/administration.users.edit.php:458
 #: include/views/configuration.action.edit.php:698
 #: include/views/configuration.action.edit.php:1440
 #: include/views/configuration.action.edit.php:1985
@@ -16839,7 +16839,7 @@ msgstr "Usuário incluído"
 msgid "User agent string"
 msgstr "Mensagem do agente de usuário"
 
-#: include/views/administration.users.edit.php:470
+#: include/views/administration.users.edit.php:475
 msgid "User can't change type for himself"
 msgstr "Um usuário não pode mudar seu próprio tipo"
 
@@ -17002,8 +17002,8 @@ msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s no mapa \"%2$s
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s na tela \"%2$s\"."
 
-#: include/views/administration.users.edit.php:470
-#: include/views/administration.users.edit.php:474
+#: include/views/administration.users.edit.php:475
+#: include/views/administration.users.edit.php:479
 #: include/views/administration.users.list.php:63
 #: include/views/administration.users.list.php:86
 msgid "User type"
@@ -17595,7 +17595,7 @@ msgid "Welcome to"
 msgstr "Bem vindo a"
 
 #: app/controllers/CControllerPopupMedia.php:110 app/views/popup.media.php:68
-#: include/views/administration.users.edit.php:244
+#: include/views/administration.users.edit.php:249
 msgid "When active"
 msgstr "Ativo quando"
 
@@ -17863,7 +17863,7 @@ msgstr "Ontem"
 msgid "You are logged in as \"%1$s\"."
 msgstr "Você está autenticado como \"%1$s\"."
 
-#: include/views/administration.users.edit.php:174
+#: include/views/administration.users.edit.php:179
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Não é possível selecionar alguns idiomas, o suporte aos idiomas adicionais necessita da instalação do pacote \"locale\" em seu servidor web."
 
@@ -18576,7 +18576,7 @@ msgid "in"
 msgstr "em"
 
 #: include/views/administration.usergroups.edit.php:116
-#: include/views/administration.users.edit.php:489
+#: include/views/administration.users.edit.php:494
 msgid "including subgroups"
 msgstr "incluindo subgrupos"
 
@@ -18907,7 +18907,7 @@ msgstr "de"
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:619
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 msgid "off"
 msgstr "off"
 
@@ -18930,7 +18930,7 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:601
 #: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:635
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:292
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
 msgstr "em"
