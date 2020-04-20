@@ -290,11 +290,15 @@ jQuery(function($) {
 			}
 
 			$obj
-				.on('mousedown', function() {
+				.on('mousedown', function(event) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
-						$('input[type="text"]', $obj).focus();
+
+						// Focus input only when not clicked on selected item.
+						if (!$(event.target).parents('.multiselect-list').length) {
+							$('input[type="text"]', $obj).focus();
+						}
 					}
 				});
 
@@ -623,9 +627,6 @@ jQuery(function($) {
 							.on('click', function() {
 								if (!ms.options.disabled && !item_disabled) {
 									removeSelected($obj, item.id);
-									if (isSearchFieldVisible($obj)) {
-										$('input[type="text"]', $obj).focus();
-									}
 								}
 							})
 						)
@@ -634,7 +635,6 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
-						$('input[type="text"]', $obj).focus();
 					}
 				});
 
