@@ -2844,8 +2844,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.31rc1
 
-New features:
-
 Bug fixes:
 ...G...PS. [ZBX-17600] fixed security vulnerability CVE-2020-11800 (remote code execution) (Andris)
 
