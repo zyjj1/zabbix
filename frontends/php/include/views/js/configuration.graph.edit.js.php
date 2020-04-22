@@ -97,6 +97,24 @@
 </script>
 <script type="text/javascript">
 	colorPalette.setThemeColors(<?= CJs::encodeJson(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+	var graphs = JSON.parse('<?= json_encode([
+		'graphtype' =>  $data['graphtype'],
+		'readonly' => $readonly,
+		'hostid' => $data['hostid'],
+		'graphid' => $data['graphid'],
+		'groupid' => $data['groupid'],
+		'is_template' => $data['is_template'],
+		'normal_only' => $data['normal_only'],
+		'parent_discoveryid' => $data['parent_discoveryid'],
+		'CALC_FNC_AVG' => CALC_FNC_AVG,
+		'ZBX_FLAG_DISCOVERY_PROTOTYPE' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		'ZBX_STYLE_DRAG_ICON' => ZBX_STYLE_DRAG_ICON,
+		'GRAPH_YAXIS_TYPE_CALCULATED' => GRAPH_YAXIS_TYPE_CALCULATED,
+		'GRAPH_YAXIS_TYPE_FIXED' => GRAPH_YAXIS_TYPE_FIXED,
+		'GRAPH_TYPE_NORMAL' => GRAPH_TYPE_NORMAL,
+		'GRAPH_TYPE_PIE' => GRAPH_TYPE_PIE,
+		'GRAPH_TYPE_EXPLODED' => GRAPH_TYPE_EXPLODED
+	]) ?>');
 
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {
@@ -132,9 +150,7 @@
 
 		colorPalette.incrementNextColor();
 
-		<?php if (!$readonly): ?>
-			rewriteNameLinks();
-		<?php endif ?>
+		!graphs.readonly && rewriteNameLinks();
 	}
 
 	function addPopupValues(list) {
@@ -150,7 +166,7 @@
 					number: number,
 					number_nr: number + 1,
 					gitemid: null,
-					graphid: <?= $this->data['graphid'] ?>,
+					graphid: graphs.graphid,
 					itemid: list.values[i].itemid,
 					type: null,
 					calc_fnc: null,
@@ -164,25 +180,22 @@
 			row = jQuery(itemTpl.evaluate(item));
 
 			jQuery('#itemButtonsRow').before(row);
-			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?= CALC_FNC_AVG ?>);
+			jQuery('#items_' + item['number'] + '_calc_fnc').val(graphs.CALC_FNC_AVG);
 			row.find('.input-color-picker input').colorpicker();
 		}
 
-		<?php if (!$readonly): ?>
+		if (!graphs.readonly) {
 			activateSortable();
 			rewriteNameLinks();
-		<?php endif ?>
+		}
 	}
 
 	function getOnlyHostParam() {
-		<?php if ($data['is_template']): ?>
-			return {'only_hostid':'<?= $data['hostid'] ?>'};
-		<?php else: ?>
-			return {'real_hosts':'1'};
-		<?php endif ?>
+		return graphs.is_template
+			? {only_hostid: graphs.hostid}
+			: {real_hosts: '1'};
 	}
 
-<?php if (!$readonly): ?>
 	function rewriteNameLinks() {
 		var size = jQuery('#itemsTable tr.sortable').length;
 
@@ -197,29 +210,30 @@
 				with_webitems: 1,
 				writeonly: 1
 			};
-			if (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
+			if (jQuery('#items_' + i + '_flags').val() == graphs.ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				popup_options['srctbl'] = 'item_prototypes',
 				popup_options['srcfld3'] = 'flags',
 				popup_options['dstfld3'] = 'items_' + i + '_flags',
-				popup_options['parent_discoveryid'] = '<?= $data['parent_discoveryid'] ?>';
+				popup_options['parent_discoveryid'] = graphs.parent_discoveryid;
 			}
 			else {
 				popup_options['srctbl'] = 'items';
 			}
-			<?php if ($data['normal_only'] !== ''): ?>
+
+			if (graphs.normal_only !== '') {
 				popup_options['normal_only'] = '1';
-			<?php endif ?>
-			<?php if (!$data['parent_discoveryid'] && $data['groupid'] && $data['hostid']): ?>
-				popup_options['groupid'] = '<?= $data['groupid'] ?>',
-				popup_options['hostid'] = '<?= $data['hostid'] ?>';
-			<?php endif ?>
+			}
+
+			if (!graphs.parent_discoveryid && graphs.groupid && graphs.hostid) {
+				popup_options['groupid'] = graphs.groupid,
+				popup_options['hostid'] = graphs.hostid;
+			}
 
 			var nameLink = 'PopUp("popup.generic",'
 				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()), null, this);';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}
-<?php endif ?>
 
 	function removeItem(obj) {
 		var number = jQuery(obj).data('remove');
@@ -228,9 +242,7 @@
 		jQuery('#items_' + number).remove();
 
 		recalculateSortOrder();
-		<?php if (!$readonly): ?>
-			activateSortable();
-		<?php endif ?>
+		!graphs.readonly && activateSortable();
 	}
 
 	function recalculateSortOrder() {
@@ -292,12 +304,9 @@
 			i++;
 		});
 
-		<?php if (!$readonly): ?>
-			rewriteNameLinks();
-		<?php endif ?>
+		!graphs.readonly && rewriteNameLinks();
 	}
 
-<?php if (!$readonly): ?>
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
 			itemsTableWidth = itemsTable.width(),
@@ -314,7 +323,7 @@
 			axis: 'y',
 			containment: 'parent',
 			cursor: IE ? 'move' : 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			handle: 'div.' + graphs.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
@@ -350,7 +359,6 @@
 	function activateSortable() {
 		jQuery('#itemsTable').sortable({disabled: (jQuery('#itemsTable tr.sortable').length < 2)});
 	}
-<?php endif ?>
 
 	jQuery(function($) {
 		$('#tabs').on('tabsactivate', function(event, ui) {
@@ -369,26 +377,24 @@
 				src.setArgument('graphtype', $('#graphtype').val());
 				src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
 
-				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-				src.setPath('chart7.php');
-				src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
-
-				<?php else: ?>
-				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-				src.setArgument('percent_left', $('#percent_left').val());
-				src.setArgument('percent_right', $('#percent_right').val());
-				<?php endif ?>
-
-				src.setArgument('ymin_type', $('#ymin_type').val());
-				src.setArgument('ymax_type', $('#ymax_type').val());
-				src.setArgument('yaxismin', $('#yaxismin').val());
-				src.setArgument('yaxismax', $('#yaxismax').val());
-				src.setArgument('ymin_itemid', $('#ymin_itemid').val());
-				src.setArgument('ymax_itemid', $('#ymax_itemid').val());
-				src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
-				src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
-
-				<?php endif ?>
+				if (graphs.graphtype == graphs.GRAPH_TYPE_PIE || graphs.graphtype == graphs.GRAPH_TYPE_EXPLODED) {
+					src.setPath('chart7.php');
+					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
+				}
+				else {
+					if (graphs.graphtype == graphs.GRAPH_TYPE_NORMAL) {
+						src.setArgument('percent_left', $('#percent_left').val());
+						src.setArgument('percent_right', $('#percent_right').val());
+					}
+					src.setArgument('ymin_type', $('#ymin_type').val());
+					src.setArgument('ymax_type', $('#ymax_type').val());
+					src.setArgument('yaxismin', $('#yaxismin').val());
+					src.setArgument('yaxismax', $('#yaxismax').val());
+					src.setArgument('ymin_itemid', $('#ymin_itemid').val());
+					src.setArgument('ymax_itemid', $('#ymax_itemid').val());
+					src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
+					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
+				}
 
 				$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
 					if (!$.isEmptyObject(value) && value.name != null) {
@@ -412,7 +418,7 @@
 			}
 		});
 
-		<?php if ($readonly): ?>
+		if (graphs.readonly) {
 			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
 			$('select', '#itemsTable').prop('disabled', true);
 
@@ -422,18 +428,18 @@
 				$('#items_' + i + '_color').removeAttr('onchange');
 				$('#lbl_items_' + i + '_color').removeAttr('onclick');
 			}
-		<?php endif ?>
+		}
 
 		// Y axis min clean unused fields
 		$('#ymin_type').change(function() {
 			switch ($(this).val()) {
-				case '<?= GRAPH_YAXIS_TYPE_CALCULATED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_CALCULATED:
 					$('#yaxismin').val('');
 					$('#ymin_name').val('');
 					$('#ymin_itemid').val('0');
 					break;
 
-				case '<?= GRAPH_YAXIS_TYPE_FIXED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_FIXED:
 					$('#ymin_name').val('');
 					$('#ymin_itemid').val('0');
 					break;
@@ -448,13 +454,13 @@
 		// Y axis max clean unused fields
 		$('#ymax_type').change(function() {
 			switch ($(this).val()) {
-				case '<?= GRAPH_YAXIS_TYPE_CALCULATED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_CALCULATED:
 					$('#yaxismax').val('');
 					$('#ymax_name').val('');
 					$('#ymax_itemid').val('0');
 					break;
 
-				case '<?= GRAPH_YAXIS_TYPE_FIXED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_FIXED:
 					$('#ymax_name').val('');
 					$('#ymax_itemid').val('0');
 					break;
@@ -466,8 +472,6 @@
 			$('form[name="graphForm"]').submit();
 		});
 
-		<?php if (!$readonly): ?>
-			initSortable();
-		<?php endif ?>
+		!graphs.readonly && initSortable();
 	});
 </script>
