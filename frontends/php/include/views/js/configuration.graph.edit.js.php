@@ -9,7 +9,6 @@
 			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 	<?php endif ?>
 		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
 		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
@@ -116,12 +115,11 @@
 		'GRAPH_TYPE_EXPLODED' => GRAPH_TYPE_EXPLODED
 	]) ?>');
 
-	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
+	function loadItem(number, gitemid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {
 				number: number,
 				number_nr: number + 1,
 				gitemid: gitemid,
-				graphid: graphid,
 				itemid: itemid,
 				type: type,
 				calc_fnc: calc_fnc,
@@ -166,7 +164,6 @@
 					number: number,
 					number_nr: number + 1,
 					gitemid: null,
-					graphid: graphs.graphid,
 					itemid: list.values[i].itemid,
 					type: null,
 					calc_fnc: null,
