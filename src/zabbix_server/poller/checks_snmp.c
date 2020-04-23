@@ -101,6 +101,8 @@ typedef struct
 }
 zbx_snmpidx_mapping_t;
 
+extern unsigned char	process_type;
+
 static zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
@@ -1301,7 +1303,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 		goto out;
 	}
 
-	ss->retries = (1 == mapping_num && 0 == level ? 1 : 0);
+	ss->retries = (1 == mapping_num && 0 == level && ZBX_POLLER_TYPE_UNREACHABLE != process_type ? 1 : 0);
 retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
