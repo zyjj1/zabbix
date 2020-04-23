@@ -92,7 +92,9 @@ $graphFormList
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Graph type'), 'graphtype')),
-		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$readonly)
+		(new CComboBox('graphtype', $this->data['graphtype'], 'jQuery(\'form[name="graphForm"]\').submit()',
+			graphType())
+		)->setEnabled(!$readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -415,6 +417,10 @@ foreach ($this->data['items'] as $n => $item) {
 
 	if (zbx_empty($item['yaxisside'])) {
 		$item['yaxisside'] = 0;
+	}
+
+	if (!array_key_exists('gitemid', $item)) {
+		$item['gitemid'] = '';
 	}
 
 	insert_js('loadItem('.$n.', '.CJs::encodeJson($item['gitemid']).', '.$item['itemid'].', '.

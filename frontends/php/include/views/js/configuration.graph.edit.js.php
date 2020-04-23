@@ -8,13 +8,13 @@
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
-			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -33,7 +33,7 @@
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
 				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
@@ -43,7 +43,7 @@
 
 		<!-- drawtype -->
 		<td>
-			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]">
+			<select id="items_#{number}_drawtype" name="drawtype">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
 				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
 			<?php endforeach ?>
@@ -52,14 +52,14 @@
 
 		<!-- yaxisside -->
 		<td>
-			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]">
+			<select id="items_#{number}_yaxisside" name="yaxisside">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
 
 		<td>
-			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
 		</td>
 
 		<?php if (!$readonly): ?>
@@ -80,13 +80,13 @@
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
-			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -105,7 +105,7 @@
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
@@ -114,14 +114,14 @@
 
 		<!-- yaxisside -->
 		<td>
-			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]">
+			<select id="items_#{number}_yaxisside" name="yaxisside">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
 
 		<td>
-			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
 		</td>
 
 		<?php if (!$readonly): ?>
@@ -142,13 +142,13 @@
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
-			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -167,7 +167,7 @@
 
 		<!-- type -->
 		<td>
-			<select id="items_#{number}_type" name="items[#{number}][type]">
+			<select id="items_#{number}_type" name="type">
 				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
 				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
@@ -175,7 +175,7 @@
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
@@ -184,7 +184,7 @@
 		</td>
 
 		<td>
-			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
 		</td>
 
 		<?php if (!$readonly): ?>
@@ -205,13 +205,13 @@
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
-			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -230,7 +230,7 @@
 
 		<!-- type -->
 		<td>
-			<select id="items_#{number}_type" name="items[#{number}][type]">
+			<select id="items_#{number}_type" name="type">
 				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
 				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
@@ -238,7 +238,7 @@
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
@@ -247,7 +247,7 @@
 		</td>
 
 		<td>
-			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
 		</td>
 
 		<?php if (!$readonly): ?>
@@ -295,20 +295,20 @@
 				name: name
 			},
 			itemTpl = new Template(jQuery('#tmpl-item-row-' + graphs.graphtype).html()),
-			row = jQuery(itemTpl.evaluate(item));
+			$row = jQuery(itemTpl.evaluate(item));
 
-		jQuery('#itemButtonsRow').before(row);
+		$row.find('[name="type"]').val(type);
+		$row.find('[name="drawtype"]').val(drawtype);
+		$row.find('[name="yaxisside"]').val(yaxisside);
 
-		var items_calc_fnc = jQuery('#items_' + number + '_calc_fnc');
-
-		items_calc_fnc.val(calc_fnc);
-		if (items_calc_fnc[0].selectedIndex < 0) {
-			items_calc_fnc[0].selectedIndex = 0;
+		var $calc_fnc = $row.find('[name="calc_fnc"]');
+		$calc_fnc.val(calc_fnc);
+		if ($calc_fnc[0].selectedIndex < 0) {
+			$calc_fnc[0].selectedIndex = 0;
 		}
-		jQuery('#items_' + number + '_type').val(type);
-		jQuery('#items_' + number + '_drawtype').val(drawtype);
-		jQuery('#items_' + number + '_yaxisside').val(yaxisside);
-		row.find('.input-color-picker input').colorpicker();
+
+		jQuery('#itemButtonsRow').before($row);
+		$row.find('.input-color-picker input').colorpicker();
 
 		colorPalette.incrementNextColor();
 
@@ -320,7 +320,7 @@
 			return false;
 		}
 		var itemTpl = new Template(jQuery('#tmpl-item-row-' + graphs.graphtype).html()),
-			row;
+			$row;
 
 		for (var i = 0; i < list.values.length; i++) {
 			var number = jQuery('#itemsTable tr.sortable').length,
@@ -338,11 +338,11 @@
 					color: colorPalette.getNextColor(),
 					name: list.values[i].name
 				};
-			row = jQuery(itemTpl.evaluate(item));
+			$row = jQuery(itemTpl.evaluate(item));
 
-			jQuery('#itemButtonsRow').before(row);
-			jQuery('#items_' + item['number'] + '_calc_fnc').val(graphs.CALC_FNC_AVG);
-			row.find('.input-color-picker input').colorpicker();
+			$row.find('[name="calc_fnc"]').val(graphs.CALC_FNC_AVG);
+			jQuery('#itemButtonsRow').before($row);
+			$row.find('.input-color-picker input').colorpicker();
 		}
 
 		if (!graphs.readonly) {
@@ -436,7 +436,6 @@
 				part2 = part2.substring(part2.indexOf('_') + 1);
 
 				obj.attr('id', part1 + '_' + i + '_' + part2);
-				obj.attr('name', part1 + '[' + i + '][' + part2 + ']');
 
 				// set sortorder
 				if (part2 === 'sortorder') {
@@ -557,10 +556,12 @@
 					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
 				}
 
-				$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
-					if (!$.isEmptyObject(value) && value.name != null) {
-						src.setArgument(value.name, value.value);
-					}
+				$('#itemsTable tr.sortable').each(function(i, node) {
+					$(node).find('*[name]').each(function(_, input) {
+						if (!$.isEmptyObject(input) && input.name != null) {
+							src.setArgument('items[' + i + '][' + input.name + ']', input.value);
+						}
+					});
 				});
 
 				var image = $('img', preview_chart);
@@ -631,6 +632,30 @@
 			}
 
 			$('form[name="graphForm"]').submit();
+		});
+
+		var $form = $('form[name="graphForm"]');
+		$form.on('submit', function(e) {
+			$form
+				.find('tr.sortable[id^="items_"]')
+				.each(function(i, node) {
+					var item = {};
+
+					$(node)
+						.find('input, select')
+						.each(function(_, node) {
+							item[node.name] = node.value;
+						})
+						.remove();
+
+					item.sortorder = i + 1;
+
+					$form.append($('<input />', {
+						type: 'hidden',
+						name: 'items[' + i + ']',
+						value: JSON.stringify(item)
+					}));
+				})
 		});
 
 		!graphs.readonly && initSortable();
