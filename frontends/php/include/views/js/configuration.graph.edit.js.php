@@ -1,67 +1,47 @@
-<script type="text/x-jquery-tmpl" id="itemTpl">
-<tr id="items_#{number}" class="sortable">
-	<!-- icon + hidden -->
-	<?php if ($readonly): ?>
-		<td>
-	<?php else: ?>
-		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-			<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-	<?php endif ?>
-		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-		<?php endif ?>
-	</td>
-
-	<!-- row number -->
-	<td>
-		<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
-	</td>
-
-	<!-- name -->
-	<td>
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_NORMAL ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
 		<?php if ($readonly): ?>
-			<span id="items_#{number}_name">#{name}</span>
+			<td>
 		<?php else: ?>
-			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
-	</td>
-
-	<!-- type -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-		<td>
-			<select id="items_#{number}_type" name="items[#{number}][type]">
-				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
-				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
-			</select>
+			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 		</td>
-	<?php endif ?>
 
-	<!-- function -->
-	<td>
-		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
-		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-			<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
-			<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
-			<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-			<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
-		<?php else: ?>
-			<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
 			<?php endif ?>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-		<?php endif ?>
-		</select>
-	</td>
+			</select>
+		</td>
 
-	<!-- drawtype -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
+		<!-- drawtype -->
 		<td>
 			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
@@ -69,31 +49,215 @@
 			<?php endforeach ?>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-	<?php endif ?>
 
-	<!-- yaxisside -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
+		<!-- yaxisside -->
 		<td>
 			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
-	<?php endif ?>
-	<td>
-		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
-	</td>
-	<?php if (!$readonly): ?>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+
+		<td>
+			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
 		</td>
-	<?php endif ?>
-</tr>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
 </script>
+
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_STACKED ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
+		<?php if ($readonly): ?>
+			<td>
+		<?php else: ?>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<?php endif ?>
+			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+		</td>
+
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<?php endif ?>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+			</select>
+		</td>
+
+		<!-- yaxisside -->
+		<td>
+			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]">
+				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
+				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
+			</select>
+		</td>
+
+		<td>
+			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+		</td>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_PIE ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
+		<?php if ($readonly): ?>
+			<td>
+		<?php else: ?>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<?php endif ?>
+			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+		</td>
+
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<?php endif ?>
+		</td>
+
+		<!-- type -->
+		<td>
+			<select id="items_#{number}_type" name="items[#{number}][type]">
+				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
+				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
+			</select>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+				<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
+			</select>
+		</td>
+
+		<td>
+			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+		</td>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_EXPLODED ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
+		<?php if ($readonly): ?>
+			<td>
+		<?php else: ?>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<?php endif ?>
+			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+		</td>
+
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<?php endif ?>
+		</td>
+
+		<!-- type -->
+		<td>
+			<select id="items_#{number}_type" name="items[#{number}][type]">
+				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
+				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
+			</select>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+				<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
+			</select>
+		</td>
+
+		<td>
+			<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
+		</td>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
+</script>
+
 <script type="text/javascript">
 	colorPalette.setThemeColors(<?= CJs::encodeJson(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
 	var graphs = JSON.parse('<?= json_encode([
@@ -130,7 +294,7 @@
 				flags: flags,
 				name: name
 			},
-			itemTpl = new Template(jQuery('#itemTpl').html()),
+			itemTpl = new Template(jQuery('#tmpl-item-row-' + graphs.graphtype).html()),
 			row = jQuery(itemTpl.evaluate(item));
 
 		jQuery('#itemButtonsRow').before(row);
@@ -155,7 +319,7 @@
 		if (!isset('object', list) || list.object != 'itemid') {
 			return false;
 		}
-		var itemTpl = new Template(jQuery('#itemTpl').html()),
+		var itemTpl = new Template(jQuery('#tmpl-item-row-' + graphs.graphtype).html()),
 			row;
 
 		for (var i = 0; i < list.values.length; i++) {
