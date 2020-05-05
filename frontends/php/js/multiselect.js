@@ -531,7 +531,8 @@ jQuery(function($) {
 									}
 								}
 								else if (e.which == KEY.BACKSPACE) {
-									/* Pressing Backspace on empty input field should select last element in
+									/*
+									 * Pressing Backspace on empty input field should select last element in
 									 * multiselect. For next Backspace press to be able to remove it.
 									 */
 									var $selected = $('.selected li:last-child', $obj).addClass('selected');
@@ -635,6 +636,9 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
+
+						// preventScroll not work in IE.
+						$('input[type="text"]', $obj)[0].focus({preventScroll: true});
 					}
 				});
 
