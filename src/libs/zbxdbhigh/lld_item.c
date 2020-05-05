@@ -1803,16 +1803,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-<<<<<<< HEAD:src/libs/zbxdbhigh/lld_item.c
-	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
-=======
 
-	if (FAIL == (ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
-			err, sizeof(err))))
+	if (FAIL == (ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err,
+			sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
 	}
->>>>>>> c030889e06... ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD:src/zabbix_server/lld/lld_item.c
 
 	item->delay = zbx_strdup(NULL, item_prototype->delay);
 	item->delay_orig = NULL;
@@ -1839,16 +1835,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-<<<<<<< HEAD:src/libs/zbxdbhigh/lld_item.c
-		if (SUCCEED == ret)
-			ret = substitute_formula_macros(&item->params, jp_row, err, sizeof(err));
-=======
-		if (SUCCEED == ret && FAIL == (ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths,
-				err, sizeof(err))))
+		if (SUCCEED == ret && FAIL == (ret = substitute_formula_macros(&item->params, jp_row, err,
+				sizeof(err))))
 		{
 			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", err);
 		}
->>>>>>> c030889e06... ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD:src/zabbix_server/lld/lld_item.c
 	}
 	else
 		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1863,16 +1854,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
 	item->snmp_oid_orig = NULL;
 
-	if (SUCCEED == ret &&  (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
+	if (SUCCEED == ret && (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
 			ITEM_TYPE_SNMPv3 == item_prototype->type) &&
-			FAIL == (ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths,
-			MACRO_TYPE_SNMP_OID, err, sizeof(err))))
+			FAIL == (ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
+			err, sizeof(err))))
 	{
-<<<<<<< HEAD:src/libs/zbxdbhigh/lld_item.c
-		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err, sizeof(err));
-=======
 		*error = zbx_strdcatf(*error, "Cannot create item, error in SNMP OID key parameters: %s.\n", err);
->>>>>>> c030889e06... ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD:src/zabbix_server/lld/lld_item.c
 	}
 
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
@@ -1910,16 +1897,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
 
-<<<<<<< HEAD:src/libs/zbxdbhigh/lld_item.c
-	if (SUCCEED == ret)
-		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
-=======
-	if (SUCCEED == ret && FAIL == (ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row,
-			lld_macro_paths, err, sizeof(err))))
+	if (SUCCEED == ret && FAIL == (ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err,
+			sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in JSON: %s.\n", err);
 	}
->>>>>>> c030889e06... ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD:src/zabbix_server/lld/lld_item.c
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -2127,19 +2109,15 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
-<<<<<<< HEAD:src/libs/zbxdbhigh/lld_item.c
-	substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
-=======
 
 	if ((ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
 			ITEM_TYPE_SNMPv3 == item_prototype->type) &&
-			FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID,
-			err, sizeof(err)))
+			FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err,
+			sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot update item, error in SNMP OID key parameters: %s.\n", err);
 	}
 
->>>>>>> c030889e06... ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD:src/zabbix_server/lld/lld_item.c
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->snmp_oid, buffer))
 	{
@@ -2217,13 +2195,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
-<<<<<<< HEAD:src/libs/zbxdbhigh/lld_item.c
 	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
-		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
-=======
-	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
 		*error = zbx_strdcatf(*error, "Cannot update item, error in JSON: %s.\n", err);
->>>>>>> c030889e06... ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD:src/zabbix_server/lld/lld_item.c
 
 	if (0 != strcmp(item->query_fields, buffer))
 	{
