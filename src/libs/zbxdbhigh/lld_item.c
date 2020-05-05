@@ -2394,85 +2394,6 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_items_preproc_susbstitute_params_macros_regsub               *
- *                                                                            *
- * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
- *          process (regsub version)                                          *
- *                                                                            *
- * Parameters: pp         - [IN] the item preprocessing step                  *
- *             lld_row    - [IN] lld source value                             *
- *             itemid     - [IN] item ID for logging                          *
- *             sub_params - [IN/OUT] the pp params value after substitute     *
- *             error      - [IN/OUT] the lld error message                    *
- *                                                                            *
- * Return value: SUCCEED - if preprocessing steps are valid                   *
- *               FAIL    - if substitute_lld_macros fails                     *
- *                                                                            *
- ******************************************************************************/
-static int	lld_items_preproc_susbstitute_params_macros_regsub(const zbx_lld_item_preproc_t * pp,
-		const zbx_lld_row_t * lld_row, zbx_uint64_t itemid, char **sub_params, char **error)
-{
-	char	*param1 = NULL, *param2 = NULL;
-	size_t	sub_params_size;
-
-	zbx_strsplit(pp->params, '\n', &param1, &param2);
-
-	if (NULL == param2)
-	{
-		zbx_free(param1);
-		*error = zbx_strdcatf(*error, "Cannot %s item: invalid preprocessing step #%d parameters: %s.\n",
-				(0 != itemid ? "update" : "create"), pp->step, pp->params);
-		return FAIL;
-	}
-
-	substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, NULL, 0);
-	substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
-
-	sub_params_size = strlen(param1) + strlen(param2) + 2;
-	*sub_params = zbx_malloc(NULL, sub_params_size);
-
-	zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
-
-	zbx_free(param1);
-	zbx_free(param2);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_items_preproc_susbstitute_params_macros_generic              *
- *                                                                            *
- * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
- *          process (generic version)                                         *
- *                                                                            *
- * Parameters: pp         - [IN] the item preprocessing step                  *
- *             lld_row    - [IN] lld source value                             *
- *             sub_params - [IN/OUT] the pp params value after substitute     *
- *                                                                            *
- * Return value: SUCCEED - if preprocessing steps are valid                   *
- *               FAIL    - if substitute_lld_macros fails                     *
- *                                                                            *
- ******************************************************************************/
-static int	lld_items_preproc_susbstitute_params_macros_generic(const zbx_lld_item_preproc_t * pp,
-		const zbx_lld_row_t * lld_row, char **sub_params)
-{
-	int	token_type = ZBX_MACRO_ANY;
-
-	if (ZBX_PREPROC_XPATH == pp->type)
-	{
-		token_type |= ZBX_TOKEN_XPATH;
-	}
-
-	*sub_params = zbx_strdup(NULL, pp->params);
-
-	substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, NULL, 0);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: lld_items_preproc_susbstitute_params_macros                      *
  *                                                                            *
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
@@ -2491,16 +2412,58 @@ static int	lld_items_preproc_susbstitute_params_macros_generic(const zbx_lld_ite
 static int	lld_items_preproc_susbstitute_params_macros(const zbx_lld_item_preproc_t * pp,
 		const zbx_lld_row_t * lld_row, zbx_uint64_t itemid, char **sub_params, char **error)
 {
-	int	ret;
-	if (ZBX_PREPROC_REGSUB == pp->type)
+	int	flags1, flags2, params_num = 1;
+
+	switch(pp->type)
 	{
-		ret = lld_items_preproc_susbstitute_params_macros_regsub(pp, lld_row, itemid, sub_params, error);
+		case ZBX_PREPROC_REGSUB:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP;
+			flags2 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT;
+			params_num = 2;
+			break;
+		case ZBX_PREPROC_XPATH:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_XPATH;
+			break;
+		case ZBX_PREPROC_JSONPATH:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_JSONPATH;
+			break;
+		default:
+			flags1 = ZBX_MACRO_ANY;
+	}
+
+	if (2 == params_num)
+	{
+		char	*param1 = NULL, *param2 = NULL;
+		size_t	sub_params_size;
+
+		zbx_strsplit(pp->params, '\n', &param1, &param2);
+
+		if (NULL == param2)
+		{
+			zbx_free(param1);
+			*error = zbx_strdcatf(*error, "Cannot %s item: invalid preprocessing step #%d parameters: %s.\n",
+					(0 != itemid ? "update" : "create"), pp->step, pp->params);
+			return FAIL;
+		}
+
+		substitute_lld_macros(&param1, &lld_row->jp_row, flags1, NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, flags2, NULL, 0);
+
+		sub_params_size = strlen(param1) + strlen(param2) + 2;
+		*sub_params = zbx_malloc(NULL, sub_params_size);
+
+		zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
+
+		zbx_free(param1);
+		zbx_free(param2);
 	}
 	else
 	{
-		ret = lld_items_preproc_susbstitute_params_macros_generic(pp, lld_row, sub_params);
+		*sub_params = zbx_strdup(NULL, pp->params);
+		substitute_lld_macros(sub_params, &lld_row->jp_row, flags1, NULL, 0);
 	}
-	return ret;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
