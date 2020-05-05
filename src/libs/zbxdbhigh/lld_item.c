@@ -1803,7 +1803,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
+
+	if (FAIL == (ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err,
+			sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
+	}
 
 	item->delay = zbx_strdup(NULL, item_prototype->delay);
 	item->delay_orig = NULL;
@@ -1830,8 +1835,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED == ret)
-			ret = substitute_formula_macros(&item->params, jp_row, err, sizeof(err));
+		if (SUCCEED == ret && FAIL == (ret = substitute_formula_macros(&item->params, jp_row, err,
+				sizeof(err))))
+		{
+			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", err);
+		}
 	}
 	else
 		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1845,11 +1853,15 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
 	item->snmp_oid_orig = NULL;
+
 	if (SUCCEED == ret && (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
-			ITEM_TYPE_SNMPv3 == item_prototype->type))
+			ITEM_TYPE_SNMPv3 == item_prototype->type) &&
+			FAIL == (ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
+			err, sizeof(err))))
 	{
-		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err, sizeof(err));
+		*error = zbx_strdcatf(*error, "Cannot create item, error in SNMP OID key parameters: %s.\n", err);
 	}
+
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
 	item->username = zbx_strdup(NULL, item_prototype->username);
@@ -1885,8 +1897,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
 
-	if (SUCCEED == ret)
-		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
+	if (SUCCEED == ret && FAIL == (ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err,
+			sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item, error in JSON: %s.\n", err);
+	}
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -1901,6 +1916,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 					sizeof(err))))
 			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
+				*error = zbx_strdcatf(*error, "Cannot create item, error in XML: %s.\n", err);
 			}
 			break;
 		default:
@@ -1947,7 +1963,6 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
 		lld_item_free(item);
 		item = NULL;
 	}
@@ -2002,7 +2017,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in item key parameters: %s.\n", err);
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->delay);
@@ -2066,7 +2081,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			}
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", err);
 	}
 	else
 	{
@@ -2094,7 +2109,15 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
-	substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+
+	if ((ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
+			ITEM_TYPE_SNMPv3 == item_prototype->type) &&
+			FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err,
+			sizeof(err)))
+	{
+		*error = zbx_strdcatf(*error, "Cannot update item, error in SNMP OID key parameters: %s.\n", err);
+	}
+
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->snmp_oid, buffer))
 	{
@@ -2173,7 +2196,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
 	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
-		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+		*error = zbx_strdcatf(*error, "Cannot update item, error in JSON: %s.\n", err);
 
 	if (0 != strcmp(item->query_fields, buffer))
 	{
@@ -2194,7 +2217,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		if (FAIL == substitute_macros_xml(&buffer, NULL, jp_row, err, sizeof(err)))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in XML: %s.\n", err);
 		}
 	}
 	else
