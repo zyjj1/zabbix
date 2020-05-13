@@ -37,7 +37,7 @@ A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields
 ...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
-..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multistatement (talbergs)
 ........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
 ..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
 
