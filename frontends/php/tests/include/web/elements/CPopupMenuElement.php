@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,20 @@ class CPopupMenuElement extends CElement {
 	}
 
 	/**
+	 * Get a single menu item.
+	 *
+	 * @return CElement
+	 */
+	public function getItem($name) {
+		$element = $this->query('xpath', './li/a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+		if (!$element->isValid()) {
+			throw new Exception('Failed to find menu item by name: "'.$name.'".');
+		}
+
+		return $element;
+	}
+
+	/**
 	 * Check if items exists.
 	 *
 	 * @param string|array $items    items to be searched for
@@ -95,16 +109,15 @@ class CPopupMenuElement extends CElement {
 			$items = [$items];
 		}
 
-		$name = array_shift($items);
-		$element = $this->query('xpath', './li/a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
-		if ($element === null) {
-			throw new Exception('Failed to find menu item by name: "'.$name.'".');
-		}
+		// Get item by name.
+		$element = $this->getItem(array_shift($items));
 
-		$element->click();
 		if ($items) {
-			$element->parents()->query('class:menu-popup')->asPopupMenu()
-					->waitUntilPresent()->one()->select($items);
+			$parents = $element->parents('tag:li')->one()->hover();
+			$parents->query('class:menu-popup')->asPopupMenu()->waitUntilVisible()->one()->select($items);
+		}
+		else {
+			$element->waitUntilClickable()->click();
 		}
 
 		return $this;

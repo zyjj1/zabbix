@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,6 @@ class CConfigurationImport {
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
 		$this->deleteMissingItems();
-		$this->deleteMissingApplications();
 
 		// import objects
 		$this->processApplications();
@@ -154,6 +153,9 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
+
+		// Missing applications should be deleted after new application changes are done to all inherited items.
+		$this->deleteMissingApplications();
 
 		return true;
 	}

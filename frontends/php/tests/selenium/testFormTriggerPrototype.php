@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -584,7 +584,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger_CheckWrongUrl',
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
-					'url' => 'www.zabbix.com',
+					'url' => 'javascript:alert(123);',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
 						'Wrong value for url field.'

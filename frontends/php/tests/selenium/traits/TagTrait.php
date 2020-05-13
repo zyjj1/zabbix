@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,73 +19,45 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/FormParametersTrait.php';
 
 /**
  * Trait for tags in form related tests.
  */
 trait TagTrait {
 
+	use FormParametersTrait;
+
+	protected $table_selector = 'id:tags-table';
+
 	/**
-	 * Get tag table element with mapping set.
+	 * Set custom selector for table.
+	 *
+	 * @param string $selector    table selector
+	 */
+	public function setTableSelector($selector) {
+		$this->table_selector = $selector;
+	}
+
+	/**
+	 * Get table element with mapping set.
 	 *
 	 * @return CMultifieldTable
 	 */
-	protected function getTagTable() {
-		return $this->query('id:tags-table')->asMultifieldTable([
+	protected function getTable() {
+		return $this->query($this->table_selector)->asMultifieldTable([
 			'mapping' => [
 				'Name' => [
 					'name' => 'name',
-					'selector' => 'xpath:./input',
+					'selector' => 'xpath:./textarea',
 					'class' => 'CElement'
 				],
 				'Value' => [
 					'name' => 'value',
-					'selector' => 'xpath:./input',
+					'selector' => 'xpath:./textarea',
 					'class' => 'CElement'
 				]
 			]
 		])->one();
-	}
-
-	/**
-	 * Fill tag with specified data.
-	 *
-	 * @param array $tags    data array where keys are fields label text and values are values to be put in fields
-	 *
-	 * @throws Exception
-	 */
-	public function fillTags($tags, $defaultAction = USER_ACTION_ADD) {
-		foreach ($tags as &$tag) {
-			$tag['action'] = CTestArrayHelper::get($tag, 'action', $defaultAction);
-		}
-		unset($tag);
-
-		$this->getTagTable()->fill($tags);
-	}
-
-	/**
-	 * Get input fields of tags.
-	 *
-	 * @return array
-	 */
-	public function getTags() {
-		return $this->getTagTable()->getValue();
-	}
-
-	/**
-	 * Check if values of tags inputs match data from data provider.
-	 *
-	 * @param array $data    tag element values
-	 */
-	public function assertTags($data) {
-		$rows = [];
-		foreach ($data as $i => $values) {
-			$rows[$i] = [
-				'name' => CTestArrayHelper::get($values, 'name', ''),
-				'value' => CTestArrayHelper::get($values, 'value', ''),
-			];
-		}
-
-		$this->assertEquals($rows, $this->getTags(), 'Tags on a page does not match tags in data provider.');
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
+//require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralMacro.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
@@ -91,6 +91,7 @@ require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
+require_once dirname(__FILE__).'/testFormHostMacros.php';
 require_once dirname(__FILE__).'/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
@@ -104,6 +105,7 @@ require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
+require_once dirname(__FILE__).'/testFormTemplateMacros.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormUser.php';
 require_once dirname(__FILE__).'/testFormUserMedia.php';
@@ -123,6 +125,7 @@ require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
+require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTriggerDependencies.php';
@@ -194,7 +197,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
-		$suite->addTestSuite('testFormAdministrationGeneralImages');
+//		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
@@ -211,6 +214,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
+		$suite->addTestSuite('testFormHostMacros');
 		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
@@ -223,6 +227,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testFormTemplateMacros');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUser');
@@ -243,6 +248,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
+		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTriggerDependencies');
