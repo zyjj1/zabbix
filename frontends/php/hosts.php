@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -902,7 +902,7 @@ elseif (hasRequest('form')) {
 		// Host
 		'host' => getRequest('host', ''),
 		'visiblename' => getRequest('visiblename', ''),
-		'interfaces' => getRequest('interfaces', []),
+		'interfaces' => [],
 		'mainInterfaces' => getRequest('mainInterfaces', []),
 		'description' => getRequest('description', ''),
 		'proxy_hostid' => getRequest('proxy_hostid', 0),
@@ -1057,13 +1057,21 @@ elseif (hasRequest('form')) {
 			$data['original_templates'] = array_combine($templateids, $templateids);
 		}
 
+		$interfaces = getRequest('interfaces', []);
+
 		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
 			if (array_key_exists($type, $data['mainInterfaces'])) {
 				$interfaceid = $data['mainInterfaces'][$type];
-				$data['interfaces'][$interfaceid]['main'] = '1';
+				$interfaces[$interfaceid]['main'] = '1';
 			}
 		}
-		$data['interfaces'] = array_values($data['interfaces']);
+
+		foreach ($interfaces as $interface) {
+			$data['interfaces'][] = [
+				'locked' => ($interface['locked'] === '1'),
+				'items' => ($interface['items'] === '1')
+			] + $interface;
+		}
 
 		$groups = getRequest('groups', []);
 	}

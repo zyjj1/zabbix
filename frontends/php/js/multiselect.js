@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -339,6 +339,7 @@ jQuery(function($) {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
+				'autocomplete': 'off',
 				'placeholder': ms.options.labels['type here to search'],
 				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
 				'aria-required': ms.options.required_str

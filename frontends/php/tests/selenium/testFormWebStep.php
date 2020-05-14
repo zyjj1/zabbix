@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -677,7 +677,19 @@ class testFormWebStep extends CLegacyWebTest {
 					'url' => 'http://www.zabbix.com',
 					'timeout' => 3601,
 					'errors' => [
-						'Incorrect value for field "timeout": a number is too large.'
+						'Invalid parameter "timeout": value must be one of 1-3600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Timeout 0',
+					'step_name' => 'Step timeout 0',
+					'url' => 'http://www.zabbix.com',
+					'timeout' => 0,
+					'errors' => [
+						'Invalid parameter "timeout": value must be one of 1-3600.'
 					]
 				]
 			],
@@ -755,7 +767,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'headers' => [
 						['name' => 'header', 'value' => 'test_header'],
 					],
-					'timeout' => 0,
+					'timeout' => 1,
 					'string' => 'Zabbix',
 					'code' => 404,
 					'dbCheck' => true

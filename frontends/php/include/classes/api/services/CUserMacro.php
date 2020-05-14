@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -748,6 +748,9 @@ class CUserMacro extends CApiService {
 			$count = API::Host()->get([
 				'countOutput' => true,
 				'hostids' => $hostids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
 				'editable' => true
 			]);
 
@@ -758,6 +761,9 @@ class CUserMacro extends CApiService {
 			$count += API::Template()->get([
 				'countOutput' => true,
 				'templateids' => $hostids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
 				'editable' => true
 			]);
 
