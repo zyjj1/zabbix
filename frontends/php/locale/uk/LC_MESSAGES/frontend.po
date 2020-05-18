@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-19 14:11+0300\n"
+"POT-Creation-Date: 2020-05-18 12:30+0300\n"
 "PO-Revision-Date: 2019-03-19 11:55+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -558,7 +558,7 @@ msgstr "Активно до"
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:171
-#: app/views/popup.media.php:48 app/views/popup.media.php:112
+#: app/views/popup.media.php:48 app/views/popup.media.php:113
 #: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
@@ -6186,7 +6186,7 @@ msgstr "Заповнений регіон"
 #: app/views/administration.script.list.php:37
 #: app/views/monitoring.discovery.view.php:39
 #: app/views/monitoring.problem.view.php:339
-#: include/classes/html/CFilter.php:391
+#: include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
@@ -8791,11 +8791,11 @@ msgstr "Інформація"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Інформація про сервіс. Повертає ціле число для параметрів state, startup; рядок - для параметрів displayname, path, user; текст - для параметра description; Особливості для state: 0 - запущений, 1 - призупинений, 2 - запускається, 3 - призупиняється, 4 - відновлюється, 5 - зупиняється, 6 - зупинений, 7 - невідомо, 255 - сервіс відсутній; Особливості для startup: 0 - автоматичний, 1 - автоматичний з затримкою, 2 - вручну, 3 - відімкнений, 4 - невідомо"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and host macros"
 msgstr "Макроси вузла мережі та успадковані"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and template macros"
 msgstr "Успадковані та макроси із шаблонів"
 
@@ -16725,7 +16725,7 @@ msgstr "Доступний"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:171 app/views/popup.media.php:112
+#: app/views/popup.httpstep.php:171 app/views/popup.media.php:113
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:138
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68

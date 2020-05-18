@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-19 14:11+0300\n"
+"POT-Creation-Date: 2020-05-18 12:30+0300\n"
 "PO-Revision-Date: 2019-01-29 07:38+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -528,7 +528,7 @@ msgstr "启用直到"
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:171
-#: app/views/popup.media.php:48 app/views/popup.media.php:112
+#: app/views/popup.media.php:48 app/views/popup.media.php:113
 #: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
@@ -6062,7 +6062,7 @@ msgstr "填满的区域"
 #: app/views/administration.script.list.php:37
 #: app/views/monitoring.discovery.view.php:39
 #: app/views/monitoring.problem.view.php:339
-#: include/classes/html/CFilter.php:391
+#: include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
@@ -8658,11 +8658,11 @@ msgstr "信息"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "有关服务的信息。返回整数字段表示状态，启动状态；字符串 - 以字段作为显示名，路径，用户; 文本 - 使用字段作为描述； 状态码：0 - 运行，1 - 暂停，2 - 启动挂起，3 - 暂停挂起，4 - 继续挂起，5 - 停止挂起，6 - 停止，7 - 未知，255 - 没有这个服务；启动码：0 - 自动，1 - 自动延迟，2 - 手动, 3 - 禁用，4 - 未知"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and host macros"
 msgstr "继承以及主机 宏"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and template macros"
 msgstr "继承模板的宏"
 
@@ -16548,7 +16548,7 @@ msgstr "上"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:171 app/views/popup.media.php:112
+#: app/views/popup.httpstep.php:171 app/views/popup.media.php:113
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:138
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
