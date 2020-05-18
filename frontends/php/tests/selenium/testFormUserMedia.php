@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  */
 class testFormUserMedia extends CWebTest {
 
-	public function getCreateData() {
+	public function getMediaData() {
 		return [
 			// User media with multiple e-mails - all fields specified.
 			[
@@ -34,12 +34,8 @@ class testFormUserMedia extends CWebTest {
 					'fields' => [
 						'Type' => 'Email',
 						'When active' => '1-5,09:00-18:00',
-						'Enabled' => true
-					],
-					'Use if severity' => [
-						'Average',
-						'High',
-						'Disaster'
+						'Enabled' => true,
+						'Use if severity' => ['Average', 'High', 'Disaster']
 					],
 					'emails' => [
 						['email' => '123@456.ttt', 'action' => USER_ACTION_UPDATE, 'index' => 0],
@@ -309,9 +305,9 @@ class testFormUserMedia extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateData
+	 * @dataProvider getMediaData
 	 */
-	public function testFormUserMedia_Validation($data) {
+	public function testFormUserMedia_Add($data) {
 		$sql = 'SELECT * FROM media';
 		$old_hash = CDBHelper::getHash($sql);
 
@@ -328,17 +324,18 @@ class testFormUserMedia extends CWebTest {
 
 		// Check if media was added and its configuration
 		if ($data['expected'] === TEST_GOOD) {
-			$this->checkMediaConfiguration($data, '1-7,00:00-24:00', null);
+			$this->checkMediaConfiguration($data);
 			// Add other media if the flag is set
 			if (array_key_exists('additional media', $data)) {
-				foreach($data['additional media'] as $i => $media) {
+				foreach ($data['additional media'] as $i => $media) {
 					$this->query('button', 'Add')->one()->click();
 					$dialog = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady();
 					$form = $dialog->asForm();
 					$form->fill($media);
 					$form->submit();
 					$this->page->waitUntilReady();
-					$this->assertEquals($this->query('name:userForm')->asForm()->waitUntilVisible()->one()->getField('Media')->getRows()->count(), $i + 2);
+					$this->assertEquals($this->query('name:userForm')->asForm()->waitUntilVisible()->one()
+							->getField('Media')->getRows()->count(), $i + 2);
 				}
 			}
 		}
@@ -349,13 +346,13 @@ class testFormUserMedia extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateData
+	 * @dataProvider getMediaData
 	 */
 	public function testFormUserMedia_Edit($data) {
 		$sql = 'SELECT * FROM media';
 		$old_hash = CDBHelper::getHash($sql);
 
-		//Open a user with defined medias and select a row.
+		// Open a user with defined medias and select a row.
 		$this->page->login()->open('users.php?ddreset=1');
 		$this->query('link:Admin')->waitUntilVisible()->one()->click();
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilPresent()->one();
@@ -371,7 +368,7 @@ class testFormUserMedia extends CWebTest {
 
 		// Check if media was updated and its configuration.
 		if ($data['expected'] === TEST_GOOD) {
-			$this->checkMediaConfiguration($data, $original_period, $edit_send_to);
+			$this->checkMediaConfiguration($data, $original_period, true);
 		}
 		else {
 			$this->checkMediaUpdateFailure($data);
@@ -387,7 +384,7 @@ class testFormUserMedia extends CWebTest {
 			}
 			$this->page->login()->open('users.php?form=update&userid=1');
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
-			$table = $this->query("xpath://ul[@id='userMediaFormList']//table")->asTable()->one();
+			$table = $this->query('xpath://ul[@id="userMediaFormList"]//table')->asTable()->one();
 
 			// Change status of one of the medias.
 			$row = $table->findRow('Send to', 'test@zabbix.com');
@@ -397,12 +394,13 @@ class testFormUserMedia extends CWebTest {
 
 			// Remove one of the medias.
 			$row->getColumn('Action')->query('button:Remove')->one()->click();
-			$this->assertTrue($table->findRow('Send to', 'test@zabbix.com') == 0);
+			$this->assertTrue(!$table->findRow('Send to', 'test@zabbix.com')->isValid());
+
 			$this->query('button', $action)->one()->click();
 			$this->query('link', 'Admin')->waitUntilVisible()->one()->click();
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
 			if ($action === 'Update') {
-				$this->assertTrue($table->findRow('Send to', 'test@zabbix.com') == 0);
+				$this->assertTrue(!$table->findRow('Send to', 'test@zabbix.com')->isValid());
 			}
 			else {
 				$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -411,14 +409,11 @@ class testFormUserMedia extends CWebTest {
 	}
 
 	public function testFormUserMedia_EmailRemoval() {
-		$media = [
-			'Type' => 'Email',
-			'emails' => [
-				['email' => '0@zabbix.com', 'action' => USER_ACTION_UPDATE, 'index' => 0],
-				['email' => '1@zabbix.com'],
-				['email' => '2@zabbix.com'],
-				['email' => '3@zabbix.com']
-			]
+		$emails = [
+			['email' => '0@zabbix.com', 'action' => USER_ACTION_UPDATE, 'index' => 0],
+			['email' => '1@zabbix.com'],
+			['email' => '2@zabbix.com'],
+			['email' => '3@zabbix.com']
 		];
 		$this->page->login()->open('users.php?form=update&userid=5');
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilPresent()->one();
@@ -427,20 +422,18 @@ class testFormUserMedia extends CWebTest {
 		// Add media with multiple emails.
 		$user_form->query('button', 'Add')->one()->click();
 		$media_form = $this->query('name:media_form')->waitUntilVisible()->asForm()->one();
-		$media_form->getField('Type')->fill($media['Type']);
 		$email_list = $media_form->getField('Send to')->asMultifieldTable();
-		$email_list->setFieldMapping(['email'])->fill($media['emails']);
+		$email_list->setFieldMapping(['email'])->fill($emails);
 		// Check that all emails are entered in media configuration form.
-		$this->assertEquals($email_list->getRows()->count(), count($media['emails']));
+		$this->assertEquals($email_list->getRows()->count(), count($emails));
 
 		// Remove email 3@zabbix.com and check that it's removed.
-		$this->removeEmailFromListAndVerify($media, '3@zabbix.com');
-		$user_form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$this->removeEmailFromListAndVerify('3@zabbix.com');
+		// Edit the media - remove email 2@zabbix.com and check that it's removed.
 		$media_list = $user_form->getField('Media')->waitUntilVisible();
 		$row = $media_list->getRow(0);
-		// Edit the media - remove email 2@zabbix.com and check that it's removed.
-		$row->query('button', 'Edit')->one()->click();
-		$this->removeEmailFromListAndVerify($media, '2@zabbix.com');
+		$row->query('button:Edit')->one()->click();
+		$this->removeEmailFromListAndVerify('2@zabbix.com');
 	}
 
 	public function getUserData() {
@@ -490,10 +483,7 @@ class testFormUserMedia extends CWebTest {
 	 */
 	public function testFormUserMedia_UserWithMediaActions($data) {
 		$this->page->login()->open('users.php?ddreset=1');
-		// Get userid for of the user to be deleted to verify media deletion along with the user.
-		if ($data['action'] === 'delete') {
-			$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['username']));
-		}
+
 		// Fill in user form for the created user or just open an existing one.
 		if ($data['action'] === 'create') {
 			$this->page->query('button:Create user')->one()->click();
@@ -506,20 +496,23 @@ class testFormUserMedia extends CWebTest {
 		// Fill in and submit user media form.
 		if ($data['action'] !== 'delete') {
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
-			$this->query('button', 'Add')->one()->click();
+			$this->query('button:Add')->one()->click();
 			$media_form = $this->query('id:media_form')->asForm()->waitUntilVisible()->one();
 			$media_form->fill($data['media_fields']);
 			$media_form->submit();
+			$this->page->waitUntilReady();
 		}
 		switch ($data['action']) {
 			case 'create':
 				$user_form->submit();
 				break;
 			case 'update':
-				$this->query('button:Update') -> one()->click();
+				$this->query('button:Update')->one()->click();
 				break;
 			case 'delete':
-				$this->query('button:Delete') -> one()->click();
+				// Get userid for of the user to be deleted to verify media deletion along with the user.
+				$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['username']));
+				$this->query('button:Delete')->one()->click();
 				$this->page->acceptAlert();
 				break;
 		}
@@ -527,16 +520,12 @@ class testFormUserMedia extends CWebTest {
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals($data['expected_message'], $message->getTitle());
-		if ($data['action'] === 'delete'){
-			$this->assertEquals(0, CDBHelper::getCount('SELECT mediaid FROM media WHERE userid ='.zbx_dbstr($userid)));
+		if ($data['action'] === 'delete') {
+			$this->assertEquals(0, CDBHelper::getCount('SELECT mediaid FROM media WHERE userid='.zbx_dbstr($userid)));
 		}
 		else {
-			if (array_key_exists('user_fields', $data) ){
-				$this->query('link', $data['user_fields']['Alias'])->waitUntilVisible()->one()->click();
-			}
-			else {
-				$this->query('link', $data['username'])->waitUntilVisible()->one()->click();
-			}
+			$user = CTestArrayHelper::get($data, 'user_fields.Alias', false) ? $data['user_fields']['Alias'] : $data['username'];
+			$this->query('link', $user)->waitUntilVisible()->one()->click();
 			$user_form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 			$media_field = $user_form->getField('Media');
 			$this->assertTrue($media_field->getRows()->count() === 1);
@@ -547,7 +536,7 @@ class testFormUserMedia extends CWebTest {
 		}
 	}
 
-	private function removeEmailFromListAndVerify($media, $to_be_removed) {
+	private function removeEmailFromListAndVerify($to_be_removed) {
 		$media_form = $this->query('name:media_form')->waitUntilVisible()->asForm()->one();
 		$email_list = $media_form->getField('Send to')->asMultifieldTable(['mapping' => ['email']]);
 		// Remove the email from the list.
@@ -564,16 +553,12 @@ class testFormUserMedia extends CWebTest {
 		$media_form = $this->query('id:media_form')->waitUntilVisible()->asForm()->one();
 		$media_form->fill($data['fields']);
 		// Check that there is posibility to add only multiple emails to media.
-		$clickable = ($data['fields']['Type'] == 'Email');
+		$clickable = ($data['fields']['Type'] === 'Email');
 		$this->assertEquals($clickable, $media_form->query('id:email_send_to_add')->one()->isClickable());
 		$this->assertEquals($clickable, $media_form->query('button:Remove')->one()->isClickable());
-		// Specify severities for the media to be created.
-		if (array_key_exists('Use if severity', $data)) {
-			$severities = $media_form->getField('Use if severity')->fill($data['Use if severity']);
-		}
+
 		// Fill in e-mails if such exist.
 		if (array_key_exists('emails', $data)) {
-			$media_form->getField('Type')->fill($data['fields']['Type']);
 			$email_list = $media_form->getField('Send to')->asMultifieldTable();
 			$email_list->setFieldMapping(['email'])->fill($data['emails']);
 		}
@@ -581,11 +566,11 @@ class testFormUserMedia extends CWebTest {
 		$this->page->waitUntilReady();
 	}
 
-	private function checkMediaConfiguration($data, $original_period, $edit_send_to) {
+	private function checkMediaConfiguration($data, $original_period = '1-7,00:00-24:00', $edit_send_to = true) {
 		// Check media type.
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$media_field = $user_form->getField('Media');
-		if ($edit_send_to == null) {
+		if (!$edit_send_to) {
 			$this->assertTrue($media_field->getRows()->count() === 1);
 			$row = $media_field->getRow(0);
 		}
@@ -593,10 +578,11 @@ class testFormUserMedia extends CWebTest {
 			foreach ($media_field->getRows() as $table_row) {
 				if ($table_row->getColumn('Send to')->getText() == $this->query("xpath://tr[@id='user_medias_0']/td[2]")->one()->getText()) {
 					$row = $table_row;
-				}
+		}
 			}
 		}
 		$this->assertEquals($row->getColumn('Type')->getText(), $data['fields']['Type']);
+
 		// Check the value of the "Send to" field.
 		if ($this->query("xpath://tr[@id='user_medias_0']/td[2]/div[@class='hint-box']")->count() === 0) {
 			$send_to = $row->getColumn('Send to')->getText();
@@ -616,20 +602,13 @@ class testFormUserMedia extends CWebTest {
 		}
 		// Check media active period.
 		$when_active = $row->getColumn('When active')->getText();
-		if (array_key_exists('When active', $data['fields'])) {
-			$this->assertEquals($when_active, $data['fields']['When active']);
-		}
-		else {
-			$this->assertEquals($when_active, $original_period);
-		}
+		$this->assertEquals($when_active, CTestArrayHelper::get($data, 'fields.When active', $original_period));
+
 		// Check media status.
-		$status = $row->getColumn('Status')->getText();
-		if (!array_key_exists('Enabled', $data['fields']) or $data['fields']['Enabled'] === true) {
-			$this->assertEquals($status, 'Enabled');
-		}
-		else {
-			$this->assertEquals($status, 'Disabled');
-		}
+		$get_status = $row->getColumn('Status')->getText();
+		$status = CTestArrayHelper::get($data, 'fields.Enabled', true) ? 'Enabled' : 'Disabled';
+		$this->assertEquals($get_status, $status);
+
 		// Check selected severities.
 		$reference_severities = [
 			'Not classified' => '1',
@@ -639,23 +618,23 @@ class testFormUserMedia extends CWebTest {
 			'High' => '5',
 			'Disaster' => '6'
 		];
-		if (array_key_exists('Use if severity', $data)) {
+		if (array_key_exists('Use if severity', $data['fields'])) {
 			// Check that the passed severities are turned on
-			foreach($data['Use if severity'] as $used_severity) {
-				$actual_severity = $this->query("xpath://tr[@id='user_medias_0']/td[4]/div/div[".$reference_severities[$used_severity]."]")->one()->getText();
+			foreach ($data['fields']['Use if severity'] as $used_severity) {
+				$actual_severity = $row->query('xpath:./td[4]/div/div['.$reference_severities[$used_severity].']')->one()->getText();
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
 			// Check that other severities are turned off
-			foreach($reference_severities as $name => $unused_severity) {
-				$actual_severity = $this->query("xpath://tr[@id='user_medias_0']/td[4]/div/div[".$unused_severity."]")->one()->getText();
+			foreach ($reference_severities as $name => $unused_severity) {
+				$actual_severity = $row->query('xpath:./td[4]/div/div['.$unused_severity.']')->one()->getText();
 				$this->assertEquals($name.' (off)', $actual_severity);
 			}
 		}
 		else {
 			// Check that when no severities are passed - they all are turned on by default
 			for ($i = 1; $i < 7; $i++) {
-				$severity = $this->query("xpath://tr[@id='user_medias_0']/td[4]/div/div[".$i."]")->one()->getText();
+				$severity =  $row->query('xpath:./td[4]/div/div['.$i.']')->one()->getText();
 				$this->assertContains('(on)', $severity);
 			}
 		}
