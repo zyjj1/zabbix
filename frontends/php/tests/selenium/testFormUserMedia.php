@@ -360,8 +360,7 @@ class testFormUserMedia extends CWebTest {
 		$table = $user_form->getField('Media');
 
 		//Edit selected media
-		$edit_send_to = $this->query("xpath://tr[@id='user_medias_0']/td[2]")->waitUntilPresent()->one()->getText();
-		$edit_row = $table->findRow('Send to', $edit_send_to);
+		$edit_row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
 		$this->setAndSubmitMediaValues($data);
@@ -575,31 +574,27 @@ class testFormUserMedia extends CWebTest {
 			$row = $media_field->getRow(0);
 		}
 		else {
-			foreach ($media_field->getRows() as $table_row) {
-				if ($table_row->getColumn('Send to')->getText() == $this->query("xpath://tr[@id='user_medias_0']/td[2]")->one()->getText()) {
-					$row = $table_row;
-		}
-			}
+			$row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
 		}
 		$this->assertEquals($row->getColumn('Type')->getText(), $data['fields']['Type']);
 
 		// Check the value of the "Send to" field.
-		if ($this->query("xpath://tr[@id='user_medias_0']/td[2]/div[@class='hint-box']")->count() === 0) {
-			$send_to = $row->getColumn('Send to')->getText();
-		}
-		else {
-			$send_to = $this->query("xpath://tr[@id='user_medias_0']/td[2]/div[@class='hint-box']")->one()->getText();
-		}
 		if (array_key_exists('emails', $data)) {
+			$get_send_to = $row->query('xpath:./td[2]/div[@class="hint-box"]')->one()->getText();
 
-			foreach ($data['emails'] as $mapped_email) {
-				$email = CTestArrayHelper::get($mapped_email, 'email');
-				$this->assertContains($email, $send_to);
+			$media_emails = [];
+			foreach ($data['emails'] as $email) {
+				$media_emails[] = $email['email'];
 			}
+			$send_to = implode(', ', $media_emails);
 		}
 		else {
-			$this->assertEquals($send_to, $data['fields']['Send to']);
+			$this->assertTrue(!$row->query('xpath:./td[2]/div[@class="hint-box"]')->one(false)->isValid());
+			$get_send_to = $row->getColumn('Send to')->getText();
+			$send_to = $data['fields']['Send to'];
 		}
+		$this->assertEquals($get_send_to, $send_to);
+
 		// Check media active period.
 		$when_active = $row->getColumn('When active')->getText();
 		$this->assertEquals($when_active, CTestArrayHelper::get($data, 'fields.When active', $original_period));
