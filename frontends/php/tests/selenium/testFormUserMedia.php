@@ -357,7 +357,6 @@ class testFormUserMedia extends CWebTest {
 		$this->query('link:Admin')->waitUntilVisible()->one()->click();
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilPresent()->one();
 		$user_form->selectTab('Media');
-		$table = $user_form->getField('Media');
 
 		//Edit selected media
 		$edit_row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
@@ -593,7 +592,7 @@ class testFormUserMedia extends CWebTest {
 			$get_send_to = $row->getColumn('Send to')->getText();
 			$send_to = $data['fields']['Send to'];
 		}
-		$this->assertEquals($get_send_to, $send_to);
+		$this->assertEquals($send_to, $get_send_to);
 
 		// Check media active period.
 		$when_active = $row->getColumn('When active')->getText();
