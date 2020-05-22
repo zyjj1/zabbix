@@ -172,6 +172,11 @@ zbx_id_xmlnode_t;
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 
+static zbx_hashset_t	evt_msg_strpool;
+
+#define vmware_shared_strdup(str)		vmware_strpool_strdup(str, &vmware->strpool, NULL)
+#define evt_msg_strpool_strdup(str, len)	vmware_strpool_strdup(str, &evt_msg_strpool, len)
+
 /*
  * SOAP support
  */
@@ -358,21 +363,28 @@ static int	vmware_strpool_compare_func(const void *d1, const void *d2)
 	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
-static char	*vmware_shared_strdup(const char *str)
+static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
 {
 	void	*ptr;
+
+	if (NULL != len)
+		*len = 0;
 
 	if (NULL == str)
 		return NULL;
 
-	ptr = zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE);
+	ptr = zbx_hashset_search(strpool, str - REFCOUNT_FIELD_SIZE);
 
 	if (NULL == ptr)
 	{
-		ptr = zbx_hashset_insert_ext(&vmware->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
+		zbx_uint64_t	sz;
 
+		sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE);
 		*(zbx_uint32_t *)ptr = 0;
+
+		if (NULL != len)
+			*len = sz;
 	}
 
 	(*(zbx_uint32_t *)ptr)++;
@@ -380,15 +392,25 @@ static char	*vmware_shared_strdup(const char *str)
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
-static void	vmware_shared_strfree(char *str)
+static void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool)
 {
 	if (NULL != str)
 	{
 		void	*ptr = str - REFCOUNT_FIELD_SIZE;
 
 		if (0 == --(*(zbx_uint32_t *)ptr))
-			zbx_hashset_remove_direct(&vmware->strpool, ptr);
+			zbx_hashset_remove_direct(strpool, ptr);
 	}
+}
+
+static void	vmware_shared_strfree(char *str)
+{
+	return vmware_strpool_strfree(str, &vmware->strpool);
+}
+
+static void	evt_msg_strpool_strfree(char *str)
+{
+	return vmware_strpool_strfree(str, &evt_msg_strpool);
 }
 
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
@@ -1530,7 +1552,7 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  ******************************************************************************/
 static void	vmware_event_free(zbx_vmware_event_t *event)
 {
-	zbx_free(event->message);
+	evt_msg_strpool_strfree(event->message);
 	zbx_free(event);
 }
 
@@ -3338,15 +3360,18 @@ out:
  * Parameters: events    - [IN/OUT] the array of parsed events                *
  *             xml_event - [IN] the xml node and id of parsed event           *
  *             xdoc      - [IN] xml document with eventlog records            *
+ *             alloc_sz  - [OUT] allocated memory size for events             *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  ******************************************************************************/
-static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnode_t xml_event, xmlDoc *xdoc)
+static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnode_t xml_event, xmlDoc *xdoc,
+		zbx_uint64_t *alloc_sz)
 {
 	zbx_vmware_event_t	*event = NULL;
 	char			*message, *time_str;
 	int			timestamp = 0;
+	zbx_uint64_t		sz;
 
 	if (NULL == (message = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("fullFormattedMessage"))))
 	{
@@ -3384,9 +3409,11 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 
 	event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
 	event->key = xml_event.id;
-	event->message = message;
 	event->timestamp = timestamp;
+	event->message = evt_msg_strpool_strdup(message, &sz);
 	zbx_vector_ptr_append(events, event);
+
+	*alloc_sz += sizeof(zbx_vmware_event_t) + sz;
 
 	return SUCCEED;
 }
@@ -3400,11 +3427,13 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  * Parameters: events   - [IN/OUT] the array of parsed events                 *
  *             last_key - [IN] the key of last parsed event                   *
  *             xdoc     - [IN] xml document with eventlog records             *
+ *             alloc_sz - [OUT] allocated memory size for events              *
  *                                                                            *
  * Return value: The count of events successfully parsed                      *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, xmlDoc *xdoc)
+static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, xmlDoc *xdoc,
+		zbx_uint64_t *alloc_sz)
 {
 	zbx_vector_id_xmlnode_t	ids;
 	int			i, parsed_num = 0;
@@ -3475,7 +3504,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		/* so inside a "scrollable view" latest events should come first too */
 		for (i = ids.values_num - 1; i >= 0; i--)
 		{
-			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc))
+			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc, alloc_sz))
 				parsed_num++;
 		}
 	}
@@ -3501,6 +3530,7 @@ clean:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             events       - [OUT] a pointer to the output variable          *
+ *             alloc_sz     - [OUT] allocated memory size for events          *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -3508,7 +3538,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *events, char **error)
+		zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
 	char		*event_session = NULL;
 	int		ret = FAIL, soap_count = 5; /* 10 - initial value of eventlog records number in one response */
@@ -3555,7 +3585,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			goto end_session;
 		}
 	}
-	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, doc));
+	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, doc, alloc_sz));
 
 	ret = SUCCEED;
 end_session:
@@ -3579,6 +3609,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             events       - [OUT] a pointer to the output variable          *
+ *             alloc_sz     - [OUT] allocated memory size for events          *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -3586,7 +3617,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *events, char **error)
+		zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
 #	define ZBX_POST_VMWARE_LASTEVENT 								\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -3655,7 +3686,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	zbx_free(value);
 
-	if (SUCCEED != vmware_service_put_event_data(events, xml_event, doc))
+	if (SUCCEED != vmware_service_put_event_data(events, xml_event, doc, alloc_sz))
 	{
 		*error = zbx_dsprintf(*error, "Cannot retrieve last eventlog data for key "ZBX_FS_UI64, xml_event.id);
 		goto clean;
@@ -4257,6 +4288,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
 	unsigned char		skip_old = service->eventlog.skip_old;
+	zbx_uint64_t		events_sz = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -4340,7 +4372,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	/* skip collection of event data if we don't know where we stopped last time or item can't accept values */
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key && 0 == service->eventlog.skip_old &&
-			SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &data->error))
+			SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &events_sz,
+			&data->error))
 	{
 		goto clean;
 	}
@@ -4350,7 +4383,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		char	*error = NULL;
 
 		/* May not be present */
-		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events, &error))
+		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events, &events_sz,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
 			zbx_free(error);
@@ -4387,8 +4421,21 @@ clean:
 	zbx_vector_str_clear_ext(&dss, zbx_str_free);
 	zbx_vector_str_destroy(&dss);
 out:
+	events_sz += data->events.values_alloc * sizeof(zbx_vmware_event_t*);
 	zbx_vector_ptr_create(&events);
 	zbx_vmware_lock();
+
+	if (vmware_mem->free_size < events_sz)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Processed VMware events requires up to " ZBX_FS_UI64 " bytes of"
+				" free VMwareCache memory, while currently " ZBX_FS_UI64 " bytes are free.",
+				events_sz, vmware_mem->free_size);
+	}
+	else if (0 < events_sz)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Processed VMware events requires up to " ZBX_FS_UI64 " bytes of"
+				" free VMwareCache memory.", events_sz);
+	}
 
 	/* remove UPDATING flag and set READY or FAILED flag */
 	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
@@ -5219,6 +5266,7 @@ int	zbx_vmware_init(char **error)
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
 		__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
 #endif
 	ret = SUCCEED;
 out:
@@ -5239,6 +5287,7 @@ void	zbx_vmware_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	zbx_hashset_destroy(&vmware->strpool);
+	zbx_hashset_destroy(&evt_msg_strpool);
 #endif
 	zbx_mutex_destroy(&vmware_lock);
 
