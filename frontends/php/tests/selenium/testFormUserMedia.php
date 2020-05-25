@@ -320,23 +320,20 @@ class testFormUserMedia extends CWebTest {
 		$this->assertTrue($user_form->getField('Media')->getRows()->count() === 0);
 		// Add media.
 		$this->query('button', 'Add')->one()->click();
-		$this->setAndSubmitMediaValues($data);
+		$this->setMediaValues($data);
 
 		// Check if media was added and its configuration
 		if ($data['expected'] === TEST_GOOD) {
 			$this->checkMediaConfiguration($data);
 			// Add other media if the flag is set
-			if (array_key_exists('additional media', $data)) {
-				foreach ($data['additional media'] as $i => $media) {
-					$this->query('button', 'Add')->one()->click();
-					$dialog = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady();
-					$form = $dialog->asForm();
-					$form->fill($media);
-					$form->submit();
-					$this->page->waitUntilReady();
-					$this->assertEquals($this->query('name:userForm')->asForm()->waitUntilVisible()->one()
-							->getField('Media')->getRows()->count(), $i + 2);
-				}
+			foreach (CTestArrayHelper::get($data, 'additional media', []) as $i => $media) {
+				$this->query('button', 'Add')->one()->click();
+				$form = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady()->asForm();
+				$form->fill($media);
+				$form->submit();
+				$this->page->waitUntilReady();
+				$user_form->invalidate();
+				$this->assertEquals($user_form->getField('Media')->getRows()->count(), $i + 2);
 			}
 		}
 		else {
@@ -362,7 +359,7 @@ class testFormUserMedia extends CWebTest {
 		$edit_row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
-		$this->setAndSubmitMediaValues($data);
+		$this->setMediaValues($data);
 
 		// Check if media was updated and its configuration.
 		if ($data['expected'] === TEST_GOOD) {
@@ -375,9 +372,9 @@ class testFormUserMedia extends CWebTest {
 	}
 
 	public function testFormUserMedia_StatusChangeAndRemove() {
+		$sql = 'SELECT * FROM media';
 		foreach (['Cancel', 'Update'] as $action) {
 			if ($action === 'Cancel') {
-				$sql = 'SELECT * FROM media';
 				$old_hash = CDBHelper::getHash($sql);
 			}
 			$this->page->login()->open('users.php?form=update&userid=1');
@@ -392,7 +389,7 @@ class testFormUserMedia extends CWebTest {
 
 			// Remove one of the medias.
 			$row->getColumn('Action')->query('button:Remove')->one()->click();
-			$this->assertTrue(!$table->findRow('Send to', 'test@zabbix.com')->isValid());
+			$this->assertFalse($table->findRow('Send to', 'test@zabbix.com')->isValid());
 
 			$this->query('button', $action)->one()->click();
 			$this->query('link', 'Admin')->waitUntilVisible()->one()->click();
@@ -426,12 +423,14 @@ class testFormUserMedia extends CWebTest {
 		$this->assertEquals($email_list->getRows()->count(), count($emails));
 
 		// Remove email 3@zabbix.com and check that it's removed.
-		$this->removeEmailFromListAndVerify('3@zabbix.com');
+		$this->removeEmailFromList('3@zabbix.com');
+		$this->checkEmailRemovedFromList('3@zabbix.com');
 		// Edit the media - remove email 2@zabbix.com and check that it's removed.
 		$media_list = $user_form->getField('Media')->waitUntilVisible();
 		$row = $media_list->getRow(0);
 		$row->query('button:Edit')->one()->click();
-		$this->removeEmailFromListAndVerify('2@zabbix.com');
+		$this->removeEmailFromList('2@zabbix.com');
+		$this->checkEmailRemovedFromList('3@zabbix.com');
 	}
 
 	public function getUserData() {
@@ -534,20 +533,22 @@ class testFormUserMedia extends CWebTest {
 		}
 	}
 
-	private function removeEmailFromListAndVerify($to_be_removed) {
+	private function removeEmailFromList($email) {
 		$media_form = $this->query('name:media_form')->waitUntilVisible()->asForm()->one();
 		$email_list = $media_form->getField('Send to')->asMultifieldTable(['mapping' => ['email']]);
 		// Remove the email from the list.
-		$email_list->fill(['action' => USER_ACTION_REMOVE, 'email' => $to_be_removed]);
+		$email_list->fill(['action' => USER_ACTION_REMOVE, 'email' => $email]);
 		$media_form->submit();
 		$this->page->waitUntilReady();
+	}
+	private function checkEmailRemovedFromList($email) {
 		// Check that the removed email is not present in 'Send to' field.
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$row = $user_form->getField('Media')->getRow(0);
-		$this->assertNotContains($to_be_removed, $row->getColumn('Send to')->getText());
+		$this->assertNotContains($email, $row->getColumn('Send to')->getText());
 	}
 
-	private function setAndSubmitMediaValues($data) {
+	private function setMediaValues($data) {
 		$media_form = $this->query('id:media_form')->waitUntilVisible()->asForm()->one();
 		$media_form->fill($data['fields']);
 		// Check that there is posibility to add only multiple emails to media.
