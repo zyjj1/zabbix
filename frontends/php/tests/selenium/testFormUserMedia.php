@@ -328,9 +328,9 @@ class testFormUserMedia extends CWebTest {
 			// Add other media if the flag is set
 			foreach (CTestArrayHelper::get($data, 'additional media', []) as $i => $media) {
 				$this->query('button', 'Add')->one()->click();
-				$form = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady()->asForm();
-				$form->fill($media);
-				$form->submit();
+				$media_form = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady()->asForm();
+				$media_form->fill($media);
+				$media_form->submit();
 				$this->page->waitUntilReady();
 				$user_form->invalidate();
 				$this->assertEquals($user_form->getField('Media')->getRows()->count(), $i + 2);
@@ -373,10 +373,8 @@ class testFormUserMedia extends CWebTest {
 
 	public function testFormUserMedia_StatusChangeAndRemove() {
 		$sql = 'SELECT * FROM media';
+		$old_hash = CDBHelper::getHash($sql);
 		foreach (['Cancel', 'Update'] as $action) {
-			if ($action === 'Cancel') {
-				$old_hash = CDBHelper::getHash($sql);
-			}
 			$this->page->login()->open('users.php?form=update&userid=1');
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
 			$table = $this->query('xpath://ul[@id="userMediaFormList"]//table')->asTable()->one();
@@ -395,7 +393,7 @@ class testFormUserMedia extends CWebTest {
 			$this->query('link', 'Admin')->waitUntilVisible()->one()->click();
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
 			if ($action === 'Update') {
-				$this->assertTrue(!$table->findRow('Send to', 'test@zabbix.com')->isValid());
+				$this->assertFalse($table->findRow('Send to', 'test@zabbix.com')->isValid());
 			}
 			else {
 				$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -424,13 +422,13 @@ class testFormUserMedia extends CWebTest {
 
 		// Remove email 3@zabbix.com and check that it's removed.
 		$this->removeEmailFromList('3@zabbix.com');
-		$this->checkEmailRemovedFromList('3@zabbix.com');
+		$this->checkEmailNotPresent('3@zabbix.com');
 		// Edit the media - remove email 2@zabbix.com and check that it's removed.
 		$media_list = $user_form->getField('Media')->waitUntilVisible();
 		$row = $media_list->getRow(0);
 		$row->query('button:Edit')->one()->click();
 		$this->removeEmailFromList('2@zabbix.com');
-		$this->checkEmailRemovedFromList('3@zabbix.com');
+		$this->checkEmailNotPresent('3@zabbix.com');
 	}
 
 	public function getUserData() {
@@ -541,7 +539,8 @@ class testFormUserMedia extends CWebTest {
 		$media_form->submit();
 		$this->page->waitUntilReady();
 	}
-	private function checkEmailRemovedFromList($email) {
+
+	private function checkEmailNotPresent($email) {
 		// Check that the removed email is not present in 'Send to' field.
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$row = $user_form->getField('Media')->getRow(0);
@@ -589,7 +588,7 @@ class testFormUserMedia extends CWebTest {
 			$send_to = implode(', ', $media_emails);
 		}
 		else {
-			$this->assertTrue(!$row->query('xpath:./td[2]/div[@class="hint-box"]')->one(false)->isValid());
+			$this->assertFalse($row->query('xpath:./td[2]/div[@class="hint-box"]')->one(false)->isValid());
 			$get_send_to = $row->getColumn('Send to')->getText();
 			$send_to = $data['fields']['Send to'];
 		}
