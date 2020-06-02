@@ -355,7 +355,7 @@ class testFormUserMedia extends CWebTest {
 		$user_form = $this->query('name:userForm')->asForm()->waitUntilPresent()->one();
 		$user_form->selectTab('Media');
 
-		//Edit selected media
+		// Edit selected media
 		$edit_row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
