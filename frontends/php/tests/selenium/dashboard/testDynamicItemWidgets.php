@@ -568,19 +568,19 @@ class testDynamicItemWidgets extends CWebTest {
 		$filter->query('name:groupid')->asDropdown()->one()->select($data['filter']['Group']);
 		$filter->query('name:hostid')->asDropdown()->one()->select($data['filter']['Host']);
 		$this->page->waitUntilReady();
-		$all_widgets = $dashboard->getWidgets();
-		$this->assertEquals(count($data['widgets']), $all_widgets->count());
+		$widgets = $dashboard->getWidgets();
+		$this->assertEquals(count($data['widgets']), $widgets->count());
 
-		foreach ($data['widgets'] as $key => $widget) {
-			$get_widget = $all_widgets->get($key);
-			$widget_content = $get_widget->getContent();
-			$this->assertEquals($widget['header'], $get_widget->getHeaderText());
+		foreach ($data['widgets'] as $key => $expected) {
+			$widget = $widgets->get($key);
+			$widget_content = $widget->getContent();
+			$this->assertEquals($expected['header'], $widget->getHeaderText());
 
 			// Check widget empty content, because the host group or/and host doesn't match dynamic option criteria.
-			if ($widget['header'] === '' || $widget['header'] === 'Plain text'
-					|| CTestArrayHelper::get($widget, 'empty', false)) {
+			if ($expected['header'] === '' || $expected['header'] === 'Plain text'
+					|| CTestArrayHelper::get($expected, 'empty', false)) {
 				$content = $widget_content->query('class:nothing-to-show')->one()->getText();
-				$message = ($widget['type'] === 'URL')
+				$message = ($expected['type'] === 'URL')
 						? 'No host selected.'
 						: 'No permissions to referred object or it does not exist!';
 				$this->assertEquals($message, $content);
@@ -589,20 +589,20 @@ class testDynamicItemWidgets extends CWebTest {
 
 			// Check widget content when the host group or/and host match dynamic option criteria.
 			$this->assertFalse($widget_content->query('class:nothing-to-show')->one(false)->isValid());
-			switch ($widget['type']) {
+			switch ($expected['type']) {
 				case 'Plain text':
 					$data = $widget_content->asTable()->index('Name');
-					foreach ($widget['expected'] as $item => $value) {
+					foreach ($expected['expected'] as $item => $value) {
 						$row = $data[$item];
 						$this->assertEquals($value, $row['Value']);
 					}
 					break;
 
 				case 'URL':
-					CElementQuery::getDriver()->switchTo()->frame($widget_content->query('id:iframe')->one());
+					$this->page->switchTo($widget_content->query('id:iframe')->one());
 					$form = $this->query('xpath://form[@action="hostinventories.php"]')->asForm()->one();
-					$this->assertEquals($widget['host'], $form->getFieldContainer('Host name')->getText());
-					CElementQuery::getDriver()->switchTo()->defaultContent();
+					$this->assertEquals($expected['host'], $form->getFieldContainer('Host name')->getText());
+					$this->page->switchTo();
 					break;
 			}
 		}
