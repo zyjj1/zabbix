@@ -1133,6 +1133,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		/* process response */
 		for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 		{
+			char	**str_res;
+
 			/* verify if we are in the same subtree */
 			if (SNMP_ENDOFMIBVIEW == var->type || var->name_length < rootOID_len ||
 					0 != memcmp(rootOID, var->name, rootOID_len * sizeof(oid)))
@@ -1193,14 +1195,18 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					break;
 				}
 
+				str_res = NULL;
 				init_result(&snmp_result);
 
-				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result) &&
-						NULL != GET_STR_RESULT(&snmp_result))
+				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result))
 				{
-					walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
+					if (ISSET_TEXT(&snmp_result))
+						zbx_remove_chars(snmp_result.text, "\r\n");
+
+					str_res = GET_STR_RESULT(&snmp_result);
 				}
-				else
+
+				if (NULL == str_res)
 				{
 					char	**msg;
 
@@ -1209,6 +1215,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
 				}
+				else
+					walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
 
 				free_result(&snmp_result);
 
