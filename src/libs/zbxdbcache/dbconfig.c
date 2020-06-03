@@ -8308,7 +8308,7 @@ void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint6
  *                                                                            *
  * Purpose: releases resources allocated to store host availability data      *
  *                                                                            *
- * Parameters: availability - [IN] host availability data                     *
+ * Parameters: ha - [IN] host availability data                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_host_availability_clean(zbx_host_availability_t *ha)
@@ -8495,7 +8495,7 @@ out:
  *                                  OUT: the host availability data in cache  *
  *                                       before changes                       *
  *             out        - [OUT] the host availability data after changes    *
- *             error      - [IN] the error message                            *
+ *             error_msg  - [IN] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the host was deactivated successfully              *
  *               FAIL    - the host was already deactivated or deactivation   *

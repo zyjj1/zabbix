@@ -2163,6 +2163,9 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90105, 40000, 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90106, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '');
 
+-- testFormUserMedia
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (6,3,1,'zabbix@zabbix.com',0,60,'1-5,09:00-18:00');
+
 -- testDynamicItemWidgets
 INSERT INTO hosts (hostid, host, name, description) VALUES (99061, 'Dynamic widgets H1', 'Dynamic widgets H1', '');
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50014, 'Dynamic widgets HG1 (H1 and H2)', 0);

@@ -481,6 +481,8 @@ DB_ACKNOWLEDGE;
 int	DBinit(char **error);
 void	DBdeinit(void);
 
+void	DBinit_autoincrement_options(void);
+
 int	DBconnect(int flag);
 void	DBclose(void);
 
@@ -552,8 +554,8 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *diffs);
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff);
+void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
