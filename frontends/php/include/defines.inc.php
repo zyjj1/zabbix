@@ -139,13 +139,6 @@ define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
-/**
- * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
- * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
- * write a custom string.
- */
-define('ZBX_IFRAME_SANDBOX', '');
-
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
@@ -1742,6 +1735,14 @@ define('PROBLEMS_SHOW_TAGS_3', 3);
 define('PROBLEMS_TAG_NAME_FULL',      0);
 define('PROBLEMS_TAG_NAME_SHORTENED', 1);
 define('PROBLEMS_TAG_NAME_NONE',      2);
+
+/**
+ * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
+ * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
+ * write a custom string.
+ * https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html#attr-iframe-sandbox
+ */
+define('ZBX_IFRAME_SANDBOX', '');
 
 // HTTP headers
 /*
