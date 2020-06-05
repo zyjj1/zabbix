@@ -557,11 +557,13 @@
 				}
 
 				$('#itemsTable tr.sortable').each(function(i, node) {
+					var short_fmt = [];
 					$(node).find('*[name]').each(function(_, input) {
 						if (!$.isEmptyObject(input) && input.name != null) {
-							src.setArgument('items[' + i + '][' + input.name + ']', input.value);
+							short_fmt.push((input.name).substr(0, 2) + ':' + input.value);
 						}
 					});
+					src.setArgument('i[' + i + ']', short_fmt.join(','));
 				});
 
 				var image = $('img', preview_chart);
