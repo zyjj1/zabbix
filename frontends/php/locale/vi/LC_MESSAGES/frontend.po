@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-18 12:30+0300\n"
+"POT-Creation-Date: 2020-06-07 11:12+0300\n"
 "PO-Revision-Date: 2020-05-01 15:52+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1588341124.000000\n"
 
-#: include/classes/db/MysqlDbBackend.php:67
-#: include/classes/db/OracleDbBackend.php:86
-#: include/classes/db/PostgresqlDbBackend.php:76
+#: include/classes/db/MysqlDbBackend.php:70
+#: include/classes/db/OracleDbBackend.php:89
+#: include/classes/db/PostgresqlDbBackend.php:79
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr "\"%1$s\" thay cho \"%2$s\""
@@ -7893,8 +7893,8 @@ msgstr "Biểu thức tự chọn \"%2$s\" không chính xác cho quy tắc khá
 msgid "Incorrect data."
 msgstr "Dữ liệu không chính xác."
 
-#: include/classes/db/MysqlDbBackend.php:66
-#: include/classes/db/PostgresqlDbBackend.php:75
+#: include/classes/db/MysqlDbBackend.php:69
+#: include/classes/db/PostgresqlDbBackend.php:78
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
 msgstr "Charset mặc định cho database không đúng: %1$s."
@@ -8133,7 +8133,7 @@ msgstr "Phương pháp \"%1$s.%2$s\" không chính xác."
 msgid "Incorrect object value."
 msgstr "Giá trị đối tượng không chính xác."
 
-#: include/classes/db/OracleDbBackend.php:85
+#: include/classes/db/OracleDbBackend.php:88
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
 msgstr "Tham số không đúng \"%1$s\" giá trị: %2$s."
@@ -15525,6 +15525,11 @@ msgstr "Tọa độ X của phần tử screen đặt tại X - %1$s và Y 
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "Tọa độ Y của phần tử screen đặt tại X - %1$s và Y - %2$s của screen \"%3$s\" là quá lớn."
 
+#: include/classes/db/DbBackend.php:51
+#, c-format
+msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
+msgstr ""
+
 #: include/html.inc.php:698
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -15533,18 +15538,6 @@ msgstr "Ứng dụng không được khám phá nữa và sẽ bị xóa trong %
 #: include/html.inc.php:693
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Ứng dụng không được khám phá nữa và sẽ bị xóa trong lần xử lý khám phá tiếp theo."
-
-#: include/classes/db/Db2DbBackend.php:41
-#: include/classes/db/MysqlDbBackend.php:35
-#: include/classes/db/OracleDbBackend.php:36
-#: include/classes/db/PostgresqlDbBackend.php:44
-msgid "The frontend does not match Zabbix database."
-msgstr "Giao diện không khớp với cơ sở dữ liệu Zabbix."
-
-#: include/classes/db/DbBackend.php:50
-#, c-format
-msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr "Giao diện không khớp với cơ sở dữ liệu Zabbix. Phiên bản cơ sở dữ liệu hiện tại (bắt buộc/tùy chọn): %d/%d. Phiên bản bắt buộc yêu cầu: %d. Liên hệ quản trị hệ thống của bạn."
 
 #: include/html.inc.php:644
 #, c-format
@@ -16316,11 +16309,19 @@ msgstr "Ukrainian (uk_UA)"
 msgid "Unable to create the configuration file."
 msgstr "Không thể tạo tập tin cấu hình."
 
+#: include/classes/db/Db2DbBackend.php:43
+#: include/classes/db/MysqlDbBackend.php:35
+#: include/classes/db/OracleDbBackend.php:36
+#: include/classes/db/PostgresqlDbBackend.php:44
+#, c-format
+msgid "Unable to determine current Zabbix database version: %1$s."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Không thể ghi đè lên tệp cấu hình hiện có."
 
-#: include/classes/db/DbBackend.php:65
+#: include/classes/db/DbBackend.php:68
 msgid "Unable to select configuration."
 msgstr "Không thể lựa chọn cấu hình."
 
@@ -16488,8 +16489,8 @@ msgstr "Hủy liên kết: Web scenario \"%1$s\" trên \"%2$s\"."
 msgid "Unmute"
 msgstr "Bật tiếng"
 
-#: include/classes/db/MysqlDbBackend.php:95
-#: include/classes/db/PostgresqlDbBackend.php:111
+#: include/classes/db/MysqlDbBackend.php:98
+#: include/classes/db/PostgresqlDbBackend.php:114
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
@@ -19016,6 +19017,14 @@ msgstr "ID template \"%1$s\" được thông qua %2$s lần"
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "Tham số \"%1$s\" bị thiếu"
+
+#: include/classes/db/Db2DbBackend.php:44
+#: include/classes/db/MysqlDbBackend.php:36
+#: include/classes/db/OracleDbBackend.php:37
+#: include/classes/db/PostgresqlDbBackend.php:45
+#, c-format
+msgid "the table \"%1$s\" was not found"
+msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-18 12:30+0300\n"
+"POT-Creation-Date: 2020-06-07 11:12+0300\n"
 "PO-Revision-Date: 2019-03-19 11:55+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1552989359.000000\n"
 
-#: include/classes/db/MysqlDbBackend.php:67
-#: include/classes/db/OracleDbBackend.php:86
-#: include/classes/db/PostgresqlDbBackend.php:76
+#: include/classes/db/MysqlDbBackend.php:70
+#: include/classes/db/OracleDbBackend.php:89
+#: include/classes/db/PostgresqlDbBackend.php:79
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr ""
@@ -8027,8 +8027,8 @@ msgstr "Некоректний довільний вираз \"%2$s\" для п�
 msgid "Incorrect data."
 msgstr "Некоректні дані."
 
-#: include/classes/db/MysqlDbBackend.php:66
-#: include/classes/db/PostgresqlDbBackend.php:75
+#: include/classes/db/MysqlDbBackend.php:69
+#: include/classes/db/PostgresqlDbBackend.php:78
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
 msgstr ""
@@ -8267,7 +8267,7 @@ msgstr "Некоректний метод \"%1$s.%2$s\"."
 msgid "Incorrect object value."
 msgstr "Некоректне значення об'єкта."
 
-#: include/classes/db/OracleDbBackend.php:85
+#: include/classes/db/OracleDbBackend.php:88
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
 msgstr ""
@@ -15697,6 +15697,11 @@ msgstr "X координата елементу комплексного екр�
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "Y координата елементу комплексного екрана розміщеного в X - %1$s та Y - %2$s на комплексному екрані \"%3$s\" занадто велика."
 
+#: include/classes/db/DbBackend.php:51
+#, c-format
+msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
+msgstr ""
+
 #: include/html.inc.php:698
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -15705,18 +15710,6 @@ msgstr "Група елементів даних більше не виявля�
 #: include/html.inc.php:693
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Група елементів даних більше не виявляється та буде видалена при наступному виконанні правила виявлення."
-
-#: include/classes/db/Db2DbBackend.php:41
-#: include/classes/db/MysqlDbBackend.php:35
-#: include/classes/db/OracleDbBackend.php:36
-#: include/classes/db/PostgresqlDbBackend.php:44
-msgid "The frontend does not match Zabbix database."
-msgstr "Веб інтерфейс не співпадає з базою даних Zabbix."
-
-#: include/classes/db/DbBackend.php:50
-#, c-format
-msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr "Веб інтерфейс не співпадає з базою даних Zabbix. Поточна версія бази даних (обов'язкова/опціональна): %d/%d. Необхідна обов'язкова версія: %d. Зв'яжіться з вашим системним адміністратором."
 
 #: include/html.inc.php:644
 #, c-format
@@ -16500,11 +16493,19 @@ msgstr "Українська (uk_UA)"
 msgid "Unable to create the configuration file."
 msgstr "Не вдалося створити файл налаштувань."
 
+#: include/classes/db/Db2DbBackend.php:43
+#: include/classes/db/MysqlDbBackend.php:35
+#: include/classes/db/OracleDbBackend.php:36
+#: include/classes/db/PostgresqlDbBackend.php:44
+#, c-format
+msgid "Unable to determine current Zabbix database version: %1$s."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Не вдалося перезаписати існуючий файл налаштувань."
 
-#: include/classes/db/DbBackend.php:65
+#: include/classes/db/DbBackend.php:68
 msgid "Unable to select configuration."
 msgstr "Неможливо вибрати конфігурацію."
 
@@ -16672,8 +16673,8 @@ msgstr "Від'єднано: Веб сценарій \"%1$s\" на \"%2$s\"."
 msgid "Unmute"
 msgstr "Увімк. звук"
 
-#: include/classes/db/MysqlDbBackend.php:95
-#: include/classes/db/PostgresqlDbBackend.php:111
+#: include/classes/db/MysqlDbBackend.php:98
+#: include/classes/db/PostgresqlDbBackend.php:114
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
@@ -19210,6 +19211,14 @@ msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "параметр \"%1$s\" відсутній"
+
+#: include/classes/db/Db2DbBackend.php:44
+#: include/classes/db/MysqlDbBackend.php:36
+#: include/classes/db/OracleDbBackend.php:37
+#: include/classes/db/PostgresqlDbBackend.php:45
+#, c-format
+msgid "the table \"%1$s\" was not found"
+msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125
