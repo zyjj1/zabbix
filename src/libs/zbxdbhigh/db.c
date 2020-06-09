@@ -59,6 +59,18 @@ void	DBclose(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBinit_autoincrement_options                                     *
+ *                                                                            *
+ * Purpose: specify the autoincrement options when connecting to the database *
+ *                                                                            *
+ ******************************************************************************/
+void	DBinit_autoincrement_options(void)
+{
+	zbx_db_init_autoincrement_options();
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBconnect                                                        *
  *                                                                            *
  * Purpose: connect to the database                                           *
@@ -1302,7 +1314,7 @@ static int	DBregister_host_active(void)
 			" from actions"
 			" where eventsource=%d"
 				" and status=%d",
-			EVENT_SOURCE_AUTO_REGISTRATION,
+			EVENT_SOURCE_AUTOREGISTRATION,
 			ACTION_STATUS_ACTIVE);
 
 	if (NULL == DBfetch(result))
@@ -1572,7 +1584,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
-		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
+		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
 				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 

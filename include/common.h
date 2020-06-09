@@ -22,6 +22,7 @@
 
 #include "sysinc.h"
 #include "zbxtypes.h"
+#include "module.h"
 #include "version.h"
 #include "md5.h"
 
@@ -208,7 +209,7 @@ zbx_item_authtype_t;
 /* event sources */
 #define EVENT_SOURCE_TRIGGERS		0
 #define EVENT_SOURCE_DISCOVERY		1
-#define EVENT_SOURCE_AUTO_REGISTRATION	2
+#define EVENT_SOURCE_AUTOREGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
 #define EVENT_SOURCE_COUNT		4
 
@@ -537,7 +538,7 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_PREPROCESSOR	27
 #define ZBX_PROCESS_TYPE_COUNT		28	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
-const char	*get_process_type_string(unsigned char process_type);
+const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);
 
 /* maintenance */
@@ -934,8 +935,8 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *str, double *value);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
-int	is_time_suffix(const char *c, int *value, int length);
-int	is_int_prefix(const char *c);
+int	is_time_suffix(const char *str, int *value, int length);
+int	is_int_prefix(const char *str);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
@@ -976,9 +977,9 @@ void	zbx_remove_chars(char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeros(char *s);
-int	get_param(const char *param, int num, char *buf, size_t max_len);
-int	num_param(const char *param);
-char	*get_param_dyn(const char *param, int num);
+int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
+int	num_param(const char *p);
+char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
 
 /******************************************************************************
  *                                                                            *
@@ -1151,11 +1152,11 @@ typedef struct
 }
 zbx_iprange_t;
 
-int	iprange_parse(zbx_iprange_t *range, const char *address);
-void	iprange_first(const zbx_iprange_t *range, int *address);
-int	iprange_next(const zbx_iprange_t *range, int *address);
-int	iprange_validate(const zbx_iprange_t *range, const int *address);
-zbx_uint64_t	iprange_volume(const zbx_iprange_t *range);
+int	iprange_parse(zbx_iprange_t *iprange, const char *address);
+void	iprange_first(const zbx_iprange_t *iprange, int *address);
+int	iprange_next(const zbx_iprange_t *iprange, int *address);
+int	iprange_validate(const zbx_iprange_t *iprange, const int *address);
+zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange);
 
 /* time related functions */
 char	*zbx_age2str(int age);
@@ -1283,7 +1284,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 
-char	*zbx_dyn_escape_shell_single_quote(const char *text);
+char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1
@@ -1499,8 +1500,8 @@ zbx_variant_t;
 void	zbx_variant_clear(zbx_variant_t *value);
 void	zbx_variant_set_none(zbx_variant_t *value);
 void	zbx_variant_set_str(zbx_variant_t *value, char *text);
-void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
-void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
+void	zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl);
+void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64);
 void	zbx_variant_set_bin(zbx_variant_t *value, void *value_bin);
 void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);

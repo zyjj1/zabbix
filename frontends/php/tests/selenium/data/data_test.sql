@@ -2162,3 +2162,85 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90105, 40000, 
 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90106, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '');
+
+-- testFormUserMedia
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (6,3,1,'zabbix@zabbix.com',0,60,'1-5,09:00-18:00');
+
+-- testDynamicItemWidgets
+INSERT INTO hosts (hostid, host, name, description) VALUES (99061, 'Dynamic widgets H1', 'Dynamic widgets H1', '');
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50014, 'Dynamic widgets HG1 (H1 and H2)', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99913, 99061, 50014);
+INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55033, 99061, 1, 1);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99092, 2, 99061, 'Dynamic widgets H1I1', 'dynamic[1]', '', '', '', '');
+INSERT INTO history (itemid, clock, value, ns) VALUES (99092, 1589983553, '11', 726692808);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99093, 2, 99061, 'Dynamic widgets H1I2', 'dynamic[2]', '', '', '', '');
+INSERT INTO history (itemid, clock, value, ns) VALUES (99093, 1589897100, '12', 726692808);
+INSERT INTO graphs (graphid, name) VALUES (700026, 'Dynamic widgets H1 G1 (I1)');
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700034, 700026, 99092, 0);
+INSERT INTO graphs (graphid, name) VALUES (700027, 'Dynamic widgets H1 G2 (I2)');
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700035, 700027, 99093, 0);
+INSERT INTO graphs (graphid, name) VALUES (700028, 'Dynamic widgets H1 G3 (I1 and I2)');
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700036, 700028, 99092, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700037, 700028, 99093, 1);
+INSERT INTO graphs (graphid, name) VALUES (700031,'Dynamic widgets H1 G4 (H1I1 and H3I1)');
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700041, 700031, 99093, 0);
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99062, 'Dynamic widgets H2', 'Dynamic widgets H2', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99914, 99062, 50014);
+INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55034, 99062, 1, 1);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99094, 2, 99062, 'Dynamic widgets H2I1', 'dynamic[1]', '', '', '', '');
+INSERT INTO history (itemid, clock, value, ns) VALUES (99094, 1589810700, '21', 726692808);
+INSERT INTO graphs (graphid, name) VALUES (700029, 'Dynamic widgets H2 G1 (I1)');
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700038, 700029, 99094, 0);
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99063, 'Dynamic widgets H3', 'Dynamic widgets H3', 0, '');
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50015, 'Dynamic widgets HG2 (H3)', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99915, 99063, 50015);
+INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55035, 99063, 1, 1);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99095, 2, 99063, 'Dynamic widgets H3I1', 'dynamic[1]', '', '', '', '');
+INSERT INTO history (itemid, clock, value, ns) VALUES (99095, 1589724300, '31', 726692808);
+INSERT INTO graphs (graphid, name) VALUES (700030,'Dynamic widgets H3 G1 (I1)');
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700039, 700030, 99095, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700040, 700031, 99095, 1);
+
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (105, 'Dashboard for Dynamic item', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (108, 105, 'graph', '', 0, 0, 4, 3);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (109, 105, 'graph', '', 4, 0, 4, 3);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (110, 105, 'graph', '', 8, 0, 4, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90035, 108, 0, 'source_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90036, 108, 4, 'itemid', 0, 99093);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90037, 109, 0, 'source_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90038, 109, 4, 'itemid', 0, 99092);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90039, 109, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90040, 110, 0, 'source_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90041, 110, 4, 'itemid', 0, 99093);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90042, 110, 0, 'dynamic', 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (111, 105, 'graph', '', 0, 3, 4, 3);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (112, 105, 'graph', '', 4, 3, 4, 3);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (113, 105, 'graph', '', 8, 3, 4, 3);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (114, 105, 'graph', '', 0, 6, 4, 3);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (115, 105, 'graph', '', 4, 6, 5, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90043, 111, 6, 'graphid', 0, 700027);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90044, 112, 6, 'graphid', 0, 700026);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90045, 112, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90046, 113, 6, 'graphid', 0, 700027);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90047, 113, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90048, 114, 6, 'graphid', 0, 700028);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90049, 114, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90050, 115, 6, 'graphid', 0, 700031);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90051, 115, 0, 'dynamic', 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (116, 105, 'plaintext', '', 0, 9, 4, 2);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (117, 105, 'plaintext', '', 4, 9, 4, 2);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (118, 105, 'plaintext', '', 8, 9, 4, 2);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (119, 105, 'plaintext', '', 0, 11, 4, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90052, 116, 4, 'itemids', 0, 99093);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90053, 117, 4, 'itemids', 0, 99092);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90054, 117, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90055, 118, 4, 'itemids', 0, 99093);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90056, 118, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90057, 119, 4, 'itemids', 0, 99092);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90058, 119, 4, 'itemids', 0, 99093);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 119, 0, 'dynamic', 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (120, 105, 'url', 'Dynamic URL', 0, 13, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 120, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 120, 1, 'url', 'hostinventories.php?hostid={HOST.ID}');

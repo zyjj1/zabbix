@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-19 14:11+0300\n"
+"POT-Creation-Date: 2020-06-07 11:12+0300\n"
 "PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1581198494.000000\n"
 
-#: include/classes/db/MysqlDbBackend.php:67
-#: include/classes/db/OracleDbBackend.php:86
-#: include/classes/db/PostgresqlDbBackend.php:76
+#: include/classes/db/MysqlDbBackend.php:70
+#: include/classes/db/OracleDbBackend.php:89
+#: include/classes/db/PostgresqlDbBackend.php:79
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr ""
@@ -542,7 +542,7 @@ msgstr "Şu zamana kadar aktif"
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:171
-#: app/views/popup.media.php:48 app/views/popup.media.php:112
+#: app/views/popup.media.php:48 app/views/popup.media.php:113
 #: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
@@ -6122,7 +6122,7 @@ msgstr "Dolu bölge"
 #: app/views/administration.script.list.php:37
 #: app/views/monitoring.discovery.view.php:39
 #: app/views/monitoring.problem.view.php:339
-#: include/classes/html/CFilter.php:391
+#: include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
@@ -7957,8 +7957,8 @@ msgstr "\"%1$s\" keşif kuralı için yanlış özel ifade \"%2$s\": %3$s."
 msgid "Incorrect data."
 msgstr "Yanlış veri."
 
-#: include/classes/db/MysqlDbBackend.php:66
-#: include/classes/db/PostgresqlDbBackend.php:75
+#: include/classes/db/MysqlDbBackend.php:69
+#: include/classes/db/PostgresqlDbBackend.php:78
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
 msgstr ""
@@ -8197,7 +8197,7 @@ msgstr "Yanlış yöntem \"%1$s.%2$s\"."
 msgid "Incorrect object value."
 msgstr "Yanlış nesne değeri."
 
-#: include/classes/db/OracleDbBackend.php:85
+#: include/classes/db/OracleDbBackend.php:88
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
 msgstr ""
@@ -8721,11 +8721,11 @@ msgstr "Bilgi"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Bir servisle ilgili bilgi. Durum ve başlangıç parametreleri olarak integer; görüntüleme ismi, yol ve kullanıcı parametreleri olarak string; açıklama parametresi olarak metin döndürür. Durumda 0 - çalışıyor, 1 - duraklatıldı, 2 - bekleme başlatma, 3 - bekleme duraklatma, 4 - bekleme devam ettirme, 5 - bekleme durdurma, 6 - durduruldu, 7 - bilinmeyen, 255 - böyle bir servis yok. Başlangıçta 0 - otomatik, 1 - otomatik gecikmeli, 2 - elle, 3 - devre dışı, 4 - bilinmeyen."
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and host macros"
 msgstr "Devralınan makrolar ve ana makine makroları"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and template macros"
 msgstr "Devralınan makrolar ve şablon makroları"
 
@@ -15609,6 +15609,11 @@ msgstr "\"%3$s\" ekranının %1$s X ve %2$s Y konumunda bulunan ekran öğesinin
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "\"%3$s\" ekranının %1$s X ve %2$s Y konumunda bulunan ekran öğesinin Y koordinatı çok büyük."
 
+#: include/classes/db/DbBackend.php:51
+#, c-format
+msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
+msgstr ""
+
 #: include/html.inc.php:698
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -15617,18 +15622,6 @@ msgstr "Uygulama artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s 
 #: include/html.inc.php:693
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Uygulama artık keşfedilemiyor ve keşif kuralı bir sonraki sefer işlendiğinde silinecek."
-
-#: include/classes/db/Db2DbBackend.php:41
-#: include/classes/db/MysqlDbBackend.php:35
-#: include/classes/db/OracleDbBackend.php:36
-#: include/classes/db/PostgresqlDbBackend.php:44
-msgid "The frontend does not match Zabbix database."
-msgstr "Önyüz, Zabbix veritabanına uymuyor."
-
-#: include/classes/db/DbBackend.php:50
-#, c-format
-msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr "Önyüz, Zabbix veritabanına uymuyor. Mevcut veritabanı sürümü (zorunlu/isteğe bağlı): %d/%d. Gerekli zorunlu sürüm: %d. Sistem yöneticinize başvurun."
 
 #: include/html.inc.php:644
 #, c-format
@@ -16406,11 +16399,19 @@ msgstr "Ukraynaca (uk_UA)"
 msgid "Unable to create the configuration file."
 msgstr "Yapılandırma dosyası oluşturulamadı."
 
+#: include/classes/db/Db2DbBackend.php:43
+#: include/classes/db/MysqlDbBackend.php:35
+#: include/classes/db/OracleDbBackend.php:36
+#: include/classes/db/PostgresqlDbBackend.php:44
+#, c-format
+msgid "Unable to determine current Zabbix database version: %1$s."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Varolan yapılandırma dosyasının üzerine yazılamadı."
 
-#: include/classes/db/DbBackend.php:65
+#: include/classes/db/DbBackend.php:68
 msgid "Unable to select configuration."
 msgstr "Yapılandırma seçilemiyor."
 
@@ -16579,8 +16580,8 @@ msgstr "Bağlantı kaldırıldı: \"%2$s\" üzerindeki \"%1$s\" web senaryosu."
 msgid "Unmute"
 msgstr "Sesi Aç"
 
-#: include/classes/db/MysqlDbBackend.php:95
-#: include/classes/db/PostgresqlDbBackend.php:111
+#: include/classes/db/MysqlDbBackend.php:98
+#: include/classes/db/PostgresqlDbBackend.php:114
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
@@ -16632,7 +16633,7 @@ msgstr "Açık"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:171 app/views/popup.media.php:112
+#: app/views/popup.httpstep.php:171 app/views/popup.media.php:113
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:138
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
@@ -19112,6 +19113,14 @@ msgstr "\"%1$s\" şablon ID'si %2$s defa geçti"
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "\"%1$s\" parametresi eksik"
+
+#: include/classes/db/Db2DbBackend.php:44
+#: include/classes/db/MysqlDbBackend.php:36
+#: include/classes/db/OracleDbBackend.php:37
+#: include/classes/db/PostgresqlDbBackend.php:45
+#, c-format
+msgid "the table \"%1$s\" was not found"
+msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125

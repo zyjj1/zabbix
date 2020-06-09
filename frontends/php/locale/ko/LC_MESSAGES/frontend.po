@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-19 14:11+0300\n"
+"POT-Creation-Date: 2020-06-07 11:12+0300\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1543898186.000000\n"
 
-#: include/classes/db/MysqlDbBackend.php:67
-#: include/classes/db/OracleDbBackend.php:86
-#: include/classes/db/PostgresqlDbBackend.php:76
+#: include/classes/db/MysqlDbBackend.php:70
+#: include/classes/db/OracleDbBackend.php:89
+#: include/classes/db/PostgresqlDbBackend.php:79
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr ""
@@ -522,7 +522,7 @@ msgstr "종료시간"
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:171
-#: app/views/popup.media.php:48 app/views/popup.media.php:112
+#: app/views/popup.media.php:48 app/views/popup.media.php:113
 #: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
@@ -6057,7 +6057,7 @@ msgstr "면"
 #: app/views/administration.script.list.php:37
 #: app/views/monitoring.discovery.view.php:39
 #: app/views/monitoring.problem.view.php:339
-#: include/classes/html/CFilter.php:391
+#: include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
@@ -7886,8 +7886,8 @@ msgstr "디스커버리 규칙 \"%1$s\"의 커스텀 조건식 \"%2$s\"이 올�
 msgid "Incorrect data."
 msgstr "데이터가 올바르지 않습니다."
 
-#: include/classes/db/MysqlDbBackend.php:66
-#: include/classes/db/PostgresqlDbBackend.php:75
+#: include/classes/db/MysqlDbBackend.php:69
+#: include/classes/db/PostgresqlDbBackend.php:78
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
 msgstr ""
@@ -8126,7 +8126,7 @@ msgstr "메소트 \"%1$s.%2$s\"가 올바르지 않습니다."
 msgid "Incorrect object value."
 msgstr "오브젝트의 값이 올바르지 않습니다."
 
-#: include/classes/db/OracleDbBackend.php:85
+#: include/classes/db/OracleDbBackend.php:88
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
 msgstr ""
@@ -8650,11 +8650,11 @@ msgstr "정보"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "서비스 정보의 습득. 파라미터가 state나 startup이라면 integer를 리턴. 파라미터가 displayname, path, user라면 string을 리턴. 파라미터가 description라면 text를 리턴. 구체적으로는 파라미터가 state라면 상태로 : 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 를 리턴. 혹은 파라미터가 startup라면 스타트업 종류로 : 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown를 리턴"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and host macros"
 msgstr "계승한 매크로와 호스트 매크로"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and template macros"
 msgstr "계승한 매크로와 템플릿 매크로"
 
@@ -15518,6 +15518,11 @@ msgstr "스크린\"%3$s\"의 X - %1$s Y - %2$s에 있는 스크린 요소의 X�
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "스크린\"%3$s\"의 X - %1$s Y - %2$s에 있는 스크린 요소의 Y좌표가 너무 큽니다."
 
+#: include/classes/db/DbBackend.php:51
+#, c-format
+msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
+msgstr ""
+
 #: include/html.inc.php:698
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -15526,18 +15531,6 @@ msgstr "어플리케이션이 디스커버리할 수 없게 되었기 때문에 
 #: include/html.inc.php:693
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 어플리케이션을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
-
-#: include/classes/db/Db2DbBackend.php:41
-#: include/classes/db/MysqlDbBackend.php:35
-#: include/classes/db/OracleDbBackend.php:36
-#: include/classes/db/PostgresqlDbBackend.php:44
-msgid "The frontend does not match Zabbix database."
-msgstr "Web 인터페이스가 Zabbix데이터베이스와 호환성이 없습니다."
-
-#: include/classes/db/DbBackend.php:50
-#, c-format
-msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr "Web 인터페이스가 Zabbix데이터베이스와 호환성이 없습니다. 현재 데이터베이스 의버전 (mandatory/optional): %d/%d. 필수 버전: %d. 시스템관리자에 문의해 주십시오."
 
 #: include/html.inc.php:644
 #, c-format
@@ -16309,11 +16302,19 @@ msgstr "우크라이나어 (uk_UA)"
 msgid "Unable to create the configuration file."
 msgstr "설정 파일을 작성할 수 없습니다."
 
+#: include/classes/db/Db2DbBackend.php:43
+#: include/classes/db/MysqlDbBackend.php:35
+#: include/classes/db/OracleDbBackend.php:36
+#: include/classes/db/PostgresqlDbBackend.php:44
+#, c-format
+msgid "Unable to determine current Zabbix database version: %1$s."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
 msgstr "설정 파일을 덮어쓰기 할 수 없습니다."
 
-#: include/classes/db/DbBackend.php:65
+#: include/classes/db/DbBackend.php:68
 msgid "Unable to select configuration."
 msgstr "선택한 설정을 할 수 없습니다"
 
@@ -16481,8 +16482,8 @@ msgstr "링크삭제: \"%2$s\"의 Web시나리오\"%1$s\"."
 msgid "Unmute"
 msgstr "음소거 해제"
 
-#: include/classes/db/MysqlDbBackend.php:95
-#: include/classes/db/PostgresqlDbBackend.php:111
+#: include/classes/db/MysqlDbBackend.php:98
+#: include/classes/db/PostgresqlDbBackend.php:114
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
@@ -16534,7 +16535,7 @@ msgstr "Up"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:171 app/views/popup.media.php:112
+#: app/views/popup.httpstep.php:171 app/views/popup.media.php:113
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:138
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
@@ -19010,6 +19011,14 @@ msgstr "템플릿ID \"%1$s\"가 %2$s번 사용되고 있습니다"
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "파라미터 \"%1$s\" 가 없습니다"
+
+#: include/classes/db/Db2DbBackend.php:44
+#: include/classes/db/MysqlDbBackend.php:36
+#: include/classes/db/OracleDbBackend.php:37
+#: include/classes/db/PostgresqlDbBackend.php:45
+#, c-format
+msgid "the table \"%1$s\" was not found"
+msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125

@@ -3415,7 +3415,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
 			}
-			else if (0 == indexed_macro && EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{

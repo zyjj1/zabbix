@@ -1178,7 +1178,7 @@ int	cmp_key_id(const char *key_1, const char *key_2)
  *                                                                            *
  * Purpose: Returns process name                                              *
  *                                                                            *
- * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
+ * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -4210,7 +4210,6 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 	return FAIL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: num_param                                                        *
@@ -4218,7 +4217,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
  * Purpose: find number of parameters in parameter list                       *
  *                                                                            *
  * Parameters:                                                                *
- *      param  - parameter list                                               *
+ *      p - [IN] parameter list                                               *
  *                                                                            *
  * Return value: number of parameters (starting from 1) or                    *
  *               0 if syntax error                                            *
@@ -4318,10 +4317,11 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      p       - parameter list                                              *
- *      num     - requested parameter index                                   *
- *      buf     - pointer of output buffer                                    *
- *      max_len - size of output buffer                                       *
+ *      p       - [IN]  parameter list                                        *
+ *      num     - [IN]  requested parameter index                             *
+ *      buf     - [OUT] pointer of output buffer                              *
+ *      max_len - [IN]  size of output buffer                                 *
+ *      type    - [OUT] parameter type (may be NULL)                          *
  *                                                                            *
  * Return value:                                                              *
  *      1 - requested parameter missing or buffer overflow                    *
@@ -4332,7 +4332,7 @@ int	num_param(const char *p)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_param(const char *p, int num, char *buf, size_t max_len)
+int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type)
 {
 #define ZBX_ASSIGN_PARAM				\
 {							\
@@ -4344,6 +4344,9 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	array, idx = 1;
 	size_t	buf_i = 0;
+
+	if (NULL != type)
+		*type = REQUEST_PARAMETER_TYPE_UNDEFINED;
 
 	if (0 == max_len)
 		return 1;	/* buffer overflow */
@@ -4366,13 +4369,26 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 				else if ('"' == *p)
 				{
 					state = 1;
-					if (0 != array && idx == num)
-						ZBX_ASSIGN_PARAM;
+
+					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_STRING;
+
+						if (0 != array)
+							ZBX_ASSIGN_PARAM;
+					}
 				}
 				else if ('[' == *p)
 				{
-					if (0 != array && idx == num)
-						ZBX_ASSIGN_PARAM;
+					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_ARRAY;
+
+						if (0 != array)
+							ZBX_ASSIGN_PARAM;
+					}
 					array++;
 				}
 				else if (']' == *p && 0 != array)
@@ -4391,7 +4407,13 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 				else if (' ' != *p)
 				{
 					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_STRING;
+
 						ZBX_ASSIGN_PARAM;
+					}
+
 					state = 2;
 				}
 				break;
@@ -4598,8 +4620,9 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      p   - [IN] parameter list                                             *
- *      num - [IN] requested parameter index                                  *
+ *      p    - [IN] parameter list                                            *
+ *      num  - [IN] requested parameter index                                 *
+ *      type - [OUT] parameter type (may be NULL)                             *
  *                                                                            *
  * Return value:                                                              *
  *      NULL - requested parameter missing                                    *
@@ -4611,7 +4634,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-char	*get_param_dyn(const char *p, int num)
+char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
 {
 	char	*buf = NULL;
 	size_t	sz;
@@ -4621,7 +4644,7 @@ char	*get_param_dyn(const char *p, int num)
 
 	buf = (char *)zbx_malloc(buf, sz + 1);
 
-	if (0 != get_param(p, num, buf, sz + 1))
+	if (0 != get_param(p, num, buf, sz + 1, type))
 		zbx_free(buf);
 
 	return buf;
@@ -4947,7 +4970,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
 		return 1;
 
 	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, max_len);
+	ret = get_param(pl + 1, num, buf, max_len, NULL);
 	*pr = ']';
 
 	return ret;

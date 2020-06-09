@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-19 14:11+0300\n"
+"POT-Creation-Date: 2020-06-07 11:12+0300\n"
 "PO-Revision-Date: 2020-02-17 09:52+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1581925935.000000\n"
 
-#: include/classes/db/MysqlDbBackend.php:67
-#: include/classes/db/OracleDbBackend.php:86
-#: include/classes/db/PostgresqlDbBackend.php:76
+#: include/classes/db/MysqlDbBackend.php:70
+#: include/classes/db/OracleDbBackend.php:89
+#: include/classes/db/PostgresqlDbBackend.php:79
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr ""
@@ -558,7 +558,7 @@ msgstr "Aktywne do"
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:171
-#: app/views/popup.media.php:48 app/views/popup.media.php:112
+#: app/views/popup.media.php:48 app/views/popup.media.php:113
 #: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
@@ -6182,7 +6182,7 @@ msgstr "Obszar wypełniony"
 #: app/views/administration.script.list.php:37
 #: app/views/monitoring.discovery.view.php:39
 #: app/views/monitoring.problem.view.php:339
-#: include/classes/html/CFilter.php:391
+#: include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
@@ -8023,8 +8023,8 @@ msgstr "Błędne wyrażenie użytkownika \"%2$s\" dla reguły wykrywania \"%1$s\
 msgid "Incorrect data."
 msgstr ""
 
-#: include/classes/db/MysqlDbBackend.php:66
-#: include/classes/db/PostgresqlDbBackend.php:75
+#: include/classes/db/MysqlDbBackend.php:69
+#: include/classes/db/PostgresqlDbBackend.php:78
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
 msgstr ""
@@ -8263,7 +8263,7 @@ msgstr "Błędna metoda \"%1$s.%2$s\"."
 msgid "Incorrect object value."
 msgstr "Błędna wartość obiektu."
 
-#: include/classes/db/OracleDbBackend.php:85
+#: include/classes/db/OracleDbBackend.php:88
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
 msgstr ""
@@ -8787,11 +8787,11 @@ msgstr "Informacja"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Informacje o usłudze. Zwraca liczbę całkowitą dla parametrów state, startup; ciąg znaków - dla parametrów displayname, path, user; tekst - dla parametru description; Specyficzne dla state: 0 - działa, 1 - wstrzymany, 2 - w trakcie uruchamiania, 3 - w trakcie wstrzymywania, 4 - w trakcie wznawiania, 5 - w trakcie zatrzymywania, 6 - zatrzymany, 7 - nieznany, 255 - nie ma takiej usługi; Specyficzne dla startup: 0 - automatyczny, 1 - automatyczny opóźniony, 2 - ręczny, 3 - wyłączony, 4 - nieznany"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and host macros"
 msgstr "Makra dziedziczone i hosta"
 
-#: include/views/hostmacros.php:180
+#: include/views/hostmacros.php:182
 msgid "Inherited and template macros"
 msgstr "Makra dziedziczone i szablonu"
 
@@ -15693,6 +15693,11 @@ msgstr "Koordynata X elementu ekranu umieszczonego w punkcie X - %1$s i Y - %2$s
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr "Koordynata Y elementu ekranu umieszczonego w punkcie X - %1$s i Y - %2$s ekranu \"%3$s\" jest zbyt duża."
 
+#: include/classes/db/DbBackend.php:51
+#, c-format
+msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
+msgstr ""
+
 #: include/html.inc.php:698
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -15701,18 +15706,6 @@ msgstr "Aplikacja nie jest już wykrywana i zostanie usunięta za %1$s (o %2$s %
 #: include/html.inc.php:693
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Aplikacja nie jest już wykrywana i zostanie usunięta przy następnym przetwarzaniu reguły wykrywania."
-
-#: include/classes/db/Db2DbBackend.php:41
-#: include/classes/db/MysqlDbBackend.php:35
-#: include/classes/db/OracleDbBackend.php:36
-#: include/classes/db/PostgresqlDbBackend.php:44
-msgid "The frontend does not match Zabbix database."
-msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix."
-
-#: include/classes/db/DbBackend.php:50
-#, c-format
-msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix. Aktualna wersja bazy (wymagan/opcjonalna): %d/%d. Wymagana jest wersja: %d. Skontaktuj się z administratorem systemu."
 
 #: include/html.inc.php:644
 #, c-format
@@ -16496,11 +16489,19 @@ msgstr "Ukraiński (uk_UA)"
 msgid "Unable to create the configuration file."
 msgstr "Nie można utworzyć pliku konfiguracji."
 
+#: include/classes/db/Db2DbBackend.php:43
+#: include/classes/db/MysqlDbBackend.php:35
+#: include/classes/db/OracleDbBackend.php:36
+#: include/classes/db/PostgresqlDbBackend.php:44
+#, c-format
+msgid "Unable to determine current Zabbix database version: %1$s."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
-#: include/classes/db/DbBackend.php:65
+#: include/classes/db/DbBackend.php:68
 msgid "Unable to select configuration."
 msgstr "Nie można wybrać konfiguracji."
 
@@ -16668,8 +16669,8 @@ msgstr "Odłączono: Scenariusz sieci www \"%1$s\" w \"%2$s\"."
 msgid "Unmute"
 msgstr "Włącz głos"
 
-#: include/classes/db/MysqlDbBackend.php:95
-#: include/classes/db/PostgresqlDbBackend.php:111
+#: include/classes/db/MysqlDbBackend.php:98
+#: include/classes/db/PostgresqlDbBackend.php:114
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
@@ -16721,7 +16722,7 @@ msgstr "Działa"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:171 app/views/popup.media.php:112
+#: app/views/popup.httpstep.php:171 app/views/popup.media.php:113
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:138
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
@@ -19205,6 +19206,14 @@ msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 #: include/classes/validators/CApiInputValidator.php:867
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
+msgstr ""
+
+#: include/classes/db/Db2DbBackend.php:44
+#: include/classes/db/MysqlDbBackend.php:36
+#: include/classes/db/OracleDbBackend.php:37
+#: include/classes/db/PostgresqlDbBackend.php:45
+#, c-format
+msgid "the table \"%1$s\" was not found"
 msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
