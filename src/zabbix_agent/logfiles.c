@@ -1659,7 +1659,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 		}
 
 		/* mtime is not used for log, log.count items, reset to ignore */
-		memset(&file_buf.st_mtim, 0, sizeof(file_buf.st_mtim));
+		file_buf.st_mtime = 0;
 
 		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
 #ifdef _WINDOWS
