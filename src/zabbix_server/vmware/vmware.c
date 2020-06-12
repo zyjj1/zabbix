@@ -174,9 +174,6 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 
 static zbx_hashset_t	evt_msg_strpool;
 
-#define vmware_shared_strdup(str)		vmware_strpool_strdup(str, &vmware->strpool, NULL)
-#define evt_msg_strpool_strdup(str, len)	vmware_strpool_strdup(str, &evt_msg_strpool, len)
-
 /*
  * SOAP support
  */
@@ -353,6 +350,8 @@ static int	vmware_vm_compare(const void *d1, const void *d2)
 
 #define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
+#define evt_msg_strpool_strdup(str, len)	vmware_strpool_strdup(str, &evt_msg_strpool, len)
+
 static zbx_hash_t	vmware_strpool_hash_func(const void *data)
 {
 	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
@@ -361,6 +360,11 @@ static zbx_hash_t	vmware_strpool_hash_func(const void *data)
 static int	vmware_strpool_compare_func(const void *d1, const void *d2)
 {
 	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+}
+
+static char	*vmware_shared_strsearch(const char *str)
+{
+	return zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE);
 }
 
 static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
@@ -381,6 +385,7 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 
 		sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
 		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE);
+
 		*(zbx_uint32_t *)ptr = 0;
 
 		if (NULL != len)
@@ -392,25 +397,51 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
-static void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool)
+static char	*vmware_shared_strdup(const char *str)
 {
+	char		*strdup;
+	zbx_uint64_t	len;
+
+	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len);
+
+	if (0 < len)
+		vmware->strpool_sz += len;
+
+	return strdup;
+}
+
+static void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
+{
+	if (NULL != len)
+		*len = 0;
+
 	if (NULL != str)
 	{
 		void	*ptr = str - REFCOUNT_FIELD_SIZE;
 
 		if (0 == --(*(zbx_uint32_t *)ptr))
+		{
+			if (NULL != len)
+				*len = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+
 			zbx_hashset_remove_direct(strpool, ptr);
+		}
 	}
 }
 
 static void	vmware_shared_strfree(char *str)
 {
-	return vmware_strpool_strfree(str, &vmware->strpool);
+	zbx_uint64_t	len;
+
+	vmware_strpool_strfree(str, &vmware->strpool, &len);
+
+	if (0 < len)
+		vmware->strpool_sz -= len;
 }
 
 static void	evt_msg_strpool_strfree(char *str)
 {
-	return vmware_strpool_strfree(str, &evt_msg_strpool);
+	vmware_strpool_strfree(str, &evt_msg_strpool, NULL);
 }
 
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
@@ -1351,7 +1382,6 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	zbx_vmware_hv_t		*hv, hv_local;
 
 	data = (zbx_vmware_data_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
-
 	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_mem_malloc_func,
 			__vm_mem_realloc_func, __vm_mem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
@@ -4370,27 +4400,32 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_name_compare);
 
-	/* skip collection of event data if we don't know where we stopped last time or item can't accept values */
-	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key && 0 == service->eventlog.skip_old &&
-			SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &events_sz,
-			&data->error))
+	if (0 == service->eventlog.req_sz)
 	{
-		goto clean;
-	}
-
-	if (0 != service->eventlog.skip_old)
-	{
-		char	*error = NULL;
-
-		/* May not be present */
-		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events, &events_sz,
-				&error))
+		/* skip collection of event data if we don't know where	*/
+		/* we stopped last time or item can't accept values 	*/
+		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key &&
+				0 == service->eventlog.skip_old &&
+				SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events,
+				&events_sz, &data->error))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
-			zbx_free(error);
+			goto clean;
 		}
-		else
-			skip_old = 0;
+
+		if (0 != service->eventlog.skip_old)
+		{
+			char	*error = NULL;
+
+			/* May not be present */
+			if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events,
+					&events_sz, &error))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
+				zbx_free(error);
+			}
+			else
+				skip_old = 0;
+		}
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
@@ -4421,25 +4456,57 @@ clean:
 	zbx_vector_str_clear_ext(&dss, zbx_str_free);
 	zbx_vector_str_destroy(&dss);
 out:
-	events_sz += data->events.values_alloc * sizeof(zbx_vmware_event_t*);
 	zbx_vector_ptr_create(&events);
 	zbx_vmware_lock();
-
-	if (vmware_mem->free_size < events_sz)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Processed VMware events requires up to " ZBX_FS_UI64 " bytes of"
-				" free VMwareCache memory, while currently " ZBX_FS_UI64 " bytes are free.",
-				events_sz, vmware_mem->free_size);
-	}
-	else if (0 < events_sz)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Processed VMware events requires up to " ZBX_FS_UI64 " bytes of"
-				" free VMwareCache memory.", events_sz);
-	}
 
 	/* remove UPDATING flag and set READY or FAILED flag */
 	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
+
+	if (0 < data->events.values_num)
+	{
+		if (0 != service->eventlog.oom)
+			service->eventlog.oom = 0;
+
+		events_sz += data->events.values_alloc * sizeof(zbx_vmware_event_t*);
+
+		if (vmware_mem->free_size < events_sz || SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		{
+			for (i = 0; i < data->events.values_num; i++)
+			{
+				zbx_vmware_event_t	*event = data->events.values[i];
+
+				if (NULL != vmware_shared_strsearch(event->message))
+					events_sz -= strlen(event->message) + REFCOUNT_FIELD_SIZE + 1;
+			}
+
+			if (vmware_mem->free_size < events_sz)
+			{
+				service->eventlog.req_sz = events_sz;
+				service->eventlog.oom = 1;
+				zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_free);
+
+				zabbix_log(LOG_LEVEL_WARNING, "Processed VMware events requires up to " ZBX_FS_UI64
+						" bytes of free VMwareCache memory, while currently only " ZBX_FS_UI64
+						" bytes are free. VMwareCache memory usage (free/strpool/total): "
+						ZBX_FS_UI64 " / " ZBX_FS_UI64 " / " ZBX_FS_UI64, events_sz,
+						vmware_mem->free_size, vmware_mem->free_size, vmware->strpool_sz,
+						vmware_mem->total_size);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Processed VMware events requires up to " ZBX_FS_UI64
+						" bytes of free VMwareCache memory. VMwareCache memory usage"
+						" (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
+						ZBX_FS_UI64, events_sz, vmware_mem->free_size, vmware->strpool_sz,
+						vmware_mem->total_size);
+			}
+		}
+	}
+	else if (0 < service->eventlog.req_sz && service->eventlog.req_sz <= vmware_mem->free_size)
+	{
+		service->eventlog.req_sz = 0;
+	}
 
 	if (NULL != service->data && 0 != service->data->events.values_num &&
 			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
@@ -5088,6 +5155,8 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->lastaccess = now;
 	service->eventlog.last_key = ZBX_VMWARE_EVENT_KEY_UNINITIALIZED;
 	service->eventlog.skip_old = 0;
+	service->eventlog.req_sz = 0;
+	service->eventlog.oom = 0;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
 			NULL, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
@@ -5264,6 +5333,7 @@ int	zbx_vmware_init(char **error)
 
 	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+	vmware->strpool_sz = 0;
 	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
 		__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
 	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
