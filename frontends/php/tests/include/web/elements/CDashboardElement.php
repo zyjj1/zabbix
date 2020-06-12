@@ -173,7 +173,7 @@ class CDashboardElement extends CElement {
 	public function deleteWidget($name) {
 		$this->checkIfEditable();
 		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
+				'"]/../../..//button[@title="Delete"]')->one()->click()->waitUntilNotVisible();
 
 
 		return $this;
