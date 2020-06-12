@@ -6739,12 +6739,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_hashset_iter_reset(&config->preprocitems, &iter);
 	while (NULL != (dc_preprocitem = (const ZBX_DC_PREPROCITEM *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_preprocitem->itemid)) ||
-				ITEM_STATUS_ACTIVE != dc_item->status)
-		{
-			continue;
-		}
-
 		if (FAIL == dc_preproc_item_init(&item_local, dc_preprocitem->itemid))
 			continue;
 
@@ -6765,12 +6759,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_hashset_iter_reset(&config->masteritems, &iter);
 	while (NULL != (dc_masteritem = (const ZBX_DC_MASTERITEM *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_masteritem->itemid)) ||
-				ITEM_STATUS_ACTIVE != dc_item->status)
-		{
-			continue;
-		}
-
 		if (NULL == (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &dc_masteritem->itemid)))
 		{
 			if (FAIL == dc_preproc_item_init(&item_local, dc_masteritem->itemid))
@@ -6796,7 +6784,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_hashset_iter_reset(&config->items, &iter);
 	while (NULL != (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ITEM_TYPE_INTERNAL != dc_item->type || ITEM_STATUS_ACTIVE != dc_item->status)
+		if (ITEM_TYPE_INTERNAL != dc_item->type)
 			continue;
 
 		if (NULL == (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
