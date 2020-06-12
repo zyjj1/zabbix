@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 if ($data['url']['error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['url']['error']);
 }
