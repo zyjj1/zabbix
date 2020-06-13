@@ -6768,7 +6768,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		}
 
 		item->dep_itemids_num = 0;
-		item->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * item->dep_itemids_num);
+		item->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL, sizeof(zbx_uint64_t) *
+				dc_masteritem->dep_itemids.values_num);
 
 		for (i = 0; i < dc_masteritem->dep_itemids.values_num; i++)
 		{
