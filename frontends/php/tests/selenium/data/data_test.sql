@@ -2243,4 +2243,4 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 119, 0, 'dynamic', 1);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (120, 105, 'url', 'Dynamic URL', 0, 13, 6, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 120, 0, 'dynamic', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 120, 1, 'url', 'hostinventories.php?hostid={HOST.ID}');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 120, 1, 'url', 'iframe.php?name={HOST.NAME}');
