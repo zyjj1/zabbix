@@ -169,6 +169,21 @@ typedef struct
 }
 zbx_id_xmlnode_t;
 
+/* VMware events host information */
+typedef struct
+{
+	const char	*node_name;
+	int		flag;
+	char		*name;
+}
+event_hostinfo_node_t;
+
+#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
+#define ZBX_HOSTINFO_NODES_COMPUTERESOURCE	0x02
+#define ZBX_HOSTINFO_NODES_HOST			0x04
+
+#define ZBX_HOSTINFO_NODES_MASK_ALL		0x07
+
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 
@@ -3344,15 +3359,69 @@ out:
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnode_t xml_event, xmlDoc *xdoc)
 {
-	zbx_vmware_event_t	*event = NULL;
-	char			*message, *time_str;
-	int			timestamp = 0;
+	zbx_vmware_event_t		*event = NULL;
+	char				*message, *time_str, *ip;
+	int				timestamp = 0, nodes_det = 0;
+	unsigned int			i;
+	xmlNodePtr			cur_node;
+	static event_hostinfo_node_t	host_nodes[] =
+			{
+				{ "datacenter",		ZBX_HOSTINFO_NODES_DATACENTER,		NULL },
+				{ "computeResource",	ZBX_HOSTINFO_NODES_COMPUTERESOURCE,	NULL },
+				{ "host",		ZBX_HOSTINFO_NODES_HOST,		NULL }
+			};
 
 	if (NULL == (message = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("fullFormattedMessage"))))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "skipping event key '" ZBX_FS_UI64 "', fullFormattedMessage"
 				" is missing", xml_event.id);
 		return FAIL;
+	}
+
+	for (cur_node = xml_event.xml_node->xmlChildrenNode; NULL != cur_node; cur_node = cur_node->next)
+	{
+		for (i = 0; i < ARRSIZE(host_nodes); i++)
+		{
+			if (0 == xmlStrcmp(cur_node->name, (const xmlChar *)host_nodes[i].node_name) &&
+					NULL != (host_nodes[i].name = zbx_xml_read_node_value(xdoc, cur_node,
+					ZBX_XPATH_NN("name"))))
+			{
+				nodes_det |= host_nodes[i].flag;
+				break;
+			}
+		}
+
+		if (ZBX_HOSTINFO_NODES_MASK_ALL == (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
+			break;
+	}
+
+	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_HOST))
+	{
+		message = zbx_strdcat(message, "\n\n");
+
+		for (i = 0; i < ARRSIZE(host_nodes); i++)
+		{
+			if (NULL != host_nodes[i].name)
+			{
+				message = zbx_dsprintf(message, "%s%s%s", message, host_nodes[i].name,
+						0 != (host_nodes[i].flag & ZBX_HOSTINFO_NODES_HOST) ? "" : "/");
+				zbx_free(host_nodes[i].name);
+			}
+		}
+	}
+	else
+	{
+		if (0 != (nodes_det | ZBX_HOSTINFO_NODES_MASK_ALL))
+		{
+			for (i = 0; i < ARRSIZE(host_nodes); i++)
+				zbx_free(host_nodes[i].name);
+		}
+
+		if (NULL != (ip = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("ipAddress"))))
+		{
+			message = zbx_dsprintf(message, "%s\n\n%s", message, ip);
+			zbx_free(ip);
+		}
 	}
 
 	zbx_replace_invalid_utf8(message);
