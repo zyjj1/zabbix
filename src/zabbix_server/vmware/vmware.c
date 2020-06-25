@@ -179,7 +179,7 @@ typedef struct
 event_hostinfo_node_t;
 
 #define ZBX_HOSTINFO_NODES_DATACENTER		0x01
-#define ZBX_HOSTINFO_NODES_COMPUTERESOURCE	0x02
+#define ZBX_HOSTINFO_NODES_COMPRES		0x02
 #define ZBX_HOSTINFO_NODES_HOST			0x04
 
 #define ZBX_HOSTINFO_NODES_MASK_ALL		0x07
@@ -3363,13 +3363,12 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	char				*message, *time_str, *ip;
 	int				timestamp = 0, nodes_det = 0;
 	unsigned int			i;
-	xmlNodePtr			cur_node;
 	static event_hostinfo_node_t	host_nodes[] =
-			{
-				{ "datacenter",		ZBX_HOSTINFO_NODES_DATACENTER,		NULL },
-				{ "computeResource",	ZBX_HOSTINFO_NODES_COMPUTERESOURCE,	NULL },
-				{ "host",		ZBX_HOSTINFO_NODES_HOST,		NULL }
-			};
+	{
+		{ "*[local-name()='datacenter']/*[local-name()='name']",	ZBX_HOSTINFO_NODES_DATACENTER,	NULL },
+		{ "*[local-name()='computeResource']/*[local-name()='name']",	ZBX_HOSTINFO_NODES_COMPRES,	NULL },
+		{ "*[local-name()='host']/*[local-name()='name']",		ZBX_HOSTINFO_NODES_HOST,	NULL }
+	};
 
 	if (NULL == (message = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("fullFormattedMessage"))))
 	{
@@ -3378,21 +3377,16 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		return FAIL;
 	}
 
-	for (cur_node = xml_event.xml_node->xmlChildrenNode; NULL != cur_node; cur_node = cur_node->next)
+	for (i = 0; i < ARRSIZE(host_nodes); i++)
 	{
-		for (i = 0; i < ARRSIZE(host_nodes); i++)
+		if (0 == (nodes_det & host_nodes[i].flag) && NULL != (host_nodes[i].name =
+				zbx_xml_read_node_value(xdoc, xml_event.xml_node, host_nodes[i].node_name)))
 		{
-			if (0 == xmlStrcmp(cur_node->name, (const xmlChar *)host_nodes[i].node_name) &&
-					NULL != (host_nodes[i].name = zbx_xml_read_node_value(xdoc, cur_node,
-					ZBX_XPATH_NN("name"))))
-			{
-				nodes_det |= host_nodes[i].flag;
-				break;
-			}
-		}
+			nodes_det |= host_nodes[i].flag;
 
-		if (ZBX_HOSTINFO_NODES_MASK_ALL == (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
-			break;
+			if (ZBX_HOSTINFO_NODES_MASK_ALL == (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
+				break;
+		}
 	}
 
 	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_HOST))
