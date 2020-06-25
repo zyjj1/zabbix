@@ -135,15 +135,15 @@ class CTrend extends CApiService {
 
 			$result = [];
 
-			foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $value_type) {
+			foreach ($options['itemids'] as $value_type => $items) {
 				if ($sql_limit !== null && $sql_limit <= 0) {
 					break;
 				}
 
 				$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
 
-				if ($options['itemids'][$value_type]) {
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($options['itemids'][$value_type]));
+				if ($items) {
+					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
 					$res = DBselect(
 						'SELECT '.implode(',', $sql_fields).
@@ -167,10 +167,10 @@ class CTrend extends CApiService {
 		else {
 			$result = 0;
 
-			foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $value_type) {
-				if ($options['itemids'][$value_type]) {
+			foreach ($options['itemids'] as $value_type => $items) {
+				if ($items) {
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($options['itemids'][$value_type]));
+					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
 					$res = DBselect(
 						'SELECT COUNT(*) AS rowscount'.
@@ -262,6 +262,11 @@ class CTrend extends CApiService {
 		}
 
 		foreach (CHistoryManager::getElasticsearchEndpoints($value_types) as $type => $endpoint) {
+
+			if (!array_key_exists($type, $options['itemids'])) {
+				continue;
+			}
+
 			$itemids = array_keys($options['itemids'][$type]);
 
 			if (!$itemids) {
