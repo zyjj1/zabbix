@@ -2075,12 +2075,12 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50014, 4)
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40067, 2, 50014, 'Item A', 'A', '', '', '', '');
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40068, 2, 50014, 'Item B', 'B', '', '', '', '');
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40069, 2, 50014, 'Item C', 'C', '', '', '', '');
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16027, '{16027}=0', 'A trigger', '');
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16028, '{16028}=0', 'B trigger', '');
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16029, '{16029}=0', 'C trigger', '');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 16027,'last','0');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 16028,'last','0');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 16029,'last','0');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100041, '{16028}=0', 'A trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100042, '{16029}=0', 'B trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100043, '{16030}=0', 'C trigger', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 100041,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 100042,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 100043,'last','0');
 
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, description, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
