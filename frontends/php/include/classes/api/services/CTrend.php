@@ -141,24 +141,21 @@ class CTrend extends CApiService {
 				}
 
 				$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
+				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
-				if ($items) {
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
+				$res = DBselect(
+					'SELECT '.implode(',', $sql_fields).
+					' FROM '.$sql_from.' t'.
+					' WHERE '.implode(' AND ', $sql_where),
+					$sql_limit
+				);
 
-					$res = DBselect(
-						'SELECT '.implode(',', $sql_fields).
-						' FROM '.$sql_from.' t'.
-						' WHERE '.implode(' AND ', $sql_where),
-						$sql_limit
-					);
+				while ($row = DBfetch($res)) {
+					$result[] = $row;
+				}
 
-					while ($row = DBfetch($res)) {
-						$result[] = $row;
-					}
-
-					if ($sql_limit !== null) {
-						$sql_limit -= count($result);
-					}
+				if ($sql_limit !== null) {
+					$sql_limit -= count($result);
 				}
 			}
 
@@ -168,19 +165,17 @@ class CTrend extends CApiService {
 			$result = 0;
 
 			foreach ($options['itemids'] as $value_type => $items) {
-				if ($items) {
-					$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
+				$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
+				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
-					$res = DBselect(
-						'SELECT COUNT(*) AS rowscount'.
-						' FROM '.$sql_from.' t'.
-						' WHERE '.implode(' AND ', $sql_where)
-					);
+				$res = DBselect(
+					'SELECT COUNT(*) AS rowscount'.
+					' FROM '.$sql_from.' t'.
+					' WHERE '.implode(' AND ', $sql_where)
+				);
 
-					if ($row = DBfetch($res)) {
-						$result += $row['rowscount'];
-					}
+				if ($row = DBfetch($res)) {
+					$result += $row['rowscount'];
 				}
 			}
 		}
@@ -262,7 +257,6 @@ class CTrend extends CApiService {
 		}
 
 		foreach (CHistoryManager::getElasticsearchEndpoints($value_types) as $type => $endpoint) {
-
 			if (!array_key_exists($type, $options['itemids'])) {
 				continue;
 			}
