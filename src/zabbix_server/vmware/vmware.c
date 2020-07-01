@@ -109,6 +109,7 @@ static zbx_vmware_t	*vmware = NULL;
 
 ZBX_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
 ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -800,6 +801,23 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_datacenter_shared_free                                    *
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store datacenter data         *
+ *                                                                            *
+ * Parameters: datacenter   - [IN] the datacenter                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
+{
+	vmware_shared_strfree(datacenter->name);
+	vmware_shared_strfree(datacenter->id);
+
+	__vm_mem_free_func(datacenter);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_props_shared_free                                         *
  *                                                                            *
  * Purpose: frees shared resources allocated to store properties list         *
@@ -999,6 +1017,9 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_shared_free);
 		zbx_vector_vmware_datastore_destroy(&data->datastores);
 
+		zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_shared_free);
+		zbx_vector_vmware_datacenter_destroy(&data->datacenters);
+
 		if (NULL != data->error)
 			vmware_shared_strfree(data->error);
 
@@ -1164,6 +1185,28 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 		zbx_vector_str_append(&datastore->hv_uuids, vmware_shared_strdup(src->hv_uuids.values[i]));
 
 	return datastore;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_datacenter_shared_dup                                     *
+ *                                                                            *
+ * Purpose: copies vmware datacenter object into shared memory                *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware datacenter object                      *
+ *                                                                            *
+ * Return value: a duplicated vmware datacenter object                        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_datacenter_t *src)
+{
+	zbx_vmware_datacenter_t	*datacenter;
+
+	datacenter = (zbx_vmware_datacenter_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
+	datacenter->name = vmware_shared_strdup(src->name);
+	datacenter->id = vmware_shared_strdup(src->id);
+
+	return datacenter;
 }
 
 /******************************************************************************
@@ -1335,9 +1378,11 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
+	VMWARE_VECTOR_CREATE(&data->datacenters, vmware_datacenter);
 	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
 	zbx_vector_ptr_reserve(&data->events, src->events.values_num);
 	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
+	zbx_vector_vmware_datacenter_reserve(&data->datacenters, src->datacenters.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
 			__vm_mem_realloc_func, __vm_mem_free_func);
@@ -1352,6 +1397,12 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 
 	for (i = 0; i < src->datastores.values_num; i++)
 		zbx_vector_vmware_datastore_append(&data->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
+
+	for (i = 0; i < src->datacenters.values_num; i++)
+	{
+		zbx_vector_vmware_datacenter_append(&data->datacenters,
+				vmware_datacenter_shared_dup(src->datacenters.values[i]));
+	}
 
 	zbx_hashset_iter_reset(&src->hvs, &iter);
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
@@ -1397,6 +1448,22 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 	zbx_free(datastore->uuid);
 	zbx_free(datastore->id);
 	zbx_free(datastore);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_datacenter_free                                           *
+ *                                                                            *
+ * Purpose: frees resources allocated to store datacenter data                *
+ *                                                                            *
+ * Parameters: datacenter   - [IN] the datacenter                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
+{
+	zbx_free(datacenter->name);
+	zbx_free(datacenter->id);
+	zbx_free(datacenter);
 }
 
 /******************************************************************************
@@ -1562,6 +1629,9 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 	zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_free);
 	zbx_vector_vmware_datastore_destroy(&data->datastores);
+
+	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
+	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
 
 	zbx_free(data->error);
 	zbx_free(data);
@@ -2603,6 +2673,75 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_create_datacenter                                 *
+ *                                                                            *
+ * Purpose: create vmware datacenter object                                   *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             easyhandle   - [IN] the CURL handle                            *
+ *             id           - [IN] the datacenter id                          *
+ *                                                                            *
+ * Return value: The created datacenter object or NULL if an error was        *
+ *                detected                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_datacenter_t	*vmware_service_create_datacenter(const zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *id)
+{
+#	define ZBX_POST_DATACENTER_GET								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrievePropertiesEx>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>Datacenter</ns0:type>"			\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"Datacenter\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	char			tmp[MAX_STRING_LEN], *name = NULL, *id_esc, *error = NULL;
+	zbx_vmware_datacenter_t	*datacenter = NULL;
+	xmlDoc			*doc = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datacenter:'%s'", __func__, id);
+
+	id_esc = xml_escape_dyn(id);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATACENTER_GET,
+			vmware_service_objects[service->type].property_collector, id_esc);
+
+	zbx_free(id_esc);
+
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, &error))
+		goto out;
+
+	name = zbx_xml_read_doc_value(doc, ZBX_XPATH_NAME_BY_TYPE("Datacenter"));
+
+	datacenter = (zbx_vmware_datacenter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datacenter_t));
+	datacenter->name = (NULL != name) ? name : zbx_strdup(NULL, id);
+	datacenter->id = zbx_strdup(NULL, id);
+out:
+	zbx_xml_free_doc(doc);
+
+	if (NULL != error)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot get Datacenter info: %s.", error);
+		zbx_free(error);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return datacenter;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_get_hv_data                                       *
  *                                                                            *
  * Purpose: gets the vmware hypervisor data                                   *
@@ -2841,6 +2980,21 @@ static int	vmware_ds_id_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_dc_id_compare                                             *
+ *                                                                            *
+ * Purpose: sorting function to sort Datacenter vector by id                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_dc_id_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_datacenter_t	*dc1 = *(const zbx_vmware_datacenter_t **)d1;
+	const zbx_vmware_datacenter_t	*dc2 = *(const zbx_vmware_datacenter_t **)d2;
+
+	return strcmp(dc1->id, dc2->id);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_init_hv                                           *
  *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
@@ -2949,7 +3103,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_hv_ds_list                                    *
+ * Function: vmware_service_get_hv_ds_dc_list                                 *
  *                                                                            *
  * Purpose: retrieves a list of all vmware service hypervisor ids             *
  *                                                                            *
@@ -2957,14 +3111,15 @@ out:
  *             easyhandle   - [IN] the CURL handle                            *
  *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             dss          - [OUT] list of vmware datastore ids              *
+ *             dcs          - [OUT] list of vmware datacenter ids             *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_hv_ds_list(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_str_t *hvs, zbx_vector_str_t *dss, char **error)
+static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vector_str_t *hvs, zbx_vector_str_t *dss, zbx_vector_str_t *dcs, char **error)
 {
 #	define ZBX_POST_VCENTER_HV_DS_LIST							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -2976,6 +3131,9 @@ static int	vmware_service_get_hv_ds_list(const zbx_vmware_service_t *service, CU
 				"</ns0:propSet>"						\
 				"<ns0:propSet>"							\
 					"<ns0:type>Datastore</ns0:type>"			\
+				"</ns0:propSet>"						\
+				"<ns0:propSet>"							\
+					"<ns0:type>Datacenter</ns0:type>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Folder\">%s</ns0:obj>"			\
@@ -3110,6 +3268,7 @@ static int	vmware_service_get_hv_ds_list(const zbx_vmware_service_t *service, CU
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
 
 	zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+	zbx_xml_read_values(doc, "//*[@type='Datacenter']", dcs);
 
 	while (NULL != iter->token)
 	{
@@ -3123,14 +3282,15 @@ static int	vmware_service_get_hv_ds_list(const zbx_vmware_service_t *service, CU
 			zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
 
 		zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+		zbx_xml_read_values(doc, "//*[@type='Datacenter']", dcs);
 	}
 
 	ret = SUCCEED;
 out:
 	zbx_property_collection_free(iter);
 	zbx_xml_free_doc(doc);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found hv:%d ds:%d", __func__, zbx_result_string(ret),
-			hvs->values_num, dss->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found hv:%d ds:%d dc:%d", __func__, zbx_result_string(ret),
+			hvs->values_num, dss->values_num, dcs->values_num);
 
 	return ret;
 }
@@ -4252,7 +4412,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	CURLcode		err;
 	struct curl_slist	*headers = NULL;
 	zbx_vmware_data_t	*data;
-	zbx_vector_str_t	hvs, dss;
+	zbx_vector_str_t	hvs, dss, dcs;
 	zbx_vector_ptr_t	events;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
@@ -4268,9 +4428,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_ptr_create(&data->clusters);
 	zbx_vector_ptr_create(&data->events);
 	zbx_vector_vmware_datastore_create(&data->datastores);
+	zbx_vector_vmware_datacenter_create(&data->datacenters);
 
 	zbx_vector_str_create(&hvs);
 	zbx_vector_str_create(&dss);
+	zbx_vector_str_create(&dcs);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -4299,7 +4461,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_get_hv_ds_list(service, easyhandle, &hvs, &dss, &data->error))
+	if (SUCCEED != vmware_service_get_hv_ds_dc_list(service, easyhandle, &hvs, &dss, &dcs, &data->error))
 		goto clean;
 
 	zbx_vector_vmware_datastore_reserve(&data->datastores, dss.values_num + data->datastores.values_alloc);
@@ -4313,6 +4475,18 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	}
 
 	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_id_compare);
+
+	zbx_vector_vmware_datacenter_reserve(&data->datacenters, dcs.values_num + data->datacenters.values_alloc);
+
+	for (i = 0; i < dcs.values_num; i++)
+	{
+		zbx_vmware_datacenter_t	*datacenter;
+
+		if (NULL != (datacenter = vmware_service_create_datacenter(service, easyhandle, dcs.values[i])))
+			zbx_vector_vmware_datacenter_append(&data->datacenters, datacenter);
+	}
+
+	zbx_vector_vmware_datacenter_sort(&data->datacenters, vmware_dc_id_compare);
 
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
@@ -4386,6 +4560,8 @@ clean:
 	zbx_vector_str_destroy(&hvs);
 	zbx_vector_str_clear_ext(&dss, zbx_str_free);
 	zbx_vector_str_destroy(&dss);
+	zbx_vector_str_clear_ext(&dcs, zbx_str_free);
+	zbx_vector_str_destroy(&dcs);
 out:
 	zbx_vector_ptr_create(&events);
 	zbx_vmware_lock();
