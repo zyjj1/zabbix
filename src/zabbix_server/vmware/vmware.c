@@ -4319,6 +4319,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
 	unsigned char		skip_old = service->eventlog.skip_old;
 	zbx_uint64_t		events_sz = 0;
+	char			msg[MAX_STRING_LEN / 8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -4526,13 +4527,17 @@ out:
 
 	vmware_service_update_perf_entities(service);
 
+	zbx_snprintf(msg, sizeof(msg), "VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
+			ZBX_FS_UI64 " / " ZBX_FS_UI64, vmware_mem->free_size, vmware->strpool_sz,
+			vmware_mem->total_size);
+
 	zbx_vmware_unlock();
 
 	vmware_data_free(data);
 	zbx_vector_ptr_destroy(&events);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed:" ZBX_FS_SIZE_T " bytes of data", __func__,
-			zbx_result_string(ret), (zbx_fs_size_t)page.alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed:" ZBX_FS_SIZE_T " bytes of data. %s", __func__,
+			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, msg);
 }
 
 /******************************************************************************
