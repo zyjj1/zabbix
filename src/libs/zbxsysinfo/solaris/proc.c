@@ -203,44 +203,85 @@ static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 	return FAIL;
 }
 
-static int	check_proccomm(FILE *f_cmd, const char *proccomm)
+static char	*get_procname(FILE *f_cmd)
 {
-	char	*tmp = NULL;
-	size_t	i, l;
-	int	ret = SUCCEED;
-
-	if (NULL == proccomm || '\0' == *proccomm)
-		return SUCCEED;
+	char	*tmp = NULL, *p;
+	size_t	l;
 
 	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
-		for (i = 0, l -= 2; i < l; i++)
-			if ('\0' == tmp[i])
-				tmp[i] = ' ';
-
-		if (NULL != zbx_regexp_match(tmp, proccomm, NULL))
-			goto clean;
+		if (NULL == (p = strrchr(tmp, '/')))
+			p = tmp;
+		else
+			p++;
 	}
 
-	ret = FAIL;
-clean:
 	zbx_free(tmp);
 
-	return ret;
+	return p;
+}
+
+static zbx_sysinfo_proc_t	*get_proc_props(char *pid, int proc_props)
+{
+	char			tmp[MAX_STRING_LEN];
+	FILE			*fd = NULL;
+	zbx_sysinfo_proc_t	*proc = NULL;
+
+	if (0 == (proc_props & ZBX_SYSINFO_PROC_NAME) && 0 == (proc_props & ZBX_SYSINFO_PROC_CMDLINE))
+		return proc;
+
+	proc = (zbx_sysinfo_proc_t *)zbx_malloc(NULL, sizeof(zbx_sysinfo_proc_t));
+	memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
+
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", pid);
+
+	if (NULL != (fd = fopen(tmp, "r")))
+	{
+		if (0 != (proc_props & ZBX_SYSINFO_PROC_NAME))
+			proc->name = zbx_strdup(NULL, get_procname(fd));
+
+		if (0 != (proc_props & ZBX_SYSINFO_PROC_CMDLINE))
+		{
+			char	*line = NULL;
+			size_t	l;
+
+			if (SUCCEED == get_cmdline(fd, &line, &l))
+			{
+				int	i;
+
+				for (i = 0, l -= 2; i < l; i++)
+					if ('\0' == line[i])
+						line[i] = ' ';
+
+				proc->cmdline = zbx_strdup(NULL, line);
+
+				zbx_free(line);
+			}
+			else if (NULL != proc)
+			{
+				zbx_sysinfo_proc_free(proc);
+				proc = NULL;
+			}
+		}
+	}
+
+	zbx_fclose(fd);
+
+	return proc;
 }
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
-	DIR		*dir;
-	struct dirent	*entries;
-	struct passwd	*usrinfo;
-	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1, do_task, proccount = 0, invalid_user = 0;
-	zbx_uint64_t	mem_size = 0, byte_value = 0;
-	double		pct_size = 0.0, pct_value = 0.0;
-	size_t		*p_value;
-	FILE		*f_cmd = NULL;
+	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
+	DIR			*dir;
+	struct dirent		*entries;
+	struct passwd		*usrinfo;
+	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
+	int			fd = -1, do_task, proccount = 0, invalid_user = 0, proc_props = 0;
+	zbx_uint64_t		mem_size = 0, byte_value = 0;
+	double			pct_size = 0.0, pct_value = 0.0;
+	size_t			*p_value;
+	zbx_sysinfo_proc_t	*proc = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -248,7 +289,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	procname = get_rparam(request, 0);
+	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
+		proc_props |= ZBX_SYSINFO_PROC_NAME;
+
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
@@ -286,7 +329,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	proccomm = get_rparam(request, 3);
+	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
 	memtype = get_rparam(request, 4);
 
 	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vsize"))
@@ -338,19 +383,31 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
 			continue;
 
-		zbx_fclose(f_cmd);
-
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
-
-		if (NULL == (f_cmd = fopen(tmp, "r")))
+		if (NULL == (proc = get_proc_props(entries->d_name, proc_props)))
 		{
-			if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_NAME) && 0 != strcmp(procname, psinfo.pr_fname))
 				continue;
+
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_CMDLINE) &&
+					NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+			{
+				continue;
+			}
 		}
-		else if (FAIL == check_proccomm(f_cmd, proccomm))
+		else
 		{
-			continue;
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_NAME) && 0 == strcmp(proc->name, procname))
+				continue;
+
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_CMDLINE) &&
+					NULL == zbx_regexp_match(proc->cmdline, proccomm, NULL))
+			{
+				continue;
+			}
 		}
+
+		if (NULL != proc)
+			zbx_sysinfo_proc_free(proc);
 
 		if (NULL != p_value)
 		{
@@ -389,7 +446,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	zbx_fclose(f_cmd);
 	closedir(dir);
 	if (-1 != fd)
 		close(fd);
@@ -414,17 +470,17 @@ out:
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *zone_parameter;
-	DIR		*dir;
-	struct dirent	*entries;
-	zbx_stat_t	buf;
-	struct passwd	*usrinfo;
-	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1, proccount = 0, invalid_user = 0, zbx_proc_stat;
-	FILE		*f_cmd = NULL;
+	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *zone_parameter;
+	DIR			*dir;
+	struct dirent		*entries;
+	zbx_stat_t		buf;
+	struct passwd		*usrinfo;
+	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
+	int			fd = -1, proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
+	zbx_sysinfo_proc_t	*proc;
 #ifdef HAVE_ZONE_H
-	zoneid_t	zoneid;
-	int		zoneflag;
+	zoneid_t		zoneid;
+	int			zoneflag;
 #endif
 
 	if (5 < request->nparam)
@@ -433,7 +489,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	procname = get_rparam(request, 0);
+	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
+		proc_props |= ZBX_SYSINFO_PROC_NAME;
+
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
@@ -471,7 +529,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	proccomm = get_rparam(request, 3);
+	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
 
 	if (NULL == (zone_parameter = get_rparam(request, 4)) || '\0' == *zone_parameter
 			|| 0 == strcmp(zone_parameter, "current"))
@@ -536,28 +595,37 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
 			continue;
 
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
-			continue;
-
 		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
 			continue;
 
 		if (FAIL == check_procstate(&psinfo, zbx_proc_stat))
 			continue;
 
-		zbx_fclose(f_cmd);
-
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
-
-		if (NULL == (f_cmd = fopen(tmp, "r")))
+		if (NULL == (proc = get_proc_props(entries->d_name, proc_props)))
 		{
-			if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_NAME) && 0 != strcmp(procname, psinfo.pr_fname))
 				continue;
+
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_CMDLINE) &&
+					NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+			{
+				continue;
+			}
 		}
-		else if (FAIL == check_proccomm(f_cmd, proccomm))
+		else
 		{
-			continue;
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_NAME) && 0 == strcmp(proc->name, procname))
+				continue;
+
+			if (0 != (proc_props & ZBX_SYSINFO_PROC_CMDLINE) &&
+					NULL == zbx_regexp_match(proc->cmdline, proccomm, NULL))
+			{
+				continue;
+			}
 		}
+
+		if (NULL != proc)
+			zbx_sysinfo_proc_free(proc);
 
 #ifdef HAVE_ZONE_H
 		if (ZBX_PROCSTAT_FLAGS_ZONE_CURRENT == zoneflag && zoneid != psinfo.pr_zoneid)
@@ -566,7 +634,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		proccount++;
 	}
 
-	zbx_fclose(f_cmd);
 	closedir(dir);
 	if (-1 != fd)
 		close(fd);
@@ -790,27 +857,19 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 
 		proc->pid = pid;
 
-		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
-			proc->name = zbx_strdup(NULL, psinfo.pr_fname);
-
 		if (0 != (flags & ZBX_SYSINFO_PROC_USER))
 			proc->uid = psinfo.pr_uid;
 
-		if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
+		if (0 != (flags & ZBX_SYSINFO_PROC_NAME) || 0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
 		{
-			FILE	*f_cmd = NULL;
-			char	*line;
-			size_t	l;
+			if (NULL == (proc = get_proc_props(entries->d_name, flags)))
+			{
+				if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
+					proc->name = zbx_strdup(NULL, psinfo.pr_fname);
 
-			zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
-
-			if (NULL != (f_cmd = fopen(tmp, "r")) && SUCCEED == get_cmdline(f_cmd, &line, &l))
-				proc->cmdline = zbx_strdup(NULL, line);
-			else
-				proc->cmdline = zbx_strdup(NULL, psinfo.pr_psargs);
-
-			zbx_free(line);
-			zbx_fclose(f_cmd);
+				if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
+					proc->cmdline = zbx_strdup(NULL, psinfo.pr_psargs);
+			}
 		}
 
 #ifdef HAVE_ZONE_H
