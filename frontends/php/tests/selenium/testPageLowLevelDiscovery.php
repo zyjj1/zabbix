@@ -30,7 +30,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 	use TableTrait;
 
 	const HOST_ID = 90001;
-	private $discovery_rule_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -82,11 +81,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public function testPageLowLevelDiscovery_EnableDisableAll() {
 		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		$discovery_rule_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
 		// Press Enable or Disable buttons and check the result.
 		foreach (['Disable', 'Enable'] as $action) {
 			$this->massChangeStatus($action);
 			$expected_status = $action === 'Disable' ? 1 : 0;
-			foreach ($this->discovery_rule_names as $name) {
+			foreach ($discovery_rule_names as $name) {
 				$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name).
 					' and hostid='.self::HOST_ID);
 				$this->assertEquals($expected_status, $status);
