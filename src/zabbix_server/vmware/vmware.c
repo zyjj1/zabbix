@@ -362,9 +362,9 @@ static int	vmware_strpool_compare_func(const void *d1, const void *d2)
 	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
-static char	*vmware_shared_strsearch(const char *str)
+static int	vmware_shared_strsearch(const char *str)
 {
-	return zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE);
+	return NULL == zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE) ? FAIL : SUCCEED;
 }
 
 static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
@@ -4476,7 +4476,7 @@ out:
 			{
 				zbx_vmware_event_t	*event = data->events.values[i];
 
-				if (NULL != vmware_shared_strsearch(event->message))
+				if (SUCCEED == vmware_shared_strsearch(event->message))
 					events_sz -= strlen(event->message) + REFCOUNT_FIELD_SIZE + 1;
 			}
 
