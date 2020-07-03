@@ -269,22 +269,31 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 			if (SUCCEED == get_cmdline(fp, &line, &l))
 			{
-				int	i;
+				if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
+				{
+					if (NULL == (ptr = strrchr(line, '/')))
+						proc->name_arg0 = zbx_strdup(NULL, line);
+					else
+						proc->name_arg0 = zbx_strdup(NULL, ptr + 1);
+				}
 
-				if (NULL == (ptr = strrchr(line, '/')))
-					proc->name_arg0 = zbx_strdup(NULL, line);
-				else
-					proc->name_arg0 = zbx_strdup(NULL, ptr + 1);
+				if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
+				{
+					int	i;
 
-				for (i = 0, l -= 2; i < l; i++)
-					if ('\0' == line[i])
-						line[i] = ' ';
+					for (i = 0, l -= 2; i < l; i++)
+						if ('\0' == line[i])
+							line[i] = ' ';
 
-				proc->cmdline = zbx_strdup(NULL, line);
+					proc->cmdline = zbx_strdup(NULL, line);
+				}
 				zbx_free(line);
 			}
 			fclose(fp);
 		}
+
+		if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE) && NULL == proc->cmdline)
+			proc->cmdline = zbx_strdup(NULL, psinfo->pr_psargs);
 	}
 
 	return SUCCEED;
