@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 09:32+0300\n"
+"POT-Creation-Date: 2020-07-03 19:50+0300\n"
 "PO-Revision-Date: 2019-01-10 20:38+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
@@ -10032,7 +10032,7 @@ msgstr "No host group ID provided for screen element."
 msgid "No host groups with groupid \"%s\"."
 msgstr "No host groups with groupid \"%s\"."
 
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr "No host selected."
 
@@ -11506,8 +11506,7 @@ msgid "Properties"
 msgstr "Properties"
 
 #: include/classes/helpers/CMenuPopupHelper.php:425
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:290
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:290
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "Provided URL \"%1$s\" is invalid."

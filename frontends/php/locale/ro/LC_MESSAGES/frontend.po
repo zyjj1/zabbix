@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 09:32+0300\n"
+"POT-Creation-Date: 2020-07-03 19:50+0300\n"
 "PO-Revision-Date: 2017-03-23 13:49+0300\n"
 "Last-Translator: Silviu <silviubv@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10122,7 +10122,7 @@ msgstr "Niciun ID pentru grup de servere prevăzut pentru elementul ecran."
 msgid "No host groups with groupid \"%s\"."
 msgstr "Niciun grup de servere cu groupid \"%s\"."
 
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr ""
 
@@ -11597,8 +11597,7 @@ msgid "Properties"
 msgstr ""
 
 #: include/classes/helpers/CMenuPopupHelper.php:425
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:290
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:290
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr ""

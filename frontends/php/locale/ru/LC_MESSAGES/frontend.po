@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 09:32+0300\n"
-"PO-Revision-Date: 2019-12-10 01:49+0300\n"
-"Last-Translator: Alexey <dotneft@gmail.com>\n"
+"POT-Creation-Date: 2020-07-03 19:50+0300\n"
+"PO-Revision-Date: 2020-07-01 11:52+0300\n"
+"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1575935375.000000\n"
+"X-POOTLE-MTIME: 1593597148.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -3564,15 +3564,15 @@ msgstr "Темная"
 #: app/views/monitoring.dashboard.view.php:156 include/menu.inc.php:46
 #: include/views/monitoring.dashconf.php:22
 msgid "Dashboard"
-msgstr "ПАНЕЛЬ"
+msgstr "Панель"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
-msgstr "Настройка ПАНЕЛИ"
+msgstr "Настройка Панели"
 
 #: include/views/monitoring.dashconf.php:48
 msgid "Dashboard filter"
-msgstr "Фильтр ПАНЕЛИ"
+msgstr "Фильтр Панели"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:347
 #: include/views/js/monitoring.sysmaps.js.php:427
@@ -5713,7 +5713,7 @@ msgstr "Перейти к"
 
 #: app/views/system.warning.php:26 include/func.inc.php:1707
 msgid "Go to dashboard"
-msgstr "Перейти на ПАНЕЛЬ"
+msgstr "Перейти на Панель"
 
 #: include/httptest.inc.php:288
 msgid "Google Chrome"
@@ -10107,7 +10107,7 @@ msgstr "Не указан ID группы узлов сети для элеме�
 msgid "No host groups with groupid \"%s\"."
 msgstr "Нет групп узлов сети с groupid \"%s\"."
 
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr "Узел сети не выбран."
 
@@ -11582,8 +11582,7 @@ msgid "Properties"
 msgstr "Свойства"
 
 #: include/classes/helpers/CMenuPopupHelper.php:425
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:290
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:290
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "Указанный URL \"%1$s\" ошибочен."

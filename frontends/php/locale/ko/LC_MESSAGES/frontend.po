@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 09:32+0300\n"
+"POT-Creation-Date: 2020-07-03 19:50+0300\n"
 "PO-Revision-Date: 2018-12-04 06:21+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9960,7 +9960,7 @@ msgstr "스크린 요소에 호스트 그룹ID가 설정되어 있지 않습니�
 msgid "No host groups with groupid \"%s\"."
 msgstr "그룹ID\"%s\"를 지닌 호스트 그룹이 설정되어 있지 않습니다"
 
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr "호스트가 선택되어 있지 않습니다."
 
@@ -11433,8 +11433,7 @@ msgid "Properties"
 msgstr "속성"
 
 #: include/classes/helpers/CMenuPopupHelper.php:425
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:290
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:290
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "설정된URL \"%1$s\"는 올바르지 않습니다."
