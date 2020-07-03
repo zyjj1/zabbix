@@ -160,11 +160,8 @@ class CControllerPopupMedia extends CController {
 			CArrayHelper::sort($db_mediatypes, ['description']);
 
 			$mediatypes = [];
-			$mediatypes_status = [];
 			foreach ($db_mediatypes as $mediatypeid => &$db_mediatype) {
 				$mediatypes[$mediatypeid] = $db_mediatype['type'];
-				$mediatypes_status[$mediatypeid] = $db_mediatype['status'];
-				$db_mediatype = $db_mediatype['description'];
 			}
 			unset($db_mediatype);
 
@@ -173,7 +170,6 @@ class CControllerPopupMedia extends CController {
 				'options' => $page_options,
 				'db_mediatypes' => $db_mediatypes,
 				'mediatypes' => $mediatypes,
-				'mediatypes_status' => $mediatypes_status,
 				'severities' => $this->severities,
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
