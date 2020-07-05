@@ -139,6 +139,13 @@ static int	zbx_detect_zone_support(void)
 }
 #endif
 
+static void	zbx_sysinfo_proc_clear(zbx_sysinfo_proc_t *proc)
+{
+	zbx_free(proc->name);
+	zbx_free(proc->cmdline);
+	zbx_free(proc->name_arg0);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sysinfo_proc_free                                            *
@@ -148,10 +155,7 @@ static int	zbx_detect_zone_support(void)
  ******************************************************************************/
 static void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 {
-	zbx_free(proc->name);
-	zbx_free(proc->cmdline);
-	zbx_free(proc->name_arg0);
-
+	zbx_sysinfo_proc_clear(proc);
 	zbx_free(proc);
 }
 
@@ -501,44 +505,46 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED != proc_match_props(&proc, usrinfo, procname, proccomm))
-			continue;
-
-		if (NULL != p_value)
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
 		{
-			/* pr_size or pr_rssize in Kbytes */
-			byte_value = *p_value << 10;	/* kB to Byte */
-
-			if (0 != proccount++)
+			if (NULL != p_value)
 			{
-				if (ZBX_DO_MAX == do_task)
-					mem_size = MAX(mem_size, byte_value);
-				else if (ZBX_DO_MIN == do_task)
-					mem_size = MIN(mem_size, byte_value);
+				/* pr_size or pr_rssize in Kbytes */
+				byte_value = *p_value << 10;	/* kB to Byte */
+
+				if (0 != proccount++)
+				{
+					if (ZBX_DO_MAX == do_task)
+						mem_size = MAX(mem_size, byte_value);
+					else if (ZBX_DO_MIN == do_task)
+						mem_size = MIN(mem_size, byte_value);
+					else
+						mem_size += byte_value;
+				}
 				else
-					mem_size += byte_value;
+					mem_size = byte_value;
 			}
 			else
-				mem_size = byte_value;
-		}
-		else
-		{
-			/* % of system memory used by process, measured in 16-bit binary fractions in the range */
-			/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
-			pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
-
-			if (0 != proccount++)
 			{
-				if (ZBX_DO_MAX == do_task)
-					pct_size = MAX(pct_size, pct_value);
-				else if (ZBX_DO_MIN == do_task)
-					pct_size = MIN(pct_size, pct_value);
+				/* % of system memory used by process, measured in 16-bit binary fractions in the range */
+				/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
+				pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
+
+				if (0 != proccount++)
+				{
+					if (ZBX_DO_MAX == do_task)
+						pct_size = MAX(pct_size, pct_value);
+					else if (ZBX_DO_MIN == do_task)
+						pct_size = MIN(pct_size, pct_value);
+					else
+						pct_size += pct_value;
+				}
 				else
-					pct_size += pct_value;
+					pct_size = pct_value;
 			}
-			else
-				pct_size = pct_value;
 		}
+
+		zbx_sysinfo_proc_clear(&proc);
 	}
 
 	closedir(dir);
@@ -681,15 +687,19 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED != proc_match_props(&proc, usrinfo, procname, proccomm))
-			continue;
-
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		{
 #ifdef HAVE_ZONE_H
-		if (SUCCEED != proc_match_zone(&proc, zoneflag, zoneid))
-			continue;
-#endif
+			if (SUCCEED != proc_match_zone(&proc, zoneflag, zoneid))
+			{
+				zbx_sysinfo_proc_clear(&proc);
+				continue;
+			}
 
-		proccount++;
+#endif
+			proccount++;
+		}
+		zbx_sysinfo_proc_clear(&proc);
 	}
 
 	closedir(dir);
