@@ -898,22 +898,14 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
-		if (isset($data['status'])) {
-			$updateStatus = $data['status'];
-		}
-
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
-			$data['macros'], $data['inventory'], $data['inventory_mode'], $data['status']);
+			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
 		if (!zbx_empty($data)) {
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
 			]);
-		}
-
-		if (isset($updateStatus)) {
-			updateHostStatus($hostids, $updateStatus);
 		}
 
 		/*
@@ -1107,13 +1099,14 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if (isset($updateStatus)) {
-			$data['status'] = $updateStatus;
-		}
-
 		$new_hosts = [];
 		foreach ($db_hosts as $hostid => $db_host) {
-			$new_hosts[] = $data + $db_host;
+			$new_host = $data + $db_host;
+			if ($new_host['status'] != $db_host['status']) {
+				info(_s('Updated status of host "%1$s".', $new_host['host']));
+			}
+
+			$new_hosts[] = $new_host;
 		}
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $new_hosts, $db_hosts);
