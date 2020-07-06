@@ -43,7 +43,7 @@
 
 		<!-- drawtype -->
 		<td>
-			<select id="items_#{number}_drawtype" name="drawtype">
+			<select name="drawtype">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
 				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
 			<?php endforeach ?>
@@ -52,7 +52,7 @@
 
 		<!-- yaxisside -->
 		<td>
-			<select id="items_#{number}_yaxisside" name="yaxisside">
+			<select name="yaxisside">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
@@ -114,7 +114,7 @@
 
 		<!-- yaxisside -->
 		<td>
-			<select id="items_#{number}_yaxisside" name="yaxisside">
+			<select name="yaxisside">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
@@ -167,7 +167,7 @@
 
 		<!-- type -->
 		<td>
-			<select id="items_#{number}_type" name="type">
+			<select name="type">
 				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
 				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
@@ -230,7 +230,7 @@
 
 		<!-- type -->
 		<td>
-			<select id="items_#{number}_type" name="type">
+			<select name="type">
 				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
 				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
