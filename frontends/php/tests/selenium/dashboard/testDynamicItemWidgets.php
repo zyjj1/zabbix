@@ -607,4 +607,4 @@ class testDynamicItemWidgets extends CWebTest {
 			}
 		}
 	}
-		}
+}
