@@ -259,9 +259,12 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
+
+#define ZBX_XPATH_PROP_NAME_NODE(property)								\
+	"*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]/*[local-name()='val']"
+
 #define ZBX_XPATH_PROP_NAME(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
-		"/*[local-name()='val']"
+	"/*/*/*/*/*/" ZBX_XPATH_PROP_NAME_NODE(property)
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
@@ -392,9 +395,12 @@ static void	vmware_shared_strfree(char *str)
 	}
 }
 
+#define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
+	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"
+
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
-	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"			\
-	"/*[local-name()='propSet'][*[local-name()='name']]/*[local-name()='val']"
+	ZBX_XPATH_OBJECTS_BY_TYPE(type) "/*[local-name()='propSet'][*[local-name()='name']]"		\
+		"/*[local-name()='val']"
 
 #define ZBX_XPATH_HV_PARENTFOLDERNAME(parent_id)							\
 	"/*/*/*/*/*[local-name()='objects']["								\
@@ -2673,75 +2679,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_create_datacenter                                 *
- *                                                                            *
- * Purpose: create vmware datacenter object                                   *
- *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             id           - [IN] the datacenter id                          *
- *                                                                            *
- * Return value: The created datacenter object or NULL if an error was        *
- *                detected                                                    *
- *                                                                            *
- ******************************************************************************/
-static zbx_vmware_datacenter_t	*vmware_service_create_datacenter(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *id)
-{
-#	define ZBX_POST_DATACENTER_GET								\
-		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrievePropertiesEx>"							\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
-			"<ns0:specSet>"								\
-				"<ns0:propSet>"							\
-					"<ns0:type>Datacenter</ns0:type>"			\
-					"<ns0:pathSet>name</ns0:pathSet>"			\
-				"</ns0:propSet>"						\
-				"<ns0:objectSet>"						\
-					"<ns0:obj type=\"Datacenter\">%s</ns0:obj>"		\
-				"</ns0:objectSet>"						\
-			"</ns0:specSet>"							\
-			"<ns0:options/>"							\
-		"</ns0:RetrievePropertiesEx>"							\
-		ZBX_POST_VSPHERE_FOOTER
-
-	char			tmp[MAX_STRING_LEN], *name = NULL, *id_esc, *error = NULL;
-	zbx_vmware_datacenter_t	*datacenter = NULL;
-	xmlDoc			*doc = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datacenter:'%s'", __func__, id);
-
-	id_esc = xml_escape_dyn(id);
-
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATACENTER_GET,
-			vmware_service_objects[service->type].property_collector, id_esc);
-
-	zbx_free(id_esc);
-
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, &error))
-		goto out;
-
-	name = zbx_xml_read_doc_value(doc, ZBX_XPATH_NAME_BY_TYPE("Datacenter"));
-
-	datacenter = (zbx_vmware_datacenter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datacenter_t));
-	datacenter->name = (NULL != name) ? name : zbx_strdup(NULL, id);
-	datacenter->id = zbx_strdup(NULL, id);
-out:
-	zbx_xml_free_doc(doc);
-
-	if (NULL != error)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot get Datacenter info: %s.", error);
-		zbx_free(error);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return datacenter;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_service_get_hv_data                                       *
  *                                                                            *
  * Purpose: gets the vmware hypervisor data                                   *
@@ -3103,6 +3040,71 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_get_datacenters_list                              *
+ *                                                                            *
+ * Purpose: retrieves a list of vmware service datacenters                    *
+ *                                                                            *
+ * Parameters: doc          - [IN] XML document                               *
+ *             datacenters  - [OUT] list of vmware datacenters                *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_get_datacenters_list(xmlDoc *doc, zbx_vector_vmware_datacenter_t *datacenters)
+{
+	xmlXPathContext		*xpathCtx;
+	xmlXPathObject		*xpathObj;
+	xmlNodeSetPtr		nodeset;
+	char			*val;
+	zbx_vmware_datacenter_t	*datacenter;
+	int			i, ret = FAIL;
+
+	if (NULL == doc)
+		return ret;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *) ZBX_XPATH_OBJECTS_BY_TYPE("Datacenter"), xpathCtx)))
+		goto out;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		xmlXPathFreeObject(xpathObj);
+		goto out;
+	}
+
+	nodeset = xpathObj->nodesetval;
+	zbx_vector_vmware_datacenter_reserve(datacenters, nodeset->nodeNr);
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		if (NULL == (val = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
+			continue;
+
+		datacenter = (zbx_vmware_datacenter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datacenter_t));
+		datacenter->id = val;
+
+		if (NULL != (val = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("name"))))
+			datacenter->name = val;
+		else
+			datacenter->name = zbx_strdup(NULL, datacenter->id);
+
+		zbx_vector_vmware_datacenter_append(datacenters, datacenter);
+	}
+
+	zbx_vector_vmware_datacenter_sort(datacenters, vmware_dc_id_compare);
+
+	ret = SUCCEED;
+	xmlXPathFreeObject(xpathObj);
+out:
+	xmlXPathFreeContext(xpathCtx);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_get_hv_ds_dc_list                                 *
  *                                                                            *
  * Purpose: retrieves a list of all vmware service hypervisor ids             *
@@ -3111,7 +3113,7 @@ out:
  *             easyhandle   - [IN] the CURL handle                            *
  *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             dss          - [OUT] list of vmware datastore ids              *
- *             dcs          - [OUT] list of vmware datacenter ids             *
+ *             datacenters  - [OUT] list of vmware datacenters                *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -3119,7 +3121,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_str_t *hvs, zbx_vector_str_t *dss, zbx_vector_str_t *dcs, char **error)
+		zbx_vector_str_t *hvs, zbx_vector_str_t *dss, zbx_vector_vmware_datacenter_t *datacenters, char **error)
 {
 #	define ZBX_POST_VCENTER_HV_DS_LIST							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -3134,6 +3136,7 @@ static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service,
 				"</ns0:propSet>"						\
 				"<ns0:propSet>"							\
 					"<ns0:type>Datacenter</ns0:type>"			\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Folder\">%s</ns0:obj>"			\
@@ -3268,7 +3271,7 @@ static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service,
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
 
 	zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
-	zbx_xml_read_values(doc, "//*[@type='Datacenter']", dcs);
+	vmware_service_get_datacenters_list(doc, datacenters);
 
 	while (NULL != iter->token)
 	{
@@ -3282,7 +3285,7 @@ static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service,
 			zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
 
 		zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
-		zbx_xml_read_values(doc, "//*[@type='Datacenter']", dcs);
+		vmware_service_get_datacenters_list(doc, datacenters);
 	}
 
 	ret = SUCCEED;
@@ -3290,7 +3293,7 @@ out:
 	zbx_property_collection_free(iter);
 	zbx_xml_free_doc(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found hv:%d ds:%d dc:%d", __func__, zbx_result_string(ret),
-			hvs->values_num, dss->values_num, dcs->values_num);
+			hvs->values_num, dss->values_num, datacenters->values_num);
 
 	return ret;
 }
@@ -4412,7 +4415,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	CURLcode		err;
 	struct curl_slist	*headers = NULL;
 	zbx_vmware_data_t	*data;
-	zbx_vector_str_t	hvs, dss, dcs;
+	zbx_vector_str_t	hvs, dss;
 	zbx_vector_ptr_t	events;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
@@ -4432,7 +4435,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	zbx_vector_str_create(&hvs);
 	zbx_vector_str_create(&dss);
-	zbx_vector_str_create(&dcs);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -4461,8 +4463,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_get_hv_ds_dc_list(service, easyhandle, &hvs, &dss, &dcs, &data->error))
+	if (SUCCEED != vmware_service_get_hv_ds_dc_list(service, easyhandle, &hvs, &dss, &data->datacenters,
+			&data->error))
+	{
 		goto clean;
+	}
 
 	zbx_vector_vmware_datastore_reserve(&data->datastores, dss.values_num + data->datastores.values_alloc);
 
@@ -4475,18 +4480,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	}
 
 	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_id_compare);
-
-	zbx_vector_vmware_datacenter_reserve(&data->datacenters, dcs.values_num + data->datacenters.values_alloc);
-
-	for (i = 0; i < dcs.values_num; i++)
-	{
-		zbx_vmware_datacenter_t	*datacenter;
-
-		if (NULL != (datacenter = vmware_service_create_datacenter(service, easyhandle, dcs.values[i])))
-			zbx_vector_vmware_datacenter_append(&data->datacenters, datacenter);
-	}
-
-	zbx_vector_vmware_datacenter_sort(&data->datacenters, vmware_dc_id_compare);
 
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
@@ -4560,8 +4553,6 @@ clean:
 	zbx_vector_str_destroy(&hvs);
 	zbx_vector_str_clear_ext(&dss, zbx_str_free);
 	zbx_vector_str_destroy(&dss);
-	zbx_vector_str_clear_ext(&dcs, zbx_str_free);
-	zbx_vector_str_destroy(&dcs);
 out:
 	zbx_vector_ptr_create(&events);
 	zbx_vmware_lock();
