@@ -264,6 +264,12 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
+#define ZBX_XPATH_EVT_INFO(param)									\
+	"*[local-name()='" param "']/*[local-name()='name']"
+
+#define ZBX_XPATH_EVT_ARGUMENT(key)									\
+	"*[local-name()='arguments'][*[local-name()='key'][text()='" key "']]/*[local-name()='value']"
+
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
@@ -3365,9 +3371,11 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	unsigned int			i;
 	static event_hostinfo_node_t	host_nodes[] =
 	{
-		{ "*[local-name()='datacenter']/*[local-name()='name']",	ZBX_HOSTINFO_NODES_DATACENTER,	NULL },
-		{ "*[local-name()='computeResource']/*[local-name()='name']",	ZBX_HOSTINFO_NODES_COMPRES,	NULL },
-		{ "*[local-name()='host']/*[local-name()='name']",		ZBX_HOSTINFO_NODES_HOST,	NULL }
+		{ ZBX_XPATH_EVT_INFO("datacenter"),		ZBX_HOSTINFO_NODES_DATACENTER,	NULL },
+		{ ZBX_XPATH_EVT_INFO("computeResource"),	ZBX_HOSTINFO_NODES_COMPRES,	NULL },
+		{ ZBX_XPATH_EVT_INFO("host"),			ZBX_HOSTINFO_NODES_HOST,	NULL },
+		{ ZBX_XPATH_EVT_ARGUMENT("_sourcehost_"),	ZBX_HOSTINFO_NODES_HOST,	NULL },
+		{ ZBX_XPATH_EVT_ARGUMENT("entityName"),		ZBX_HOSTINFO_NODES_HOST,	NULL }
 	};
 
 	if (NULL == (message = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("fullFormattedMessage"))))
@@ -3391,7 +3399,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 
 	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_HOST))
 	{
-		message = zbx_strdcat(message, "\n\n");
+		message = zbx_strdcat(message, "\n\nsource: ");
 
 		for (i = 0; i < ARRSIZE(host_nodes); i++)
 		{
@@ -3413,7 +3421,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 
 		if (NULL != (ip = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("ipAddress"))))
 		{
-			message = zbx_dsprintf(message, "%s\n\n%s", message, ip);
+			message = zbx_dsprintf(message, "%s\n\nsource: %s", message, ip);
 			zbx_free(ip);
 		}
 	}
