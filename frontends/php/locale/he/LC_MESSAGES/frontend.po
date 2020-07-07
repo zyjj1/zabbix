@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-07 11:12+0300\n"
+"POT-Creation-Date: 2020-07-03 19:51+0300\n"
 "PO-Revision-Date: 2018-11-30 14:01+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -11235,7 +11235,7 @@ msgid "No host groups with groupid \"%s\"."
 msgstr "אין קבוצת מארחים עם groupid (מזהה קבוצה) „%s”."
 
 #: app/controllers/CControllerWidgetUrlView.php:41
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr "לא נבחר מארח."
 
@@ -12970,8 +12970,7 @@ msgstr "תכונות"
 
 #: app/controllers/CControllerMenuPopup.php:562
 #: app/controllers/CControllerWidgetUrlView.php:56
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:431
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:431
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "הכתובת שסופקה „%1$s” שגויה."
