@@ -3198,7 +3198,7 @@ static int	vmware_service_get_datacenters_list(xmlDoc *doc, zbx_vector_vmware_da
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
-	char			*val;
+	char			*id, *name;
 	zbx_vmware_datacenter_t	*datacenter;
 	int			i, ret = FAIL;
 
@@ -3221,17 +3221,22 @@ static int	vmware_service_get_datacenters_list(xmlDoc *doc, zbx_vector_vmware_da
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		if (NULL == (val = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
+		if (NULL == (id = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter id.", __func__);
 			continue;
+		}
+
+		if (NULL == (name = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("name"))))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter name for id: %s.", __func__, id);
+			zbx_free(id);
+			continue;
+		}
 
 		datacenter = (zbx_vmware_datacenter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datacenter_t));
-		datacenter->id = val;
-
-		if (NULL != (val = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("name"))))
-			datacenter->name = val;
-		else
-			datacenter->name = zbx_strdup(NULL, datacenter->id);
-
+		datacenter->id = id;
+		datacenter->name = name;
 		zbx_vector_vmware_datacenter_append(datacenters, datacenter);
 	}
 
