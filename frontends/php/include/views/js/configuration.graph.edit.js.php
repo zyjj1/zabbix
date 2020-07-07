@@ -264,7 +264,6 @@
 		'graphtype' =>  $data['graphtype'],
 		'readonly' => $readonly,
 		'hostid' => $data['hostid'],
-		'graphid' => $data['graphid'],
 		'groupid' => $data['groupid'],
 		'is_template' => $data['is_template'],
 		'normal_only' => $data['normal_only'],
