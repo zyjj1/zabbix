@@ -3322,7 +3322,7 @@ out:
 	return ret;
 }
 
-int	check_vcenter_datacenter_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	char			*url;

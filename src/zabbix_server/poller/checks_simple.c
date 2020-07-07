@@ -112,7 +112,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.vfs.fs.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_discovery)},
 	{"vm.vfs.fs.size", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_size)},
 
-	{"datacenter.discovery", VMCHECK_FUNC(check_vcenter_datacenter_discovery)},
+	{"dc.discovery", VMCHECK_FUNC(check_vcenter_dc_discovery)},
 
 	{NULL, NULL}
 };
