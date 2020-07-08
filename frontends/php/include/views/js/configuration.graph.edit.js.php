@@ -13,8 +13,8 @@
 			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
 			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
 			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="">
-			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -85,8 +85,8 @@
 			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
 			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
 			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="">
-			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -147,8 +147,8 @@
 			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
 			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
 			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="">
-			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -210,8 +210,8 @@
 			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
 			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
 			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="">
-			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
 
 		<!-- row number -->
@@ -326,6 +326,8 @@
 					gitemid: null,
 					itemid: list.values[i].itemid,
 					calc_fnc: null,
+					drawtype: 0,
+					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
 					color: colorPalette.getNextColor(),
