@@ -181,8 +181,8 @@ event_hostinfo_node_t;
 #define ZBX_HOSTINFO_NODES_DATACENTER		0x01
 #define ZBX_HOSTINFO_NODES_COMPRES		0x02
 #define ZBX_HOSTINFO_NODES_HOST			0x04
-
-#define ZBX_HOSTINFO_NODES_MASK_ALL		0x07
+#define ZBX_HOSTINFO_NODES_MASK_ALL		\
+		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST)
 
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
@@ -3403,12 +3403,12 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 
 		for (i = 0; i < ARRSIZE(host_nodes); i++)
 		{
-			if (NULL != host_nodes[i].name)
-			{
-				message = zbx_dsprintf(message, "%s%s%s", message, host_nodes[i].name,
-						0 != (host_nodes[i].flag & ZBX_HOSTINFO_NODES_HOST) ? "" : "/");
-				zbx_free(host_nodes[i].name);
-			}
+			if (NULL == host_nodes[i].name)
+				continue;
+
+			message = zbx_dsprintf(message, "%s%s%s", message, host_nodes[i].name,
+					0 != (host_nodes[i].flag & ZBX_HOSTINFO_NODES_HOST) ? "" : "/");
+			zbx_free(host_nodes[i].name);
 		}
 	}
 	else
