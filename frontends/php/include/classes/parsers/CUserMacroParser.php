@@ -30,34 +30,6 @@ class CUserMacroParser extends CParser {
 	private $macro = '';
 	private $context = null;
 	private $context_quoted = false;
-	private $error = '';
-
-	/**
-	 * Returns an error message depending on input parameters.
-	 *
-	 * @param string $source
-	 * @param int $pos
-	 *
-	 * @return string
-	 */
-	private function errorMessage($source, $pos) {
-		if (!isset($source[$pos])) {
-			return ($pos == 0) ? _('macro is empty') : _('unexpected end of macro');
-		}
-
-		for ($p = $pos, $chunk = '', $maxChunkSize = 50; isset($source[$p]); $p++) {
-			if (0x80 != (0xc0 & ord($source[$p])) && $maxChunkSize-- == 0) {
-				break;
-			}
-			$chunk .= $source[$p];
-		}
-
-		if (isset($source[$p])) {
-			$chunk .= ' ...';
-		}
-
-		return _s('incorrect syntax near "%1$s"', $chunk);
-	}
 
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
@@ -65,19 +37,19 @@ class CUserMacroParser extends CParser {
 		$this->macro = '';
 		$this->context = null;
 		$this->context_quoted = false;
-		$this->error = '';
+		$this->errorMessage('');
 
 		$p = $pos;
 
 		if (!isset($source[$p]) || $source[$p] != '{') {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		if (!isset($source[$p]) || $source[$p] != '$') {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
@@ -87,7 +59,7 @@ class CUserMacroParser extends CParser {
 			;
 
 		if ($p == $pos + 2 || !isset($source[$p])) {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
@@ -100,7 +72,7 @@ class CUserMacroParser extends CParser {
 			$this->match = substr($source, $pos, $this->length);
 
 			if (isset($source[$p])) {
-				$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+				$this->errorPos(substr($source, $pos), $p - $pos);
 
 				return self::PARSE_SUCCESS_CONT;
 			}
@@ -110,7 +82,7 @@ class CUserMacroParser extends CParser {
 
 		if ($source[$p] != ':') {
 			$this->macro = '';
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
@@ -187,7 +159,7 @@ class CUserMacroParser extends CParser {
 			$this->macro = '';
 			$this->context = null;
 			$this->context_quoted = false;
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
@@ -196,7 +168,7 @@ class CUserMacroParser extends CParser {
 		$this->match = substr($source, $pos, $this->length);
 
 		if (isset($source[$p])) {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_SUCCESS_CONT;
 		}
@@ -260,6 +232,19 @@ class CUserMacroParser extends CParser {
 	 * @return string
 	 */
 	public function getError() {
-		return $this->error;
+		if ($this->error !== '') {
+			return $this->error;
+		}
+		else if ($this->error_source !== false) {
+			if (!isset($this->error_source[$this->error_pos])) {
+				return ($this->error_pos == 0) ? _('macro is empty') : _('unexpected end of macro');
+			}
+			else {
+				return $this->errorPosMessage($this->error_source, $this->error_pos);
+			}
+		}
+		else {
+			return '';
+		}
 	}
 }

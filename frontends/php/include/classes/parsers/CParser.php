@@ -26,6 +26,9 @@ abstract class CParser {
 
 	protected $length = 0;
 	protected $match = '';
+	protected $error = '';
+	protected $error_source = false;
+	protected $error_pos = 0;
 
 	/**
 	 * Try to parse the string starting from the given position.
@@ -53,5 +56,64 @@ abstract class CParser {
 	 */
 	public function getMatch() {
 		return $this->match;
+	}
+
+	/**
+	 * Returns the error message if string is invalid.
+	 *
+	 * @return string
+	 */
+	public function getError() {
+		if ($this->error !== '') {
+			return $this->error;
+		}
+		else if ($this->error_source !== false) {
+			// The error message is prepared here to avoid extra calculations, if error message is not used.
+			return $this->errorPosMessage($this->error_source, $this->error_pos);
+		}
+		else {
+			return '';
+		}
+	}
+
+	/**
+	 * Save error source string and position for later use, when error will be retrieved.
+	 *
+	 * @param string $error
+	 */
+	protected function errorMessage($error) {
+		$this->error = $error;
+		$this->error_source = false;
+		$this->error_pos = 0;
+	}
+
+	/**
+	 * Save error source string and position for later use, when error will be retrieved.
+	 *
+	 * @param string $source
+	 * @param int $pos
+	 */
+	protected function errorPos($source, $pos) {
+		$this->error = '';
+		$this->error_source = $source;
+		$this->error_pos = $pos;
+	}
+
+	/**
+	 * Prepares error message for incorrect syntax at position.
+	 *
+	 * @param string $source
+	 * @param int $pos
+	 *
+	 * @return string
+	 */
+	protected function errorPosMessage($source, $pos) {
+		$maxChunkSize = 50;
+		$chunk = mb_substr($source, $pos, $maxChunkSize);
+		if (mb_strlen($source) > $maxChunkSize + $pos) {
+			$chunk .= ' ...';
+		}
+
+		return _s('incorrect syntax near "%1$s"', $chunk);
 	}
 }
