@@ -174,6 +174,8 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 
 static zbx_hashset_t	evt_msg_strpool;
 
+static zbx_uint64_t	evt_req_chunk_size;
+
 /*
  * SOAP support
  */
@@ -3443,7 +3445,8 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	event->message = evt_msg_strpool_strdup(message, &sz);
 	zbx_vector_ptr_append(events, event);
 
-	*alloc_sz += sizeof(zbx_vmware_event_t) + sz;
+	if (0 < sz)
+		*alloc_sz += zbx_mem_required_chunk_size(sz);
 
 	return SUCCEED;
 }
@@ -4469,7 +4472,8 @@ out:
 		if (0 != service->eventlog.oom)
 			service->eventlog.oom = 0;
 
-		events_sz += data->events.values_alloc * sizeof(zbx_vmware_event_t*);
+		events_sz += evt_req_chunk_size * data->events.values_alloc +
+				zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t*) * data->events.values_alloc);
 
 		if (vmware_mem->free_size < events_sz || SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		{
@@ -4478,7 +4482,10 @@ out:
 				zbx_vmware_event_t	*event = data->events.values[i];
 
 				if (SUCCEED == vmware_shared_strsearch(event->message))
-					events_sz -= strlen(event->message) + REFCOUNT_FIELD_SIZE + 1;
+				{
+					events_sz -= zbx_mem_required_chunk_size(strlen(event->message) +
+							REFCOUNT_FIELD_SIZE + 1);
+				}
 			}
 
 			if (vmware_mem->free_size < events_sz)
@@ -5322,6 +5329,8 @@ int	zbx_vmware_init(char **error)
 
 	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
 		goto out;
+
+	evt_req_chunk_size = zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t));
 
 	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
 

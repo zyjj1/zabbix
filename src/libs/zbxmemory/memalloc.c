@@ -820,3 +820,11 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 
 	return size;
 }
+
+size_t	zbx_mem_required_chunk_size(size_t size)
+{
+	if (0 == size)
+		return 0;
+
+	return (MEM_MIN_ALLOC < size ? size : MEM_MIN_ALLOC) + MEM_SIZE_FIELD * 2;
+}
