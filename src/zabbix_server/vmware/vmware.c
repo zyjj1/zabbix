@@ -3612,8 +3612,8 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 					eventlog_last_key - 1;
 		}
 
-		if (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle, event_session,
-				soap_count, &doc, error))
+		if (!ZBX_IS_RUNNING() || (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle,
+				event_session, soap_count, &doc, error)))
 		{
 			goto end_session;
 		}
