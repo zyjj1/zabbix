@@ -109,8 +109,8 @@ abstract class CParser {
 	 */
 	protected function errorPosMessage($source, $pos) {
 		$maxChunkSize = 50;
-		$chunk = mb_substr($source, $pos, $maxChunkSize);
-		if (mb_strlen($source) > $maxChunkSize + $pos) {
+		$chunk = substr($source, $pos, $maxChunkSize);
+		if (strlen($source) > $maxChunkSize + $pos) {
 			$chunk .= ' ...';
 		}
 
