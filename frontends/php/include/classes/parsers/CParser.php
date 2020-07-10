@@ -109,9 +109,10 @@ abstract class CParser {
 	 */
 	protected function errorPosMessage($source, $pos) {
 		$maxChunkSize = 50;
-		$chunk = substr($source, $pos, $maxChunkSize);
-		if (strlen($source) > $maxChunkSize + $pos) {
-			$chunk .= ' ...';
+		$chunk = substr($source, $pos);
+
+		if (mb_strlen($chunk) > $maxChunkSize) {
+			$chunk = mb_substr($chunk, 0, $maxChunkSize) . ' ...';
 		}
 
 		return _s('incorrect syntax near "%1$s"', $chunk);
