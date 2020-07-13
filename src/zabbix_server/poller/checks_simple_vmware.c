@@ -3345,7 +3345,8 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < service->data->datacenters.values_num; i++)
 	{
