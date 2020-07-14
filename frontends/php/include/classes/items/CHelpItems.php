@@ -715,7 +715,7 @@ class CHelpItems {
 					'description' => _('VMware service full name, <url> - VMware service URL')
 				],
 				[
-					'key' => 'vmware.dc.discovery[url]',
+					'key' => 'vmware.dc.discovery[<url>]',
 					'description' => _('VMware datacenters and their IDs. Returns JSON')
 				],
 				[
