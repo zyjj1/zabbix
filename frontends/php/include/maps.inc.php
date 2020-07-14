@@ -795,7 +795,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 	$allHosts = zbx_toHash($allHosts, 'hostid');
 
-	//Get triggers data, triggers from current map and from submaps, select all.
+	// Get triggers data, triggers from current map and from submaps, select all.
 	if ($triggerIdToSelementIds || $subSysmapTriggerIdToSelementIds) {
 		$all_triggerid_to_selementids = [];
 
