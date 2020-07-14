@@ -31,13 +31,18 @@ class CUserMacroParser extends CParser {
 	private $context = null;
 	private $context_quoted = false;
 
+	public function __construct() {
+		$this->error_msgs['empty'] = _('macro is empty');
+		$this->error_msgs['unexpected_end'] = _('unexpected end of macro');
+	}
+
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
 		$this->macro = '';
 		$this->context = null;
 		$this->context_quoted = false;
-		$this->errorMessage('');
+		$this->errorClear();
 
 		$p = $pos;
 
@@ -224,27 +229,5 @@ class CUserMacroParser extends CParser {
 	 */
 	public function getContext() {
 		return $this->context_quoted ? $this->unquoteContext($this->context) : $this->context;
-	}
-
-	/**
-	 * Returns the error message if macro is invalid.
-	 *
-	 * @return string
-	 */
-	public function getError() {
-		if ($this->error !== '') {
-			return $this->error;
-		}
-		else if ($this->error_source !== false) {
-			if (!isset($this->error_source[$this->error_pos])) {
-				return ($this->error_pos == 0) ? _('macro is empty') : _('unexpected end of macro');
-			}
-			else {
-				return $this->errorPosMessage($this->error_source, $this->error_pos);
-			}
-		}
-		else {
-			return '';
-		}
 	}
 }

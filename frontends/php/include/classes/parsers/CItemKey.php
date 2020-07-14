@@ -51,6 +51,9 @@ class CItemKey extends CParser {
 	 * @param array $options
 	 */
 	public function __construct($options = []) {
+		$this->error_msgs['empty'] = _('key is empty');
+		$this->error_msgs['unexpected_end'] = _('unexpected end of key');
+
 		if (array_key_exists('18_simple_checks', $options)) {
 			$this->options['18_simple_checks'] = $options['18_simple_checks'];
 		}
@@ -84,7 +87,7 @@ class CItemKey extends CParser {
 		$this->match = '';
 		$this->key = '';
 		$this->parameters = [];
-		$this->errorMessage('');
+		$this->errorClear();
 
 		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
 			// Code is not missing here.
@@ -92,12 +95,7 @@ class CItemKey extends CParser {
 
 		// is key empty?
 		if ($p == $offset) {
-			if (isset($data[$p])) {
-				$this->errorPos(substr($data, $offset), 0);
-			}
-			else {
-				$this->errorMessage(_('key is empty'));
-			}
+			$this->errorPos(substr($data, $offset), 0);
 
 			return self::PARSE_FAIL;
 		}
@@ -147,12 +145,7 @@ class CItemKey extends CParser {
 			return self::PARSE_SUCCESS;
 		}
 
-		if (isset($data[$p2])) {
-			$this->errorPos(substr($data, $offset), $p2 - $offset);
-		}
-		else {
-			$this->errorMessage(_('unexpected end of key'));
-		}
+		$this->errorPos(substr($data, $offset), $p2 - $offset);
 
 		return self::PARSE_SUCCESS_CONT;
 	}
