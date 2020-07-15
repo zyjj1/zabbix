@@ -391,7 +391,7 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 		*(zbx_uint32_t *)ptr = 0;
 
 		if (NULL != len)
-			*len = sz;
+			*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
 	}
 
 	(*(zbx_uint32_t *)ptr)++;
@@ -407,7 +407,7 @@ static char	*vmware_shared_strdup(const char *str)
 	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len);
 
 	if (0 < len)
-		vmware->strpool_sz += len;
+		vmware->strpool_sz += zbx_mem_required_chunk_size(len);
 
 	return strdup;
 }
@@ -424,7 +424,7 @@ static void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64
 		if (0 == --(*(zbx_uint32_t *)ptr))
 		{
 			if (NULL != len)
-				*len = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+				*len = REFCOUNT_FIELD_SIZE + strlen(str) + 1 + ZBX_HASHSET_ENTRY_OFFSET;
 
 			zbx_hashset_remove_direct(strpool, ptr);
 		}
@@ -438,7 +438,7 @@ static void	vmware_shared_strfree(char *str)
 	vmware_strpool_strfree(str, &vmware->strpool, &len);
 
 	if (0 < len)
-		vmware->strpool_sz -= len;
+		vmware->strpool_sz -= zbx_mem_required_chunk_size(len);
 }
 
 static void	evt_msg_strpool_strfree(char *str)
@@ -4484,7 +4484,7 @@ out:
 				if (SUCCEED == vmware_shared_strsearch(event->message))
 				{
 					events_sz -= zbx_mem_required_chunk_size(strlen(event->message) +
-							REFCOUNT_FIELD_SIZE + 1);
+							REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
 				}
 			}
 
