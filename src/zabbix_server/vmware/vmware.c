@@ -4473,7 +4473,7 @@ out:
 			service->eventlog.oom = 0;
 
 		events_sz += evt_req_chunk_size * data->events.values_alloc +
-				zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t*) * data->events.values_alloc);
+				zbx_mem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
 
 		if (vmware_mem->free_size < events_sz || SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		{
