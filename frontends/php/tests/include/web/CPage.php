@@ -203,7 +203,7 @@ class CPage {
 			self::$cookie = null;
 		}
 		catch (\Exception $e) {
-			// Code is not missing here.
+			throw new \Exception('Cannot logout user: '.$e->getTraceAsString());
 		}
 	}
 

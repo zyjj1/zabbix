@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-07 11:12+0300\n"
+"POT-Creation-Date: 2020-07-03 19:51+0300\n"
 "PO-Revision-Date: 2019-01-29 07:38+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -11160,7 +11160,7 @@ msgid "No host groups with groupid \"%s\"."
 msgstr "没有含群组ID\"%s\"的主机群组."
 
 #: app/controllers/CControllerWidgetUrlView.php:41
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr "未选定主机."
 
@@ -12895,8 +12895,7 @@ msgstr "属性"
 
 #: app/controllers/CControllerMenuPopup.php:562
 #: app/controllers/CControllerWidgetUrlView.php:56
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:431
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:431
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "提供的 URL \"%1$s\" 无效。"
