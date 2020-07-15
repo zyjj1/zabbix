@@ -638,6 +638,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->query('id:overlay_bg')->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$dashboard->getWidget($header);
+		sleep(1);
 		$dashboard->save();
 	}
 
