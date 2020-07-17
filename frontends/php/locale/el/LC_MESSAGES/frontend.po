@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-03 19:51+0300\n"
+"POT-Creation-Date: 2020-07-17 19:52+0300\n"
 "PO-Revision-Date: 2020-02-08 23:44+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -274,7 +274,7 @@ msgstr ""
 msgid "30 seconds"
 msgstr "30 δευτερόλεπτα"
 
-#: include/views/configuration.graph.edit.php:319
+#: include/views/configuration.graph.edit.php:321
 msgid "3D view"
 msgstr "3D προβολή"
 
@@ -399,7 +399,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:2129
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.correlation.edit.php:218
-#: include/views/configuration.graph.edit.php:348
+#: include/views/configuration.graph.edit.php:350
 #: include/views/configuration.host.discovery.edit.php:516
 #: include/views/configuration.host.discovery.edit.php:615
 #: include/views/configuration.host.edit.php:546
@@ -579,8 +579,8 @@ msgstr "Ενεργό έως"
 #: include/views/configuration.correlation.edit.php:255
 #: include/views/configuration.correlation.edit.php:288
 #: include/views/configuration.discovery.edit.php:118
-#: include/views/configuration.graph.edit.php:392
-#: include/views/configuration.graph.edit.php:475
+#: include/views/configuration.graph.edit.php:394
+#: include/views/configuration.graph.edit.php:481
 #: include/views/configuration.host.discovery.edit.php:114
 #: include/views/configuration.host.discovery.edit.php:209
 #: include/views/configuration.host.discovery.edit.php:552
@@ -709,7 +709,7 @@ msgstr "Προσθήκη νέων ή υφιστάμενων ομάδων ξεν�
 msgid "Add new override"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:398
+#: include/views/configuration.graph.edit.php:400
 #: include/views/configuration.trigger.prototype.edit.php:606
 #: include/views/configuration.trigger.prototype.massupdate.php:109
 msgid "Add prototype"
@@ -1489,8 +1489,8 @@ msgstr ""
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "Υπολογισμός SLA, αποδεκτό SLA (in %)"
 
-#: include/items.inc.php:102 include/views/configuration.graph.edit.php:155
-#: include/views/configuration.graph.edit.php:237
+#: include/items.inc.php:102 include/views/configuration.graph.edit.php:157
+#: include/views/configuration.graph.edit.php:239
 msgid "Calculated"
 msgstr "Υπολογισμένο"
 
@@ -1593,11 +1593,11 @@ msgstr "Αδύνατη η προσθήκη εξάρτησης από έναυσ�
 msgid "Cannot add discovery rule"
 msgstr "Αδύνατη η προσθήκη κανόνα εντοπισμού"
 
-#: graphs.php:243
+#: graphs.php:246
 msgid "Cannot add graph"
 msgstr "Αδύνατη η προσθήκη γραφήματος"
 
-#: graphs.php:225
+#: graphs.php:228
 msgid "Cannot add graph prototype"
 msgstr "Αδύνατη η προσθήκη πρωτότυπου γραφήματος"
 
@@ -1750,9 +1750,13 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr ""
 
-#: httpconf.php:196 httpconf.php:512 items.php:924 items.php:1310
+#: httpconf.php:196 httpconf.php:512 items.php:924
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
+
+#: items.php:1317
+msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1535
 msgid "Cannot clone graph prototypes."
@@ -1789,7 +1793,7 @@ msgstr ""
 msgid "Cannot convert POST data:"
 msgstr ""
 
-#: graphs.php:387
+#: graphs.php:390
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] ""
@@ -1902,19 +1906,19 @@ msgstr "Αδύνατη η διαγραφή κανόνα εντοπισμού"
 msgid "Cannot delete discovery rules"
 msgstr "Αδύνατη η διαγραφή κανόνων εντοπισμού"
 
-#: graphs.php:286
+#: graphs.php:289
 msgid "Cannot delete graph"
 msgstr "Αδύνατη η διαγραφή γραφήματος"
 
-#: graphs.php:278
+#: graphs.php:281
 msgid "Cannot delete graph prototype"
 msgstr "Αδύνατη η διαγραφή πρωτότυπου γραφήματος"
 
-#: graphs.php:311
+#: graphs.php:314
 msgid "Cannot delete graph prototypes"
 msgstr "Αδύνατη η διαγραφή πρωτότυπων γραφημάτων"
 
-#: graphs.php:328
+#: graphs.php:331
 msgid "Cannot delete graphs"
 msgstr "Αδύνατη η διαγραφή γραφημάτων"
 
@@ -1974,7 +1978,7 @@ msgstr "Αδύνατη η διαγραφή πρωτότυπου συλλέκτη
 msgid "Cannot delete item prototypes"
 msgstr "Αδύνατη η διαγραφή πρωτότυπων συλλεκτών"
 
-#: items.php:1320
+#: items.php:1327
 msgid "Cannot delete items"
 msgstr "Αδύνατη η διαγραφή συλλεκτών"
 
@@ -2175,7 +2179,7 @@ msgstr[1] "Αδύνατη η απενεργοποίηση σενάριων ισ�
 msgid "Cannot display item queue."
 msgstr "Αδύνατη η εμφάνιση ουράς συλλέκτη."
 
-#: chart7.php:88
+#: chart7.php:91
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Αδύνατη η εμφάνιση πλέον του ενός συλλέκτη τύπου \"Graph sum\"."
 
@@ -2494,7 +2498,7 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Αδύνατη η αποστολή εντολής, ελέγξτε σύνδεση με Zabbix εξυπηρετητή \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1332
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1339
 msgid "Cannot send request"
 msgstr ""
 
@@ -2738,11 +2742,11 @@ msgstr[1] ""
 msgid "Cannot update frontend access"
 msgstr "Αδύνατη η ενημέρωση πρόσβασης frontend"
 
-#: graphs.php:237
+#: graphs.php:240
 msgid "Cannot update graph"
 msgstr "Αδύνατη η ενημέρωση γραφήματος"
 
-#: graphs.php:219
+#: graphs.php:222
 msgid "Cannot update graph prototype"
 msgstr "Αδύνατη η ενημέρωση πρωτότυπου γραφήματος"
 
@@ -2932,11 +2936,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:937
+#: include/classes/items/CHelpItems.php:941
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:933
+#: include/classes/items/CHelpItems.php:937
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
@@ -3020,7 +3024,7 @@ msgstr "Ελέγξτε το τμήμα έκφρασης που ξεκινά απ
 #: include/views/configuration.host.discovery.edit.php:696
 #: include/views/configuration.host.discovery.list.php:155
 #: include/views/configuration.item.edit.php:1079
-#: include/views/configuration.item.list.php:246
+#: include/views/configuration.item.list.php:252
 msgid "Check now"
 msgstr ""
 
@@ -3129,7 +3133,7 @@ msgid "Clear"
 msgstr "Εκκαθάριση"
 
 #: include/views/configuration.httpconf.list.php:167
-#: include/views/configuration.item.list.php:247
+#: include/views/configuration.item.list.php:239
 msgid "Clear history"
 msgstr ""
 
@@ -3160,7 +3164,7 @@ msgstr "Ρολόι"
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:110
-#: include/views/configuration.graph.edit.php:467
+#: include/views/configuration.graph.edit.php:473
 #: include/views/configuration.host.discovery.edit.php:693
 #: include/views/configuration.host.edit.php:812
 #: include/views/configuration.hostgroups.edit.php:58
@@ -3212,7 +3216,7 @@ msgstr ""
 msgid "Collapse"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:347
+#: include/views/configuration.graph.edit.php:349
 #: include/views/js/monitoring.sysmaps.js.php:321
 #: include/views/js/monitoring.sysmaps.js.php:342
 #: include/views/js/monitoring.sysmaps.js.php:361
@@ -3339,7 +3343,7 @@ msgstr ""
 msgid "Configuration"
 msgstr "Διαμόρφωση"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1023
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Διαμόρφωση στατιστικών cache. Cache - buffer (λειτουργίες: pfree, συνολική, χρήση, ελεύθερη)"
 
@@ -3711,7 +3715,7 @@ msgstr "Συντεταγμένες"
 
 #: include/views/configuration.copy.elements.php:73
 #: include/views/configuration.graph.list.php:150
-#: include/views/configuration.item.list.php:250
+#: include/views/configuration.item.list.php:254
 #: include/views/configuration.triggers.list.php:301 jsLoader.php:195
 msgid "Copy"
 msgstr "Αντιγραφή"
@@ -4155,7 +4159,7 @@ msgstr "Διακεκομμένη γραμμή"
 msgid "Data"
 msgstr "Δεδομένα"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1067
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Στατιστικά δεδομένων cache. Cache - μία από τιμές (λειτουργίες: all, float, uint, str, log, text), ιστορικό (λειτουργίες: pfree, total, used, free), τάση (λειτουργίες: pfree, total, used, free), κείμενο (λειτουργίες: pfree, total, used, free)."
 
@@ -4390,7 +4394,7 @@ msgstr "Καθυστερημένο από"
 #: include/views/configuration.host.list.php:382
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.httpconf.list.php:170
-#: include/views/configuration.item.list.php:252
+#: include/views/configuration.item.list.php:256
 #: include/views/configuration.item.prototype.list.php:172
 #: include/views/configuration.maintenance.list.php:109
 #: include/views/configuration.template.list.php:230
@@ -4448,15 +4452,15 @@ msgstr "Διαγραφή κανόνα εντοπισμού;"
 msgid "Delete expression?"
 msgstr "Διαγραφή έκφρασης;"
 
-#: include/views/configuration.graph.edit.php:453
+#: include/views/configuration.graph.edit.php:459
 msgid "Delete graph prototype?"
 msgstr "Διαγραφή πρωτότυπου γραφήματος;"
 
-#: include/views/configuration.graph.edit.php:453
+#: include/views/configuration.graph.edit.php:459
 msgid "Delete graph?"
 msgstr "Διαγραφή γραφήματος;"
 
-#: include/views/configuration.item.list.php:248
+#: include/views/configuration.item.list.php:240
 msgid "Delete history of selected items?"
 msgstr "Διαγραφή ιστορικού επιλεγμένων συλλεκτών;"
 
@@ -4578,7 +4582,7 @@ msgstr "Διαγραφή επιλεγμένης εικόνας;"
 msgid "Delete selected item prototypes?"
 msgstr "Διαγραφή επιλεγμένων πρωτότυπων συλλεκτών;"
 
-#: include/views/configuration.item.list.php:252
+#: include/views/configuration.item.list.php:256
 msgid "Delete selected items?"
 msgstr "Διαγραφή επιλεγμένων συλλεκτών;"
 
@@ -4816,7 +4820,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:152
 #: include/views/configuration.host.list.php:371
 #: include/views/configuration.httpconf.list.php:166
-#: include/views/configuration.item.list.php:245
+#: include/views/configuration.item.list.php:251
 #: include/views/configuration.triggers.list.php:300
 msgid "Disable"
 msgstr "Απενεργοποίηση"
@@ -4875,7 +4879,7 @@ msgstr "Απενεργοποίηση επιλεγμένων ομάδων;"
 msgid "Disable selected hosts?"
 msgstr "Απενεργοποίηση επιλεγμένων ξενιστών;"
 
-#: include/views/configuration.item.list.php:245
+#: include/views/configuration.item.list.php:251
 msgid "Disable selected items?"
 msgstr "Απενεργοποίηση επιλεγμένων συλλεκτών;"
 
@@ -5160,7 +5164,7 @@ msgstr "Χρόνος μη διαθεσιμότητας"
 msgid "Draw"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:338
+#: include/views/configuration.graph.edit.php:340
 msgid "Draw style"
 msgstr "Τρόπος σχεδίασης"
 
@@ -5522,7 +5526,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:149
 #: include/views/configuration.host.list.php:370
 #: include/views/configuration.httpconf.list.php:165
-#: include/views/configuration.item.list.php:244
+#: include/views/configuration.item.list.php:250
 #: include/views/configuration.triggers.list.php:299
 msgid "Enable"
 msgstr "Ενεργοποίηση"
@@ -5601,7 +5605,7 @@ msgstr "Ενεργοποίηση επιλεγμένων ομάδων;"
 msgid "Enable selected hosts?"
 msgstr "Ενεργοποίηση επιλεγμένων ξενιστών;"
 
-#: include/views/configuration.item.list.php:244
+#: include/views/configuration.item.list.php:250
 msgid "Enable selected items?"
 msgstr "Ενεργοποίηση επιλεγμένων συλλεκτών;"
 
@@ -6201,8 +6205,8 @@ msgstr ""
 msgid "Fit to map"
 msgstr "Προσαρμογή στο χάρτη"
 
-#: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.graph.edit.php:238
+#: include/views/configuration.graph.edit.php:158
+#: include/views/configuration.graph.edit.php:240
 msgid "Fixed"
 msgstr "Σταθερό"
 
@@ -6304,7 +6308,7 @@ msgid "Fullscreen"
 msgstr "Πλήρης οθόνη"
 
 #: app/views/popup.triggerexpr.php:97
-#: include/views/configuration.graph.edit.php:336
+#: include/views/configuration.graph.edit.php:338
 msgid "Function"
 msgstr "Συνάρτηση"
 
@@ -6403,7 +6407,7 @@ msgstr "Χρωμοβαθμισμένη γραμμή"
 #: include/classes/widgets/CWidgetConfig.php:46
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
-#: include/screens.inc.php:30 include/views/configuration.graph.edit.php:435
+#: include/screens.inc.php:30 include/views/configuration.graph.edit.php:441
 #: include/views/monitoring.charts.php:38
 #: include/views/monitoring.history.php:71
 #: include/views/monitoring.screen.constructor.edit.php:156 latest.php:539
@@ -6464,17 +6468,17 @@ msgstr "Γράφημα \"%1$s\" με σχεδιότυπους συλλέκτες
 msgid "Graph (classic)"
 msgstr ""
 
-#: graphs.php:242
+#: graphs.php:245
 msgid "Graph added"
 msgstr "Γράφημα προστέθηκε"
 
-#: graphs.php:386
+#: graphs.php:389
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] ""
 msgstr[1] ""
 
-#: graphs.php:286
+#: graphs.php:289
 msgid "Graph deleted"
 msgstr "Γράφημα διεγράφη"
 
@@ -6483,7 +6487,7 @@ msgid "Graph element"
 msgstr "Στοιχείο γραφήματος"
 
 #: include/audit.inc.php:31 include/screens.inc.php:45
-#: include/views/configuration.graph.edit.php:435
+#: include/views/configuration.graph.edit.php:441
 #: include/views/monitoring.screen.constructor.edit.php:221
 msgid "Graph prototype"
 msgstr "Πρωτότυπο γράφημα"
@@ -6503,11 +6507,11 @@ msgstr "Πρωτότυπο γράφημα \"%1$s\" νά έχει τουλάχι�
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Πρωτότυπο γράφημα \"%1$s\" με σχεδιότυπους συλλέκτες δεν μπορεί να περιέχει συλλέκτες από άλλους ξενιστές."
 
-#: graphs.php:224
+#: graphs.php:227
 msgid "Graph prototype added"
 msgstr "Πρωτότυπο γράφημα προστέθηκε"
 
-#: graphs.php:278
+#: graphs.php:281
 msgid "Graph prototype deleted"
 msgstr "Πρωτότυπο γράφημα διεγράφη"
 
@@ -6515,7 +6519,7 @@ msgstr "Πρωτότυπο γράφημα διεγράφη"
 msgid "Graph prototype not found."
 msgstr "Πρωτότυπο γράφημα δεν βρέθηκε."
 
-#: graphs.php:218
+#: graphs.php:221
 msgid "Graph prototype updated"
 msgstr "Πρωτότυπο γράφημα ενημερώθηκε"
 
@@ -6533,11 +6537,12 @@ msgstr ""
 msgid "Graph prototypes"
 msgstr "Πρωτότυπα γραφήματα"
 
-#: graphs.php:311
+#: graphs.php:314
 msgid "Graph prototypes deleted"
 msgstr "Πρωτότυπα γραφήματα διεγράφησαν"
 
-#: include/views/js/configuration.graph.edit.js.php:40
+#: include/views/js/configuration.graph.edit.js.php:172
+#: include/views/js/configuration.graph.edit.js.php:235
 msgid "Graph sum"
 msgstr "Άθροισμα γραφήματος"
 
@@ -6549,7 +6554,7 @@ msgstr "Άθροισμα γραφήματος"
 msgid "Graph type"
 msgstr "Τύπος γραφήματος"
 
-#: graphs.php:236
+#: graphs.php:239
 msgid "Graph updated"
 msgstr "Γράφημα ενημερώθηκε"
 
@@ -6570,7 +6575,7 @@ msgstr "Γράφημα με όνομα \"%1$s\" υπάρχει ήδη σε γρ�
 msgid "Graph with same name but other type exist."
 msgstr "Υπάρχει γράφημα με ίδιο όνομα αλλά άλλο τύπο."
 
-#: app/controllers/CControllerPopupGeneric.php:226 graphs.php:418
+#: app/controllers/CControllerPopupGeneric.php:226 graphs.php:421
 #: include/html.inc.php:398 include/menu.inc.php:73
 #: include/views/configuration.graph.edit.php:26
 #: include/views/configuration.graph.list.php:39
@@ -6590,7 +6595,7 @@ msgstr "Υπάρχει γράφημα με ίδιο όνομα αλλά άλλο
 msgid "Graphs"
 msgstr "Γραφήματα"
 
-#: graphs.php:328
+#: graphs.php:331
 msgid "Graphs deleted"
 msgstr "Γραφήματα διεγράφησαν"
 
@@ -6858,7 +6863,7 @@ msgid "History"
 msgstr "Ιστορικό"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1298 items.php:1310
+#: items.php:917 items.php:924 items.php:1304 items.php:1317
 msgid "History cleared"
 msgstr "Ιστορικό καθαρίστηκε"
 
@@ -6943,7 +6948,7 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1297
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1303
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -9209,12 +9214,12 @@ msgstr "Ιταλικά (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
-#: include/forms.inc.php:1113 include/views/configuration.graph.edit.php:157
-#: include/views/configuration.graph.edit.php:239
+#: include/forms.inc.php:1113 include/views/configuration.graph.edit.php:159
+#: include/views/configuration.graph.edit.php:241
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1297
+#: items.php:1303
 msgid "Item"
 msgstr "Συλλέκτης"
 
@@ -9428,7 +9433,7 @@ msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη �
 #: include/html.inc.php:378 include/items.inc.php:1165
 #: include/views/configuration.application.list.php:64
 #: include/views/configuration.application.list.php:108
-#: include/views/configuration.graph.edit.php:428
+#: include/views/configuration.graph.edit.php:434
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:327
 #: include/views/configuration.host.list.php:130
@@ -9440,13 +9445,13 @@ msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη �
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1666 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1673 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Συλλέκτες"
 
-#: items.php:1320
+#: items.php:1327
 msgid "Items deleted"
 msgstr "Συλλέκτες διεγράφησαν"
 
@@ -9781,7 +9786,8 @@ msgstr "Λετονικά (lv_LV)"
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
-#: include/views/js/configuration.graph.edit.js.php:81
+#: include/views/js/configuration.graph.edit.js.php:56
+#: include/views/js/configuration.graph.edit.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:10
 #: include/views/js/monitoring.sysmaps.js.php:120
 #: include/views/js/monitoring.sysmaps.js.php:595
@@ -10328,7 +10334,7 @@ msgstr "Μάσκα"
 
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/views/configuration.host.list.php:381
-#: include/views/configuration.item.list.php:251
+#: include/views/configuration.item.list.php:255
 #: include/views/configuration.item.massupdate.php:739
 #: include/views/configuration.trigger.prototype.list.php:162
 #: include/views/configuration.trigger.prototype.massupdate.php:184
@@ -10804,7 +10810,7 @@ msgstr "NTLM"
 #: include/views/configuration.discovery.list.php:36
 #: include/views/configuration.discovery.list.php:60
 #: include/views/configuration.graph.edit.php:78
-#: include/views/configuration.graph.edit.php:332
+#: include/views/configuration.graph.edit.php:334
 #: include/views/configuration.graph.list.php:87
 #: include/views/configuration.host.discovery.edit.php:46
 #: include/views/configuration.host.discovery.edit.php:110
@@ -11309,7 +11315,7 @@ msgstr "Δεν παρέχεται ID πρωτότυπου συλλέκτη στ�
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Όχι συλλέκτης με itemid=\"%1$s\"."
 
-#: chart3.php:137 chart7.php:53
+#: chart3.php:145 chart7.php:56
 msgid "No items defined."
 msgstr "Δεν ορίσθηκαν συλλέκτες."
 
@@ -11490,7 +11496,7 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1420 items.php:1621 services.php:84
+#: include/func.inc.php:1803 items.php:1427 items.php:1628 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Χωρίς δικαιώματα σε αντικείμενο που αναφέρεται ή δεν υπάρχει!"
 
@@ -11540,7 +11546,7 @@ msgstr "Δεν καθορίσθηκε δέσμη ενεργειών για εν�
 msgid "No target selected"
 msgstr "Δεν επιλέχθηκε στόχος"
 
-#: graphs.php:391 items.php:1270
+#: graphs.php:394 items.php:1270
 msgid "No target selected."
 msgstr "Δεν επιλέχθηκε στόχος."
 
@@ -11689,7 +11695,7 @@ msgstr "Νοέμβριος"
 msgid "Number of CPUs. Returns integer"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:971
 msgid "Number of enabled items on the host."
 msgstr ""
 
@@ -11701,25 +11707,25 @@ msgstr "Αριθμός ξενιστών (ενεργοί/ανενεργοί/σχ�
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Αριθμός συλλεκτών (ενεργοί/ανενεργοί/ανυποστήρικτοι)"
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:995
 msgid "Number of items in Zabbix database."
 msgstr "Αριθμός συλλεκτών βάσεως δεδομένων Zabbix."
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1015
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Αριθμός συλλεκτών στο ιστορικό διαμεσολαβητή οι οποίοι ακόμη δεν απεστάλησαν στον εξυπηρετητή"
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1019
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Αριθμός συλλεκτών στην ουρά οι οποίοι καθυστερούν από έως σε δευτερόλεπτα, χωρίς αποκλεισμούς."
 
 #: include/classes/items/CHelpItems.php:353
 #: include/classes/items/CHelpItems.php:667
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1035
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:991
 msgid "Number of monitored hosts"
 msgstr "Αριθμός εποπτευόμενων συλλεκτών"
 
@@ -11736,15 +11742,15 @@ msgstr ""
 msgid "Number of problems and expand most critical one"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:775
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός πυρήνων επεξεργαστή σε VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:779
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός νημάτων επεξεργαστή σε VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:843
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Αριθμός επεξεργαστών σε VMware εικονική μηχανή, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -11769,15 +11775,15 @@ msgstr "Αριθμός βημάτων"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Αριθμός εναυσμάτων (ενεργά/ανενεργά) [προβληματικά/ok]"
 
-#: include/classes/items/CHelpItems.php:1043
+#: include/classes/items/CHelpItems.php:1047
 msgid "Number of triggers in Zabbix database."
 msgstr "Αριθμός εναυσμάτων βάσεως δεδομένων Zabbix."
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:999
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Αριθμός ανυποστήρικτων συλλεκτών βάσεως δεδομένων Zabbix."
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:975
 msgid "Number of unsupported items on the host."
 msgstr ""
 
@@ -11790,35 +11796,35 @@ msgstr "Αριθμός χρηστών (σε σύνδεση)"
 msgid "Number of users logged in. Returns integer"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:951
 msgid "Number of values stored in table HISTORY."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY."
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:959
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:963
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:967
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1039
 msgid "Number of values stored in table TRENDS."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα TRENDS."
 
-#: include/classes/items/CHelpItems.php:1039
+#: include/classes/items/CHelpItems.php:1043
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός εικονικών μηχανών VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -12608,11 +12614,11 @@ msgstr ""
 msgid "Percentage"
 msgstr ""
 
-#: graphs.php:56 include/views/configuration.graph.edit.php:133
+#: graphs.php:56 include/views/configuration.graph.edit.php:135
 msgid "Percentile line (left)"
 msgstr "Εκατοστιαία γραμμή (αριστερά)"
 
-#: graphs.php:57 include/views/configuration.graph.edit.php:151
+#: graphs.php:57 include/views/configuration.graph.edit.php:153
 msgid "Percentile line (right)"
 msgstr "Εκατοστιαία γραμμή (δεξιά)"
 
@@ -12798,7 +12804,7 @@ msgstr ""
 
 #: include/views/administration.general.iconmap.edit.php:77
 #: include/views/administration.general.iconmap.edit.php:110
-#: include/views/configuration.graph.edit.php:447
+#: include/views/configuration.graph.edit.php:453
 #: include/views/js/administration.general.iconmap.js.php:21
 msgid "Preview"
 msgstr "Προεπισκόπηση"
@@ -13388,7 +13394,10 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/js/configuration.action.edit.js.php:35
 #: include/views/js/configuration.action.edit.js.php:49
 #: include/views/js/configuration.discovery.edit.js.php:10
-#: include/views/js/configuration.graph.edit.js.php:93
+#: include/views/js/configuration.graph.edit.js.php:67
+#: include/views/js/configuration.graph.edit.js.php:129
+#: include/views/js/configuration.graph.edit.js.php:192
+#: include/views/js/configuration.graph.edit.js.php:255
 #: include/views/js/configuration.host.discovery.edit.js.php:31
 #: include/views/js/configuration.host.edit.js.php:47
 #: include/views/js/configuration.host.prototype.edit.js.php:7
@@ -13510,7 +13519,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1332
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1339
 msgid "Request sent successfully"
 msgstr ""
 
@@ -13533,7 +13542,7 @@ msgstr "Απαιτούμενα δικαιώματα ξενιστή"
 msgid "Required performance (vps)"
 msgstr "Απαιτούμενη απόδοση (vps)"
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1027
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Απαιτούμενη απόδοση εξυπηρετητή Zabbix, αναμένεται σε νέες τιμές ανά δευτερόλεπτο."
 
@@ -13666,15 +13675,15 @@ msgstr ""
 msgid "Retry"
 msgstr "Επανάληψη"
 
-#: include/classes/items/CHelpItems.php:1083
+#: include/classes/items/CHelpItems.php:1087
 msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1069
+#: include/classes/items/CHelpItems.php:1073
 msgid "Return first column of the first row of the SQL query result."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1079
+#: include/classes/items/CHelpItems.php:1083
 msgid "Return value of an attribute of MBean object."
 msgstr ""
 
@@ -13684,23 +13693,23 @@ msgstr "Επιστροφή χρόνου απόκρισης ICMP ping σε δευ
 
 #: include/classes/items/CHelpItems.php:349
 #: include/classes/items/CHelpItems.php:663
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1031
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:983
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:987
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Επιστροφή διαθεσιμότητας συγκεκριμένου τύπου ελέγχου ξενιστή. Τιμή συλλέκτη αντιστοιχεί σε διαθέσιμα εικονίδια στον κατάλογο ξενιστή. Έγκυροι τύποι είναι: αντιπρόσωπος, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:979
 msgid "Returns current maintenance status of the host."
 msgstr "Επιστρέφει κατάσταση τρέχουσας συντήρησης ξενιστή."
 
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1003
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Επιστρέφει πληροφορίες σχετιζόμενες με πύλη Zabbix Java. Έγκυρες παράμετροι είναι: ping, version."
 
@@ -13711,7 +13720,8 @@ msgstr "Επιστρέφει ποσοστό χαμένων πακέτων ICMP p
 #: include/classes/widgets/CWidgetHelper.php:671
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:1028
-#: include/views/js/configuration.graph.edit.js.php:82
+#: include/views/js/configuration.graph.edit.js.php:57
+#: include/views/js/configuration.graph.edit.js.php:119
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
 #: include/views/js/monitoring.sysmaps.js.php:596
@@ -14277,8 +14287,8 @@ msgstr "Όνομα ασφάλειας"
 #: include/views/configuration.action.edit.php:910
 #: include/views/configuration.action.edit.php:1692
 #: include/views/configuration.action.edit.php:2168
-#: include/views/configuration.graph.edit.php:185
-#: include/views/configuration.graph.edit.php:267
+#: include/views/configuration.graph.edit.php:187
+#: include/views/configuration.graph.edit.php:269
 #: include/views/configuration.item.edit.php:91
 #: include/views/configuration.item.prototype.edit.php:79
 #: include/views/configuration.item.prototype.edit.php:392
@@ -14300,8 +14310,8 @@ msgid "Select"
 msgstr "Επιλέξτε"
 
 #: app/views/popup.triggerexpr.php:75
-#: include/views/configuration.graph.edit.php:206
-#: include/views/configuration.graph.edit.php:288
+#: include/views/configuration.graph.edit.php:208
+#: include/views/configuration.graph.edit.php:290
 #: include/views/configuration.item.prototype.edit.php:410
 msgid "Select prototype"
 msgstr "Επιλέξτε πρωτότυπο"
@@ -14674,7 +14684,7 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:275
-#: include/views/configuration.graph.edit.php:97
+#: include/views/configuration.graph.edit.php:99
 msgid "Show legend"
 msgstr "Εμφάνιση υπομνήματος"
 
@@ -14725,7 +14735,7 @@ msgstr "Εμφάνιση κειμένου ως HTML"
 msgid "Show timeline"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:110
+#: include/views/configuration.graph.edit.php:112
 msgid "Show triggers"
 msgstr "Εμφάνιση εναυσμάτων"
 
@@ -14749,7 +14759,7 @@ msgstr "Εμφάνιση τιμής"
 msgid "Show warning if Zabbix server is down"
 msgstr "Εμφάνιση προειδοποίησης εάν εξυπηρετητής Zabbix ανενεργός"
 
-#: include/views/configuration.graph.edit.php:105
+#: include/views/configuration.graph.edit.php:107
 msgid "Show working time"
 msgstr "Εμφάνιση χρόνου εργασίας"
 
@@ -14769,7 +14779,8 @@ msgstr ""
 msgid "Sign out"
 msgstr ""
 
-#: include/views/js/configuration.graph.edit.js.php:39
+#: include/views/js/configuration.graph.edit.js.php:171
+#: include/views/js/configuration.graph.edit.js.php:234
 msgid "Simple"
 msgstr "Απλό"
 
@@ -15019,7 +15030,7 @@ msgstr "Έναρξη σε"
 msgid "Starting TLS failed."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:947
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Χρόνος λειτουργίας εξυπηρετητή Zabbix, Unix timestamp."
 
@@ -15794,11 +15805,11 @@ msgstr "Χρόνος (αύξουσα)"
 msgid "Time (descending)"
 msgstr "Χρόνος (φθίνουσα)"
 
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1007
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1011
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Χρόνος τελευταίας πρόσβασης διαμεσολαβητή. Name - όνομα διαμεσολαβητή. Param - τελευταία πρόσβαση. Unix χρονοσήμανση."
 
@@ -15903,7 +15914,7 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Η συναλλαγή δεν έκλεισε. Ματαίωση..."
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1077
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr ""
 
@@ -16262,7 +16273,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:916
 #: include/views/configuration.action.edit.php:1696
 #: include/views/configuration.action.edit.php:2145
-#: include/views/configuration.graph.edit.php:334
+#: include/views/configuration.graph.edit.php:336
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.discovery.edit.php:61
 #: include/views/configuration.host.discovery.edit.php:516
@@ -16594,7 +16605,7 @@ msgstr "Ασύνδετο: Σενάριο ιστού \"%1$s\" σε \"%2$s\"."
 msgid "Unmute"
 msgstr "Αναίρεση σίγασης"
 
-#: include/classes/db/MysqlDbBackend.php:98
+#: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:114
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
@@ -16670,7 +16681,7 @@ msgstr "Ανοικτά"
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:108
-#: include/views/configuration.graph.edit.php:451
+#: include/views/configuration.graph.edit.php:457
 #: include/views/configuration.host.discovery.edit.php:707
 #: include/views/configuration.host.edit.php:810
 #: include/views/configuration.hostgroups.edit.php:57
@@ -16759,7 +16770,7 @@ msgstr "Χάρτες Άνω επίπεδο"
 msgid "Uptime"
 msgstr "Χρόνος διαθεσιμότητας"
 
-#: include/classes/items/CHelpItems.php:1047
+#: include/classes/items/CHelpItems.php:1051
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Χρόνος διαθεσιμότητας υπηρεσίας εξυπηρετητή Zabbix σε δευτερόλεπτα."
 
@@ -17061,7 +17072,7 @@ msgstr "Χρήστες"
 msgid "Users unblocked"
 msgstr "Χρήστες απεμπλάκησαν"
 
-#: include/classes/items/CHelpItems.php:1059
+#: include/classes/items/CHelpItems.php:1063
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Στατιστικά cache VMware. Έγκυροι τρόποι: total, free, pfree, used and pused."
 
@@ -17069,20 +17080,24 @@ msgstr "Στατιστικά cache VMware. Έγκυροι τρόποι: total, f
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Κατάσταση cluster VMware, <url> - URL υπηρεσίας VMware, <name> - όνομα cluster VMware"
 
-#: include/classes/items/CHelpItems.php:723
-#: include/classes/items/CHelpItems.php:747
-msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:731
-msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
-msgstr ""
-
 #: include/classes/items/CHelpItems.php:719
-msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:751
+msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:735
+msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:723
+msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
@@ -17090,83 +17105,83 @@ msgstr ""
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Μέγεθος μνήμης ballooned VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα cluster VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Στατιστικά datastore read VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <datastore> - όνομα datastore, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Στατιστικά datastore write VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <datastore> - όνομα datastore, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Τύπος VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Στατιστικά εισόδου δικτύου VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Στατιστικά εξόδου δικτύου VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Συχνότητα επεξεργαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Τύπος επεξεργαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρήση επεξεργαστή VMware hypervisor σε Hz, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Κατάσταση VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Συνολικό μέγεθος μνήμης VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρόνος λειτουργίας VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Μέγεθος χρησιμοποιούμενης μνήμης VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα κατασκευαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Έκδοση VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -17174,99 +17189,99 @@ msgstr "Έκδοση VMware hypervisor, <url> - URL υπηρεσίας VMware, <
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Πλήρες όνομα υπηρεσίας VMware, <url> - URL υπηρεσίας VMware"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Έκδοση υπηρεσίας VMware, <url> - URL υπηρεσίας VMware"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος μνήμης ballooned εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Δεσμευμένος αποθηκευτικός χώρος εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος συμπιεσμένης μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Στατιστικά ανάγνωσης συσκευής δίσκου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance συσκευής δίσκου, <mode> - bps/ops - bytes/λειτουργίες ανά δευτερόλεπτο"
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Στατιστικά εγγραφής συσκευής δίσκου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance συσκευής δίσκου, <mode> - bps/ops - bytes/λειτουργίες ανά δευτερόλεπτο"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Στατιστικά συστήματος αρχείων εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <fsname> - όνομα αρχείου συστήματος, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση μνήμης λογικής εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση μνήμης ξενιστή εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Όνομα VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Όνομα εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Στατιστικά εισόδου δικτύου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance διεπαφή δικτύου, <mode> - bps/pps - bytes/packets per second"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Στατιστικά εξόδου δικτύου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance διεπαφή δικτύου, <mode> - bps/pps - bytes/packets per second"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Κατάσταση ενέργειας εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος ιδιωτικής μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση επεξεργαστή σε Hz εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος κοινόχρηστης μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:875
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος ανταλλασσόμενης μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος συνολικής μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Αδιάθετος αποθηκευτικός χώρος εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Αδιαμοίραστος αποθηκευτικός χώρος εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρόνος λειτουργίας εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
@@ -17342,11 +17357,11 @@ msgstr "Τιμή \"%2$s\" από \"%1$s\" πολλά ακέραια ψηφία: 
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Τιμή \"%2$s\" από \"%1$s\" πολύ μεγάλη: όχι πλέον των %3$s ακέραιων ψηφίων και πλέον των %4$s δεκαδικών."
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1059
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Αποτελεσματικότητα τιμής cache. Έγκυρες παράμετροι: αιτήματα, επιτυχίες και αποτυχίες."
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1055
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Στατιστικά τιμής cache. Έγκυρες τρόποι: total, free, pfree, used and pused."
 
@@ -17764,7 +17779,7 @@ msgstr ""
 msgid "Y"
 msgstr "Ψ"
 
-#: include/views/configuration.graph.edit.php:309
+#: include/views/configuration.graph.edit.php:311
 msgid "Y axis MAX value"
 msgstr "Μέγιστη τιμή άξονα Ψ"
 
@@ -17778,11 +17793,11 @@ msgstr ""
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Μέγιστη τιμή άξονα Y να είναι μεγαλύτερη της ΕΛΑΧ τιμής άξονα Y."
 
-#: include/views/configuration.graph.edit.php:227
+#: include/views/configuration.graph.edit.php:229
 msgid "Y axis MIN value"
 msgstr "Ελάχιστη τιμή άξονα Ψ"
 
-#: include/views/configuration.graph.edit.php:343
+#: include/views/configuration.graph.edit.php:345
 msgid "Y axis side"
 msgstr "Πλευρά άξονα ψ"
 
@@ -18167,7 +18182,7 @@ msgstr "αντιπρόσωπος"
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.list.php:48
 #: include/views/configuration.triggers.list.php:57
-#: include/views/js/configuration.graph.edit.js.php:55 report2.php:239
+#: include/views/js/configuration.graph.edit.js.php:37 report2.php:239
 #: report2.php:275 report2.php:310 report2.php:337 report2.php:424
 #: report4.php:91 report4.php:293
 msgid "all"
@@ -18256,8 +18271,10 @@ msgstr "αυτόματη καταχώρηση ξενιστή"
 #: include/classes/graphdraw/CLineGraphDraw.php:1855
 #: include/classes/graphdraw/CLineGraphDraw.php:1877
 #: include/classes/graphdraw/CPieGraphDraw.php:338 include/graphs.inc.php:85
-#: include/views/js/configuration.graph.edit.js.php:50
-#: include/views/js/configuration.graph.edit.js.php:58
+#: include/views/js/configuration.graph.edit.js.php:39
+#: include/views/js/configuration.graph.edit.js.php:110
+#: include/views/js/configuration.graph.edit.js.php:180
+#: include/views/js/configuration.graph.edit.js.php:243
 msgid "avg"
 msgstr "μ.ο."
 
@@ -18674,7 +18691,8 @@ msgstr "κενό κλειδί"
 #: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
-#: include/views/js/configuration.graph.edit.js.php:52
+#: include/views/js/configuration.graph.edit.js.php:182
+#: include/views/js/configuration.graph.edit.js.php:245
 msgid "last"
 msgstr "τελευταίο"
 
@@ -18751,8 +18769,10 @@ msgstr "ταιριάσματα"
 #: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/graphdraw/CPieGraphDraw.php:329 include/graphs.inc.php:80
-#: include/views/js/configuration.graph.edit.js.php:51
-#: include/views/js/configuration.graph.edit.js.php:59
+#: include/views/js/configuration.graph.edit.js.php:40
+#: include/views/js/configuration.graph.edit.js.php:111
+#: include/views/js/configuration.graph.edit.js.php:181
+#: include/views/js/configuration.graph.edit.js.php:244
 msgid "max"
 msgstr "μεγ."
 
@@ -18773,8 +18793,10 @@ msgstr ""
 #: include/classes/graphdraw/CLineGraphDraw.php:1854
 #: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:325 include/graphs.inc.php:78
-#: include/views/js/configuration.graph.edit.js.php:49
-#: include/views/js/configuration.graph.edit.js.php:57
+#: include/views/js/configuration.graph.edit.js.php:38
+#: include/views/js/configuration.graph.edit.js.php:109
+#: include/views/js/configuration.graph.edit.js.php:179
+#: include/views/js/configuration.graph.edit.js.php:242
 msgid "min"
 msgstr "ελάχ."
 
@@ -19031,7 +19053,7 @@ msgstr ""
 msgid "second parameter is expected"
 msgstr ""
 
-#: include/classes/html/CActionButtonList.php:116
+#: include/classes/html/CActionButtonList.php:123
 msgid "selected"
 msgstr ""
 
