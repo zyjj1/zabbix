@@ -763,10 +763,10 @@ if (!empty($data['new_operation'])) {
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				);
 
-			$media_type_combobox = new CComboBox('new_operation[opmessage][mediatypeid]',
+			$media_type_combobox = (new CComboBox('new_operation[opmessage][mediatypeid]',
 				$data['new_operation']['opmessage']['mediatypeid']
-			);
-			$media_type_combobox->addItem(0, '- '._('All').' -');
+			))->addItem(0, '- '._('All').' -');
+
 			foreach ($data['available_mediatypes'] as $value) {
 				$media_type_combobox->addItem($value['mediatypeid'], $value['description'], null, true,
 					($value['status'] == MEDIA_TYPE_STATUS_DISABLED) ? ZBX_STYLE_RED : null
