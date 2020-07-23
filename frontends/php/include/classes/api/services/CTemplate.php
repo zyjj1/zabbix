@@ -372,6 +372,14 @@ class CTemplate extends CHostGeneral {
 			$template['groups'] = zbx_toArray($template['groups']);
 
 			foreach ($template['groups'] as $group) {
+				if (!is_array($group) || (is_array($group) && !array_key_exists('groupid', $group))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'groups',
+							_s('the parameter "%1$s" is missing', 'groupid')
+						)
+					);
+				}
+
 				$groupIds[$group['groupid']] = $group['groupid'];
 			}
 		}
