@@ -537,7 +537,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function update(array $triggers) {
 		$triggers = zbx_toArray($triggers);
-		$db_triggers = [];
 
 		$this->validateUpdate($triggers, $db_triggers);
 

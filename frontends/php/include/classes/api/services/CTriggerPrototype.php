@@ -459,7 +459,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function update(array $trigger_prototypes) {
 		$trigger_prototypes = zbx_toArray($trigger_prototypes);
-		$db_triggers = [];
 
 		$this->validateUpdate($trigger_prototypes, $db_triggers);
 		$this->updateReal($trigger_prototypes, $db_triggers);
