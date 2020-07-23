@@ -47,7 +47,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$result = DBselect(
 			'SELECT DISTINCT t.triggerid,h.hostid'.
-			' FROM triggers t,functions f,items i, hosts h'.
+			' FROM triggers t,functions f,items i,hosts h'.
 			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
@@ -274,7 +274,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$sql = 'SELECT ht.hostid,ht.templateid,h.host'.
 			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid'.
-				' AND '.dbConditionInt('ht.templateid', $tpl_hostids);
+				' AND '.dbConditionInt('ht.templateid', $tpl_hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
 		if ($hostids !== null) {
 			$sql .= ' AND '.dbConditionInt('ht.hostid', $hostids);
 		}
