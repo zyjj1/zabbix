@@ -1837,7 +1837,7 @@ class CHost extends CHostGeneral {
 	protected function validateUpdate(array $hosts, array $db_hosts) {
 		$host_db_fields = ['hostid' => null];
 
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			// Validate mandatory fields.
 			if (!check_db_fields($host_db_fields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1880,6 +1880,7 @@ class CHost extends CHostGeneral {
 
 			// Permissions to host groups is validated in massUpdate().
 		}
+		unset($host);
 
 		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 

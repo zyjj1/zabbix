@@ -361,7 +361,7 @@ class CTemplate extends CHostGeneral {
 	protected function validateCreate(array $templates) {
 		$groupIds = [];
 
-		foreach ($templates as $template) {
+		foreach ($templates as &$template) {
 			// check if hosts have at least 1 group
 			if (!isset($template['groups']) || !$template['groups']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -383,6 +383,7 @@ class CTemplate extends CHostGeneral {
 				$groupIds[$group['groupid']] = $group['groupid'];
 			}
 		}
+		unset($template);
 
 		$dbHostGroups = API::HostGroup()->get([
 			'output' => ['groupid'],
