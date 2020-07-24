@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-17 19:52+0300\n"
-"PO-Revision-Date: 2020-07-01 12:46+0300\n"
+"PO-Revision-Date: 2020-07-20 08:11+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1593600409.000000\n"
+"X-POOTLE-MTIME: 1595225506.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:89
@@ -1733,7 +1733,7 @@ msgstr "ヒストリを削除できません"
 
 #: items.php:1317
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "ヒストリを削除できません：選択したアイテムの少なくとも1つが監視対象ホストに属していません"
 
 #: include/classes/api/services/CDiscoveryRule.php:1535
 msgid "Cannot clone graph prototypes."
@@ -16965,7 +16965,7 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr ""
+msgstr "VMwareデータセンターとそのID。JSONを返す"
 
 #: include/classes/items/CHelpItems.php:727
 #: include/classes/items/CHelpItems.php:751
