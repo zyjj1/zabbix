@@ -1390,7 +1390,7 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
 	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
-	zbx_vector_ptr_reserve(&data->events, src->events.values_num);
+	zbx_vector_ptr_reserve(&data->events, src->events.values_alloc);
 	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
@@ -4472,10 +4472,11 @@ out:
 		if (0 != service->eventlog.oom)
 			service->eventlog.oom = 0;
 
-		events_sz += evt_req_chunk_size * data->events.values_alloc +
+		events_sz += evt_req_chunk_size * data->events.values_num +
 				zbx_mem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
 
-		if (vmware_mem->free_size < events_sz || SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		if (0 == service->eventlog.last_key || vmware_mem->free_size < events_sz ||
+				SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		{
 			for (i = 0; i < data->events.values_num; i++)
 			{
@@ -4494,7 +4495,7 @@ out:
 				service->eventlog.oom = 1;
 				zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_free);
 
-				zabbix_log(LOG_LEVEL_WARNING, "Processed VMware events requires up to " ZBX_FS_UI64
+				zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
 						" bytes of free VMwareCache memory, while currently only " ZBX_FS_UI64
 						" bytes are free. VMwareCache memory usage (free/strpool/total): "
 						ZBX_FS_UI64 " / " ZBX_FS_UI64 " / " ZBX_FS_UI64, events_sz,
@@ -4503,7 +4504,8 @@ out:
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Processed VMware events requires up to " ZBX_FS_UI64
+				zabbix_log(0 == service->eventlog.last_key ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG,
+						"Processed VMware events requires up to " ZBX_FS_UI64
 						" bytes of free VMwareCache memory. VMwareCache memory usage"
 						" (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
 						ZBX_FS_UI64, events_sz, vmware_mem->free_size, vmware->strpool_sz,
@@ -4520,6 +4522,7 @@ out:
 			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
 	{
 		zbx_vector_ptr_append_array(&events, service->data->events.values, service->data->events.values_num);
+		zbx_vector_ptr_reserve(&data->events, data->events.values_num + service->data->events.values_num);
 		zbx_vector_ptr_clear(&service->data->events);
 	}
 
