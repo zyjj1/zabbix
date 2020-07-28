@@ -1,3 +1,84 @@
+Changes for 4.0.23
+
+4.0.23rc1 was released as 4.0.23 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.23rc1
+
+New features:
+.......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
+.......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
+
+Bug fixes:
+...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
+........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
+..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
+........S. [ZBX-18069] fixed server exit when trying to execute IPMI script without IPMI pollers (wiper)
+A......... [ZBX-17960] fixed undefined index in trends API (talbergs)
+..F....... [ZBX-17682] fixed button disable state in template item list and discovery list (rlataria)
+..F....... [ZBX-17820] fixed classic graph widget default header (talbergs)
+..F....... [ZBX-17924] fixed php errors in "System information" window for MySQL (talbergs)
+...G...... [ZBX-17917] changed vm.memory.size keys on Solaris to get memory usage statistics from kstat (wiper)
+...G...... [ZBX-18029] fixed cpu counter wraparound handling on Solaris (wiper)
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.22
+
+4.0.22rc1 was released as 4.0.22 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.22rc1
+
+New features:
+........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
+
+Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
+.......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
+........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
+.....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
+...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
+..F....... [ZBX-17697] fixed strict DFSG compliance issue in using minified jQuery sources (talbergs)
+.........T [ZBX-16461] fixed recovery expression for "link down" trigger and updated for following zabbix template guidelines (tuskov)
+........S. [ZBX-17702] fixed escalation cancellation message not being sent when action is disabled (wiper)
+.........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
+.......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
+...G...... [ZBX-17780] fixed memory leak (viktors)
+..F....... [ZBX-17577] fixed remove of selected items in multiselect (rlataria)
+..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.21
+
+4.0.21rc1 was released as 4.0.21 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.21rc1
+
+New features:
+.......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
+
+Bug fixes:
+........S. [ZBX-17662] fixed a failing query when updating existing host prototypes (viktors, vso)
+.......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
+.......PS. [ZBX-17607] fixed unreachable poller being too busy due to SNMP checks being attempted twice at a time (mabele)
+..F....... [ZBX-17629] fixed markup in User Media popup (vmaksimovs)
+........S. [ZBX-17109] fixed agent request parameter type parsing (atumilovics)
+..F....... [ZBX-17470] fixed element of filters is not focused on several pages (agriscenko)
+........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
+........S. [ZBX-17186] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.20
+
+4.0.20rc1 was released as 4.0.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.20rc1
 
 New features:
@@ -16,12 +97,12 @@ A......... [ZBX-17496] fixed UserMacro API validation (miks)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 .......PS. [ZBX-17336] fixed wrong error message when fping fails (mabele)
 ..F....... [ZBX-17427] fixed top busiest triggers filter (miks)
-...G...... [ZBX-17523] fixed agent compilation on Windows is broken (akozlovs)
+...G...... [ZBX-17523] fixed agent compilation on Windows (akozlovs)
 ..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
-..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multistatement (talbergs)
 ........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
 ..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
 
@@ -2840,6 +2921,19 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.32rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.31
+
+3.0.31rc1 was released as 3.0.31 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.31rc1

@@ -32,13 +32,18 @@ class Db2DbBackend extends DbBackend {
 	protected function checkDbVersionTable() {
 		global $DB;
 
-		$tabSchema = zbx_dbstr(!empty($DB['SCHEMA']) ? $DB['SCHEMA'] : strtoupper($DB['USER']));
-		$tableExists = DBfetch(DBselect('SELECT 1 FROM SYSCAT.TABLES'.
+		$schema = zbx_dbstr(!empty($DB['SCHEMA']) ? $DB['SCHEMA'] : strtoupper($DB['USER']));
+		$table_exists = DBfetch(DBselect(
+			'SELECT 1 FROM SYSCAT.TABLES'.
 			" WHERE TABNAME='DBVERSION'".
-				" AND TABSCHEMA=".$tabSchema));
+				" AND TABSCHEMA=".$schema
+		));
 
-		if (!$tableExists) {
-			$this->setError(_('The frontend does not match Zabbix database.'));
+		if (!$table_exists) {
+			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
+				_s('the table "%1$s" was not found', 'dbversion')
+			));
+
 			return false;
 		}
 

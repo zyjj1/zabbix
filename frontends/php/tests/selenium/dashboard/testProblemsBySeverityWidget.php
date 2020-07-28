@@ -35,7 +35,8 @@ class testProblemsBySeverityWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_groupid';
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' wf.value_itemid, wf.value_graphid';
 
 	public function getCreateWidgetData() {
 		return [
@@ -637,6 +638,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->query('id:overlay_bg')->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$dashboard->getWidget($header);
+		sleep(1);
 		$dashboard->save();
 	}
 
