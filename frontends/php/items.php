@@ -1292,7 +1292,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 			$hosts_status[] = $value[0]['status'];
 		}
 
-		if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
+		if (in_array(HOST_STATUS_TEMPLATE, array_unique($hosts_status))) {
 			$result = false;
 		}
 		else {
