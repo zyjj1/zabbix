@@ -144,7 +144,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$new_trigger = $tpl_trigger;
-			unset($new_trigger['triggerid']);
+			unset($new_trigger['triggerid'], $new_trigger['templateid']);
 
 			if (array_key_exists($tpl_hostid, $hosts_by_tpl_hostid)) {
 				foreach ($hosts_by_tpl_hostid[$tpl_hostid] as $host) {
