@@ -541,7 +541,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException if at least one trigger exists
 	 */
-	protected function checkDuplicates($descriptions) {
+	protected function checkDuplicates(array $descriptions) {
 		foreach ($descriptions as $description => $triggers) {
 			$hostids = [];
 			$expressions = [];
