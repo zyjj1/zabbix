@@ -256,8 +256,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 *   [
 	 *     <tpl_hostid> => [
 	 *       [
-	 *         'hostid' => <hostid>],
-	 *         'host' => <host>]
+	 *         'hostid' => <hostid>,
+	 *         'host' => <host>
 	 *       ],
 	 *       ...
 	 *     ],
@@ -294,7 +294,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Returns list of linked triggers.
+	 * Returns list of already linked triggers.
 	 *
 	 * Output format:
 	 *   [
@@ -341,7 +341,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Returns list of linked triggers.
+	 * Returns list of not inherited triggers with same name and expression.
 	 *
 	 * Output format:
 	 *   [
