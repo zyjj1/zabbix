@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-17 19:52+0300\n"
+"POT-Creation-Date: 2020-07-31 19:52+0300\n"
 "PO-Revision-Date: 2019-01-29 07:38+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -145,7 +145,7 @@ msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
 msgstr "选择了 %1$s 项，您可以使用向上和向下箭头键以及回车键进行选择"
 
-#: include/maps.inc.php:1111
+#: include/maps.inc.php:1095
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
@@ -329,8 +329,8 @@ msgstr[0] "账号被封 %1$s 秒。"
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1135 include/events.inc.php:250
-#: include/events.inc.php:462 include/views/configuration.action.edit.php:1114
-#: include/views/configuration.action.edit.php:1207
+#: include/events.inc.php:462 include/views/configuration.action.edit.php:1113
+#: include/views/configuration.action.edit.php:1206
 msgid "Ack"
 msgstr "确认"
 
@@ -372,17 +372,17 @@ msgstr "确认已解决的事件"
 #: include/views/configuration.action.edit.php:439
 #: include/views/configuration.action.edit.php:676
 #: include/views/configuration.action.edit.php:698
-#: include/views/configuration.action.edit.php:888
-#: include/views/configuration.action.edit.php:1096
-#: include/views/configuration.action.edit.php:1255
-#: include/views/configuration.action.edit.php:1273
-#: include/views/configuration.action.edit.php:1418
-#: include/views/configuration.action.edit.php:1440
-#: include/views/configuration.action.edit.php:1654
-#: include/views/configuration.action.edit.php:1869
-#: include/views/configuration.action.edit.php:1963
-#: include/views/configuration.action.edit.php:1985
-#: include/views/configuration.action.edit.php:2129
+#: include/views/configuration.action.edit.php:887
+#: include/views/configuration.action.edit.php:1095
+#: include/views/configuration.action.edit.php:1254
+#: include/views/configuration.action.edit.php:1272
+#: include/views/configuration.action.edit.php:1417
+#: include/views/configuration.action.edit.php:1439
+#: include/views/configuration.action.edit.php:1651
+#: include/views/configuration.action.edit.php:1866
+#: include/views/configuration.action.edit.php:1960
+#: include/views/configuration.action.edit.php:1982
+#: include/views/configuration.action.edit.php:2126
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/configuration.graph.edit.php:350
@@ -528,7 +528,7 @@ msgstr "启用直到"
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:171
-#: app/views/popup.media.php:48 app/views/popup.media.php:113
+#: app/views/popup.media.php:48 app/views/popup.media.php:120
 #: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
@@ -549,15 +549,15 @@ msgstr "启用直到"
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
 #: include/views/configuration.action.edit.php:700
-#: include/views/configuration.action.edit.php:1216
-#: include/views/configuration.action.edit.php:1238
-#: include/views/configuration.action.edit.php:1420
-#: include/views/configuration.action.edit.php:1442
-#: include/views/configuration.action.edit.php:1835
-#: include/views/configuration.action.edit.php:1967
-#: include/views/configuration.action.edit.php:1989
-#: include/views/configuration.action.edit.php:2317
-#: include/views/configuration.action.edit.php:2364
+#: include/views/configuration.action.edit.php:1215
+#: include/views/configuration.action.edit.php:1237
+#: include/views/configuration.action.edit.php:1419
+#: include/views/configuration.action.edit.php:1441
+#: include/views/configuration.action.edit.php:1832
+#: include/views/configuration.action.edit.php:1964
+#: include/views/configuration.action.edit.php:1986
+#: include/views/configuration.action.edit.php:2316
+#: include/views/configuration.action.edit.php:2363
 #: include/views/configuration.application.edit.php:60
 #: include/views/configuration.correlation.edit.php:197
 #: include/views/configuration.correlation.edit.php:255
@@ -819,9 +819,9 @@ msgstr "对齐拓扑元素"
 #: include/views/administration.auditlogs.list.php:53
 #: include/views/administration.general.gui.edit.php:44
 #: include/views/administration.users.list.php:22
-#: include/views/configuration.action.edit.php:767
+#: include/views/configuration.action.edit.php:768
 #: include/views/configuration.action.edit.php:1513
-#: include/views/configuration.action.edit.php:2276
+#: include/views/configuration.action.edit.php:2274
 #: include/views/monitoring.sysmap.edit.php:213
 msgid "All"
 msgstr "所有"
@@ -895,7 +895,7 @@ msgstr "另外，您也可以手动安装:"
 
 #: include/triggers.inc.php:1351
 #: include/views/configuration.action.edit.php:112
-#: include/views/configuration.action.edit.php:1140
+#: include/views/configuration.action.edit.php:1139
 #: include/views/configuration.correlation.edit.php:94
 #: include/views/configuration.host.discovery.edit.php:596
 #: include/views/configuration.trigger.prototype.edit.php:130
@@ -909,7 +909,7 @@ msgstr "和（同时满足）"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/views/configuration.action.edit.php:111
-#: include/views/configuration.action.edit.php:1139
+#: include/views/configuration.action.edit.php:1138
 #: include/views/configuration.correlation.edit.php:93
 #: include/views/configuration.host.discovery.edit.php:595
 #: include/views/configuration.maintenance.edit.php:170
@@ -1125,15 +1125,15 @@ msgstr "必须创建至少一个维护期间."
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 msgstr "至少要支持Mysql、PostgreSQL、Oracle或者IBMDB2其中一个。"
 
-#: include/views/configuration.action.edit.php:1258
+#: include/views/configuration.action.edit.php:1257
 msgid "At least one operation must exist."
 msgstr "必须至少设置一个执行内容。"
 
-#: include/views/configuration.action.edit.php:1262
+#: include/views/configuration.action.edit.php:1261
 msgid "At least one operation or recovery operation must exist."
 msgstr "至少需要设置一个恢复操作或者操作."
 
-#: include/views/configuration.action.edit.php:1857
+#: include/views/configuration.action.edit.php:1854
 msgid "At least one operation, recovery operation or update operation must exist."
 msgstr "必须设置恢复时的至少一个执行内容或执行内容或更新时的执行内容。"
 
@@ -1146,8 +1146,8 @@ msgid "At least one update operation or message must exist."
 msgstr "至少需要一个更新内容或消息。"
 
 #: include/views/configuration.action.edit.php:754
-#: include/views/configuration.action.edit.php:1497
-#: include/views/configuration.action.edit.php:2251
+#: include/views/configuration.action.edit.php:1496
+#: include/views/configuration.action.edit.php:2248
 msgid "At least one user or user group must be selected."
 msgstr "您必须至少选择一个用户或用户组。"
 
@@ -1206,9 +1206,9 @@ msgstr "认证算法"
 msgid "Authentication failed: %1$s."
 msgstr "验证失败: %1$s"
 
-#: include/views/configuration.action.edit.php:944
-#: include/views/configuration.action.edit.php:1725
-#: include/views/configuration.action.edit.php:2182
+#: include/views/configuration.action.edit.php:943
+#: include/views/configuration.action.edit.php:1722
+#: include/views/configuration.action.edit.php:2179
 #: include/views/configuration.host.discovery.edit.php:462
 #: include/views/configuration.item.edit.php:610
 #: include/views/configuration.item.massupdate.php:296
@@ -1278,7 +1278,7 @@ msgstr "自动注册事件和报警数据存储期 \"%1$s\" 。"
 
 #: include/hosts.inc.php:1301
 #: include/views/administration.general.other.edit.php:59
-#: include/views/configuration.action.edit.php:1075
+#: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:693
 #: include/views/configuration.host.massupdate.php:275
 #: include/views/configuration.host.prototype.edit.php:368
@@ -1501,10 +1501,10 @@ msgstr "加拿大 (136 字节)"
 #: app/views/monitoring.dashboard.view.php:100
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:106
-#: include/views/configuration.action.edit.php:1221
-#: include/views/configuration.action.edit.php:1241
-#: include/views/configuration.action.edit.php:1840
-#: include/views/configuration.action.edit.php:2320
+#: include/views/configuration.action.edit.php:1220
+#: include/views/configuration.action.edit.php:1240
+#: include/views/configuration.action.edit.php:1837
+#: include/views/configuration.action.edit.php:2319
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:85
 #: include/views/conf.import.php:126
@@ -1909,7 +1909,7 @@ msgstr[0] "无法删除组"
 msgid "Cannot delete host"
 msgstr "无法删除主机"
 
-#: include/classes/api/services/CHost.php:1193
+#: include/classes/api/services/CHost.php:1194
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -1937,7 +1937,7 @@ msgstr "无法删除图标映射"
 msgid "Cannot delete image"
 msgstr "无法删除图片"
 
-#: include/classes/api/services/CHost.php:998
+#: include/classes/api/services/CHost.php:999
 msgid "Cannot delete inventory."
 msgstr "无法删除资产纪录."
 
@@ -2326,7 +2326,7 @@ msgstr "无法形成树状格式。检查服务链接的逻辑结构。"
 msgid "Cannot format tree."
 msgstr "无法形成树状格式"
 
-#: include/classes/api/services/CTemplate.php:805
+#: include/classes/api/services/CTemplate.php:814
 msgid "Cannot have empty visible template name."
 msgstr "模板的显示名称不得为空."
 
@@ -2356,12 +2356,12 @@ msgstr "不能包含视图文件 \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "不能插入触发器表达式"
 
-#: include/classes/api/services/CHost.php:976
+#: include/classes/api/services/CHost.php:977
 msgid "Cannot link template"
 msgstr "无法链接模板"
 
-#: include/classes/api/services/CTemplate.php:892
-#: include/classes/api/services/CTemplate.php:906
+#: include/classes/api/services/CTemplate.php:901
+#: include/classes/api/services/CTemplate.php:915
 msgid "Cannot link template."
 msgstr "无法链接到模板。"
 
@@ -2369,19 +2369,19 @@ msgstr "无法链接到模板。"
 msgid "Cannot logout."
 msgstr "不能登出"
 
-#: include/classes/api/services/CHost.php:834
+#: include/classes/api/services/CHost.php:835
 msgid "Cannot mass update host name."
 msgstr "不能大量更新主机名称."
 
-#: include/classes/api/services/CTemplate.php:1030
+#: include/classes/api/services/CTemplate.php:1039
 msgid "Cannot mass update template name."
 msgstr "无法批量更新模板名称."
 
-#: include/classes/api/services/CHost.php:820
+#: include/classes/api/services/CHost.php:821
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可见主机名称"
 
-#: include/classes/api/services/CTemplate.php:995
+#: include/classes/api/services/CTemplate.php:1004
 msgid "Cannot mass update visible template name."
 msgstr "无法批量更新模板的显示名称"
 
@@ -2503,9 +2503,9 @@ msgstr "不能设置 \"templateid\" 设置到项目原形 \"%1$s\" 。"
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "无法设置 \"模板序列号\" 为聚合图形 \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:885
-#: include/classes/api/services/CHost.php:1751
-#: include/classes/api/services/CHost.php:1897
+#: include/classes/api/services/CHost.php:886
+#: include/classes/api/services/CHost.php:1764
+#: include/classes/api/services/CHost.php:1925
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "无法设置审计字段为已经禁止的审计."
 
@@ -2538,12 +2538,12 @@ msgstr "无法断开和清除应用程序."
 msgid "Cannot unlink and clear discovery rules"
 msgstr "无法断开和清除探索规则"
 
-#: include/classes/api/services/CHost.php:951
+#: include/classes/api/services/CHost.php:952
 msgid "Cannot unlink template"
 msgstr "无法断开与模板的连接"
 
-#: include/classes/api/services/CTemplate.php:857
-#: include/classes/api/services/CTemplate.php:880
+#: include/classes/api/services/CTemplate.php:866
+#: include/classes/api/services/CTemplate.php:889
 msgid "Cannot unlink template."
 msgstr "无法断开与模板的连接。"
 
@@ -2593,7 +2593,7 @@ msgstr "无法更新 \"%1$s\" 为触发器 \"%2$s\"."
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "无法更新触发器模板\"%2$s\"的\"%1$s\""
 
-#: include/classes/api/services/CHost.php:1874
+#: include/classes/api/services/CHost.php:1902
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "无法更新 \"%2$s\"在发现的主机\"%1$s\"。"
@@ -2710,7 +2710,7 @@ msgstr "对于被自动发现的主机\"%1$s\"无法更新其主机组"
 msgid "Cannot update host"
 msgstr "无法更新主机"
 
-#: include/classes/api/services/CHost.php:782
+#: include/classes/api/services/CHost.php:783
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "无法更新主机的加密设置，配置两端的设置规则不正确。"
 
@@ -2812,8 +2812,8 @@ msgstr "无法更新模板"
 msgid "Cannot update templated applications."
 msgstr "无法更新被模板化的应用程序."
 
-#: include/classes/api/services/CTemplate.php:756
-#: include/classes/api/services/CTemplate.php:1091
+#: include/classes/api/services/CTemplate.php:765
+#: include/classes/api/services/CTemplate.php:1100
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "对于被自动发现的主机 \"%1$s\"无法更新其模板"
@@ -3099,7 +3099,7 @@ msgstr "时钟"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.regularexpressions.edit.php:146
 #: include/views/administration.general.valuemapping.edit.php:107
-#: include/views/configuration.action.edit.php:2353
+#: include/views/configuration.action.edit.php:2352
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:110
@@ -3201,12 +3201,12 @@ msgstr "命令"
 #: app/controllers/CControllerPopupGeneric.php:318
 #: app/views/administration.script.edit.php:55
 #: app/views/administration.script.list.php:59
-#: include/views/configuration.action.edit.php:997
-#: include/views/configuration.action.edit.php:1003
-#: include/views/configuration.action.edit.php:1775
-#: include/views/configuration.action.edit.php:1783
-#: include/views/configuration.action.edit.php:2231
-#: include/views/configuration.action.edit.php:2239
+#: include/views/configuration.action.edit.php:996
+#: include/views/configuration.action.edit.php:1002
+#: include/views/configuration.action.edit.php:1772
+#: include/views/configuration.action.edit.php:1780
+#: include/views/configuration.action.edit.php:2228
+#: include/views/configuration.action.edit.php:2236
 msgid "Commands"
 msgstr "命令"
 
@@ -3265,7 +3265,7 @@ msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" i
 msgstr "对于自动发现规则\"%1$s\"应用于计算表达式 \"%3$s\"中的条件 \"%2$s\"未被定义"
 
 #: include/views/configuration.action.edit.php:124
-#: include/views/configuration.action.edit.php:1158
+#: include/views/configuration.action.edit.php:1157
 #: include/views/configuration.action.list.php:73
 #: include/views/configuration.correlation.edit.php:106
 #: include/views/configuration.correlation.list.php:61
@@ -3974,9 +3974,9 @@ msgstr "自定义倍数"
 msgid "Custom screens"
 msgstr "自定义聚合图形"
 
-#: include/views/configuration.action.edit.php:921
-#: include/views/configuration.action.edit.php:1675
-#: include/views/configuration.action.edit.php:2150
+#: include/views/configuration.action.edit.php:920
+#: include/views/configuration.action.edit.php:1672
+#: include/views/configuration.action.edit.php:2147
 msgid "Custom script"
 msgstr "自定义脚本"
 
@@ -4262,17 +4262,17 @@ msgstr "默认主机资产记录模式"
 msgid "Default login form"
 msgstr "默认登录表格"
 
-#: include/views/configuration.action.edit.php:2285
+#: include/views/configuration.action.edit.php:2282
 msgid "Default media type"
 msgstr "默认媒介类型"
 
 #: include/views/configuration.action.edit.php:421
-#: include/views/configuration.action.edit.php:779
-#: include/views/configuration.action.edit.php:1267
-#: include/views/configuration.action.edit.php:1525
-#: include/views/configuration.action.edit.php:1813
-#: include/views/configuration.action.edit.php:1864
-#: include/views/configuration.action.edit.php:2292
+#: include/views/configuration.action.edit.php:778
+#: include/views/configuration.action.edit.php:1266
+#: include/views/configuration.action.edit.php:1522
+#: include/views/configuration.action.edit.php:1810
+#: include/views/configuration.action.edit.php:1861
+#: include/views/configuration.action.edit.php:2291
 msgid "Default message"
 msgstr "消息内容"
 
@@ -4281,8 +4281,8 @@ msgid "Default operation step duration"
 msgstr "默认操作步骤持续时间"
 
 #: include/views/configuration.action.edit.php:418
-#: include/views/configuration.action.edit.php:1264
-#: include/views/configuration.action.edit.php:1861
+#: include/views/configuration.action.edit.php:1263
+#: include/views/configuration.action.edit.php:1858
 msgid "Default subject"
 msgstr "默认标题"
 
@@ -4364,7 +4364,7 @@ msgstr "删除并清除模板? (警告: 所有链接的主机将被清除!)"
 msgid "Delete application?"
 msgstr "删除应用集?"
 
-#: include/views/configuration.action.edit.php:2355
+#: include/views/configuration.action.edit.php:2354
 msgid "Delete current action?"
 msgstr "删除目前的动作?"
 
@@ -4629,7 +4629,7 @@ msgstr "删除 web 场景？"
 msgid "Deleted"
 msgstr "已删除"
 
-#: include/classes/api/services/CHost.php:1345
+#: include/classes/api/services/CHost.php:1346
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
@@ -4639,7 +4639,7 @@ msgstr "已删除: 主机 \"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "已删除：主机原型 \"%1$s\" 于 \"%2$s\"。"
 
-#: include/classes/api/services/CTemplate.php:686
+#: include/classes/api/services/CTemplate.php:695
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "已删除: 模板 \"%1$s\"."
@@ -4712,8 +4712,8 @@ msgstr "描述已经更新"
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
-#: include/views/configuration.action.edit.php:1273
-#: include/views/configuration.action.edit.php:1869
+#: include/views/configuration.action.edit.php:1272
+#: include/views/configuration.action.edit.php:1866
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/inventory.host.view.php:215 queue.php:75
 msgid "Details"
@@ -5160,14 +5160,14 @@ msgstr "重复依赖关系在触发器 \"%1$s\" 中."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "触发器的原形依赖复制\"%1$s\"。"
 
-#: include/classes/api/services/CHost.php:1687
-#: include/classes/api/services/CHost.php:1927
+#: include/classes/api/services/CHost.php:1700
+#: include/classes/api/services/CHost.php:1955
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "重复的主机. 有相同主机名称 \"%s\" 的主机已存于数据中."
 
-#: include/classes/api/services/CHost.php:1694
-#: include/classes/api/services/CHost.php:1947
+#: include/classes/api/services/CHost.php:1707
+#: include/classes/api/services/CHost.php:1975
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "重复的主机. 有相同主机可视名称\"%s\"的主机已存于数据中."
@@ -5241,8 +5241,8 @@ msgstr "每个URL必须是唯一的. 请确保只有一个被命名的 URL."
 #: include/views/administration.users.edit.php:315
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
-#: include/views/configuration.action.edit.php:1306
-#: include/views/configuration.action.edit.php:1900
+#: include/views/configuration.action.edit.php:1305
+#: include/views/configuration.action.edit.php:1897
 #: include/views/configuration.maintenance.edit.php:90
 #: include/views/configuration.trigger.prototype.edit.php:87
 #: include/views/configuration.trigger.prototype.edit.php:280
@@ -5394,7 +5394,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
-#: include/classes/api/services/CHost.php:1157
+#: include/classes/api/services/CHost.php:1158
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CImage.php:437
 #: include/classes/api/services/CMaintenance.php:528
@@ -5410,7 +5410,7 @@ msgstr ""
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:551
+#: include/classes/api/services/CTemplate.php:560
 #: include/classes/api/services/CTrigger.php:659
 #: include/classes/api/services/CTrigger.php:783
 #: include/classes/api/services/CUserMacro.php:600
@@ -5564,7 +5564,7 @@ msgstr "启用trapping"
 #: app/views/administration.mediatype.edit.php:171
 #: app/views/administration.mediatype.list.php:46
 #: app/views/administration.mediatype.list.php:124
-#: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:128
+#: app/views/popup.media.php:81 app/views/popup.triggerwizard.php:128
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
@@ -5739,9 +5739,9 @@ msgstr "执行 WMI 查询返回第一个对象。返回整形、浮点、字符�
 #: app/controllers/CControllerPopupGeneric.php:317
 #: app/views/administration.script.edit.php:48
 #: app/views/administration.script.list.php:58
-#: include/views/configuration.action.edit.php:934
-#: include/views/configuration.action.edit.php:1706
-#: include/views/configuration.action.edit.php:2173
+#: include/views/configuration.action.edit.php:933
+#: include/views/configuration.action.edit.php:1703
+#: include/views/configuration.action.edit.php:2170
 msgid "Execute on"
 msgstr "执行在"
 
@@ -5901,7 +5901,7 @@ msgstr "无法解析URL。"
 msgid "Failed to update dashboard"
 msgstr "更新仪表盘失败"
 
-#: include/classes/api/services/CTemplate.php:509
+#: include/classes/api/services/CTemplate.php:518
 msgid "Failed to update template."
 msgstr "更新模板失败"
 
@@ -5950,8 +5950,8 @@ msgstr "字段 \"%1$s\"不能被设置为空"
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:906
-#: include/classes/api/services/CHost.php:743
-#: include/classes/api/services/CTemplate.php:784
+#: include/classes/api/services/CHost.php:744
+#: include/classes/api/services/CTemplate.php:793
 #: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
@@ -6003,7 +6003,7 @@ msgstr "字段 \"%1$s\" 需要媒体类型 \"%2$s\"."
 msgid "Field \"%1$s\" must be missing."
 msgstr "字段\"%1$s\"不可以填写"
 
-#: include/classes/api/services/CTemplate.php:403
+#: include/classes/api/services/CTemplate.php:412
 msgid "Field \"host\" is mandatory."
 msgstr "字段\"host\"为必填项."
 
@@ -6298,9 +6298,9 @@ msgstr "此表达式不是宏"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "找不到全局正则表达式 \"%1$s\" 。"
 
-#: include/views/configuration.action.edit.php:924
-#: include/views/configuration.action.edit.php:1678
-#: include/views/configuration.action.edit.php:2153
+#: include/views/configuration.action.edit.php:923
+#: include/views/configuration.action.edit.php:1675
+#: include/views/configuration.action.edit.php:2150
 msgid "Global script"
 msgstr "全局脚本"
 
@@ -6886,17 +6886,17 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
 
-#: include/classes/api/services/CHost.php:847
-#: include/classes/api/services/CTemplate.php:435
+#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CTemplate.php:444
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "主机 \"%1$s\" 已存在."
 
 #: include/classes/api/services/CHostGroup.php:1452
-#: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1675
-#: include/classes/api/services/CHost.php:1851
+#: include/classes/api/services/CHost.php:807
+#: include/classes/api/services/CHost.php:1676
+#: include/classes/api/services/CHost.php:1865
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "主机 \"%1$s\" 没有设置主机组"
@@ -7009,7 +7009,7 @@ msgstr "ID为 \"%1$s\" 主机组不可用。"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:48
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:46
 #: include/classes/widgets/forms/CWidgetFormWeb.php:31
-#: include/menu.inc.php:184 include/views/configuration.action.edit.php:1024
+#: include/menu.inc.php:184 include/views/configuration.action.edit.php:1023
 #: include/views/configuration.copy.elements.php:57
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:23
@@ -7139,7 +7139,7 @@ msgstr "主机子网掩码"
 msgid "Host time"
 msgstr "主机时间"
 
-#: include/classes/api/services/CHost.php:674
+#: include/classes/api/services/CHost.php:675
 msgid "Host update failed."
 msgstr "主机更新失败."
 
@@ -7152,25 +7152,25 @@ msgstr "主机已更新"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的主机不可用"
 
-#: include/classes/api/services/CTemplate.php:1056
+#: include/classes/api/services/CTemplate.php:1065
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "主机名称为\"%1$s\"的主机已存在"
 
-#: include/classes/api/services/CHost.php:1782
-#: include/classes/api/services/CHost.php:2003
+#: include/classes/api/services/CHost.php:1795
+#: include/classes/api/services/CHost.php:2031
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "名称同样为 \"%s\" 的主机已存在."
 
-#: include/classes/api/services/CTemplate.php:461
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:470
+#: include/classes/api/services/CTemplate.php:1030
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "显示名称为\"%1$s\" 的主机已经存在"
 
-#: include/classes/api/services/CHost.php:1788
-#: include/classes/api/services/CHost.php:2010
+#: include/classes/api/services/CHost.php:1801
+#: include/classes/api/services/CHost.php:2038
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "可视名称同样为 \"%s\" 的主机已存在."
@@ -7279,9 +7279,9 @@ msgstr "IP范围 \"%1$s\" 超出 \"%2$s\" 地址限制"
 
 #: app/views/administration.script.edit.php:44
 #: app/views/administration.script.list.php:71 include/hosts.inc.php:471
-#: include/items.inc.php:352 include/views/configuration.action.edit.php:920
-#: include/views/configuration.action.edit.php:1674
-#: include/views/configuration.action.edit.php:2149
+#: include/items.inc.php:352 include/views/configuration.action.edit.php:919
+#: include/views/configuration.action.edit.php:1671
+#: include/views/configuration.action.edit.php:2146
 #: include/views/configuration.host.edit.php:662
 #: include/views/configuration.host.massupdate.php:361
 #: include/views/configuration.host.prototype.edit.php:343
@@ -7847,9 +7847,9 @@ msgstr "接口的值不正确"
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "服务\"%1$s\"出现了错误的计算SLA值."
 
-#: include/classes/api/services/CHost.php:829
-#: include/classes/api/services/CHost.php:1663
-#: include/classes/api/services/CHost.php:1921
+#: include/classes/api/services/CHost.php:830
+#: include/classes/api/services/CHost.php:1664
+#: include/classes/api/services/CHost.php:1949
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "错误的字符串用于主机名称\"%s\"."
@@ -7860,8 +7860,8 @@ msgstr "错误的字符串用于主机名称\"%s\"."
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "代理名\"%1$s\" 使用了错误的字符."
 
-#: include/classes/api/services/CTemplate.php:413
-#: include/classes/api/services/CTemplate.php:1066
+#: include/classes/api/services/CTemplate.php:422
+#: include/classes/api/services/CTemplate.php:1075
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "模板名称\"%1$s\"使用了不正确的名称."
@@ -8010,9 +8010,9 @@ msgstr "错误的图片索引"
 #: include/classes/api/services/CAction.php:2902
 #: include/classes/api/services/CAction.php:2914
 #: include/classes/api/services/CAction.php:2926
-#: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1657
-#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:813
+#: include/classes/api/services/CHost.php:1658
+#: include/classes/api/services/CHost.php:1851
 #: include/classes/api/services/CImage.php:449
 #: include/classes/api/services/CImage.php:490
 #: include/classes/api/services/CProxy.php:619
@@ -8020,8 +8020,8 @@ msgstr "错误的图片索引"
 #: include/classes/api/services/CProxy.php:727
 #: include/classes/api/services/CProxy.php:749
 #: include/classes/api/services/CScreen.php:455
-#: include/classes/api/services/CTemplate.php:408
-#: include/classes/api/services/CTemplate.php:536
+#: include/classes/api/services/CTemplate.php:417
+#: include/classes/api/services/CTemplate.php:545
 #: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "不正确的输入参数"
@@ -8036,8 +8036,8 @@ msgstr "提供了错误的DNS参数\"%s\"."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "提供了错误的端口\"%s\"."
 
-#: include/classes/api/services/CHost.php:1757
-#: include/classes/api/services/CHost.php:1903
+#: include/classes/api/services/CHost.php:1770
+#: include/classes/api/services/CHost.php:1931
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "错误的资产纪录栏位\"%s\"."
@@ -8237,8 +8237,8 @@ msgstr "服务\"%1$s\" 中的排序不正确。"
 msgid "Incorrect source value."
 msgstr "错误的源值."
 
-#: include/classes/api/services/CHost.php:1729
-#: include/classes/api/services/CHost.php:1869
+#: include/classes/api/services/CHost.php:1742
+#: include/classes/api/services/CHost.php:1897
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "主机\"%1$s\"的状态值不正确."
@@ -8480,19 +8480,21 @@ msgstr "\"%1$s\" 字段的值不正确。"
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1559
-#: include/classes/api/services/CHost.php:1565
-#: include/classes/api/services/CHost.php:1580
-#: include/classes/api/services/CHost.php:1586
-#: include/classes/api/services/CHost.php:1591
-#: include/classes/api/services/CHost.php:1597
-#: include/classes/api/services/CHost.php:1605
-#: include/classes/api/services/CHost.php:1611
-#: include/classes/api/services/CHost.php:1620
-#: include/classes/api/services/CHost.php:1626
-#: include/classes/api/services/CHost.php:1723
-#: include/classes/api/services/CHost.php:1863
+#: include/classes/api/services/CHost.php:771
+#: include/classes/api/services/CHost.php:1560
+#: include/classes/api/services/CHost.php:1566
+#: include/classes/api/services/CHost.php:1581
+#: include/classes/api/services/CHost.php:1587
+#: include/classes/api/services/CHost.php:1592
+#: include/classes/api/services/CHost.php:1598
+#: include/classes/api/services/CHost.php:1606
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1621
+#: include/classes/api/services/CHost.php:1627
+#: include/classes/api/services/CHost.php:1685
+#: include/classes/api/services/CHost.php:1736
+#: include/classes/api/services/CHost.php:1874
+#: include/classes/api/services/CHost.php:1891
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:216
@@ -8563,6 +8565,7 @@ msgstr "\"%1$s\" 字段的值不正确。"
 #: include/classes/api/services/CProxy.php:793
 #: include/classes/api/services/CScreen.php:423
 #: include/classes/api/services/CScreen.php:429
+#: include/classes/api/services/CTemplate.php:377
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:248
 #: include/classes/api/services/CTriggerGeneral.php:258
@@ -9094,7 +9097,7 @@ msgstr "所给的 \"%s\" 为无效的检视名称。可用的: \"a-z\" 和 \".\"
 msgid "Inventory"
 msgstr "资产记录"
 
-#: include/classes/api/services/CHost.php:1017
+#: include/classes/api/services/CHost.php:1018
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "主机\"%1$s\"的资产记录被禁用."
@@ -9103,7 +9106,7 @@ msgstr "主机\"%1$s\"的资产记录被禁用."
 msgid "Inventory field"
 msgstr "资产纪录栏位"
 
-#: include/views/configuration.action.edit.php:1070
+#: include/views/configuration.action.edit.php:1069
 #: include/views/configuration.host.massupdate.php:269
 msgid "Inventory mode"
 msgstr "资产纪录模式"
@@ -9510,9 +9513,9 @@ msgstr "键值"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "键值 \"%1$s\" 不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: include/views/configuration.action.edit.php:983
-#: include/views/configuration.action.edit.php:1764
-#: include/views/configuration.action.edit.php:2218
+#: include/views/configuration.action.edit.php:982
+#: include/views/configuration.action.edit.php:1761
+#: include/views/configuration.action.edit.php:2215
 #: include/views/js/common.item.edit.js.php:361
 msgid "Key passphrase"
 msgstr "键值通行短语"
@@ -9556,7 +9559,7 @@ msgid "LDAP settings"
 msgstr "LDAP 设置"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:1096
+#: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.host.discovery.edit.php:615
 #: include/views/js/monitoring.sysmaps.js.php:110
@@ -10116,7 +10119,7 @@ msgstr "维护参数不存在."
 
 #: include/hosts.inc.php:1300
 #: include/views/administration.general.other.edit.php:58
-#: include/views/configuration.action.edit.php:1074
+#: include/views/configuration.action.edit.php:1073
 #: include/views/configuration.host.edit.php:692
 #: include/views/configuration.host.massupdate.php:274
 #: include/views/configuration.host.prototype.edit.php:367
@@ -10330,7 +10333,7 @@ msgctxt "May short"
 msgid "May"
 msgstr "五月"
 
-#: app/controllers/CControllerPopupMedia.php:170 app/views/popup.media.php:54
+#: app/controllers/CControllerPopupMedia.php:168 app/views/popup.media.php:61
 #: include/views/administration.users.edit.php:327
 #: include/views/administration.users.edit.php:460
 msgid "Media"
@@ -10416,10 +10419,10 @@ msgstr "进程内存，以字节为单位。返回整数"
 #: include/actions.inc.php:2119 include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:60
 #: include/views/administration.auditacts.list.php:91
-#: include/views/configuration.action.edit.php:787
-#: include/views/configuration.action.edit.php:1534
-#: include/views/configuration.action.edit.php:1822
-#: include/views/configuration.action.edit.php:2301
+#: include/views/configuration.action.edit.php:786
+#: include/views/configuration.action.edit.php:1531
+#: include/views/configuration.action.edit.php:1819
+#: include/views/configuration.action.edit.php:2300
 msgid "Message"
 msgstr "消息"
 
@@ -10708,7 +10711,7 @@ msgstr "NTLM"
 #: include/views/common.filter.trigger.php:66
 #: include/views/configuration.action.edit.php:40
 #: include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:1096
+#: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.action.list.php:47
 #: include/views/configuration.action.list.php:72
 #: include/views/configuration.application.edit.php:39
@@ -10840,12 +10843,12 @@ msgid "Never"
 msgstr "从未"
 
 #: include/views/configuration.action.edit.php:562
-#: include/views/configuration.action.edit.php:892
-#: include/views/configuration.action.edit.php:1153
-#: include/views/configuration.action.edit.php:1342
-#: include/views/configuration.action.edit.php:1658
-#: include/views/configuration.action.edit.php:2133
-#: include/views/configuration.action.edit.php:2332
+#: include/views/configuration.action.edit.php:891
+#: include/views/configuration.action.edit.php:1152
+#: include/views/configuration.action.edit.php:1341
+#: include/views/configuration.action.edit.php:1655
+#: include/views/configuration.action.edit.php:2130
+#: include/views/configuration.action.edit.php:2331
 #: include/views/configuration.discovery.edit.php:73
 #: include/views/configuration.maintenance.edit.php:123
 msgid "New"
@@ -11201,8 +11204,8 @@ msgstr "没有找到接口."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "代理\"%s\" 没有提供接口."
 
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1914
+#: include/classes/api/services/CHost.php:1749
+#: include/classes/api/services/CHost.php:1942
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "主机\"%s\" 没有提供接口."
@@ -11322,10 +11325,10 @@ msgstr "没有系统访问权限。"
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
 #: include/classes/api/services/CHostInterface.php:653
-#: include/classes/api/services/CHost.php:1126
-#: include/classes/api/services/CHost.php:1161
-#: include/classes/api/services/CHost.php:1712
-#: include/classes/api/services/CHost.php:1844
+#: include/classes/api/services/CHost.php:1127
+#: include/classes/api/services/CHost.php:1162
+#: include/classes/api/services/CHost.php:1725
+#: include/classes/api/services/CHost.php:1857
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11380,8 +11383,8 @@ msgstr "没有系统访问权限。"
 #: include/classes/api/services/CService.php:988
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:136
-#: include/classes/api/services/CTemplate.php:724
-#: include/classes/api/services/CTemplate.php:746
+#: include/classes/api/services/CTemplate.php:733
+#: include/classes/api/services/CTemplate.php:755
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
@@ -11523,8 +11526,8 @@ msgid "Norwegian (nb_NO)"
 msgstr "挪威（nb_NO）"
 
 #: include/actions.inc.php:155
-#: include/views/configuration.action.edit.php:1114
-#: include/views/configuration.action.edit.php:1206
+#: include/views/configuration.action.edit.php:1113
+#: include/views/configuration.action.edit.php:1205
 msgid "Not Ack"
 msgstr "非确认"
 
@@ -12003,13 +12006,13 @@ msgstr "操作\"%s\"已存在."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "由于未认证的请求, 操作无法完成."
 
-#: include/views/configuration.action.edit.php:1212
+#: include/views/configuration.action.edit.php:1211
 msgid "Operation condition"
 msgstr "操作的条件"
 
-#: include/views/configuration.action.edit.php:1233
-#: include/views/configuration.action.edit.php:1830
-#: include/views/configuration.action.edit.php:2314
+#: include/views/configuration.action.edit.php:1232
+#: include/views/configuration.action.edit.php:1827
+#: include/views/configuration.action.edit.php:2313
 msgid "Operation details"
 msgstr "操作细节"
 
@@ -12023,17 +12026,17 @@ msgstr "操作并无模板来操作."
 
 #: include/views/configuration.action.edit.php:615
 #: include/views/configuration.action.edit.php:627
-#: include/views/configuration.action.edit.php:1375
-#: include/views/configuration.action.edit.php:1387
-#: include/views/configuration.action.edit.php:1953
+#: include/views/configuration.action.edit.php:1374
+#: include/views/configuration.action.edit.php:1386
+#: include/views/configuration.action.edit.php:1950
 msgid "Operation type"
 msgstr "操作类型"
 
 #: include/views/configuration.action.edit.php:567
-#: include/views/configuration.action.edit.php:1256
-#: include/views/configuration.action.edit.php:1347
-#: include/views/configuration.action.edit.php:2308
-#: include/views/configuration.action.edit.php:2330
+#: include/views/configuration.action.edit.php:1255
+#: include/views/configuration.action.edit.php:1346
+#: include/views/configuration.action.edit.php:2307
+#: include/views/configuration.action.edit.php:2329
 #: include/views/configuration.action.list.php:74
 #: include/views/configuration.correlation.edit.php:242
 #: include/views/configuration.correlation.edit.php:267
@@ -12054,7 +12057,7 @@ msgstr "选项"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
 #: include/triggers.inc.php:1351
 #: include/views/configuration.action.edit.php:113
-#: include/views/configuration.action.edit.php:1141
+#: include/views/configuration.action.edit.php:1140
 #: include/views/configuration.correlation.edit.php:95
 #: include/views/configuration.host.discovery.edit.php:597
 #: include/views/configuration.maintenance.edit.php:171
@@ -12465,12 +12468,12 @@ msgstr "被动式"
 #: include/classes/setup/CSetupWizard.php:248
 #: include/views/administration.users.edit.php:114
 #: include/views/administration.users.edit.php:146
-#: include/views/configuration.action.edit.php:948
-#: include/views/configuration.action.edit.php:977
-#: include/views/configuration.action.edit.php:1720
-#: include/views/configuration.action.edit.php:1752
-#: include/views/configuration.action.edit.php:2186
-#: include/views/configuration.action.edit.php:2213
+#: include/views/configuration.action.edit.php:947
+#: include/views/configuration.action.edit.php:976
+#: include/views/configuration.action.edit.php:1717
+#: include/views/configuration.action.edit.php:1749
+#: include/views/configuration.action.edit.php:2183
+#: include/views/configuration.action.edit.php:2210
 #: include/views/configuration.host.discovery.edit.php:302
 #: include/views/configuration.host.discovery.edit.php:459
 #: include/views/configuration.host.discovery.edit.php:487
@@ -12656,9 +12659,9 @@ msgstr "填入主机资产纪录栏位"
 #: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:105
 #: host_discovery.php:105 include/classes/setup/CSetupWizard.php:279
-#: include/forms.inc.php:472 include/views/configuration.action.edit.php:991
-#: include/views/configuration.action.edit.php:1767
-#: include/views/configuration.action.edit.php:2225
+#: include/forms.inc.php:472 include/views/configuration.action.edit.php:990
+#: include/views/configuration.action.edit.php:1764
+#: include/views/configuration.action.edit.php:2222
 #: include/views/configuration.host.discovery.edit.php:446
 #: include/views/configuration.host.edit.php:111
 #: include/views/configuration.host.edit.php:194
@@ -12782,9 +12785,9 @@ msgstr "隐私协议"
 msgid "Private"
 msgstr "Private（私人的）"
 
-#: include/views/configuration.action.edit.php:970
-#: include/views/configuration.action.edit.php:1744
-#: include/views/configuration.action.edit.php:2206
+#: include/views/configuration.action.edit.php:969
+#: include/views/configuration.action.edit.php:1741
+#: include/views/configuration.action.edit.php:2203
 #: include/views/configuration.host.discovery.edit.php:481
 #: include/views/configuration.item.edit.php:629
 #: include/views/configuration.item.massupdate.php:323
@@ -12980,9 +12983,9 @@ msgstr "agent代理程序已添加"
 msgid "Public"
 msgstr "公开"
 
-#: include/views/configuration.action.edit.php:949
-#: include/views/configuration.action.edit.php:1721
-#: include/views/configuration.action.edit.php:2187
+#: include/views/configuration.action.edit.php:948
+#: include/views/configuration.action.edit.php:1718
+#: include/views/configuration.action.edit.php:2184
 #: include/views/configuration.host.discovery.edit.php:460
 #: include/views/configuration.item.edit.php:600
 #: include/views/configuration.item.massupdate.php:300
@@ -12990,9 +12993,9 @@ msgstr "公开"
 msgid "Public key"
 msgstr "公钥"
 
-#: include/views/configuration.action.edit.php:962
-#: include/views/configuration.action.edit.php:1735
-#: include/views/configuration.action.edit.php:2198
+#: include/views/configuration.action.edit.php:961
+#: include/views/configuration.action.edit.php:1732
+#: include/views/configuration.action.edit.php:2195
 #: include/views/configuration.host.discovery.edit.php:474
 #: include/views/configuration.item.edit.php:622
 #: include/views/configuration.item.massupdate.php:315
@@ -13130,7 +13133,7 @@ msgstr "恢复表达式"
 msgid "Recovery expression syntax error."
 msgstr "恢复表达式语法错误。"
 
-#: include/views/configuration.action.edit.php:1852
+#: include/views/configuration.action.edit.php:1849
 msgid "Recovery operations"
 msgstr "恢复操作"
 
@@ -13236,7 +13239,7 @@ msgstr "远程命令"
 #: app/views/monitoring.problem.view.js.php:28
 #: app/views/monitoring.problem.view.php:200
 #: app/views/monitoring.problem.view.php:247 app/views/popup.media.php:41
-#: app/views/popup.media.php:96 include/classes/widgets/CWidgetHelper.php:409
+#: app/views/popup.media.php:103 include/classes/widgets/CWidgetHelper.php:409
 #: include/classes/widgets/CWidgetHelper.php:453
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
@@ -13248,9 +13251,9 @@ msgstr "远程命令"
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.action.edit.php:533
-#: include/views/configuration.action.edit.php:1123
-#: include/views/configuration.action.edit.php:1312
-#: include/views/configuration.action.edit.php:1906
+#: include/views/configuration.action.edit.php:1122
+#: include/views/configuration.action.edit.php:1311
+#: include/views/configuration.action.edit.php:1903
 #: include/views/configuration.correlation.edit.php:76
 #: include/views/configuration.correlation.edit.php:230
 #: include/views/configuration.host.discovery.edit.php:131
@@ -13850,9 +13853,9 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQL描述式执行已失败: \"%1$s\"."
 
 #: include/discovery.inc.php:47
-#: include/views/configuration.action.edit.php:922
-#: include/views/configuration.action.edit.php:1676
-#: include/views/configuration.action.edit.php:2151
+#: include/views/configuration.action.edit.php:921
+#: include/views/configuration.action.edit.php:1673
+#: include/views/configuration.action.edit.php:2148
 #: include/views/js/configuration.discovery.edit.js.php:193
 msgid "SSH"
 msgstr "SSH"
@@ -14079,9 +14082,9 @@ msgstr "脚本菜单路径\"%1$s\"已经应用于脚本名 \"%2$s\""
 
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.list.php:81
-#: include/views/configuration.action.edit.php:929
-#: include/views/configuration.action.edit.php:1700
-#: include/views/configuration.action.edit.php:2157
+#: include/views/configuration.action.edit.php:928
+#: include/views/configuration.action.edit.php:1697
+#: include/views/configuration.action.edit.php:2154
 msgid "Script name"
 msgstr "脚本名称"
 
@@ -14191,9 +14194,9 @@ msgstr "安全名称"
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
 #: include/views/configuration.action.edit.php:269
-#: include/views/configuration.action.edit.php:910
-#: include/views/configuration.action.edit.php:1692
-#: include/views/configuration.action.edit.php:2168
+#: include/views/configuration.action.edit.php:909
+#: include/views/configuration.action.edit.php:1689
+#: include/views/configuration.action.edit.php:2165
 #: include/views/configuration.graph.edit.php:187
 #: include/views/configuration.graph.edit.php:269
 #: include/views/configuration.item.edit.php:91
@@ -14280,26 +14283,26 @@ msgstr "发送消息给用户群组"
 msgid "Send message to users"
 msgstr "发送消息给用户"
 
-#: include/views/configuration.action.edit.php:778
-#: include/views/configuration.action.edit.php:1524
-#: include/views/configuration.action.edit.php:2288
+#: include/views/configuration.action.edit.php:777
+#: include/views/configuration.action.edit.php:1521
+#: include/views/configuration.action.edit.php:2283
 msgid "Send only to"
 msgstr "仅送到"
 
-#: app/views/popup.media.php:57 app/views/popup.media.php:64
+#: app/views/popup.media.php:64 app/views/popup.media.php:71
 #: include/views/administration.users.edit.php:249
 msgid "Send to"
 msgstr "收件人"
 
 #: include/views/configuration.action.edit.php:755
-#: include/views/configuration.action.edit.php:1500
-#: include/views/configuration.action.edit.php:2257
+#: include/views/configuration.action.edit.php:1499
+#: include/views/configuration.action.edit.php:2254
 msgid "Send to User groups"
 msgstr "发送到用户群组"
 
 #: include/views/configuration.action.edit.php:760
-#: include/views/configuration.action.edit.php:1505
-#: include/views/configuration.action.edit.php:2265
+#: include/views/configuration.action.edit.php:1504
+#: include/views/configuration.action.edit.php:2262
 msgid "Send to Users"
 msgstr "发送到用户"
 
@@ -15108,10 +15111,10 @@ msgid "Subfilter"
 msgstr "过滤器"
 
 #: include/views/administration.auditacts.list.php:86
-#: include/views/configuration.action.edit.php:783
-#: include/views/configuration.action.edit.php:1529
-#: include/views/configuration.action.edit.php:1817
-#: include/views/configuration.action.edit.php:2296
+#: include/views/configuration.action.edit.php:782
+#: include/views/configuration.action.edit.php:1526
+#: include/views/configuration.action.edit.php:1814
+#: include/views/configuration.action.edit.php:2295
 msgid "Subject"
 msgstr "主题"
 
@@ -15322,9 +15325,9 @@ msgstr "标记值"
 msgid "Tags"
 msgstr "标记"
 
-#: include/views/configuration.action.edit.php:888
-#: include/views/configuration.action.edit.php:1654
-#: include/views/configuration.action.edit.php:2129
+#: include/views/configuration.action.edit.php:887
+#: include/views/configuration.action.edit.php:1651
+#: include/views/configuration.action.edit.php:2126
 #: include/views/configuration.copy.elements.php:64
 #: include/views/configuration.trigger.prototype.edit.php:172
 #: include/views/configuration.trigger.prototype.edit.php:366
@@ -15336,9 +15339,9 @@ msgstr "标记"
 msgid "Target"
 msgstr "目标"
 
-#: include/views/configuration.action.edit.php:884
-#: include/views/configuration.action.edit.php:1650
-#: include/views/configuration.action.edit.php:2125
+#: include/views/configuration.action.edit.php:883
+#: include/views/configuration.action.edit.php:1647
+#: include/views/configuration.action.edit.php:2122
 msgid "Target list"
 msgstr "目标列表"
 
@@ -15347,9 +15350,9 @@ msgid "Target type"
 msgstr "目标类型"
 
 #: include/discovery.inc.php:61
-#: include/views/configuration.action.edit.php:923
-#: include/views/configuration.action.edit.php:1677
-#: include/views/configuration.action.edit.php:2152
+#: include/views/configuration.action.edit.php:922
+#: include/views/configuration.action.edit.php:1674
+#: include/views/configuration.action.edit.php:2149
 #: include/views/js/configuration.discovery.edit.js.php:194
 msgid "Telnet"
 msgstr "Telnet"
@@ -15362,8 +15365,8 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "模板"
 
-#: include/classes/api/services/CHost.php:858
-#: include/classes/api/services/CTemplate.php:425
+#: include/classes/api/services/CHost.php:859
+#: include/classes/api/services/CTemplate.php:434
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15371,7 +15374,7 @@ msgstr "模板 \"%1$s\" 已存在."
 
 #: include/classes/api/services/CHostGroup.php:1457
 #: include/classes/api/services/CTemplate.php:368
-#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:997
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "模板 \"%1$s\" 不能没有主机组。"
@@ -15435,25 +15438,25 @@ msgstr "模板已更新"
 msgid "Template value"
 msgstr "模板值"
 
-#: include/classes/api/services/CTemplate.php:1043
+#: include/classes/api/services/CTemplate.php:1052
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "拥有相同名称 \"%1$s\"的模板已经存在."
 
-#: include/classes/api/services/CHost.php:1803
-#: include/classes/api/services/CHost.php:2028
+#: include/classes/api/services/CHost.php:1816
+#: include/classes/api/services/CHost.php:2056
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "含有相同名称\"%1$s\"的模板已链接到主机."
 
-#: include/classes/api/services/CTemplate.php:448
-#: include/classes/api/services/CTemplate.php:1008
+#: include/classes/api/services/CTemplate.php:457
+#: include/classes/api/services/CTemplate.php:1017
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "拥有相同显示名称\"%1$s\"的模板已经存在."
 
-#: include/classes/api/services/CHost.php:1809
-#: include/classes/api/services/CHost.php:2036
+#: include/classes/api/services/CHost.php:1822
+#: include/classes/api/services/CHost.php:2064
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "含有相同可视名称\"%1$s\"的模板已链接到主机."
@@ -15463,7 +15466,7 @@ msgid "Templated items"
 msgstr "模板的监控项"
 
 #: app/controllers/CControllerPopupGeneric.php:75 include/menu.inc.php:188
-#: include/views/configuration.action.edit.php:1047
+#: include/views/configuration.action.edit.php:1046
 #: include/views/configuration.copy.elements.php:59
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.hostgroups.list.php:59
@@ -16161,7 +16164,7 @@ msgstr "应选择两个拓扑元素"
 #: app/views/administration.script.list.php:57
 #: app/views/dashboard.sharing.edit.php:73
 #: app/views/monitoring.widget.actionlog.view.php:31
-#: app/views/popup.generic.php:87 app/views/popup.media.php:55
+#: app/views/popup.generic.php:87 app/views/popup.media.php:62
 #: app/views/popup.triggerwizard.php:43 app/views/popup.triggerwizard.php:112
 #: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:48
@@ -16171,9 +16174,9 @@ msgstr "应选择两个拓扑元素"
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
 #: include/views/administration.users.edit.php:249
-#: include/views/configuration.action.edit.php:916
-#: include/views/configuration.action.edit.php:1696
-#: include/views/configuration.action.edit.php:2145
+#: include/views/configuration.action.edit.php:915
+#: include/views/configuration.action.edit.php:1693
+#: include/views/configuration.action.edit.php:2142
 #: include/views/configuration.graph.edit.php:336
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.discovery.edit.php:61
@@ -16221,7 +16224,7 @@ msgid "Type (descending)"
 msgstr "类型(降序)"
 
 #: include/views/configuration.action.edit.php:118
-#: include/views/configuration.action.edit.php:1145
+#: include/views/configuration.action.edit.php:1144
 #: include/views/configuration.correlation.edit.php:91
 #: include/views/configuration.host.discovery.edit.php:592
 msgid "Type of calculation"
@@ -16559,7 +16562,7 @@ msgstr "上"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:171 app/views/popup.media.php:113
+#: app/views/popup.httpstep.php:171 app/views/popup.media.php:120
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:138
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
@@ -16575,10 +16578,10 @@ msgstr "上"
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
 #: include/views/administration.users.edit.php:533
-#: include/views/configuration.action.edit.php:1238
-#: include/views/configuration.action.edit.php:1835
-#: include/views/configuration.action.edit.php:2317
-#: include/views/configuration.action.edit.php:2352
+#: include/views/configuration.action.edit.php:1237
+#: include/views/configuration.action.edit.php:1832
+#: include/views/configuration.action.edit.php:2316
+#: include/views/configuration.action.edit.php:2351
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:108
@@ -16624,7 +16627,7 @@ msgstr "更新现有的"
 msgid "Update interval"
 msgstr "更新间隔"
 
-#: include/views/configuration.action.edit.php:2341
+#: include/views/configuration.action.edit.php:2340
 msgid "Update operations"
 msgstr "更新操作"
 
@@ -16689,7 +16692,7 @@ msgstr "使用大量请求"
 msgid "Use custom event status colours"
 msgstr "使用自定义事件状态颜色"
 
-#: app/views/popup.media.php:73
+#: app/views/popup.media.php:80
 #: include/views/administration.users.edit.php:249
 msgid "Use if severity"
 msgstr "如果存在严重性则使用"
@@ -16709,8 +16712,8 @@ msgstr "用于监控项"
 #: include/views/administration.auditlogs.list.php:71
 #: include/views/administration.users.edit.php:458
 #: include/views/configuration.action.edit.php:698
-#: include/views/configuration.action.edit.php:1440
-#: include/views/configuration.action.edit.php:1985
+#: include/views/configuration.action.edit.php:1439
+#: include/views/configuration.action.edit.php:1982
 #: include/views/configuration.httpconf.edit.php:163
 msgid "User"
 msgstr "用户"
@@ -16779,8 +16782,8 @@ msgstr "用户已删除"
 #: include/views/administration.usergroups.edit.php:268
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:676
-#: include/views/configuration.action.edit.php:1418
-#: include/views/configuration.action.edit.php:1963
+#: include/views/configuration.action.edit.php:1417
+#: include/views/configuration.action.edit.php:1960
 msgid "User group"
 msgstr "用户群组"
 
@@ -16867,9 +16870,9 @@ msgid "User menu"
 msgstr "用户菜单"
 
 #: disc_prototypes.php:75 host_discovery.php:72
-#: include/views/configuration.action.edit.php:954
-#: include/views/configuration.action.edit.php:1727
-#: include/views/configuration.action.edit.php:2190
+#: include/views/configuration.action.edit.php:953
+#: include/views/configuration.action.edit.php:1724
+#: include/views/configuration.action.edit.php:2187
 #: include/views/configuration.host.discovery.edit.php:294
 #: include/views/configuration.host.discovery.edit.php:469
 #: include/views/configuration.item.edit.php:335
@@ -17388,7 +17391,7 @@ msgstr "虚拟空间大小（以字节计）或百分比（总计）。 返回�
 msgid "Visible name"
 msgstr "可见的名称"
 
-#: include/classes/api/services/CHost.php:1939
+#: include/classes/api/services/CHost.php:1967
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "如果缺少主机名称, 可见的名称不能为空."
 
@@ -17507,7 +17510,7 @@ msgstr "欢迎"
 msgid "Welcome to"
 msgstr "欢迎来到"
 
-#: app/controllers/CControllerPopupMedia.php:110 app/views/popup.media.php:68
+#: app/controllers/CControllerPopupMedia.php:110 app/views/popup.media.php:75
 #: include/views/administration.users.edit.php:249
 msgid "When active"
 msgstr "当启用时"
@@ -17586,8 +17589,8 @@ msgstr "写"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "错误的服务\"%1$s\"其依赖关系栏位."
 
-#: include/classes/api/services/CHost.php:1651
-#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:1652
+#: include/classes/api/services/CHost.php:1845
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "错误的主机栏位\"%1$s\"."
@@ -17807,8 +17810,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "您没有指定目标为动作操作的全域脚本\"%s\"."
 
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:699
-#: include/classes/api/services/CHost.php:761
+#: include/classes/api/services/CHost.php:700
+#: include/classes/api/services/CHost.php:762
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:521
@@ -17818,11 +17821,11 @@ msgstr "您没有指定目标为动作操作的全域脚本\"%s\"."
 #: include/classes/api/services/CScript.php:318
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:104
-#: include/classes/api/services/CTemplate.php:388
-#: include/classes/api/services/CTemplate.php:531
-#: include/classes/api/services/CTemplate.php:563
-#: include/classes/api/services/CTemplate.php:980
-#: include/classes/api/services/CTemplate.php:1086
+#: include/classes/api/services/CTemplate.php:397
+#: include/classes/api/services/CTemplate.php:540
+#: include/classes/api/services/CTemplate.php:572
+#: include/classes/api/services/CTemplate.php:989
+#: include/classes/api/services/CTemplate.php:1095
 #: include/classes/api/services/CUserMacro.php:266
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
@@ -17883,9 +17886,9 @@ msgstr "用户"
 
 #: app/views/administration.script.edit.php:50 include/actions.inc.php:895
 #: include/discovery.inc.php:56 include/items.inc.php:85
-#: include/views/configuration.action.edit.php:938
-#: include/views/configuration.action.edit.php:1710
-#: include/views/configuration.action.edit.php:2177
+#: include/views/configuration.action.edit.php:937
+#: include/views/configuration.action.edit.php:1707
+#: include/views/configuration.action.edit.php:2174
 #: include/views/js/configuration.discovery.edit.js.php:195
 msgid "Zabbix agent"
 msgstr "Zabbix 客户端"
@@ -17916,9 +17919,9 @@ msgstr "Zabbix 登录表单"
 
 #: app/views/administration.script.edit.php:52 include/actions.inc.php:905
 #: include/classes/setup/CSetupWizard.php:320
-#: include/views/configuration.action.edit.php:940
-#: include/views/configuration.action.edit.php:1712
-#: include/views/configuration.action.edit.php:2179
+#: include/views/configuration.action.edit.php:939
+#: include/views/configuration.action.edit.php:1709
+#: include/views/configuration.action.edit.php:2176
 msgid "Zabbix server"
 msgstr "zabbix服务器"
 
@@ -17934,9 +17937,9 @@ msgstr ""
 "2. 错误的网络配置。\n"
 
 #: app/views/administration.script.edit.php:51 include/actions.inc.php:900
-#: include/views/configuration.action.edit.php:939
-#: include/views/configuration.action.edit.php:1711
-#: include/views/configuration.action.edit.php:2178
+#: include/views/configuration.action.edit.php:938
+#: include/views/configuration.action.edit.php:1708
+#: include/views/configuration.action.edit.php:2175
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (代理)"
 
@@ -18111,7 +18114,7 @@ msgstr "预设一个数组或一个字符串"
 msgid "an empty string is expected"
 msgstr "请指定一个空字符串"
 
-#: include/classes/api/services/CHost.php:1592
+#: include/classes/api/services/CHost.php:1593
 msgid "an even number of hexadecimal characters is expected"
 msgstr "预设会出现偶数个十六进制字符"
 
@@ -18219,8 +18222,8 @@ msgstr "不能变更"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1580
-#: include/classes/api/services/CHost.php:1586
+#: include/classes/api/services/CHost.php:1581
+#: include/classes/api/services/CHost.php:1587
 #: include/classes/api/services/CItemGeneral.php:484
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
@@ -18499,8 +18502,7 @@ msgstr "包括子组"
 msgid "incorrect element count"
 msgstr "错误的元素"
 
-#: include/classes/parsers/CItemKey.php:80
-#: include/classes/parsers/CUserMacroParser.php:59
+#: include/classes/parsers/CParser.php:117
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
 msgstr "\"%1$s\"附近语法错误"
@@ -18577,7 +18579,7 @@ msgstr "监控项被禁用"
 msgid "item pattern"
 msgstr "监控项模式"
 
-#: include/classes/parsers/CItemKey.php:120
+#: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "关键字为空"
 
@@ -18641,7 +18643,7 @@ msgstr "m-d"
 msgid "m-d H:i"
 msgstr "m-d H:i"
 
-#: include/classes/parsers/CUserMacroParser.php:45
+#: include/classes/parsers/CUserMacroParser.php:35
 msgid "macro is empty"
 msgstr "宏是空的"
 
@@ -18697,7 +18699,7 @@ msgstr "最小"
 msgid "min() - Minimum value for period T"
 msgstr "min() - 周期 T 内的最小值"
 
-#: include/classes/api/services/CHost.php:1598
+#: include/classes/api/services/CHost.php:1599
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "最小长度为 %1$s 个字符"
@@ -18954,10 +18956,10 @@ msgstr "选择"
 msgid "short description"
 msgstr "简要描述"
 
-#: include/classes/api/services/CHost.php:1605
-#: include/classes/api/services/CHost.php:1611
-#: include/classes/api/services/CHost.php:1620
-#: include/classes/api/services/CHost.php:1626
+#: include/classes/api/services/CHost.php:1606
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1621
+#: include/classes/api/services/CHost.php:1627
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
@@ -19040,7 +19042,10 @@ msgstr "模板ID\"%1$s\"已传送%2$s次"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:385
+#: include/classes/api/services/CHost.php:1686
+#: include/classes/api/services/CHost.php:1875
 #: include/classes/api/services/CHttpTest.php:744
+#: include/classes/api/services/CTemplate.php:378
 #: include/classes/validators/CApiInputValidator.php:867
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -19110,11 +19115,11 @@ msgstr "在此输入搜索"
 msgid "unacceptable URL"
 msgstr ""
 
-#: include/classes/parsers/CItemKey.php:172
+#: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
 msgstr "非期望的关键字结束"
 
-#: include/classes/parsers/CUserMacroParser.php:45
+#: include/classes/parsers/CUserMacroParser.php:36
 msgid "unexpected end of macro"
 msgstr "宏的结束是不正确"
 
@@ -19140,8 +19145,8 @@ msgstr "异常的文本 \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1560
-#: include/classes/api/services/CHost.php:1566
+#: include/classes/api/services/CHost.php:1561
+#: include/classes/api/services/CHost.php:1567
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -19228,9 +19233,9 @@ msgid "value is too long"
 msgstr "值过长"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1724
-#: include/classes/api/services/CHost.php:1864
+#: include/classes/api/services/CHost.php:772
+#: include/classes/api/services/CHost.php:1737
+#: include/classes/api/services/CHost.php:1892
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
