@@ -499,7 +499,7 @@ class CHost extends CHostGeneral {
 
 		$hostids = [];
 
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
 			if (!array_key_exists('name', $host) || !trim($host['name'])) {
 				$host['name'] = $host['host'];
@@ -559,9 +559,10 @@ class CHost extends CHostGeneral {
 				$hostInventory['hostid'] = $hostid;
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
-
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['name'], null, null, null);
 		}
+		unset($host);
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hosts);
 
 		return ['hostids' => $hostids];
 	}
