@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 19:52+0300\n"
+"POT-Creation-Date: 2020-08-07 19:52+0300\n"
 "PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1274,7 +1274,7 @@ msgstr "自動登錄之事件及警報資料保存期限"
 msgid "Auto-registration event and alert data storage period \"%1$s\"."
 msgstr ""
 
-#: include/hosts.inc.php:1301
+#: include/hosts.inc.php:1274
 #: include/views/administration.general.other.edit.php:59
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:693
@@ -1905,11 +1905,11 @@ msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "無法刪除群組"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:749 hosts.php:770
 msgid "Cannot delete host"
 msgstr "無法删除主機"
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1210
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -1937,7 +1937,7 @@ msgstr "無法刪除圖示對應"
 msgid "Cannot delete image"
 msgstr "無法删除圖片"
 
-#: include/classes/api/services/CHost.php:999
+#: include/classes/api/services/CHost.php:997
 msgid "Cannot delete inventory."
 msgstr "無法刪除資產紀錄."
 
@@ -2101,8 +2101,8 @@ msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "無法停用探索規則"
 
-#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:205
-#: hosts.php:818
+#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:196
+#: hosts.php:802
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "無法停用主機"
@@ -2156,8 +2156,8 @@ msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "無法啟用探索規則"
 
-#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:204
-#: hosts.php:817
+#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:195
+#: hosts.php:801
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "無法啟用數筆主機"
@@ -2358,7 +2358,7 @@ msgstr "不能包含檢視檔案\"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "無法插入觸發器表示式"
 
-#: include/classes/api/services/CHost.php:977
+#: include/classes/api/services/CHost.php:975
 msgid "Cannot link template"
 msgstr "無法連結模板"
 
@@ -2371,7 +2371,7 @@ msgstr "無法連結範本"
 msgid "Cannot logout."
 msgstr "不能登出"
 
-#: include/classes/api/services/CHost.php:835
+#: include/classes/api/services/CHost.php:841
 msgid "Cannot mass update host name."
 msgstr "不能大量更新主機名稱."
 
@@ -2379,7 +2379,7 @@ msgstr "不能大量更新主機名稱."
 msgid "Cannot mass update template name."
 msgstr "無法大量更新範本名稱"
 
-#: include/classes/api/services/CHost.php:821
+#: include/classes/api/services/CHost.php:827
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可見主機名稱"
 
@@ -2505,9 +2505,9 @@ msgstr ""
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "無法設置 \"templateid\"給篩選\"%1$s\"."
 
-#: include/classes/api/services/CHost.php:886
-#: include/classes/api/services/CHost.php:1764
-#: include/classes/api/services/CHost.php:1925
+#: include/classes/api/services/CHost.php:892
+#: include/classes/api/services/CHost.php:1780
+#: include/classes/api/services/CHost.php:1941
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -2540,7 +2540,7 @@ msgstr ""
 msgid "Cannot unlink and clear discovery rules"
 msgstr "無法斷連和清除探索規則"
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:950
 msgid "Cannot unlink template"
 msgstr "無法斷連模板"
 
@@ -2595,7 +2595,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1902
+#: include/classes/api/services/CHost.php:1918
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr ""
@@ -2712,7 +2712,7 @@ msgstr ""
 msgid "Cannot update host"
 msgstr "無法更新主機"
 
-#: include/classes/api/services/CHost.php:783
+#: include/classes/api/services/CHost.php:789
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr ""
 
@@ -4631,7 +4631,7 @@ msgstr ""
 msgid "Deleted"
 msgstr "已删除"
 
-#: include/classes/api/services/CHost.php:1346
+#: include/classes/api/services/CHost.php:1362
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已刪除: 主機 \"%1$s\"."
@@ -4834,7 +4834,7 @@ msgstr "停用選取的網頁檢測？"
 
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:128 auditlogs.php:147
-#: include/discovery.inc.php:108 include/hosts.inc.php:1299
+#: include/discovery.inc.php:108 include/hosts.inc.php:1272
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
 #: include/items.inc.php:189 include/triggers.inc.php:2216
@@ -5162,14 +5162,14 @@ msgstr "觸發器 \"%1$s\" 中的重複相依關係."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1700
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1716
+#: include/classes/api/services/CHost.php:1971
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "重複的主機. 有相同主機名稱\"%s\"的主機已存於資料中."
 
-#: include/classes/api/services/CHost.php:1707
-#: include/classes/api/services/CHost.php:1975
+#: include/classes/api/services/CHost.php:1723
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "重複的主機. 有相同主機可視名稱\"%s\"的主機已存於資料中."
@@ -5396,7 +5396,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
-#: include/classes/api/services/CHost.php:1158
+#: include/classes/api/services/CHost.php:1138
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CImage.php:437
 #: include/classes/api/services/CMaintenance.php:528
@@ -5952,7 +5952,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:906
-#: include/classes/api/services/CHost.php:744
+#: include/classes/api/services/CHost.php:747
 #: include/classes/api/services/CTemplate.php:793
 #: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:256
@@ -6887,7 +6887,7 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主機"
 
-#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CHost.php:854
 #: include/classes/api/services/CTemplate.php:444
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
@@ -6895,9 +6895,9 @@ msgid "Host \"%1$s\" already exists."
 msgstr "主機 \"%1$s\" 已存在."
 
 #: include/classes/api/services/CHostGroup.php:1452
-#: include/classes/api/services/CHost.php:807
-#: include/classes/api/services/CHost.php:1676
-#: include/classes/api/services/CHost.php:1865
+#: include/classes/api/services/CHost.php:813
+#: include/classes/api/services/CHost.php:1692
+#: include/classes/api/services/CHost.php:1881
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr ""
@@ -6923,7 +6923,7 @@ msgstr "主機存取"
 msgid "Host added"
 msgstr "已新增主機"
 
-#: include/classes/api/services/CHostInterface.php:819
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "主機不能有超過一個同類型的預設介面."
 
@@ -6931,18 +6931,18 @@ msgstr "主機不能有超過一個同類型的預設介面."
 msgid "Host count"
 msgstr "主機計數"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:749 hosts.php:770
 msgid "Host deleted"
 msgstr "主機已删除"
 
-#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:202
-#: hosts.php:815
+#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:193
+#: hosts.php:799
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] ""
 
-#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:201
-#: hosts.php:814
+#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:192
+#: hosts.php:798
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] ""
@@ -7140,7 +7140,7 @@ msgstr "主機子網路遮罩"
 msgid "Host time"
 msgstr "主機時間"
 
-#: include/classes/api/services/CHost.php:675
+#: include/classes/api/services/CHost.php:678
 msgid "Host update failed."
 msgstr "主機更新失敗."
 
@@ -7158,8 +7158,8 @@ msgstr ""
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1795
-#: include/classes/api/services/CHost.php:2031
+#: include/classes/api/services/CHost.php:1811
+#: include/classes/api/services/CHost.php:2047
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "名稱同樣為 \"%s\" 的主機已存在."
@@ -7170,8 +7170,8 @@ msgstr "名稱同樣為 \"%s\" 的主機已存在."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1801
-#: include/classes/api/services/CHost.php:2038
+#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:2054
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
@@ -7528,8 +7528,8 @@ msgstr ""
 msgid "Inaccessible map"
 msgstr ""
 
-#: include/graphs.inc.php:271 include/hosts.inc.php:658
-#: include/hosts.inc.php:827 include/httptest.inc.php:209
+#: include/graphs.inc.php:271 include/hosts.inc.php:631
+#: include/hosts.inc.php:800 include/httptest.inc.php:209
 #: include/items.inc.php:898 include/triggers.inc.php:2507
 msgid "Inaccessible template"
 msgstr ""
@@ -7794,6 +7794,7 @@ msgstr "不正確的自變數傳入方程式"
 #: include/classes/api/services/CEvent.php:793
 #: include/classes/api/services/CHostInterface.php:234
 #: include/classes/api/services/CHostInterface.php:431
+#: include/classes/api/services/CHost.php:1174
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:257
@@ -7839,7 +7840,7 @@ msgstr "不正確的自變數傳給方法."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:674
+#: include/classes/api/services/CHostInterface.php:678
 msgid "Incorrect bulk value for interface."
 msgstr ""
 
@@ -7848,9 +7849,9 @@ msgstr ""
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "不正確的計算SLA值予服務\"%1$s\"."
 
-#: include/classes/api/services/CHost.php:830
-#: include/classes/api/services/CHost.php:1664
-#: include/classes/api/services/CHost.php:1949
+#: include/classes/api/services/CHost.php:836
+#: include/classes/api/services/CHost.php:1680
+#: include/classes/api/services/CHost.php:1965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "不正確的字元用於主機名稱\"%s\"."
@@ -8011,9 +8012,9 @@ msgstr "不正確的圖片索引"
 #: include/classes/api/services/CAction.php:2902
 #: include/classes/api/services/CAction.php:2914
 #: include/classes/api/services/CAction.php:2926
-#: include/classes/api/services/CHost.php:813
-#: include/classes/api/services/CHost.php:1658
-#: include/classes/api/services/CHost.php:1851
+#: include/classes/api/services/CHost.php:819
+#: include/classes/api/services/CHost.php:1674
+#: include/classes/api/services/CHost.php:1867
 #: include/classes/api/services/CImage.php:449
 #: include/classes/api/services/CImage.php:490
 #: include/classes/api/services/CProxy.php:619
@@ -8027,18 +8028,18 @@ msgstr "不正確的圖片索引"
 msgid "Incorrect input parameters."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:586
+#: include/classes/api/services/CHostInterface.php:590
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "給予了不正確的介面DNS參數\"%s\"."
 
-#: include/classes/api/services/CHostInterface.php:630
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "給予了不正確的介面埠參數\"%s\"."
 
-#: include/classes/api/services/CHost.php:1770
-#: include/classes/api/services/CHost.php:1931
+#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1947
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "不正確的資產紀錄欄位\"%s\"."
@@ -8238,8 +8239,8 @@ msgstr ""
 msgid "Incorrect source value."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1897
+#: include/classes/api/services/CHost.php:1758
+#: include/classes/api/services/CHost.php:1913
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
@@ -8481,21 +8482,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1560
-#: include/classes/api/services/CHost.php:1566
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
-#: include/classes/api/services/CHost.php:1592
-#: include/classes/api/services/CHost.php:1598
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
-#: include/classes/api/services/CHost.php:1685
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:777
+#: include/classes/api/services/CHost.php:1576
+#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1608
+#: include/classes/api/services/CHost.php:1614
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
+#: include/classes/api/services/CHost.php:1701
+#: include/classes/api/services/CHost.php:1752
+#: include/classes/api/services/CHost.php:1890
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:216
@@ -8703,7 +8704,7 @@ msgstr "安裝名稱"
 msgid "Interface"
 msgstr "介面"
 
-#: include/classes/api/services/CHostInterface.php:839
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "介面是連結到\"%2$s\"上的項目\"%1$s\"."
@@ -8793,7 +8794,7 @@ msgstr "IE瀏覽器"
 msgid "Interval"
 msgstr "間隔"
 
-#: include/classes/api/services/CHostInterface.php:614
+#: include/classes/api/services/CHostInterface.php:618
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr ""
@@ -9098,7 +9099,7 @@ msgstr "所給的\"%s\"為無效的檢視名稱.  可用的: \"a-z\" 和 \".\"."
 msgid "Inventory"
 msgstr "資產記錄"
 
-#: include/classes/api/services/CHost.php:1018
+#: include/classes/api/services/CHost.php:1016
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -10117,7 +10118,7 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr "維修參數不存在."
 
-#: include/hosts.inc.php:1300
+#: include/hosts.inc.php:1273
 #: include/views/administration.general.other.edit.php:58
 #: include/views/configuration.action.edit.php:1073
 #: include/views/configuration.host.edit.php:692
@@ -11101,7 +11102,7 @@ msgstr ""
 msgid "No data."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"上之\"%1$s\"類型無預設介面."
@@ -11206,8 +11207,8 @@ msgstr "沒有找到介面."
 msgid "No interface provided for proxy \"%s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1749
-#: include/classes/api/services/CHost.php:1942
+#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1958
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "沒有主機\"%s\"的介面."
@@ -11326,11 +11327,11 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
-#: include/classes/api/services/CHostInterface.php:653
-#: include/classes/api/services/CHost.php:1127
-#: include/classes/api/services/CHost.php:1162
-#: include/classes/api/services/CHost.php:1725
-#: include/classes/api/services/CHost.php:1857
+#: include/classes/api/services/CHostInterface.php:657
+#: include/classes/api/services/CHost.php:1143
+#: include/classes/api/services/CHost.php:1178
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1873
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -12676,7 +12677,7 @@ msgstr "填入主機資產紀錄欄位"
 msgid "Port"
 msgstr "埠"
 
-#: include/classes/api/services/CHostInterface.php:627
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr "主機介面的埠不能是空白."
 
@@ -15363,7 +15364,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "模板"
 
-#: include/classes/api/services/CHost.php:859
+#: include/classes/api/services/CHost.php:865
 #: include/classes/api/services/CTemplate.php:434
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
@@ -15441,8 +15442,8 @@ msgstr ""
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1816
-#: include/classes/api/services/CHost.php:2056
+#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:2072
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "含有相同名稱\"%1$s\"的模板已連結到主機."
@@ -15453,8 +15454,8 @@ msgstr "含有相同名稱\"%1$s\"的模板已連結到主機."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1822
-#: include/classes/api/services/CHost.php:2064
+#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:2080
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "含有相同可視名稱\"%1$s\"的模板已連結到主機."
@@ -16637,7 +16638,7 @@ msgstr ""
 msgid "Updated"
 msgstr "更新"
 
-#: include/hosts.inc.php:554
+#: include/classes/api/services/CHost.php:1111
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr ""
@@ -17388,7 +17389,7 @@ msgstr ""
 msgid "Visible name"
 msgstr "可見的名稱"
 
-#: include/classes/api/services/CHost.php:1967
+#: include/classes/api/services/CHost.php:1983
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "如果缺少主機名稱, 可見的名稱不能是空白."
 
@@ -17586,8 +17587,8 @@ msgstr "寫"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "錯誤的服務\"%1$s\"其相依關係欄位."
 
-#: include/classes/api/services/CHost.php:1652
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1668
+#: include/classes/api/services/CHost.php:1861
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "錯誤的主機欄位\"%1$s\"."
@@ -17807,8 +17808,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:700
-#: include/classes/api/services/CHost.php:762
+#: include/classes/api/services/CHost.php:703
+#: include/classes/api/services/CHost.php:768
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:521
@@ -18111,7 +18112,7 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1593
+#: include/classes/api/services/CHost.php:1609
 msgid "an even number of hexadecimal characters is expected"
 msgstr ""
 
@@ -18219,8 +18220,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
 #: include/classes/api/services/CItemGeneral.php:484
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
@@ -18696,7 +18697,7 @@ msgstr "最小"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1599
+#: include/classes/api/services/CHost.php:1615
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr ""
@@ -18748,7 +18749,7 @@ msgstr ""
 msgid "new"
 msgstr "新的"
 
-#: hosts.php:1156 include/views/configuration.host.massupdate.php:83
+#: hosts.php:1140 include/views/configuration.host.massupdate.php:83
 #: include/views/configuration.item.massupdate.php:646 templates.php:531
 msgctxt "new element in multiselect"
 msgid "new"
@@ -18953,10 +18954,10 @@ msgstr ""
 msgid "short description"
 msgstr "簡述"
 
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
@@ -19039,8 +19040,8 @@ msgstr "模板ID\"%1$s\"已傳送%2$s次"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:385
-#: include/classes/api/services/CHost.php:1686
-#: include/classes/api/services/CHost.php:1875
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1891
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CTemplate.php:378
 #: include/classes/validators/CApiInputValidator.php:867
@@ -19142,8 +19143,8 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CHost.php:1577
+#: include/classes/api/services/CHost.php:1583
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -19230,9 +19231,9 @@ msgid "value is too long"
 msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CHost.php:772
-#: include/classes/api/services/CHost.php:1737
-#: include/classes/api/services/CHost.php:1892
+#: include/classes/api/services/CHost.php:778
+#: include/classes/api/services/CHost.php:1753
+#: include/classes/api/services/CHost.php:1908
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681

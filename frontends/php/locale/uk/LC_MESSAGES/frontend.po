@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 19:52+0300\n"
+"POT-Creation-Date: 2020-08-07 19:52+0300\n"
 "PO-Revision-Date: 2019-03-19 11:55+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1312,7 +1312,7 @@ msgstr "Період зберігання даних про події авто�
 msgid "Auto-registration event and alert data storage period \"%1$s\"."
 msgstr "Період зберігання даних про події автореєстрації та повідомлень \"%1$s\"."
 
-#: include/hosts.inc.php:1301
+#: include/hosts.inc.php:1274
 #: include/views/administration.general.other.edit.php:59
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:693
@@ -1953,11 +1953,11 @@ msgstr[0] "Не вдалося видалити групу"
 msgstr[1] "Не вдалося видалити групи"
 msgstr[2] "Не вдалося видалити групи"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:749 hosts.php:770
 msgid "Cannot delete host"
 msgstr "Не вдалося видалити вузел мережі"
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1210
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -1989,7 +1989,7 @@ msgstr "Не вдалося видалити призначення іконок
 msgid "Cannot delete image"
 msgstr "Не вдалося видалити картинку"
 
-#: include/classes/api/services/CHost.php:999
+#: include/classes/api/services/CHost.php:997
 msgid "Cannot delete inventory."
 msgstr "Не вдалося видалити інвентарні дані."
 
@@ -2169,8 +2169,8 @@ msgstr[0] "Не вдалося дезактивувати правило вия�
 msgstr[1] "Не вдалося дезактивувати правила виявлення"
 msgstr[2] "Не вдалося дезактивувати правила виявлення"
 
-#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:205
-#: hosts.php:818
+#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:196
+#: hosts.php:802
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Не вдалося дезактивувати вузел мережі"
@@ -2241,8 +2241,8 @@ msgstr[0] "Не вдалося активувати правило виявле�
 msgstr[1] "Не вдалося активувати правила виявлення"
 msgstr[2] "Не вдалося активувати правила виявлення"
 
-#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:204
-#: hosts.php:817
+#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:195
+#: hosts.php:801
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Не вдалося активувати вузел мережі"
@@ -2458,7 +2458,7 @@ msgstr "Не вдалося включити файлу вигляду \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "Не вдалося вставити вираз тригера"
 
-#: include/classes/api/services/CHost.php:977
+#: include/classes/api/services/CHost.php:975
 msgid "Cannot link template"
 msgstr "Не вдалося приєднати шаблон"
 
@@ -2471,7 +2471,7 @@ msgstr "Не вдалося приєднати шаблон."
 msgid "Cannot logout."
 msgstr "Не вдалося виконати вихід."
 
-#: include/classes/api/services/CHost.php:835
+#: include/classes/api/services/CHost.php:841
 msgid "Cannot mass update host name."
 msgstr "Неможливо масово оновити ім'я вузла мережі."
 
@@ -2479,7 +2479,7 @@ msgstr "Неможливо масово оновити ім'я вузла мер
 msgid "Cannot mass update template name."
 msgstr "Неможливо масово оновити ім'я шаблону."
 
-#: include/classes/api/services/CHost.php:821
+#: include/classes/api/services/CHost.php:827
 msgid "Cannot mass update visible host name."
 msgstr "Неможливо масово оновити видиме ім'я вузла мережі."
 
@@ -2605,9 +2605,9 @@ msgstr "Не вдалося задати поле \"templateid\" для прот
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Не вдалося встановити \"templateid\" для комплексного екрану \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:886
-#: include/classes/api/services/CHost.php:1764
-#: include/classes/api/services/CHost.php:1925
+#: include/classes/api/services/CHost.php:892
+#: include/classes/api/services/CHost.php:1780
+#: include/classes/api/services/CHost.php:1941
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Не вдалося задати поля інтентарних даних при відключеній інвентаризації."
 
@@ -2640,7 +2640,7 @@ msgstr "Не вдалося від'єднати і очистити групи �
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не вдалося від'єднати та очистити правила виявлення"
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:950
 msgid "Cannot unlink template"
 msgstr "Не вдалося від'єднати шаблон"
 
@@ -2695,7 +2695,7 @@ msgstr "Не вдалося оновити \"%1$s\" для тригера \"%2$s
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для прототипу тригера \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1902
+#: include/classes/api/services/CHost.php:1918
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для виявленого вузла мережі \"%2$s\"."
@@ -2814,7 +2814,7 @@ msgstr "Не вдалося оновити групи для виявленог�
 msgid "Cannot update host"
 msgstr "Не вдалося оновити вузел мережі"
 
-#: include/classes/api/services/CHost.php:783
+#: include/classes/api/services/CHost.php:789
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Не вдалося оновити налаштування шифрування вузла мережі. Потрібно вказати налаштування з'єднання для обох сторін."
 
@@ -4747,7 +4747,7 @@ msgstr "Видалити веб сценарій?"
 msgid "Deleted"
 msgstr "Видалено"
 
-#: include/classes/api/services/CHost.php:1346
+#: include/classes/api/services/CHost.php:1362
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Видалено: Вузел мережі \"%1$s\"."
@@ -4950,7 +4950,7 @@ msgstr "Дезактивувати вибрані веб сценарії?"
 
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:128 auditlogs.php:147
-#: include/discovery.inc.php:108 include/hosts.inc.php:1299
+#: include/discovery.inc.php:108 include/hosts.inc.php:1272
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
 #: include/items.inc.php:189 include/triggers.inc.php:2216
@@ -5282,14 +5282,14 @@ msgstr "Дублюючі залежності в тригері \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Дублікат залежності в прототипі тригерів \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1700
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1716
+#: include/classes/api/services/CHost.php:1971
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Дублікат вузла мережі. Вузел мережі з таким же ім'ям \"%s\" вже існує в даних."
 
-#: include/classes/api/services/CHost.php:1707
-#: include/classes/api/services/CHost.php:1975
+#: include/classes/api/services/CHost.php:1723
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Дублікат вузла мережі. Вузел мережі з таким же видимим ім'ям \"%s\" вже існує в даних."
@@ -5516,7 +5516,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
-#: include/classes/api/services/CHost.php:1158
+#: include/classes/api/services/CHost.php:1138
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CImage.php:437
 #: include/classes/api/services/CMaintenance.php:528
@@ -6074,7 +6074,7 @@ msgstr "Поле \"%1$s\" не може бути встановлено в NULL.
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:906
-#: include/classes/api/services/CHost.php:744
+#: include/classes/api/services/CHost.php:747
 #: include/classes/api/services/CTemplate.php:793
 #: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:256
@@ -7013,7 +7013,7 @@ msgstr[0] "Вузел мережі"
 msgstr[1] "Вузли мережі"
 msgstr[2] "Вузли мережі"
 
-#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CHost.php:854
 #: include/classes/api/services/CTemplate.php:444
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
@@ -7021,9 +7021,9 @@ msgid "Host \"%1$s\" already exists."
 msgstr "Вузел мережі \"%1$s\" вже існує."
 
 #: include/classes/api/services/CHostGroup.php:1452
-#: include/classes/api/services/CHost.php:807
-#: include/classes/api/services/CHost.php:1676
-#: include/classes/api/services/CHost.php:1865
+#: include/classes/api/services/CHost.php:813
+#: include/classes/api/services/CHost.php:1692
+#: include/classes/api/services/CHost.php:1881
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Вузел мережі \"%1$s\" не може бути без групи вузлів мережі."
@@ -7049,7 +7049,7 @@ msgstr "Доступ до вузла мережі"
 msgid "Host added"
 msgstr "Вузел мережі додано"
 
-#: include/classes/api/services/CHostInterface.php:819
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "У вузла мережі не може бути більше одного інтерфейсу по замовчуванню однакового типу."
 
@@ -7057,20 +7057,20 @@ msgstr "У вузла мережі не може бути більше одно�
 msgid "Host count"
 msgstr "Кількість вузлів мережі"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:749 hosts.php:770
 msgid "Host deleted"
 msgstr "Вузел мережі видалено"
 
-#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:202
-#: hosts.php:815
+#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:193
+#: hosts.php:799
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Вузел мережі дезактивовано"
 msgstr[1] "Вузли мережі дезактивовано"
 msgstr[2] "Вузли мережі дезактивовано"
 
-#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:201
-#: hosts.php:814
+#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:192
+#: hosts.php:798
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Вузел мережі активовано"
@@ -7272,7 +7272,7 @@ msgstr "Маска підмережі вузла мережі"
 msgid "Host time"
 msgstr "Час вузла мережі"
 
-#: include/classes/api/services/CHost.php:675
+#: include/classes/api/services/CHost.php:678
 msgid "Host update failed."
 msgstr "Помилка при оновленні вузла мережі."
 
@@ -7290,8 +7290,8 @@ msgstr "Вузел мережі з ID \"%1$s\" недоступний."
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Вузел мережі з таким самим іменем \"%1$s\" вже існує."
 
-#: include/classes/api/services/CHost.php:1795
-#: include/classes/api/services/CHost.php:2031
+#: include/classes/api/services/CHost.php:1811
+#: include/classes/api/services/CHost.php:2047
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Вузел мережі з цим самим іменем \"%s\" вже існує."
@@ -7302,8 +7302,8 @@ msgstr "Вузел мережі з цим самим іменем \"%s\" вже 
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Вузел мережі з таким самим видимим іменем \"%1$s\" вже існує."
 
-#: include/classes/api/services/CHost.php:1801
-#: include/classes/api/services/CHost.php:2038
+#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:2054
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Вузел мережі з цим самим видимим іменем \"%s\" вже існує."
@@ -7660,8 +7660,8 @@ msgstr "Недоступне обслуговування"
 msgid "Inaccessible map"
 msgstr "Недоступна карта мережі"
 
-#: include/graphs.inc.php:271 include/hosts.inc.php:658
-#: include/hosts.inc.php:827 include/httptest.inc.php:209
+#: include/graphs.inc.php:271 include/hosts.inc.php:631
+#: include/hosts.inc.php:800 include/httptest.inc.php:209
 #: include/items.inc.php:898 include/triggers.inc.php:2507
 msgid "Inaccessible template"
 msgstr "Недоступний шаблон"
@@ -7926,6 +7926,7 @@ msgstr "Функції передано некоректні параметри"
 #: include/classes/api/services/CEvent.php:793
 #: include/classes/api/services/CHostInterface.php:234
 #: include/classes/api/services/CHostInterface.php:431
+#: include/classes/api/services/CHost.php:1174
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:257
@@ -7971,7 +7972,7 @@ msgstr "Некоректні параметри передано методу."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Некоректний протокол аутентифікації для елемента даних \"%1$s\"."
 
-#: include/classes/api/services/CHostInterface.php:674
+#: include/classes/api/services/CHostInterface.php:678
 msgid "Incorrect bulk value for interface."
 msgstr "Некоректне масове значення для інтерфейсу."
 
@@ -7980,9 +7981,9 @@ msgstr "Некоректне масове значення для інтерфе
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некоректне значення для вирахування SLA для послуги \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:830
-#: include/classes/api/services/CHost.php:1664
-#: include/classes/api/services/CHost.php:1949
+#: include/classes/api/services/CHost.php:836
+#: include/classes/api/services/CHost.php:1680
+#: include/classes/api/services/CHost.php:1965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Використано некоректні символи в імені вузла мережі \"%s\"."
@@ -8143,9 +8144,9 @@ msgstr "Некоректний номер картинки."
 #: include/classes/api/services/CAction.php:2902
 #: include/classes/api/services/CAction.php:2914
 #: include/classes/api/services/CAction.php:2926
-#: include/classes/api/services/CHost.php:813
-#: include/classes/api/services/CHost.php:1658
-#: include/classes/api/services/CHost.php:1851
+#: include/classes/api/services/CHost.php:819
+#: include/classes/api/services/CHost.php:1674
+#: include/classes/api/services/CHost.php:1867
 #: include/classes/api/services/CImage.php:449
 #: include/classes/api/services/CImage.php:490
 #: include/classes/api/services/CProxy.php:619
@@ -8159,18 +8160,18 @@ msgstr "Некоректний номер картинки."
 msgid "Incorrect input parameters."
 msgstr "Некоректні вхідні параметри."
 
-#: include/classes/api/services/CHostInterface.php:586
+#: include/classes/api/services/CHostInterface.php:590
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Для інтерфейсу вказано некоректний параметр DNS \"%s\"."
 
-#: include/classes/api/services/CHostInterface.php:630
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Для інтерфейсу вказано некоректний порт \"%s\"."
 
-#: include/classes/api/services/CHost.php:1770
-#: include/classes/api/services/CHost.php:1931
+#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1947
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Некоректне поле \"%s\" інвентарних даних."
@@ -8370,8 +8371,8 @@ msgstr "Некоректный порядок сортування в послу
 msgid "Incorrect source value."
 msgstr "Некоректне значення джерела."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1897
+#: include/classes/api/services/CHost.php:1758
+#: include/classes/api/services/CHost.php:1913
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Некоректний статус для вузла мережі \"%1$s\"."
@@ -8613,21 +8614,21 @@ msgstr "Некоректне значення для поля \"%1$s\"."
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1560
-#: include/classes/api/services/CHost.php:1566
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
-#: include/classes/api/services/CHost.php:1592
-#: include/classes/api/services/CHost.php:1598
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
-#: include/classes/api/services/CHost.php:1685
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:777
+#: include/classes/api/services/CHost.php:1576
+#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1608
+#: include/classes/api/services/CHost.php:1614
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
+#: include/classes/api/services/CHost.php:1701
+#: include/classes/api/services/CHost.php:1752
+#: include/classes/api/services/CHost.php:1890
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:216
@@ -8835,7 +8836,7 @@ msgstr "Ім'я інсталятора"
 msgid "Interface"
 msgstr "Інтерфейс"
 
-#: include/classes/api/services/CHostInterface.php:839
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Інтерфейс зв'язаний з елементом даних \"%1$s\" у \"%2$s\"."
@@ -8925,7 +8926,7 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Інтервал"
 
-#: include/classes/api/services/CHostInterface.php:614
+#: include/classes/api/services/CHostInterface.php:618
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr "Неправильна IP адреса \"%1$s\"."
@@ -9230,7 +9231,7 @@ msgstr "Отримано помилкове ім'я вигляду \"%s\". До�
 msgid "Inventory"
 msgstr "Інвентаризація"
 
-#: include/classes/api/services/CHost.php:1018
+#: include/classes/api/services/CHost.php:1016
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Інвентарні данні дезактивовано для вузла мережі \"%1$s\"."
@@ -10269,7 +10270,7 @@ msgstr "Обслуговування: %1$s"
 msgid "Mandatory parameter is missing."
 msgstr "Пропущено обов'язковий параметр."
 
-#: include/hosts.inc.php:1300
+#: include/hosts.inc.php:1273
 #: include/views/administration.general.other.edit.php:58
 #: include/views/configuration.action.edit.php:1073
 #: include/views/configuration.host.edit.php:692
@@ -11261,7 +11262,7 @@ msgstr "Дані не знайдено."
 msgid "No data."
 msgstr "Данні відсутні."
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Відсутній інтерфейс по замовчуванню \"%1$s\" типу у вузла мережі \"%2$s\"."
@@ -11366,8 +11367,8 @@ msgstr "Інтерфейсу не знайдено."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Не вказано інтерфейс для проксі \"%s\"."
 
-#: include/classes/api/services/CHost.php:1749
-#: include/classes/api/services/CHost.php:1942
+#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1958
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Немає інтерфейсів для вузла мережі \"%s\"."
@@ -11486,11 +11487,11 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
-#: include/classes/api/services/CHostInterface.php:653
-#: include/classes/api/services/CHost.php:1127
-#: include/classes/api/services/CHost.php:1162
-#: include/classes/api/services/CHost.php:1725
-#: include/classes/api/services/CHost.php:1857
+#: include/classes/api/services/CHostInterface.php:657
+#: include/classes/api/services/CHost.php:1143
+#: include/classes/api/services/CHost.php:1178
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1873
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -12838,7 +12839,7 @@ msgstr "Заповнює поле інвентарних даних вузла �
 msgid "Port"
 msgstr "Порт"
 
-#: include/classes/api/services/CHostInterface.php:627
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr "Порт не може бути порожнім для інтерфейсу вузла мережі."
 
@@ -15531,7 +15532,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Шаблон"
 
-#: include/classes/api/services/CHost.php:859
+#: include/classes/api/services/CHost.php:865
 #: include/classes/api/services/CTemplate.php:434
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
@@ -15609,8 +15610,8 @@ msgstr "Значення з шаблону"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Шаблон з таким самим іменем \"%1$s\" вже існує."
 
-#: include/classes/api/services/CHost.php:1816
-#: include/classes/api/services/CHost.php:2056
+#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:2072
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Шаблон із цим самим ім'ям \"%s\" вже існує."
@@ -15621,8 +15622,8 @@ msgstr "Шаблон із цим самим ім'ям \"%s\" вже існує."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Шаблон із цим самим видимим ім'ям \"%1$s\" вже існує."
 
-#: include/classes/api/services/CHost.php:1822
-#: include/classes/api/services/CHost.php:2064
+#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:2080
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Шаблон із цим самим видимим ім'ям \"%s\" вже існує."
@@ -16817,7 +16818,7 @@ msgstr "Оновити проблему"
 msgid "Updated"
 msgstr "Оновлено"
 
-#: include/hosts.inc.php:554
+#: include/classes/api/services/CHost.php:1111
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Стан вузла мережі \"%1$s\" оновлено."
@@ -17574,7 +17575,7 @@ msgstr "Розмір віртуального простору в байтах �
 msgid "Visible name"
 msgstr "Видиме ім'я"
 
-#: include/classes/api/services/CHost.php:1967
+#: include/classes/api/services/CHost.php:1983
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Видиме ім'я не може бути пустим, якщо ім'я вузла мережі відсутнє."
 
@@ -17776,8 +17777,8 @@ msgstr "Запис"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Помилкові поля для залежності послуги \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1652
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1668
+#: include/classes/api/services/CHost.php:1861
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Помилкові поля для вузла мережі \"%1$s\"."
@@ -17997,8 +17998,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Ви не вказали цілі глобального скрипта \"%s\" в операції дії."
 
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:700
-#: include/classes/api/services/CHost.php:762
+#: include/classes/api/services/CHost.php:703
+#: include/classes/api/services/CHost.php:768
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:521
@@ -18301,7 +18302,7 @@ msgstr "очікується масив або рядок символів"
 msgid "an empty string is expected"
 msgstr "очікувався пустий рядок"
 
-#: include/classes/api/services/CHost.php:1593
+#: include/classes/api/services/CHost.php:1609
 msgid "an even number of hexadecimal characters is expected"
 msgstr "очікується парна кількість шістнадцяткових символів"
 
@@ -18409,8 +18410,8 @@ msgstr "неможливо змінити"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
 #: include/classes/api/services/CItemGeneral.php:484
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
@@ -18886,7 +18887,7 @@ msgstr "мін."
 msgid "min() - Minimum value for period T"
 msgstr "max() - Мінімальне значення за період Т"
 
-#: include/classes/api/services/CHost.php:1599
+#: include/classes/api/services/CHost.php:1615
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "мінімальна довжина %1$s символів"
@@ -18938,7 +18939,7 @@ msgstr "назва"
 msgid "new"
 msgstr "новий"
 
-#: hosts.php:1156 include/views/configuration.host.massupdate.php:83
+#: hosts.php:1140 include/views/configuration.host.massupdate.php:83
 #: include/views/configuration.item.massupdate.php:646 templates.php:531
 msgctxt "new element in multiselect"
 msgid "new"
@@ -19143,10 +19144,10 @@ msgstr "вибрано"
 msgid "short description"
 msgstr "короткий опис"
 
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
@@ -19229,8 +19230,8 @@ msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:385
-#: include/classes/api/services/CHost.php:1686
-#: include/classes/api/services/CHost.php:1875
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1891
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CTemplate.php:378
 #: include/classes/validators/CApiInputValidator.php:867
@@ -19332,8 +19333,8 @@ msgstr "неочікуваний текст \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CHost.php:1577
+#: include/classes/api/services/CHost.php:1583
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -19420,9 +19421,9 @@ msgid "value is too long"
 msgstr "значення надто довге"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CHost.php:772
-#: include/classes/api/services/CHost.php:1737
-#: include/classes/api/services/CHost.php:1892
+#: include/classes/api/services/CHost.php:778
+#: include/classes/api/services/CHost.php:1753
+#: include/classes/api/services/CHost.php:1908
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681

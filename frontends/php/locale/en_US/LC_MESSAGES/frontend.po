@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 19:52+0300\n"
+"POT-Creation-Date: 2020-08-07 19:52+0300\n"
 "PO-Revision-Date: 2019-03-19 11:57+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: \n"
@@ -1290,7 +1290,7 @@ msgstr "Auto-registration event and alert data storage period"
 msgid "Auto-registration event and alert data storage period \"%1$s\"."
 msgstr "Auto-registration event and alert data storage period \"%1$s\"."
 
-#: include/hosts.inc.php:1301
+#: include/hosts.inc.php:1274
 #: include/views/administration.general.other.edit.php:59
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:693
@@ -1925,11 +1925,11 @@ msgid_plural "Cannot delete groups"
 msgstr[0] "Cannot delete group"
 msgstr[1] "Cannot delete groups"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:749 hosts.php:770
 msgid "Cannot delete host"
 msgstr "Cannot delete host"
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1210
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -1959,7 +1959,7 @@ msgstr "Cannot delete icon map"
 msgid "Cannot delete image"
 msgstr "Cannot delete image"
 
-#: include/classes/api/services/CHost.php:999
+#: include/classes/api/services/CHost.php:997
 msgid "Cannot delete inventory."
 msgstr "Cannot delete inventory."
 
@@ -2131,8 +2131,8 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Cannot disable discovery rule"
 msgstr[1] "Cannot disable discovery rules"
 
-#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:205
-#: hosts.php:818
+#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:196
+#: hosts.php:802
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Cannot disable host"
@@ -2194,8 +2194,8 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Cannot enable discovery rule"
 msgstr[1] "Cannot enable discovery rules"
 
-#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:204
-#: hosts.php:817
+#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:195
+#: hosts.php:801
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Cannot enable host"
@@ -2403,7 +2403,7 @@ msgstr "Cannot include view file \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "Cannot insert trigger expression"
 
-#: include/classes/api/services/CHost.php:977
+#: include/classes/api/services/CHost.php:975
 msgid "Cannot link template"
 msgstr "Cannot link template"
 
@@ -2416,7 +2416,7 @@ msgstr "Cannot link template."
 msgid "Cannot logout."
 msgstr "Cannot logout."
 
-#: include/classes/api/services/CHost.php:835
+#: include/classes/api/services/CHost.php:841
 msgid "Cannot mass update host name."
 msgstr "Cannot mass update host name."
 
@@ -2424,7 +2424,7 @@ msgstr "Cannot mass update host name."
 msgid "Cannot mass update template name."
 msgstr "Cannot mass update template name."
 
-#: include/classes/api/services/CHost.php:821
+#: include/classes/api/services/CHost.php:827
 msgid "Cannot mass update visible host name."
 msgstr "Cannot mass update visible host name."
 
@@ -2550,9 +2550,9 @@ msgstr "Cannot set \"templateid\" field for application prototype in item protot
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Cannot set \"templateid\" for screen \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:886
-#: include/classes/api/services/CHost.php:1764
-#: include/classes/api/services/CHost.php:1925
+#: include/classes/api/services/CHost.php:892
+#: include/classes/api/services/CHost.php:1780
+#: include/classes/api/services/CHost.php:1941
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Cannot set inventory fields for disabled inventory."
 
@@ -2585,7 +2585,7 @@ msgstr "Cannot unlink and clear applications."
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Cannot unlink and clear discovery rules"
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:950
 msgid "Cannot unlink template"
 msgstr "Cannot unlink template"
 
@@ -2640,7 +2640,7 @@ msgstr "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1902
+#: include/classes/api/services/CHost.php:1918
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -2758,7 +2758,7 @@ msgstr "Cannot update groups for discovered host \"%1$s\"."
 msgid "Cannot update host"
 msgstr "Cannot update host"
 
-#: include/classes/api/services/CHost.php:783
+#: include/classes/api/services/CHost.php:789
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Cannot update host encryption settings. Connection settings for both directions should be specified."
 
@@ -4684,7 +4684,7 @@ msgstr "Delete web scenario?"
 msgid "Deleted"
 msgstr "Deleted"
 
-#: include/classes/api/services/CHost.php:1346
+#: include/classes/api/services/CHost.php:1362
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Deleted: Host \"%1$s\"."
@@ -4887,7 +4887,7 @@ msgstr "Disable selected web scenarios?"
 
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:128 auditlogs.php:147
-#: include/discovery.inc.php:108 include/hosts.inc.php:1299
+#: include/discovery.inc.php:108 include/hosts.inc.php:1272
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
 #: include/items.inc.php:189 include/triggers.inc.php:2216
@@ -5217,14 +5217,14 @@ msgstr "Duplicate dependencies in trigger \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Duplicate dependencies in trigger prototype \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1700
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1716
+#: include/classes/api/services/CHost.php:1971
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Duplicate host. Host with the same host name \"%s\" already exists in data."
 
-#: include/classes/api/services/CHost.php:1707
-#: include/classes/api/services/CHost.php:1975
+#: include/classes/api/services/CHost.php:1723
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Duplicate host. Host with the same visible name \"%s\" already exists in data."
@@ -5451,7 +5451,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
-#: include/classes/api/services/CHost.php:1158
+#: include/classes/api/services/CHost.php:1138
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CImage.php:437
 #: include/classes/api/services/CMaintenance.php:528
@@ -6008,7 +6008,7 @@ msgstr "Field \"%1$s\" cannot be set to NULL."
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:906
-#: include/classes/api/services/CHost.php:744
+#: include/classes/api/services/CHost.php:747
 #: include/classes/api/services/CTemplate.php:793
 #: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:256
@@ -6944,7 +6944,7 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Hosts"
 
-#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CHost.php:854
 #: include/classes/api/services/CTemplate.php:444
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
@@ -6952,9 +6952,9 @@ msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" already exists."
 
 #: include/classes/api/services/CHostGroup.php:1452
-#: include/classes/api/services/CHost.php:807
-#: include/classes/api/services/CHost.php:1676
-#: include/classes/api/services/CHost.php:1865
+#: include/classes/api/services/CHost.php:813
+#: include/classes/api/services/CHost.php:1692
+#: include/classes/api/services/CHost.php:1881
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Host \"%1$s\" cannot be without host group."
@@ -6980,7 +6980,7 @@ msgstr "Host access"
 msgid "Host added"
 msgstr "Host added"
 
-#: include/classes/api/services/CHostInterface.php:819
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Host cannot have more than one default interface of the same type."
 
@@ -6988,19 +6988,19 @@ msgstr "Host cannot have more than one default interface of the same type."
 msgid "Host count"
 msgstr "Host count"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:749 hosts.php:770
 msgid "Host deleted"
 msgstr "Host deleted"
 
-#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:202
-#: hosts.php:815
+#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:193
+#: hosts.php:799
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Host disabled"
 msgstr[1] "Hosts disabled"
 
-#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:201
-#: hosts.php:814
+#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:192
+#: hosts.php:798
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host enabled"
@@ -7200,7 +7200,7 @@ msgstr "Host subnet mask"
 msgid "Host time"
 msgstr "Host time"
 
-#: include/classes/api/services/CHost.php:675
+#: include/classes/api/services/CHost.php:678
 msgid "Host update failed."
 msgstr "Host update failed."
 
@@ -7218,8 +7218,8 @@ msgstr "Host with ID \"%1$s\" is not available."
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Host with the same name \"%1$s\" already exists."
 
-#: include/classes/api/services/CHost.php:1795
-#: include/classes/api/services/CHost.php:2031
+#: include/classes/api/services/CHost.php:1811
+#: include/classes/api/services/CHost.php:2047
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Host with the same name \"%s\" already exists."
@@ -7230,8 +7230,8 @@ msgstr "Host with the same name \"%s\" already exists."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Host with the same visible name \"%1$s\" already exists."
 
-#: include/classes/api/services/CHost.php:1801
-#: include/classes/api/services/CHost.php:2038
+#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:2054
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host with the same visible name \"%s\" already exists."
@@ -7588,8 +7588,8 @@ msgstr "Inaccessible maintenance"
 msgid "Inaccessible map"
 msgstr "Inaccessible map"
 
-#: include/graphs.inc.php:271 include/hosts.inc.php:658
-#: include/hosts.inc.php:827 include/httptest.inc.php:209
+#: include/graphs.inc.php:271 include/hosts.inc.php:631
+#: include/hosts.inc.php:800 include/httptest.inc.php:209
 #: include/items.inc.php:898 include/triggers.inc.php:2507
 msgid "Inaccessible template"
 msgstr "Inaccessible template"
@@ -7854,6 +7854,7 @@ msgstr "Incorrect arguments passed to function"
 #: include/classes/api/services/CEvent.php:793
 #: include/classes/api/services/CHostInterface.php:234
 #: include/classes/api/services/CHostInterface.php:431
+#: include/classes/api/services/CHost.php:1174
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:257
@@ -7899,7 +7900,7 @@ msgstr "Incorrect arguments passed to method."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Incorrect authentication protocol for item \"%1$s\"."
 
-#: include/classes/api/services/CHostInterface.php:674
+#: include/classes/api/services/CHostInterface.php:678
 msgid "Incorrect bulk value for interface."
 msgstr "Incorrect bulk value for interface."
 
@@ -7908,9 +7909,9 @@ msgstr "Incorrect bulk value for interface."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Incorrect calculate SLA value for service \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:830
-#: include/classes/api/services/CHost.php:1664
-#: include/classes/api/services/CHost.php:1949
+#: include/classes/api/services/CHost.php:836
+#: include/classes/api/services/CHost.php:1680
+#: include/classes/api/services/CHost.php:1965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Incorrect characters used for host name \"%s\"."
@@ -8071,9 +8072,9 @@ msgstr "Incorrect image index."
 #: include/classes/api/services/CAction.php:2902
 #: include/classes/api/services/CAction.php:2914
 #: include/classes/api/services/CAction.php:2926
-#: include/classes/api/services/CHost.php:813
-#: include/classes/api/services/CHost.php:1658
-#: include/classes/api/services/CHost.php:1851
+#: include/classes/api/services/CHost.php:819
+#: include/classes/api/services/CHost.php:1674
+#: include/classes/api/services/CHost.php:1867
 #: include/classes/api/services/CImage.php:449
 #: include/classes/api/services/CImage.php:490
 #: include/classes/api/services/CProxy.php:619
@@ -8087,18 +8088,18 @@ msgstr "Incorrect image index."
 msgid "Incorrect input parameters."
 msgstr "Incorrect input parameters."
 
-#: include/classes/api/services/CHostInterface.php:586
+#: include/classes/api/services/CHostInterface.php:590
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Incorrect interface DNS parameter \"%s\" provided."
 
-#: include/classes/api/services/CHostInterface.php:630
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Incorrect interface port \"%s\" provided."
 
-#: include/classes/api/services/CHost.php:1770
-#: include/classes/api/services/CHost.php:1931
+#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1947
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Incorrect inventory field \"%s\"."
@@ -8298,8 +8299,8 @@ msgstr "Incorrect sort order for service \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Incorrect source value."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1897
+#: include/classes/api/services/CHost.php:1758
+#: include/classes/api/services/CHost.php:1913
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Incorrect status for host \"%1$s\"."
@@ -8541,21 +8542,21 @@ msgstr "Incorrect value for \"%1$s\" field."
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1560
-#: include/classes/api/services/CHost.php:1566
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
-#: include/classes/api/services/CHost.php:1592
-#: include/classes/api/services/CHost.php:1598
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
-#: include/classes/api/services/CHost.php:1685
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:777
+#: include/classes/api/services/CHost.php:1576
+#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1608
+#: include/classes/api/services/CHost.php:1614
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
+#: include/classes/api/services/CHost.php:1701
+#: include/classes/api/services/CHost.php:1752
+#: include/classes/api/services/CHost.php:1890
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:216
@@ -8763,7 +8764,7 @@ msgstr "Installer name"
 msgid "Interface"
 msgstr "Interface"
 
-#: include/classes/api/services/CHostInterface.php:839
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Interface is linked to item \"%1$s\" on \"%2$s\"."
@@ -8853,7 +8854,7 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Interval"
 
-#: include/classes/api/services/CHostInterface.php:614
+#: include/classes/api/services/CHostInterface.php:618
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr "Invalid IP address \"%1$s\"."
@@ -9158,7 +9159,7 @@ msgstr "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgid "Inventory"
 msgstr "Inventory"
 
-#: include/classes/api/services/CHost.php:1018
+#: include/classes/api/services/CHost.php:1016
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventory disabled for host \"%1$s\"."
@@ -10187,7 +10188,7 @@ msgstr "Maintenance: %1$s"
 msgid "Mandatory parameter is missing."
 msgstr "Mandatory parameter is missing."
 
-#: include/hosts.inc.php:1300
+#: include/hosts.inc.php:1273
 #: include/views/administration.general.other.edit.php:58
 #: include/views/configuration.action.edit.php:1073
 #: include/views/configuration.host.edit.php:692
@@ -11174,7 +11175,7 @@ msgstr "No data found."
 msgid "No data."
 msgstr "No data."
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "No default interface for \"%1$s\" type on \"%2$s\"."
@@ -11279,8 +11280,8 @@ msgstr "No interface found."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "No interface provided for proxy \"%s\"."
 
-#: include/classes/api/services/CHost.php:1749
-#: include/classes/api/services/CHost.php:1942
+#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1958
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "No interfaces for host \"%s\"."
@@ -11399,11 +11400,11 @@ msgstr "No permissions for system access."
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
-#: include/classes/api/services/CHostInterface.php:653
-#: include/classes/api/services/CHost.php:1127
-#: include/classes/api/services/CHost.php:1162
-#: include/classes/api/services/CHost.php:1725
-#: include/classes/api/services/CHost.php:1857
+#: include/classes/api/services/CHostInterface.php:657
+#: include/classes/api/services/CHost.php:1143
+#: include/classes/api/services/CHost.php:1178
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1873
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -12750,7 +12751,7 @@ msgstr "Populates host inventory field"
 msgid "Port"
 msgstr "Port"
 
-#: include/classes/api/services/CHostInterface.php:627
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr "Port cannot be empty for host interface."
 
@@ -15440,7 +15441,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:859
+#: include/classes/api/services/CHost.php:865
 #: include/classes/api/services/CTemplate.php:434
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
@@ -15518,8 +15519,8 @@ msgstr "Template value"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Template with the same name \"%1$s\" already exists."
 
-#: include/classes/api/services/CHost.php:1816
-#: include/classes/api/services/CHost.php:2056
+#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:2072
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Template with the same name \"%s\" already exists."
@@ -15530,8 +15531,8 @@ msgstr "Template with the same name \"%s\" already exists."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Template with the same visible name \"%1$s\" already exists."
 
-#: include/classes/api/services/CHost.php:1822
-#: include/classes/api/services/CHost.php:2064
+#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:2080
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Template with the same visible name \"%s\" already exists."
@@ -16720,7 +16721,7 @@ msgstr "Update problem"
 msgid "Updated"
 msgstr "Updated"
 
-#: include/hosts.inc.php:554
+#: include/classes/api/services/CHost.php:1111
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Updated status of host \"%1$s\"."
@@ -17474,7 +17475,7 @@ msgstr "Virtual space size in bytes or in percentage from total. Returns integer
 msgid "Visible name"
 msgstr "Visible name"
 
-#: include/classes/api/services/CHost.php:1967
+#: include/classes/api/services/CHost.php:1983
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Visible name cannot be empty if host name is missing."
 
@@ -17674,8 +17675,8 @@ msgstr "Write"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Wrong fields for dependency for service \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1652
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1668
+#: include/classes/api/services/CHost.php:1861
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Wrong fields for host \"%1$s\"."
@@ -17895,8 +17896,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "You did not specify targets for action operation global script \"%s\"."
 
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:700
-#: include/classes/api/services/CHost.php:762
+#: include/classes/api/services/CHost.php:703
+#: include/classes/api/services/CHost.php:768
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:521
@@ -18199,7 +18200,7 @@ msgstr "an array or a character string is expected"
 msgid "an empty string is expected"
 msgstr "an empty string is expected"
 
-#: include/classes/api/services/CHost.php:1593
+#: include/classes/api/services/CHost.php:1609
 msgid "an even number of hexadecimal characters is expected"
 msgstr "an even number of hexadecimal characters is expected"
 
@@ -18307,8 +18308,8 @@ msgstr "cannot be changed"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
 #: include/classes/api/services/CItemGeneral.php:484
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
@@ -18784,7 +18785,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr "min() - Minimum value for period T"
 
-#: include/classes/api/services/CHost.php:1599
+#: include/classes/api/services/CHost.php:1615
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "minimum length is %1$s characters"
@@ -18836,7 +18837,7 @@ msgstr "name"
 msgid "new"
 msgstr "new"
 
-#: hosts.php:1156 include/views/configuration.host.massupdate.php:83
+#: hosts.php:1140 include/views/configuration.host.massupdate.php:83
 #: include/views/configuration.item.massupdate.php:646 templates.php:531
 msgctxt "new element in multiselect"
 msgid "new"
@@ -19041,10 +19042,10 @@ msgstr "selected"
 msgid "short description"
 msgstr "short description"
 
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
@@ -19127,8 +19128,8 @@ msgstr "template ID \"%1$s\" is passed %2$s times"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:385
-#: include/classes/api/services/CHost.php:1686
-#: include/classes/api/services/CHost.php:1875
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1891
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CTemplate.php:378
 #: include/classes/validators/CApiInputValidator.php:867
@@ -19230,8 +19231,8 @@ msgstr "unexpected text \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CHost.php:1577
+#: include/classes/api/services/CHost.php:1583
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -19318,9 +19319,9 @@ msgid "value is too long"
 msgstr "value is too long"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CHost.php:772
-#: include/classes/api/services/CHost.php:1737
-#: include/classes/api/services/CHost.php:1892
+#: include/classes/api/services/CHost.php:778
+#: include/classes/api/services/CHost.php:1753
+#: include/classes/api/services/CHost.php:1908
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
