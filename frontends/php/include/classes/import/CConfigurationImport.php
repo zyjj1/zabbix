@@ -1009,7 +1009,7 @@ class CConfigurationImport {
 		$prototypes_to_create = [];
 		$host_prototypes_to_update = [];
 		$hostPrototypesToCreate = [];
-		$ex_group_prototypes_where = '';
+		$ex_group_prototypes_where = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -1163,7 +1163,7 @@ class CConfigurationImport {
 
 					if ($hostPrototypeId) {
 						if ($hostPrototype['groupPrototypes']) {
-							$ex_group_prototypes_where .= ' OR ('.dbConditionInt('hostid', [$hostPrototypeId]).
+							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$hostPrototypeId]).
 								' AND '.dbConditionString('name',
 									zbx_objectValues($hostPrototype['groupPrototypes'], 'name')
 								).
@@ -1200,11 +1200,11 @@ class CConfigurationImport {
 		}
 
 		// Attach existing host group prototype ids.
-		if ($ex_group_prototypes_where !== '') {
+		if ($ex_group_prototypes_where) {
 			$db_group_prototypes = DBFetchArray(DBselect(
 				'SELECT group_prototypeid,name,hostid'.
 					' FROM group_prototype'.
-					' WHERE '.mb_substr($ex_group_prototypes_where, 4)
+					' WHERE '.implode(' OR ', $ex_group_prototypes_where)
 			));
 
 			if ($db_group_prototypes) {
