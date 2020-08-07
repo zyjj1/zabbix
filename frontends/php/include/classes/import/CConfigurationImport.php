@@ -1165,7 +1165,7 @@ class CConfigurationImport {
 						if ($hostPrototype['groupPrototypes']) {
 							$ex_group_prototypes_where .= ' OR ('.dbConditionInt('hostid', [$hostPrototypeId]).
 								' AND '.dbConditionString('name',
-									array_column($hostPrototype['groupPrototypes'], 'name')
+									zbx_objectValues($hostPrototype['groupPrototypes'], 'name')
 								).
 							')';
 						}
