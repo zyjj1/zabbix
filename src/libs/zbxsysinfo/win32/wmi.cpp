@@ -153,7 +153,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		{
 			ret = SYSINFO_RET_FAIL;
 			zabbix_log(LOG_LEVEL_DEBUG, "WMI query timeout");
-			return ret;
+			goto exit;
 		}
 
 		if (0 == uReturn)
