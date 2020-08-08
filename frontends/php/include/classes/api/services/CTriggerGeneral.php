@@ -423,14 +423,14 @@ abstract class CTriggerGeneral extends CApiService {
 
 					if ($tpl_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 						$recovery_expression = $tpl_trigger['recovery_expression'];
-						$expr_part = end($expression_data->expressions);
+						$expr_part = end($recovery_expression_data->expressions);
 						do {
 							$recovery_expression = substr_replace($recovery_expression,
 								'{'.$chd_trigger['host'].':'.$expr_part['item'].'.'.$expr_part['function'].'}',
 								$expr_part['pos'], strlen($expr_part['expression'])
 							);
 						}
-						while ($expr_part = prev($expression_data->expressions));
+						while ($expr_part = prev($recovery_expression_data->expressions));
 
 						if ($chd_trigger['recovery_expression'] !== $recovery_expression) {
 							continue;
