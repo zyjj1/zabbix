@@ -50,7 +50,11 @@ class testHostImport extends CAPITest {
 			'rules' => $rules
 		], null);
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr('host group discovered').' AND groupid='.zbx_dbstr(50026)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hosts_groups WHERE hostgroupid='.zbx_dbstr(50022).' AND hostid='.zbx_dbstr(99012).' AND groupid='.zbx_dbstr(50026)));
+		$query = 'SELECT * FROM hstgrp WHERE name='.zbx_dbstr('host group discovered').' AND groupid='.zbx_dbstr(50026);
+		$this->assertEquals(1, CDBHelper::getCount($query));
+
+		$query = 'SELECT * FROM hosts_groups WHERE hostgroupid='.zbx_dbstr(50022).' AND hostid='.zbx_dbstr(99012).
+			' AND groupid='.zbx_dbstr(50026);
+		$this->assertEquals(1, CDBHelper::getCount($query));
 	}
 }
