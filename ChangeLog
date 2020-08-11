@@ -1,7 +1,5 @@
 Changes for 4.0.24rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
 ........S. [ZBX-18014] added ODBC empty query check (viktors)
