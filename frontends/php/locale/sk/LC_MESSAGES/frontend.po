@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-07 19:52+0300\n"
+"POT-Creation-Date: 2020-08-11 09:33+0300\n"
 "PO-Revision-Date: 2020-02-08 23:47+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -1594,8 +1594,8 @@ msgstr ""
 msgid "Cannot add correlation condition"
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:944
-#: include/classes/api/services/CTriggerPrototype.php:791
+#: include/classes/api/services/CTrigger.php:939
+#: include/classes/api/services/CTriggerPrototype.php:784
 msgid "Cannot add dependency from a host to a template."
 msgstr "Šablóna nemôže závisieť na hostovi."
 
@@ -1770,7 +1770,7 @@ msgstr "Nie je možné volať metódu \"%1$s.%2$s\" bez parameterov."
 msgid "Cannot clear history"
 msgstr "Nie je možné zmazať históriu"
 
-#: items.php:1317
+#: items.php:1322
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1844,16 +1844,16 @@ msgstr "Nie je možné vytvoriť prototyp grafu pre zisteného hosta \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Nie je možné otvoriť ďalšie spojenie k databáze."
 
-#: include/classes/api/services/CTrigger.php:978
-#: include/classes/api/services/CTriggerPrototype.php:822
+#: include/classes/api/services/CTrigger.php:973
+#: include/classes/api/services/CTriggerPrototype.php:815
 msgid "Cannot create circular dependencies."
 msgstr "Nie je možné vytvoriť zacyklené závislosti."
 
-#: include/classes/api/services/CTrigger.php:950
+#: include/classes/api/services/CTrigger.php:945
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie je možné vytvoriť závislosť prototypu spúšťača na sebe samom."
 
-#: include/classes/api/services/CTriggerPrototype.php:761
+#: include/classes/api/services/CTriggerPrototype.php:754
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Nie je možné vytvoriť závislosť prototypu spúšťača na sebe samom."
 
@@ -1909,8 +1909,8 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/classes/api/services/CTrigger.php:848
-#: include/classes/api/services/CTriggerPrototype.php:588
+#: include/classes/api/services/CTrigger.php:843
+#: include/classes/api/services/CTriggerPrototype.php:581
 msgid "Cannot delete dependency"
 msgstr "Nie je možné zmazať závislosť"
 
@@ -1950,7 +1950,7 @@ msgstr[0] "Nie je možné zmazať skupinu"
 msgstr[1] "Nie je možné zmazať skupinu"
 msgstr[2] "Nie je možné zmazať skupinu"
 
-#: hosts.php:749 hosts.php:770
+#: hosts.php:754 hosts.php:775
 msgid "Cannot delete host"
 msgstr "Nie je možné zmazať hosta"
 
@@ -2002,7 +2002,7 @@ msgstr "Nie je možné zmazať prototyp položky"
 msgid "Cannot delete item prototypes"
 msgstr "Nie je možné zmazať prototypy položiek"
 
-#: items.php:1327
+#: items.php:1332
 msgid "Cannot delete items"
 msgstr "Nie je možné zmazať položky"
 
@@ -2099,12 +2099,12 @@ msgstr "Nie je možné zmazať položku patriacu šablóne."
 msgid "Cannot delete templated items."
 msgstr "Nie je možné zmazať položky patriace šablóne."
 
-#: include/classes/api/services/CTrigger.php:641
+#: include/classes/api/services/CTrigger.php:636
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Nie je možné zmazať spúšťač \"%1$s:%2$s\" patriaci šablóne."
 
-#: include/classes/api/services/CTriggerPrototype.php:541
+#: include/classes/api/services/CTriggerPrototype.php:534
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
 msgstr ""
@@ -2167,7 +2167,7 @@ msgstr[1] "Nie je možné vypnúť zisťovacie pravidlá"
 msgstr[2] "Nie je možné vypnúť zisťovacie pravidlá"
 
 #: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:196
-#: hosts.php:802
+#: hosts.php:807
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Nie je možné vypnúť hosta"
@@ -2239,7 +2239,7 @@ msgstr[1] "Nie je možné povoliť zisťovacie pravidlá"
 msgstr[2] "Nie je možné povoliť zisťovacie pravidlá"
 
 #: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:195
-#: hosts.php:801
+#: hosts.php:806
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Nie je možné povoliť hosta"
@@ -2543,7 +2543,7 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Nie je možné poslať príkaz, skontrolujte spojenie so Zabbix serverom \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1339
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
 msgid "Cannot send request"
 msgstr ""
 
@@ -2582,12 +2582,12 @@ msgstr "Nie je možné nastaviť \"%1$s\" pre položku \"%2$s\"."
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Nie je možné nastaviť \"%1$s\" pre šablónu obrazovky \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:816
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "Nie je možné nastaviť \"%1$s\" pre spúšťač \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:506
+#: include/classes/api/services/CTriggerGeneral.php:822
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr ""
@@ -2672,22 +2672,22 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Nie je možné aktualizovať \"%1$s\" pre položku \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:658
+#: include/classes/api/services/CTriggerGeneral.php:974
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:664
+#: include/classes/api/services/CTriggerGeneral.php:980
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:657
+#: include/classes/api/services/CTriggerGeneral.php:973
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Nie je možné aktualizovať \"%1$s\" pre spúšťač \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:663
+#: include/classes/api/services/CTriggerGeneral.php:979
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr ""
@@ -2702,9 +2702,9 @@ msgstr "Nie je možné aktualizovať \"%2$s\" pre zisteného hosta \"%1$s\"."
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Nie je možné aktualizovať \"%2$s\" pre zistenú položku \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:714
-#: include/classes/api/services/CTrigger.php:684
-#: include/classes/api/services/CTrigger.php:808
+#: include/classes/api/services/CTriggerGeneral.php:1030
+#: include/classes/api/services/CTrigger.php:679
+#: include/classes/api/services/CTrigger.php:803
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Nie je možné aktualizovať \"%2$s\" pre zistený spúštač \"%1$s\"."
@@ -2930,7 +2930,7 @@ msgstr "Nie je možné aktualizovať šablóny pre zisteného hosta \"%1$s\"."
 msgid "Cannot update trigger"
 msgstr "Nie je možné aktualizovať spúšťač"
 
-#: include/classes/api/services/CTriggerGeneral.php:1619
+#: include/classes/api/services/CTriggerGeneral.php:1931
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr ""
@@ -2943,7 +2943,7 @@ msgstr[0] "Nie je možné aktualizovať prototyp spúšťača"
 msgstr[1] "Nie je možné aktualizovať prototyp spúšťača"
 msgstr[2] "Nie je možné aktualizovať prototyp spúšťača"
 
-#: include/classes/api/services/CTriggerGeneral.php:1475
+#: include/classes/api/services/CTriggerGeneral.php:1787
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr ""
@@ -5272,12 +5272,12 @@ msgstr "Duplicitné \"meno\" hodnoty \"%1$s\" pre mapu."
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Duplicitné \"meno\" hodnoty \"%1$s\" pre obrazovku."
 
-#: include/classes/api/services/CTrigger.php:1120
+#: include/classes/api/services/CTrigger.php:1115
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Kopírovať závislosti v spúšťači \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:992
+#: include/classes/api/services/CTriggerPrototype.php:985
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Duplicitné závislosti v prototype spúšťača \"%1$s\"."
@@ -5299,12 +5299,12 @@ msgstr "Kopírovanie hosta. Host s rovnakým zobrazovaným menom \"%s\" už exis
 msgid "Duplicate severity name \"%s\"."
 msgstr "Kopírovanie mena závažnosti \"%s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:504
+#: include/classes/api/services/CTriggerGeneral.php:820
 #, c-format
 msgid "Duplicate trigger prototype with name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:814
 #, c-format
 msgid "Duplicate trigger with name \"%1$s\"."
 msgstr ""
@@ -5533,8 +5533,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
 #: include/classes/api/services/CTemplate.php:560
-#: include/classes/api/services/CTrigger.php:659
-#: include/classes/api/services/CTrigger.php:783
+#: include/classes/api/services/CTrigger.php:654
+#: include/classes/api/services/CTrigger.php:778
 #: include/classes/api/services/CUserMacro.php:600
 msgid "Empty input parameter."
 msgstr "Prázdny vstupný parameter."
@@ -5752,7 +5752,7 @@ msgstr ""
 msgid "Error"
 msgstr "Chyba"
 
-#: include/db.inc.php:683
+#: include/db.inc.php:674
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Chyba vo vyhľadávacej požiadavke nad tabuľkou \"%1$s\"."
@@ -6076,7 +6076,7 @@ msgstr "Pole \"%1$s\" nemôže byť nastavené na NULL."
 #: include/classes/api/services/CHostGroup.php:906
 #: include/classes/api/services/CHost.php:747
 #: include/classes/api/services/CTemplate.php:793
-#: include/classes/api/services/CTriggerGeneral.php:237
+#: include/classes/api/services/CTriggerGeneral.php:495
 #: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
 #, c-format
@@ -6919,7 +6919,7 @@ msgid "History"
 msgstr "História"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1304 items.php:1317
+#: items.php:917 items.php:924 items.php:1309 items.php:1322
 msgid "History cleared"
 msgstr "História vyčistená"
 
@@ -7004,7 +7004,7 @@ msgstr "Vodorovné zarovnanie"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1303
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -7057,12 +7057,12 @@ msgstr "Host nemôže mať viac ako jedno predvolené rozhranie toho istého typ
 msgid "Host count"
 msgstr "Počet hostov"
 
-#: hosts.php:749 hosts.php:770
+#: hosts.php:754 hosts.php:775
 msgid "Host deleted"
 msgstr "Host zmazaný"
 
 #: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:193
-#: hosts.php:799
+#: hosts.php:804
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Host vypnutý"
@@ -7070,7 +7070,7 @@ msgstr[1] "Hosty vypnuté"
 msgstr[2] "Hosty vypnuté"
 
 #: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:192
-#: hosts.php:798
+#: hosts.php:803
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host povolený"
@@ -8190,7 +8190,7 @@ msgstr "Neplatné ID položky \"%1$s\" v prvku obrazovky."
 msgid "Incorrect item for axis value."
 msgstr "Neplatná položka pre hodnotu osi."
 
-#: include/classes/api/services/CTriggerGeneral.php:1389
+#: include/classes/api/services/CTriggerGeneral.php:1701
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Neplatný kľúč položky \"%1$s\" pre spúšťač na \"%2$s\"."
@@ -8409,13 +8409,13 @@ msgstr "Neplatný výraz spúšťača"
 msgid "Incorrect trigger expression."
 msgstr "Neplatný výraz spúšťača."
 
-#: include/classes/api/services/CTriggerGeneral.php:1179
+#: include/classes/api/services/CTriggerGeneral.php:1491
 #: include/triggers.inc.php:633
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Neplatný výraz spúšťača. Host \"%1$s\" neexistuje alebo nemáte prístup k tomuto hostu."
 
-#: include/classes/api/services/CTriggerGeneral.php:1180
+#: include/classes/api/services/CTriggerGeneral.php:1492
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Neplatný výraz spúšťača. Elementy výrazu spúšťača by nemali patriť k šablónam a hostom zároveň."
 
@@ -8427,12 +8427,12 @@ msgstr "Neplatný výraz spúšťača. Elementy výrazu spúšťača by nemali p
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "Neplatná funkcia spúšťača \"%1$s\" pre výraz."
 
-#: include/classes/api/services/CTriggerGeneral.php:1186
+#: include/classes/api/services/CTriggerGeneral.php:1498
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Neplatný výraz prototypu spúšťača. Host \"%1$s\" neexistuje alebo nemáte k nemu prístup."
 
-#: include/classes/api/services/CTriggerGeneral.php:1187
+#: include/classes/api/services/CTriggerGeneral.php:1499
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Neplatný výraz prototypu spúšťača. Elementy výrazu prototypu spúšťača by nemali patriť šablóne a hostovi zároveň."
 
@@ -8701,23 +8701,23 @@ msgstr ""
 #: include/classes/api/services/CScreen.php:423
 #: include/classes/api/services/CScreen.php:429
 #: include/classes/api/services/CTemplate.php:377
-#: include/classes/api/services/CTriggerGeneral.php:242
-#: include/classes/api/services/CTriggerGeneral.php:248
-#: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:556
-#: include/classes/api/services/CTriggerGeneral.php:574
-#: include/classes/api/services/CTriggerGeneral.php:581
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:594
-#: include/classes/api/services/CTriggerGeneral.php:602
-#: include/classes/api/services/CTriggerGeneral.php:784
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:801
-#: include/classes/api/services/CTriggerGeneral.php:811
-#: include/classes/api/services/CTriggerGeneral.php:819
-#: include/classes/api/services/CTriggerGeneral.php:825
-#: include/classes/api/services/CTriggerGeneral.php:833
+#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:506
+#: include/classes/api/services/CTriggerGeneral.php:516
+#: include/classes/api/services/CTriggerGeneral.php:864
+#: include/classes/api/services/CTriggerGeneral.php:872
+#: include/classes/api/services/CTriggerGeneral.php:890
+#: include/classes/api/services/CTriggerGeneral.php:897
+#: include/classes/api/services/CTriggerGeneral.php:904
+#: include/classes/api/services/CTriggerGeneral.php:910
+#: include/classes/api/services/CTriggerGeneral.php:918
+#: include/classes/api/services/CTriggerGeneral.php:1100
+#: include/classes/api/services/CTriggerGeneral.php:1109
+#: include/classes/api/services/CTriggerGeneral.php:1117
+#: include/classes/api/services/CTriggerGeneral.php:1127
+#: include/classes/api/services/CTriggerGeneral.php:1135
+#: include/classes/api/services/CTriggerGeneral.php:1141
+#: include/classes/api/services/CTriggerGeneral.php:1149
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
 #: include/classes/graphdraw/CLineGraphDraw.php:113
@@ -8887,14 +8887,14 @@ msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:494
 #: include/classes/api/services/CGraphGeneral.php:625
-#: include/classes/api/services/CTriggerGeneral.php:300
-#: include/classes/api/services/CTriggerGeneral.php:445
-#: include/classes/api/services/CTriggerGeneral.php:510
-#: include/classes/api/services/CTriggerGeneral.php:668
-#: include/classes/api/services/CTriggerGeneral.php:898
-#: include/classes/api/services/CTriggerGeneral.php:1009
-#: include/classes/api/services/CTriggerGeneral.php:1192
-#: include/classes/api/services/CTriggerGeneral.php:1554
+#: include/classes/api/services/CTriggerGeneral.php:616
+#: include/classes/api/services/CTriggerGeneral.php:761
+#: include/classes/api/services/CTriggerGeneral.php:826
+#: include/classes/api/services/CTriggerGeneral.php:984
+#: include/classes/api/services/CTriggerGeneral.php:1214
+#: include/classes/api/services/CTriggerGeneral.php:1323
+#: include/classes/api/services/CTriggerGeneral.php:1504
+#: include/classes/api/services/CTriggerGeneral.php:1866
 #: include/classes/core/CJsonRpc.php:205
 #: include/classes/import/validators/CXmlValidatorGeneral.php:147
 #: include/classes/widgets/fields/CWidgetField.php:100
@@ -9283,7 +9283,7 @@ msgstr "Taliansky (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1303
+#: items.php:1308
 msgid "Item"
 msgstr "Položka"
 
@@ -9513,13 +9513,13 @@ msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1673 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Položky"
 
-#: items.php:1327
+#: items.php:1332
 msgid "Items deleted"
 msgstr "Položky zmazané"
 
@@ -11554,14 +11554,14 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
-#: include/classes/api/services/CTriggerGeneral.php:730
-#: include/classes/api/services/CTrigger.php:633
-#: include/classes/api/services/CTrigger.php:677
-#: include/classes/api/services/CTrigger.php:713
-#: include/classes/api/services/CTrigger.php:801
-#: include/classes/api/services/CTriggerPrototype.php:533
-#: include/classes/api/services/CTriggerPrototype.php:711
-#: include/classes/api/services/CTriggerPrototype.php:729
+#: include/classes/api/services/CTriggerGeneral.php:1046
+#: include/classes/api/services/CTrigger.php:628
+#: include/classes/api/services/CTrigger.php:672
+#: include/classes/api/services/CTrigger.php:708
+#: include/classes/api/services/CTrigger.php:796
+#: include/classes/api/services/CTriggerPrototype.php:526
+#: include/classes/api/services/CTriggerPrototype.php:704
+#: include/classes/api/services/CTriggerPrototype.php:722
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:373
@@ -11574,7 +11574,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1427 items.php:1628 services.php:84
+#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 
@@ -11700,8 +11700,8 @@ msgstr "Nepotvrdené"
 msgid "Not Templated items"
 msgstr "Položky bez šablóny"
 
-#: include/classes/api/services/CTrigger.php:1023
-#: include/classes/api/services/CTriggerPrototype.php:870
+#: include/classes/api/services/CTrigger.php:1018
+#: include/classes/api/services/CTriggerPrototype.php:863
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nie všetky šablóny sú pripojené k \"%s\"."
@@ -13598,7 +13598,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1339
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
 msgid "Request sent successfully"
 msgstr ""
 
@@ -15052,7 +15052,7 @@ msgstr "Radenie (0->999)"
 msgid "Sort triggers by"
 msgstr "Zoradiť spúšťače podľa"
 
-#: include/classes/api/CApiService.php:550
+#: include/classes/api/CApiService.php:581
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Zoradenie podľa pola \"%1$s\" nie je dovolené."
@@ -15448,7 +15448,7 @@ msgstr "Tabuľka \"%1$s\" neobsahuje pole s menom \"%2$s\"."
 msgid "Tag"
 msgstr "Označenie"
 
-#: include/classes/api/services/CTriggerGeneral.php:268
+#: include/classes/api/services/CTriggerGeneral.php:526
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr ""
@@ -16067,12 +16067,13 @@ msgstr "Trendy"
 msgid "Trigger"
 msgstr "Spúšťač"
 
-#: include/classes/api/services/CTriggerGeneral.php:291
+#: include/classes/api/services/CTriggerGeneral.php:575
+#: include/classes/api/services/CTriggerGeneral.php:607
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Spúšťač \"%1$s\" už existuje na \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1546
+#: include/classes/api/services/CTriggerGeneral.php:1858
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
@@ -16086,7 +16087,7 @@ msgstr "Spúšťač \"%1$s\" závisí na inom spúšťači \"%2$s\", ktorý neex
 msgid "Trigger added"
 msgstr "Spúšťač pridaný"
 
-#: include/classes/api/services/CTrigger.php:1066
+#: include/classes/api/services/CTrigger.php:1061
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Spúšťač nemôže závisieť na spúšťači, ktorý je z neho zdedený."
 
@@ -16142,7 +16143,7 @@ msgstr "Perióda uloženia údajov udalostí a poplachov spúšťačov"
 msgid "Trigger event and alert data storage period \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:455
+#: include/classes/api/services/CTriggerGeneral.php:771
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Výraz podmienky musí obsahovať najmenej jednu referenciu na host:kľúč."
 
@@ -16183,17 +16184,18 @@ msgstr "Prehľad spúšťačov"
 msgid "Trigger prototype"
 msgstr "Prototyp spúšťača"
 
-#: include/classes/api/services/CTriggerGeneral.php:296
+#: include/classes/api/services/CTriggerGeneral.php:576
+#: include/classes/api/services/CTriggerGeneral.php:612
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1550
+#: include/classes/api/services/CTriggerGeneral.php:1862
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1469
+#: include/classes/api/services/CTriggerGeneral.php:1781
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Prototyp spúšťača \"%1$s\" obsahuje prototypy položiek z rôznych zisťovacích pravidiel."
@@ -16203,7 +16205,7 @@ msgstr "Prototyp spúšťača \"%1$s\" obsahuje prototypy položiek z rôznych z
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Prototyp spúšťača \"%1$s\" závisí na spúštači \"%2$s\", ktorý neexistuje."
 
-#: include/classes/api/services/CTriggerGeneral.php:1464
+#: include/classes/api/services/CTriggerGeneral.php:1776
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Prototyp spúšťača \"%1$s\" musí obsahovať najmenej jeden prototyp položky."
@@ -16212,7 +16214,7 @@ msgstr "Prototyp spúšťača \"%1$s\" musí obsahovať najmenej jeden prototyp 
 msgid "Trigger prototype added"
 msgstr "Prototyp spúšťača pridaný"
 
-#: include/classes/api/services/CTriggerPrototype.php:927
+#: include/classes/api/services/CTriggerPrototype.php:920
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Prototyp spúšťača nemôže závisieť na spúšťači, ktorý je z neho vytvorený."
 
@@ -16246,7 +16248,7 @@ msgstr "Prototypy spúšťačov zmazané"
 msgid "Trigger prototypes updated"
 msgstr "Prototypy spúšťačov aktualizované"
 
-#: include/classes/api/services/CTriggerGeneral.php:467
+#: include/classes/api/services/CTriggerGeneral.php:783
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr ""
 
@@ -17807,13 +17809,13 @@ msgstr "Nesprávne polia pre službu \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Nesprávne polia pre čas služby \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:505
-#: include/classes/api/services/CTriggerGeneral.php:662
+#: include/classes/api/services/CTriggerGeneral.php:821
+#: include/classes/api/services/CTriggerGeneral.php:978
 msgid "Wrong fields for trigger prototype."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:499
-#: include/classes/api/services/CTriggerGeneral.php:656
+#: include/classes/api/services/CTriggerGeneral.php:815
+#: include/classes/api/services/CTriggerGeneral.php:972
 msgid "Wrong fields for trigger."
 msgstr "Nesprávne polia pre spúšťač."
 
@@ -17821,8 +17823,8 @@ msgstr "Nesprávne polia pre spúšťač."
 #: include/classes/api/services/CMap.php:958
 #: include/classes/api/services/CMap.php:1418
 #: include/classes/api/services/CScreenItem.php:967
-#: include/classes/api/services/CTriggerGeneral.php:530
-#: include/classes/api/services/CTriggerGeneral.php:683
+#: include/classes/api/services/CTriggerGeneral.php:846
+#: include/classes/api/services/CTriggerGeneral.php:999
 msgid "Wrong value for url field."
 msgstr ""
 
@@ -18182,8 +18184,8 @@ msgstr "[Nesprávna hodnota pre mesiac: \"%s\" ]"
 msgid "a boolean is expected"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:242
-#: include/classes/api/services/CTriggerGeneral.php:258
+#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:516
 #: include/classes/api/services/CUser.php:668
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:250
@@ -18435,11 +18437,11 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:721
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CTriggerGeneral.php:248
-#: include/classes/api/services/CTriggerGeneral.php:556
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:801
-#: include/classes/api/services/CTriggerGeneral.php:819
+#: include/classes/api/services/CTriggerGeneral.php:506
+#: include/classes/api/services/CTriggerGeneral.php:872
+#: include/classes/api/services/CTriggerGeneral.php:904
+#: include/classes/api/services/CTriggerGeneral.php:1117
+#: include/classes/api/services/CTriggerGeneral.php:1135
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
 #: include/classes/api/services/CUser.php:679
@@ -18942,7 +18944,7 @@ msgstr ""
 msgid "new"
 msgstr "nový"
 
-#: hosts.php:1140 include/views/configuration.host.massupdate.php:83
+#: hosts.php:1145 include/views/configuration.host.massupdate.php:83
 #: include/views/configuration.item.massupdate.php:646 templates.php:531
 msgctxt "new element in multiselect"
 msgid "new"
@@ -19162,10 +19164,10 @@ msgstr "krátky popis"
 #: include/classes/api/services/CMaintenance.php:711
 #: include/classes/api/services/CProxy.php:662
 #: include/classes/api/services/CProxy.php:786
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:574
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:811
+#: include/classes/api/services/CTriggerGeneral.php:864
+#: include/classes/api/services/CTriggerGeneral.php:890
+#: include/classes/api/services/CTriggerGeneral.php:1109
+#: include/classes/api/services/CTriggerGeneral.php:1127
 msgid "should be empty"
 msgstr ""
 
@@ -19289,11 +19291,11 @@ msgstr "spúšťač"
 msgid "trigger does not allow manual closing"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1476
+#: include/classes/api/services/CTriggerGeneral.php:1788
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1621
+#: include/classes/api/services/CTriggerGeneral.php:1933
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
@@ -19341,12 +19343,12 @@ msgstr "neočakávaný text \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
-#: include/classes/api/services/CTriggerGeneral.php:582
-#: include/classes/api/services/CTriggerGeneral.php:595
-#: include/classes/api/services/CTriggerGeneral.php:603
-#: include/classes/api/services/CTriggerGeneral.php:785
-#: include/classes/api/services/CTriggerGeneral.php:826
-#: include/classes/api/services/CTriggerGeneral.php:834
+#: include/classes/api/services/CTriggerGeneral.php:898
+#: include/classes/api/services/CTriggerGeneral.php:911
+#: include/classes/api/services/CTriggerGeneral.php:919
+#: include/classes/api/services/CTriggerGeneral.php:1101
+#: include/classes/api/services/CTriggerGeneral.php:1142
+#: include/classes/api/services/CTriggerGeneral.php:1150
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr "neočakávaná hodnota \"%1$s\""
