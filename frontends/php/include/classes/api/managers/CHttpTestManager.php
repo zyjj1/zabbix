@@ -1240,7 +1240,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getTestKey(int $type, string $test_name): ?string {
+	protected function getTestKey(int $type, string $test_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'web.test.in['.quoteItemKeyParam($test_name).',,bps]';
@@ -1261,7 +1261,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getTestName(int $type, string $test_name): ?string {
+	protected function getTestName(int $type, string $test_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'Download speed for scenario "' . $test_name . '".';
@@ -1283,7 +1283,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getStepKey(int $type, string $test_name, string $step_name): ?string {
+	protected function getStepKey(int $type, string $test_name, string $step_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'web.test.in['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',bps]';
@@ -1305,7 +1305,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getStepName(int $type, string $test_name, string $step_name): ?string {
+	protected function getStepName(int $type, string $test_name, string $step_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'Download speed for step "' . $step_name . '" of scenario "' . $test_name . '".';
