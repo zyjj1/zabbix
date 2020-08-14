@@ -1194,21 +1194,6 @@ class CConfigurationImport {
 						$hostPrototypesToCreate[] = $hostPrototype;
 					}
 				}
-
-				unset($item['item_prototypes']);
-				unset($item['trigger_prototypes']);
-				unset($item['graph_prototypes']);
-				unset($item['host_prototypes']);
-
-				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
-
-				if ($itemsId) {
-					$item['itemid'] = $itemsId;
-					$itemsToUpdate[] = $item;
-				}
-				else {
-					$itemsToCreate[] = $item;
-				}
 			}
 		}
 
