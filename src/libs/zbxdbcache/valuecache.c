@@ -801,6 +801,9 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
  ******************************************************************************/
 void	zbx_vc_housekeeping_value_cache(void)
 {
+	if (NULL == vc_cache)
+		return;
+
 	vc_try_lock();
 	vc_release_unused_items(NULL);
 	vc_try_unlock();
