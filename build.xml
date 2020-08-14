@@ -101,8 +101,8 @@
 		</exec>
 	</target>
 
-	<target name="init-server-postgresql" depends="">
-		<!-- Create PostgreSQL database -->
+	<target name="drop-db-postgresql">
+		<!-- Drop PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -111,6 +111,10 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="-c 'drop database if exists ${dbname}'"/>
 		</exec>
+	</target>
+
+	<target name="create-db-postgresql" depends="drop-db-postgresql">
+		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -177,7 +181,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,make-gettext,init-server-postgresql">
+	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,make-gettext,create-db-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -189,7 +193,7 @@
 		</exec>
 	</target>
 
-	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
+	<target name="init-api-postgresql" depends="create-configs,make-dbschema,create-db-postgresql">
 		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -201,7 +205,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,create-db-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -236,14 +240,18 @@
 		</exec>
 	</target>
 
-	<target name="init-server-mysql" depends="">
-		<!-- Create MySQL database -->
+	<target name="drop-db-mysql">
+		<!-- Drop MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='drop database if exists ${dbname}'"/>
 		</exec>
+	</target>
+
+	<target name="create-db-mysql" depends="drop-db-mysql">
+		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -292,7 +300,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,make-gettext,init-server-mysql">
+	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,make-gettext,create-db-mysql">
 		<exec executable="mysql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -301,7 +309,7 @@
 		</exec>
 	</target>
 
-	<target name="init-api-mysql" depends="create-configs,make-dbschema,init-server-mysql">
+	<target name="init-api-mysql" depends="create-configs,make-dbschema,create-db-mysql">
 		<exec executable="mysql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -310,7 +318,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -357,8 +365,8 @@
 	<target name="build-phpunit" depends="test-phpunit"/>
 	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
 	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
-	<target name="build-api-mysql" depends="init-api-mysql,test-api"/>
-	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
+	<target name="build-api-mysql" depends="init-api-mysql,test-api,drop-db-mysql"/>
+	<target name="build-api-postgresql" depends="init-api-postgresql,test-api,drop-db-postgresql"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
 
