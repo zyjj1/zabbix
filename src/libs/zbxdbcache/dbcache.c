@@ -2527,8 +2527,11 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 {
 	const char	*__function_name = "DCmass_prepare_history";
 	int		i;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, history_num);
+
+	now = time(NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2559,13 +2562,33 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		}
 
 		if (0 == item->history)
-			h->flags |= ZBX_DC_FLAG_NOHISTORY;
-
-		if ((ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type) ||
-				0 == item->trends)
 		{
-			h->flags |= ZBX_DC_FLAG_NOTRENDS;
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 		}
+		else if (now - h->ts.sec > item->history_sec)
+		{
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside history "
+					"storage period", item->host.host, item->key_orig, zbx_date2str(h->ts.sec),
+					zbx_time2str(h->ts.sec));
+		}
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type == ITEM_VALUE_TYPE_UINT64 == item->value_type)
+		{
+			if (0 == item->trends)
+			{
+				h->flags |= ZBX_DC_FLAG_NOTRENDS;
+			}
+			else if (now - h->ts.sec > item->trends_sec)
+			{
+				h->flags |= ZBX_DC_FLAG_NOTRENDS;
+				zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside "
+						"trends storage period", item->host.host, item->key_orig,
+						zbx_date2str(h->ts.sec), zbx_time2str(h->ts.sec));
+			}
+		}
+		else
+			h->flags |= ZBX_DC_FLAG_NOTRENDS;
 
 		normalize_item_value(item, h);
 
