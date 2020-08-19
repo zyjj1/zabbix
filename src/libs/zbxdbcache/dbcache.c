@@ -419,37 +419,55 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
  *                                                                            *
  * Function: dc_remove_updated_trends                                         *
  *                                                                            *
- * Purpose: helper function for DCflush trends                                *
+ * Purpose: Update trends disable_until for items without trends data past or *
+ *          equal the specified clock                                         *
+ *                                                                            *
+ * Comments: A helper function for DCflush trends                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const char *table_name,
 		int value_type, zbx_uint64_t *itemids, int *itemids_num, int clock)
 {
-	int		i;
+	int		i, j, last_period;
 	ZBX_DC_TREND	*trend;
 	zbx_uint64_t	itemid;
 	size_t		sql_offset;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		periods[5] = {SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, SEC_PER_YEAR};
 
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct itemid"
-			" from %s"
-			" where clock>=%d and",
-			table_name, clock);
+	last_period = ARRSIZE(periods) - 1;
+	periods[last_period] = time(NULL);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	/* remove itemids with trends data past or equal the clock */
+	for (j = 0; j <= last_period && 0 < *itemids_num; j++)
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_remove(itemids, itemids_num, &itemid, 1);
-	}
-	DBfree_result(result);
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct itemid"
+				" from %s"
+				" where clock>=%d and",
+				table_name, periods[last_period] - periods[j]);
 
+		if (0 < j)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " clock<%d and",
+					periods[last_period] - periods[j - 1]);
+		}
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+			uint64_array_remove(itemids, itemids_num, &itemid, 1);
+		}
+		DBfree_result(result);
+	}
+
+	/* update trends disable_until for the leftover itemids */
 	while (0 != *itemids_num)
 	{
 		itemid = itemids[--*itemids_num];
