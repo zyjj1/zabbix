@@ -2573,7 +2573,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 					zbx_time2str(h->ts.sec));
 		}
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type == ITEM_VALUE_TYPE_UINT64 == item->value_type)
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
 			if (0 == item->trends)
 			{
