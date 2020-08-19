@@ -428,32 +428,32 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const char *table_name,
 		int value_type, zbx_uint64_t *itemids, int *itemids_num, int clock)
 {
-	int		i, j, last_period;
+	int		i, j, clocks_num, now, age;
 	ZBX_DC_TREND	*trend;
 	zbx_uint64_t	itemid;
 	size_t		sql_offset;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		periods[5] = {SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, SEC_PER_YEAR};
+	int		clocks[] = {SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, SEC_PER_YEAR, INT_MAX};
 
-	last_period = ARRSIZE(periods) - 1;
-	periods[last_period] = time(NULL);
+	now = time(NULL);
+	age = now - clock;
+	for (clocks_num = 0; age > clocks[clocks_num]; clocks_num++)
+		clocks[clocks_num] = now - clocks[clocks_num];
+	clocks[clocks_num] = clock;
 
 	/* remove itemids with trends data past or equal the clock */
-	for (j = 0; j <= last_period && 0 < *itemids_num; j++)
+	for (j = 0; j <= clocks_num && 0 < *itemids_num; j++)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct itemid"
 				" from %s"
 				" where clock>=%d and",
-				table_name, periods[last_period] - periods[j]);
+				table_name, clocks[j]);
 
 		if (0 < j)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " clock<%d and",
-					periods[last_period] - periods[j - 1]);
-		}
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " clock<%d and", clocks[j - 1]);
 
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
 
