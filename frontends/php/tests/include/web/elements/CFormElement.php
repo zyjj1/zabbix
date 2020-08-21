@@ -111,7 +111,7 @@ class CFormElement extends CElement {
 	/**
 	 * Get element field by label element.
 	 *
-	 * @param CElement $label    label element
+	 * @param CElement $label     label element
 	 *
 	 * @return CElement|CNullElement
 	 */
@@ -285,7 +285,7 @@ class CFormElement extends CElement {
 	 * @return CMessageElement
 	 */
 	public function getOverlayMessage() {
-		return $this->parents('class:overlay-dialogue-body')->one()
+		return $this->parents('class:overlay-dialogue-body')->waitUntilVisible()->one()
 				->query('tag:output')->asMessage()->waitUntilVisible()->one();
 	}
 
@@ -377,8 +377,8 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
+	* @inheritdoc
+	*/
 	public function checkValue($expected, $raise_exception = true) {
 		$state = $this->toggle_fields;
 		$this->toggle_fields = false;
