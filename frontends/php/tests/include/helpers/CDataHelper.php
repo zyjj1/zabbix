@@ -40,6 +40,11 @@ class CDataHelper extends CAPIHelper {
 	 * @throws Exception on API error
 	 */
 	public static function call($method, $params) {
+		global $URL;
+		if (!$URL) {
+			$URL = PHPUNIT_URL.'api_jsonrpc.php';
+		}
+
 		static::$request = [];
 		static::$response = [];
 
