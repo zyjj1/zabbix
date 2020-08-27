@@ -1,3 +1,21 @@
+Changes for 4.0.25rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24
+
+4.0.24rc2 was released as 4.0.24 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc2
+
+Bug fixes:
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.24rc1
 
 Bug fixes:

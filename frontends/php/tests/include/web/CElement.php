@@ -118,7 +118,7 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot reload stalled element selected as a part of multi-element selection.');
 		}
 
-		if ($this->parent !== null) {
+		if ($this->parent !== null && $this->parent->isStalled()) {
 			$this->parent->reload();
 		}
 
@@ -612,6 +612,10 @@ class CElement extends CBaseElement implements IWaitable {
 
 		if (in_array('multilineinput-control', $class)) {
 			return $this->asMultiline($options);
+		}
+
+		if (in_array('input-group', $class)) {
+			return $this->asInputGroup($options);
 		}
 
 		CTest::addWarning('No specific element was detected');
