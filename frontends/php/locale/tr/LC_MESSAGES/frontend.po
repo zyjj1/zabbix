@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-11 09:33+0300\n"
+"POT-Creation-Date: 2020-08-28 19:52+0300\n"
 "PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -804,10 +804,6 @@ msgstr "Aracı arayüzleri"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Aracı veya SNMP veya JMX veya IPMI arayüzü"
 
-#: include/classes/items/CHelpItems.php:673
-msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr "Kümelenmiş kontroller gözlemlenen ana makine üzerinden herhangi bir aracı çalışmasına gereksinim duymaz. Zabbix sunucu kümelenmiş bilgiyi doğrudan veritabanı sorgularıyla toplar. Zabbix El Kitabına bakın."
-
 #: include/actions.inc.php:2142
 msgid "Alert message"
 msgstr ""
@@ -850,7 +846,7 @@ msgstr "Tüm panolar"
 msgid "All groups"
 msgstr "Tüm gruplar"
 
-#: include/html.inc.php:345
+#: include/html.inc.php:334
 msgid "All hosts"
 msgstr "Tüm ana makineler"
 
@@ -858,7 +854,7 @@ msgstr "Tüm ana makineler"
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Tüm bağlantılarda \"Name\" ve \"URL\" tanımlanmış olmalıdır"
 
-#: include/html.inc.php:524
+#: include/html.inc.php:513
 msgid "All maps"
 msgstr "Tüm haritalar"
 
@@ -1004,7 +1000,7 @@ msgid "Application with applicationid \"%1$s\" does not exist."
 msgstr "\"%1$s\" applicationid'li uygulama mevcut değil."
 
 #: app/controllers/CControllerPopupGeneric.php:123 include/forms.inc.php:832
-#: include/html.inc.php:368
+#: include/html.inc.php:357
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:23
 #: include/views/configuration.host.edit.php:304
@@ -1492,6 +1488,22 @@ msgstr "SLA Hesapla, kabul edilebilir SLA (% olarak)"
 #: include/views/configuration.graph.edit.php:239
 msgid "Calculated"
 msgstr "Hesaplanmış"
+
+#: include/classes/items/CHelpItems.php:673
+msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:681
+msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:677
+msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:685
+msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
 
 #: jsLoader.php:146
 msgid "Calendar"
@@ -2271,7 +2283,7 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" ana makinesi bulunamıyor."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ana makinesi bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1125
+#: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının ana makine prototipi \"%2$s\" için ana makine grubu \"%1$s\" bulunamadı."
@@ -2294,32 +2306,47 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" simgesi bulunamadı."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "\"%2$s\" haritasında kullanılan simge haritası \"%1$s\" bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1509
+#: include/classes/import/CConfigurationImport.php:955
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:751
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1073
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1564
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "\"%3$s\" grafiği için Y ekseni MAKS değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1278
+#: include/classes/import/CConfigurationImport.php:1333
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının grafik prototipi \"%3$s\" için Y ekseni MAKS değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1493
+#: include/classes/import/CConfigurationImport.php:1548
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "\"%3$s\" grafiği için Y ekseni MİN değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1258
+#: include/classes/import/CConfigurationImport.php:1313
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının grafik prototipi \"%3$s\" için Y ekseni MİN değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1528
+#: include/classes/import/CConfigurationImport.php:1583
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "\"%3$s\" grafiğinde kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1298
+#: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının \"%3$s\" grafik prototipinde kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
@@ -2344,7 +2371,7 @@ msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" haritası bulunamıyor."
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ekranı bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1148
+#: include/classes/import/CConfigurationImport.php:1182
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının \"%2$s\" ana makine prototipi için \"%1$s\" şablonu bulunamıyor."
@@ -2355,12 +2382,12 @@ msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının \"%2$s\" ana makine pro
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" tetikleyicisi bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:751
+#: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\" üzerindeki \"%2$s\" öğesi için değer haritası \"%1$s\" bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1087
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının öğe prototipi \"%2$s\" için kullanılan \"%1$s\" değer haritası bulunamıyor."
@@ -2928,11 +2955,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr "Katalanca (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:941
+#: include/classes/items/CHelpItems.php:953
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Regex ile eşleşen tüm SNMP trap'lerini yakalar. Regexp belirtilmemişse bütün trap'leri yakalar."
 
-#: include/classes/items/CHelpItems.php:937
+#: include/classes/items/CHelpItems.php:949
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "snmptrap[] öğelerinden herhangi biri tarafından yakalanmayan tüm SNMP trap'lerini yakalar."
 
@@ -3055,19 +3082,19 @@ msgstr "Dosya var mı diye kontrol eder. Bulunamazsa 0 döndürür, normal dosya
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Belirtilen bağlantı noktasına TCP bağlantısı yapmanın mümkün olup olmadığını kontrol eder. Bağlanılamıyorsa 0 döndürür; bağlanılabiliyorsa 1 döndürür"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:691
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "Sunucunun ICMP pingi tarafından erişilebilir olup olmadığını kontrol eder. ICMP ping başarısız olursa 0. ICMP ping başarılı olursa 1."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:435
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:703
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Servisin çalışıp çalışmadığını ve TCP bağlantılarını kabul edip etmediğini kontrol eder. Servis kesintideyse 0 döner; servis çalışıyorsa 1 döner"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:447
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:711
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Servisin çalışıp çalışmadığını ve UDP isteklerine yanıt verip vermediğini denetler. Servis kesintideyse 0 döner; servis çalışıyorsa 1 döner"
 
@@ -3083,13 +3110,13 @@ msgstr "Bu UDP bağlantı noktasının LISTEN durumda olup olmadığını kontro
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:439
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:707
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "TCP hizmetinin performansını denetler. Servis kesintideyse 0 döner; diğer durumlarda saniye döner ve servise bağlanırken harcanan saniye miktarını gösterir"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:451
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:715
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "UDP hizmetinin performansını denetler. Servis kesintideyse 0 döner; diğer durumlarda saniye döner ve servisten yanıt beklemek için harcanan saniye miktarını gösterir"
 
@@ -3335,7 +3362,7 @@ msgstr "Korelasyon \"%1$s\" için durum yinelemeleri."
 msgid "Configuration"
 msgstr "Yapılandırma"
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1035
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Yapılandırma önbellek istatistikleri. Önbellek - arabellek (kipler: pfree, total, used, free)."
 
@@ -3679,7 +3706,7 @@ msgstr ""
 msgid "Content controls"
 msgstr ""
 
-#: include/html.inc.php:361
+#: include/html.inc.php:350
 msgid "Content menu"
 msgstr ""
 
@@ -4151,7 +4178,7 @@ msgstr "Kesikli çizgi"
 msgid "Data"
 msgstr "Veri"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1079
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Veri önbellek istatistikleri. Önbellek - değerlerden biri (kipler: all, float, uint, str, log, text), geçmiş (kipler: pfree, total, used, free), eğilim (kipler: pfree, total, used, free), metin (kipler: pfree, total, used, free)."
 
@@ -4266,7 +4293,7 @@ msgstr "Haftanın günü"
 msgid "Days"
 msgstr "Günler"
 
-#: include/html.inc.php:931 include/html.inc.php:935
+#: include/html.inc.php:920 include/html.inc.php:924
 msgid "Debug"
 msgstr "Hata Ayıklama"
 
@@ -4890,7 +4917,7 @@ msgstr "Seçilen web senaryoları devre dışı bırakılsın mı?"
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:128 auditlogs.php:147
 #: include/discovery.inc.php:108 include/hosts.inc.php:1272
-#: include/html.inc.php:331 include/httptest.inc.php:46
+#: include/html.inc.php:318 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
 #: include/items.inc.php:189 include/triggers.inc.php:2216
 #: include/users.inc.php:86
@@ -4970,7 +4997,7 @@ msgstr "Keşif kontrol hatası"
 msgid "Discovery checks"
 msgstr "Keşif kontrolleri"
 
-#: include/html.inc.php:452
+#: include/html.inc.php:441
 msgid "Discovery list"
 msgstr "Keşif listesi"
 
@@ -5034,7 +5061,7 @@ msgstr[1] "Keşif kuralları etkin"
 msgid "Discovery rule updated"
 msgstr "Keşif kuralı güncellendi"
 
-#: app/controllers/CControllerPopupGeneric.php:288 include/html.inc.php:420
+#: app/controllers/CControllerPopupGeneric.php:288 include/html.inc.php:409
 #: include/views/configuration.discovery.edit.php:24
 #: include/views/configuration.discovery.list.php:22
 #: include/views/configuration.host.discovery.edit.php:23
@@ -5624,7 +5651,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:46
 #: app/views/administration.mediatype.list.php:124
 #: app/views/popup.media.php:81 app/views/popup.triggerwizard.php:128
-#: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
+#: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:314
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
 #: include/triggers.inc.php:1288 include/triggers.inc.php:2213
@@ -6315,7 +6342,7 @@ msgstr "GMT%1$s"
 msgid "GSM modem"
 msgstr "GSM modem"
 
-#: include/html.inc.php:755
+#: include/html.inc.php:744
 #: include/views/administration.general.gui.edit.php:25
 #: include/views/administration.general.gui.edit.php:67
 msgid "GUI"
@@ -6518,7 +6545,7 @@ msgstr "Grafik prototipi güncellendi"
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "\"%1$s\" ID'li grafik prototipi mevcut değil."
 
-#: app/controllers/CControllerPopupGeneric.php:239 include/html.inc.php:482
+#: app/controllers/CControllerPopupGeneric.php:239 include/html.inc.php:471
 #: include/views/configuration.graph.edit.php:31
 #: include/views/configuration.graph.list.php:24
 #: include/views/configuration.host.discovery.list.php:129
@@ -6566,7 +6593,7 @@ msgid "Graph with same name but other type exist."
 msgstr "Aynı ada sahip ancak başka türdeki grafik mevcut."
 
 #: app/controllers/CControllerPopupGeneric.php:226 graphs.php:421
-#: include/html.inc.php:398 include/menu.inc.php:73
+#: include/html.inc.php:387 include/menu.inc.php:73
 #: include/views/configuration.graph.edit.php:26
 #: include/views/configuration.graph.list.php:39
 #: include/views/configuration.host.discovery.list.php:54
@@ -6802,7 +6829,7 @@ msgstr "Onaltılıktan ondalığa"
 msgid "Hidden"
 msgstr "Gizli"
 
-#: include/html.inc.php:935
+#: include/html.inc.php:924
 msgid "Hide debug"
 msgstr "Hata ayıklamayı gizle"
 
@@ -6816,7 +6843,7 @@ msgid "Hide selected"
 msgstr "Seçileni gizle"
 
 #: app/views/monitoring.dashboard.view.php:111 include/html.inc.php:285
-#: include/html.inc.php:520 include/views/monitoring.screen.php:31
+#: include/html.inc.php:509 include/views/monitoring.screen.php:31
 #: include/views/monitoring.slides.php:31
 msgctxt "screen reader"
 msgid "Hierarchy"
@@ -7173,7 +7200,7 @@ msgstr "Ana makine adı \"%1$s\" olan ana makine prototipi, \"%2$s\" keşif kura
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Görünür adı \"%1$s\" olan ana makine prototipi, \"%2$s\" keşif kuralında halihazırda mevcut."
 
-#: include/html.inc.php:493
+#: include/html.inc.php:482
 #: include/views/configuration.host.discovery.list.php:97
 #: include/views/configuration.host.edit.php:509
 #: include/views/configuration.host.prototype.edit.php:30
@@ -7284,7 +7311,7 @@ msgstr "Ana makineler güncellendi"
 msgid "Hours"
 msgstr "Saat"
 
-#: include/html.inc.php:756
+#: include/html.inc.php:745
 #: include/views/administration.general.housekeeper.edit.php:25
 #: include/views/administration.general.housekeeper.edit.php:154
 msgid "Housekeeping"
@@ -7442,7 +7469,7 @@ msgstr "Simge haritası silindi"
 msgid "Icon map updated"
 msgstr "Simge haritası güncellendi"
 
-#: include/audit.inc.php:54 include/html.inc.php:758
+#: include/audit.inc.php:54 include/html.inc.php:747
 #: include/views/administration.general.iconmap.edit.php:25
 #: include/views/administration.general.iconmap.list.php:23
 msgid "Icon mapping"
@@ -7510,7 +7537,7 @@ msgstr ""
 msgid "Image updated"
 msgstr "Resim güncellendi"
 
-#: include/html.inc.php:757
+#: include/html.inc.php:746
 #: include/views/administration.general.image.edit.php:22
 #: include/views/administration.general.image.list.php:23
 #: include/views/conf.import.php:46
@@ -7552,7 +7579,7 @@ msgstr "İçe aktarma başarılı"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Mevcut olmayan \"%s\" envanter alanına göre filtreleme yapılamaz."
 
-#: include/html.inc.php:324
+#: include/html.inc.php:311
 msgid "In maintenance"
 msgstr "Bakımda"
 
@@ -8656,14 +8683,14 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
 #: include/classes/helpers/CSvgGraphHelper.php:247
-#: include/classes/import/CConfigurationImport.php:842
-#: include/classes/import/CConfigurationImport.php:880
-#: include/classes/import/CConfigurationImport.php:2509
-#: include/classes/import/CConfigurationImport.php:2613
-#: include/classes/import/CConfigurationImport.php:2623
-#: include/classes/import/CConfigurationImport.php:2659
+#: include/classes/import/CConfigurationImport.php:853
+#: include/classes/import/CConfigurationImport.php:891
+#: include/classes/import/CConfigurationImport.php:2564
 #: include/classes/import/CConfigurationImport.php:2668
-#: include/classes/import/CConfigurationImport.php:2674
+#: include/classes/import/CConfigurationImport.php:2678
+#: include/classes/import/CConfigurationImport.php:2714
+#: include/classes/import/CConfigurationImport.php:2723
+#: include/classes/import/CConfigurationImport.php:2729
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:267
@@ -9248,7 +9275,7 @@ msgstr "\"%1$s\" öğesi mevcut değil veya bu öğeye erişiminiz yok"
 msgid "Item \"%1$s\" has master item and cannot be copied."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:734
+#: include/classes/import/CConfigurationImport.php:736
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" üzerindeki \"%1$s\" öğesi: uygulama \"%3$s\" mevcut değil."
@@ -9344,7 +9371,7 @@ msgstr[1] "Öğe prototipleri güncellendi"
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "\"%1$s\" ID'li öğe prototipi mevcut değil."
 
-#: app/controllers/CControllerPopupGeneric.php:252 include/html.inc.php:460
+#: app/controllers/CControllerPopupGeneric.php:252 include/html.inc.php:449
 #: include/views/configuration.host.discovery.list.php:115
 #: include/views/configuration.host.edit.php:436
 #: include/views/configuration.item.prototype.edit.php:22
@@ -9422,7 +9449,7 @@ msgstr "\"%1$s\" anahtarlı öğe \"%2$s\" üzerinde halihazırda var."
 
 #: app/controllers/CControllerPopupGeneric.php:189
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:378 include/items.inc.php:1165
+#: include/html.inc.php:367 include/items.inc.php:1165
 #: include/views/configuration.application.list.php:64
 #: include/views/configuration.application.list.php:108
 #: include/views/configuration.graph.edit.php:434
@@ -10085,7 +10112,7 @@ msgstr "\"%1$s\" makrosu benzersiz değil."
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "\"%1$s\" hostmacroid'li makro mevcut değil."
 
-#: include/html.inc.php:760
+#: include/html.inc.php:749
 #: include/views/administration.general.macros.edit.php:25
 #: include/views/administration.general.macros.edit.php:80
 #: include/views/configuration.host.edit.php:685
@@ -10173,15 +10200,15 @@ msgstr "Bakım türü"
 msgid "Maintenance updated"
 msgstr "Bakım güncellendi"
 
-#: include/html.inc.php:806
+#: include/html.inc.php:795
 msgid "Maintenance with data collection"
 msgstr "Veri toplayarak bakım"
 
-#: include/html.inc.php:805
+#: include/html.inc.php:794
 msgid "Maintenance without data collection"
 msgstr "Veri toplamayarak bakım"
 
-#: include/html.inc.php:842
+#: include/html.inc.php:831
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr ""
@@ -11686,7 +11713,7 @@ msgstr "Kasım"
 msgid "Number of CPUs. Returns integer"
 msgstr "CPU sayısı. Tam sayı döndürür"
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:983
 msgid "Number of enabled items on the host."
 msgstr "Ana makinedeki etkin öğelerin sayısı."
 
@@ -11698,25 +11725,25 @@ msgstr "Ana makinelerin sayısı (etkin/devre dışı/şablon)"
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Öğe sayısı (etkin/devre dışı/desteklenmiyor)"
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:1007
 msgid "Number of items in Zabbix database."
 msgstr "Zabbix veritabanındaki öğe sayısı."
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1027
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Henüz sunucuya gönderilmeyen vekil sunucu geçmişindeki öğelerin sayısı"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1031
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Kuyrukta, başlangıçtan belli saniye kadar ötelenen öğelerin sayısı, kapsayıcı."
 
 #: include/classes/items/CHelpItems.php:353
 #: include/classes/items/CHelpItems.php:667
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1047
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1003
 msgid "Number of monitored hosts"
 msgstr "İzlenen ana makine sayısı"
 
@@ -11733,15 +11760,15 @@ msgstr "Problem sayısı"
 msgid "Number of problems and expand most critical one"
 msgstr "Problem sayısı ve en kritik olanı genişlet"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:787
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü üzerindeki işlemci çekirdeği sayısı,<url> - VMware servis URL, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:791
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizöründeki işlemci iş parçacığı sayısı, <url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:855
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware hipervizörü üzerindeki işlemci sayısı,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
@@ -11766,15 +11793,15 @@ msgstr "Adımların sayısı"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Tetikleyicilerin sayısı (etkin/devre dışı [problem/tamam])"
 
-#: include/classes/items/CHelpItems.php:1047
+#: include/classes/items/CHelpItems.php:1059
 msgid "Number of triggers in Zabbix database."
 msgstr "Zabbix veritabanındaki tetikleyicilerin sayısı."
 
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1011
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Zabbix veritabanındaki desteklenmeyen öğelerin sayısı."
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:987
 msgid "Number of unsupported items on the host."
 msgstr "Ana makinedeki desteklenmeyen öğelerin sayısı."
 
@@ -11787,35 +11814,35 @@ msgstr "Kullanıcıların sayısı (çevrimiçi)"
 msgid "Number of users logged in. Returns integer"
 msgstr "Oturum açan kullanıcı sayısı. Tam sayı döndürür"
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:963
 msgid "Number of values stored in table HISTORY."
 msgstr "HISTORY tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:967
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "HISTORY_LOG tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:971
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "HISTORY_STR tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:975
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "HISTORY_TEXT tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:979
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "HISTORY_UINT tablosunda depolanan değerlerin sayısı."
 
-#: include/classes/items/CHelpItems.php:1039
+#: include/classes/items/CHelpItems.php:1051
 msgid "Number of values stored in table TRENDS."
 msgstr "TRENDS tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:1043
+#: include/classes/items/CHelpItems.php:1055
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "TRENDS_UINT tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:843
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü üzerindeki sanal makine sayısı,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
@@ -12209,7 +12236,7 @@ msgstr "Veya"
 msgid "Original"
 msgstr "Orjinal"
 
-#: include/html.inc.php:765
+#: include/html.inc.php:754
 msgid "Other"
 msgstr "Diğer"
 
@@ -13288,7 +13315,7 @@ msgstr "Düzenli ifade bir string olmalıdır"
 msgid "Regular expression updated"
 msgstr "Düzenli ifade güncellendi"
 
-#: include/html.inc.php:759
+#: include/html.inc.php:748
 #: include/views/administration.general.regularexpressions.edit.php:25
 #: include/views/administration.general.regularexpressions.list.php:23
 msgid "Regular expressions"
@@ -13531,7 +13558,7 @@ msgstr "Ana makine izinleri gerekli"
 msgid "Required performance (vps)"
 msgstr "Gerekli performans (vps)"
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1039
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Saniye başına beklenen yeni değerler cinsinden gerekli Zabbix sunucu performansı."
 
@@ -13664,45 +13691,45 @@ msgstr "Bir dosyanın içeriği alınıyor. Metin döndürür"
 msgid "Retry"
 msgstr "Tekrar dene"
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1099
 msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "MBean nesnelerini veya özelliklerini açıklayan bir JSON nesnesi döndürür. LLD için kullanılabilir."
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1085
 msgid "Return first column of the first row of the SQL query result."
 msgstr "SQL sorgu sonucunun ilk satırının ilk sütununu döndürür."
 
-#: include/classes/items/CHelpItems.php:1083
+#: include/classes/items/CHelpItems.php:1095
 msgid "Return value of an attribute of MBean object."
 msgstr "Bir MBean nesne özniteliğinin dönüş değeri."
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:699
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "ICMP ping yanıt süresini saniye cinsinden döndürür. Örnek: 0.02"
 
 #: include/classes/items/CHelpItems.php:349
 #: include/classes/items/CHelpItems.php:663
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1043
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:995
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr "Zabbix'te yapılandırılmış ana makine ağ arabirimlerini açıklayan bir JSON nesnesi döndürür. LLD için kullanılabilir."
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:999
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Ana makinede belirli bir denetim türünün kullanılabilirliğini döndürür. Bu öğenin değeri, ana makine listesindeki kullanılabilirlik simgelerine karşılık gelir. Geçerli türler: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:991
 msgid "Returns current maintenance status of the host."
 msgstr "Ana makinenin mevcut bakım durumunu döndürür."
 
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1015
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Zabbix Java ağ geçidiyle ilişkili bilgileri döndürür. Geçerli parametreler şunlardır: ping, version."
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:695
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Kayıp ICMP ping paketlerinin yüzdesini döndürür."
 
@@ -14112,7 +14139,7 @@ msgid "Screen updated"
 msgstr "Ekran güncellendi"
 
 #: app/controllers/CControllerPopupGeneric.php:214
-#: app/controllers/CControllerPopupGeneric.php:280 include/html.inc.php:409
+#: app/controllers/CControllerPopupGeneric.php:280 include/html.inc.php:398
 #: include/menu.inc.php:78 include/views/configuration.template.edit.php:306
 #: include/views/configuration.template.list.php:90
 #: include/views/configuration.template.list.php:200
@@ -14962,7 +14989,7 @@ msgstr "Sıralama düzeni (0->999)"
 msgid "Sort triggers by"
 msgstr "Tetikleyicileri şuna göre sırala"
 
-#: include/classes/api/CApiService.php:581
+#: include/classes/api/CApiService.php:579
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "\"%1$s\" alanına göre sıralama yapılmasına izin verilmiyor."
@@ -15019,7 +15046,7 @@ msgstr "Başlama yeri"
 msgid "Starting TLS failed."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:959
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Zabbix sunucusunun başlatılma zamanı, Unix zaman damgası."
 
@@ -15235,7 +15262,7 @@ msgstr "Pazar"
 msgid "Support"
 msgstr "Destek"
 
-#: include/html.inc.php:837
+#: include/html.inc.php:826
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr ""
@@ -15628,30 +15655,30 @@ msgstr "\"%3$s\" ekranının %1$s X ve %2$s Y konumunda bulunan ekran öğesinin
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/html.inc.php:698
+#: include/html.inc.php:687
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Uygulama artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s saatinde) silinecek."
 
-#: include/html.inc.php:693
+#: include/html.inc.php:682
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Uygulama artık keşfedilemiyor ve keşif kuralı bir sonraki sefer işlendiğinde silinecek."
 
-#: include/html.inc.php:644
+#: include/html.inc.php:633
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Ana makine grubu artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s saatinde) silinecek."
 
-#: include/html.inc.php:639
+#: include/html.inc.php:628
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Ana makine grubu artık keşfedilemiyor ve bir sonraki sefer keşif kuralı işlendiğinde silinecek."
 
-#: include/html.inc.php:671
+#: include/html.inc.php:660
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Ana makine artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s saatinde) silinecek."
 
-#: include/html.inc.php:666
+#: include/html.inc.php:655
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Ana makine artık keşfedilemiyor ve bir sonraki sefer keşif kuralı işlendiğinde silinecek."
 
@@ -15669,12 +15696,12 @@ msgid_plural "The image is used in maps %1$s."
 msgstr[0] "Resim, %1$s haritasında kullanılıyor."
 msgstr[1] "Resim, %1$s haritalarında kullanılıyor."
 
-#: include/html.inc.php:725
+#: include/html.inc.php:714
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Öğe artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s saatinde) silinecek."
 
-#: include/html.inc.php:720
+#: include/html.inc.php:709
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Öğe artık keşfedilemiyor ve bir sonraki sefer keşif kuralı işlendiğinde silinecek."
 
@@ -15794,11 +15821,11 @@ msgstr "Zaman (artan)"
 msgid "Time (descending)"
 msgstr "Zaman (azalan)"
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1019
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1023
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Vekil sunucu son erişim zamanı. Ad - vekil sunucu adı. Parametre - lastaccess. Unix zaman damgası."
 
@@ -15903,7 +15930,7 @@ msgstr "Toplam süre: %1$s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "İşlem kapatılmadı. Durduruluyor..."
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1089
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Düşük seviyeli keşif için SQL sorgu sonuçlarını bir JSON nesnesine dönüştür."
 
@@ -15986,7 +16013,7 @@ msgstr "\"%2$s\" üzerinde \"%1$s\" tetiği zaten var."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "\"%1$s\" tetikleyicisi farklı bağlantılara sahip şablonlara ait."
 
-#: include/classes/import/CConfigurationImport.php:1649
+#: include/classes/import/CConfigurationImport.php:1704
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "\"%1$s\" tetikleyicisi, varolmayan \"%2$s\" tetikleyicisine bağımlı."
@@ -16027,7 +16054,7 @@ msgid_plural "Triggers disabled"
 msgstr[0] "Tetikleyici devre dışı"
 msgstr[1] "Tetikleyiciler devre dışı"
 
-#: include/html.inc.php:764
+#: include/html.inc.php:753
 #: include/views/administration.general.trigger.options.edit.php:25
 #: include/views/administration.general.trigger.options.edit.php:99
 msgid "Trigger displaying options"
@@ -16105,7 +16132,7 @@ msgstr "Tetikleyici prototipi \"%1$s\", farklı bağlantılara sahip şablonlara
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Tetikleyici prototipi \"%1$s\", çoklu keşif kurallarından öğe prototipleri içeriyor."
 
-#: include/classes/import/CConfigurationImport.php:1371
+#: include/classes/import/CConfigurationImport.php:1426
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Tetikleyici prototipi \"%1$s\", var olmayan \"%2$s\" tetikleyicisine bağlı."
@@ -16133,7 +16160,7 @@ msgid_plural "Trigger prototypes updated"
 msgstr[0] "Tetikleyici prototipi güncellendi"
 msgstr[1] "Tetikleyici prototipleri güncellendi"
 
-#: app/controllers/CControllerPopupGeneric.php:149 include/html.inc.php:470
+#: app/controllers/CControllerPopupGeneric.php:149 include/html.inc.php:459
 #: include/views/configuration.host.discovery.list.php:122
 #: include/views/configuration.host.edit.php:464
 #: include/views/configuration.template.edit.php:264
@@ -16155,7 +16182,7 @@ msgstr "Tetikleyici prototipleri güncellendi"
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr "Tetikleyici kurtarma ifadesi en az bir ana_makine:anahtar başvurusu içermelidir."
 
-#: include/html.inc.php:763
+#: include/html.inc.php:752
 #: include/views/administration.general.trigseverity.edit.php:25
 #: include/views/administration.general.trigseverity.edit.php:93
 msgid "Trigger severities"
@@ -16179,7 +16206,7 @@ msgstr "Tetikleyici güncellendi"
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/views/monitoring.problem.view.php:145 include/forms.inc.php:441
-#: include/html.inc.php:388 include/triggers.inc.php:921
+#: include/html.inc.php:377 include/triggers.inc.php:921
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:355
@@ -16479,7 +16506,7 @@ msgstr "Birim"
 #: include/discovery.inc.php:151 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:67 include/hosts.inc.php:47 include/hosts.inc.php:74
-#: include/html.inc.php:334 include/httptest.inc.php:39
+#: include/html.inc.php:321 include/httptest.inc.php:39
 #: include/httptest.inc.php:56 include/items.inc.php:45
 #: include/items.inc.php:113 include/items.inc.php:137
 #: include/items.inc.php:171 include/maintenances.inc.php:39
@@ -16751,7 +16778,7 @@ msgstr "Güncelleme: %s"
 msgid "Upload"
 msgstr "Karşıya yükle"
 
-#: include/html.inc.php:542 include/html.inc.php:545
+#: include/html.inc.php:531 include/html.inc.php:534
 msgid "Upper level maps"
 msgstr "Daha üst seviye haritalar"
 
@@ -16761,7 +16788,7 @@ msgstr "Daha üst seviye haritalar"
 msgid "Uptime"
 msgstr "Çalışma Süresi"
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1063
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Zabbix sunucu işleminin saniye cinsinden çalışma süresi."
 
@@ -17062,216 +17089,216 @@ msgstr "Kullanıcılar"
 msgid "Users unblocked"
 msgstr "Bloklaması kaldırılmış kullanıcılar"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1075
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware önbellek istatistikleri. Geçerli kipler: total, free, pfree, used ve pused."
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware cluster durumu,<url> - VMware servis URL, <name> - VMware cluster adı"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:727
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Bayt cinsinden veya toplamın yüzdesi olarak VMware veri deposu kapasite istatistikleri. Bayt için tam sayı; yüzde için float döndürür"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü BIOS uuid'si,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü balonlaşmış bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü cluster adı,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware hipervizör veri deposu okuma istatistikleri <url> - VMware servis URL'si,<uuid> - VMware hipervizör ana makine adı, <datastore> - veri deposu adı, <mode> - gecikme"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware hipervizör veri deposu yazma istatistikleri <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <datastore> - veri deposu adı, <mode> - gecikme"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör modeli,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör adı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hipervizör ağ giriş istatistikleri <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hipervizör ağ çıkış istatistikleri <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware hipervizör performans sayacı, <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <path> - performans sayacı yolu, <instance> - performans sayacı örneği"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör işlemci frekansı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör işlemci modeli,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör Hz olarak işlemci kullanımı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör durumu,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör toplam bellek miktarı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör çalışma süresi, <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör kullanılan bellek miktarı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör üretici adı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör sürümü,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware servis tam adı, <url> - VMware servis URL'si"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware servis sürümü, <url> - VMware servis URL'si"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine balonlaşmış bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine taahhüt edilen depolama alanı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:875
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine sıkıştırılmış bellek miktarı,<url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:935
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware sanal makine disk aygıtı okuma istatistikleri,<url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - disk aygıtı örneği, <mode> - bps/ops - saniyedeki byte/operasyon"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:939
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware sanal makine disk aygıtı yazma istatistikleri,<url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - disk aygıtı örneği, <mode> - bps/ops - saniyedeki byte/operasyon"
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:943
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware sanal makine dosya sistemi istatistikleri, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <fsname> - dosya sistemi adı, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine konuk bellek kullanımı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine ana makine bellek kullanımı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine hipervizör adı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine adı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware sanal makine ağ arayüzü giriş istatistikleri, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - ağ arayüzü örneği, <mode> - bps/pps - saniye başına bayt/paket"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware sanal makine ağ arayüzü çıkış istatistikleri, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - ağ arayüzü örneği, <mode> - bps/pps - saniye başına bayt/paket"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware sanal makine performans sayacı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <path> - performans sayacı yolu, <instance> - performans sayacı örneği"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine güç durumu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine özel bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine işlemci hazırlama süresi ms, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine işlemci kullanımı (Hz), <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine paylaşımlı bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine takas bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine toplam bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine kaydedilmemiş depolama alanı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine paylaşılmayan depolama alanı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine çalışma süresi, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
@@ -17347,11 +17374,11 @@ msgstr "\"%1$s\" öğesinin \"%2$s\" değeri ondalık işaretinden önce çok fa
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "\"%1$s\" öğesinin \"%2$s\" değeri çok uzun: ondalık işaretinden önce %3$s basamaktan ve ondalık işaretinden sonra %4$s basamaktan çok olamaz."
 
-#: include/classes/items/CHelpItems.php:1059
+#: include/classes/items/CHelpItems.php:1071
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Değer önbellek etkinliği. Geçerli parametreler: istekler, isabetler ve kaçırılanlar."
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1067
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Değer önbellek istatistikleri. Geçerli kipler şunlardır: total, free, pfree, used ve pused."
 
@@ -17379,7 +17406,7 @@ msgstr[1] "Değer eşlemeleri silindi"
 msgid "Value map updated"
 msgstr "Değer eşlemesi güncellendi"
 
-#: include/html.inc.php:761
+#: include/html.inc.php:750
 #: include/views/administration.general.valuemapping.edit.php:25
 #: include/views/administration.general.valuemapping.edit.php:89
 #: include/views/administration.general.valuemapping.list.php:23
@@ -17545,7 +17572,7 @@ msgstr "\"%1$s\" web senaryosu, \"%2$s\" sunucusunda halihazırda mevcut."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "\"%1$s\" web senaryosu zaten var."
 
-#: include/classes/import/CConfigurationImport.php:1421
+#: include/classes/import/CConfigurationImport.php:1476
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" üzerindeki \"%1$s\" web senaryosu: \"%3$s\" uygulaması mevcut değil."
@@ -17574,7 +17601,7 @@ msgstr[1] "Web senaryosları etkin"
 msgid "Web scenario updated"
 msgstr "Web senaryosu güncellendi"
 
-#: include/html.inc.php:430 include/views/configuration.host.edit.php:531
+#: include/html.inc.php:419 include/views/configuration.host.edit.php:531
 #: include/views/configuration.template.edit.php:328
 #: include/views/conf.import.php:38
 msgid "Web scenarios"
@@ -17659,7 +17686,7 @@ msgstr "Tetiksiz"
 msgid "Wizard"
 msgstr "Sihirbaz"
 
-#: adm.workingtime.php:30 include/html.inc.php:762
+#: adm.workingtime.php:30 include/html.inc.php:751
 #: include/views/administration.general.workingtime.edit.php:23
 #: include/views/administration.general.workingtime.edit.php:35
 #: include/views/administration.general.workingtime.edit.php:37
@@ -18375,7 +18402,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "\"%1$s\" sonrasından itibaren ifadeyi kontrol et"
 
 #: include/classes/api/services/CItemGeneral.php:1649
-#: include/classes/import/CConfigurationImport.php:2660
+#: include/classes/import/CConfigurationImport.php:2715
 msgid "circular item dependency is not allowed"
 msgstr "çevrimsel öğe bağımlılığına izin verilmiyor"
 
@@ -18772,8 +18799,8 @@ msgid "maximum dependent items count reached"
 msgstr "maksimum bağımlı öğe sayısına ulaşıldı"
 
 #: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/import/CConfigurationImport.php:2614
-#: include/classes/import/CConfigurationImport.php:2675
+#: include/classes/import/CConfigurationImport.php:2669
+#: include/classes/import/CConfigurationImport.php:2730
 msgid "maximum number of dependency levels reached"
 msgstr "maksimum bağımlılık düzeyi sayısına ulaşıldı"
 
@@ -19295,11 +19322,11 @@ msgstr "desteklenmeyen sürüm numarası"
 msgid "value"
 msgstr "değer"
 
-#: include/classes/import/CConfigurationImport.php:843
-#: include/classes/import/CConfigurationImport.php:881
-#: include/classes/import/CConfigurationImport.php:2510
-#: include/classes/import/CConfigurationImport.php:2624
-#: include/classes/import/CConfigurationImport.php:2669
+#: include/classes/import/CConfigurationImport.php:854
+#: include/classes/import/CConfigurationImport.php:892
+#: include/classes/import/CConfigurationImport.php:2565
+#: include/classes/import/CConfigurationImport.php:2679
+#: include/classes/import/CConfigurationImport.php:2724
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "\"%1$s\" değeri bulunamadı"
