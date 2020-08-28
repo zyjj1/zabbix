@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 19:52+0300\n"
+"POT-Creation-Date: 2020-08-11 09:33+0300\n"
 "PO-Revision-Date: 2020-02-08 23:48+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -1291,7 +1291,7 @@ msgstr "Otomatik kayıt olay ve uyarı verileri depolama süresi"
 msgid "Auto-registration event and alert data storage period \"%1$s\"."
 msgstr "Otomatik kayıt olayı ve uyarı verisi depolama süresi \"%1$s\"."
 
-#: include/hosts.inc.php:1301
+#: include/hosts.inc.php:1274
 #: include/views/administration.general.other.edit.php:59
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:693
@@ -1577,8 +1577,8 @@ msgstr "Korelasyon eklenemez"
 msgid "Cannot add correlation condition"
 msgstr "Korelasyon durumu eklenemez"
 
-#: include/classes/api/services/CTrigger.php:944
-#: include/classes/api/services/CTriggerPrototype.php:791
+#: include/classes/api/services/CTrigger.php:939
+#: include/classes/api/services/CTriggerPrototype.php:784
 msgid "Cannot add dependency from a host to a template."
 msgstr "Bir ana makineden bir şablona bağımlılık eklenemiyor."
 
@@ -1753,7 +1753,7 @@ msgstr "Parametre olmadan \"%1$s.%2$s\" yöntemi çağrılamaz."
 msgid "Cannot clear history"
 msgstr "Geçmiş temizlenemiyor"
 
-#: items.php:1317
+#: items.php:1322
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1824,16 +1824,16 @@ msgstr "Keşfedilmiş \"%1$s\" ana makinesi üzerinde bir ana makine prototipi o
 msgid "Cannot create another database connection."
 msgstr "Başka bir veritabanı bağlantısı oluşturulamıyor."
 
-#: include/classes/api/services/CTrigger.php:978
-#: include/classes/api/services/CTriggerPrototype.php:822
+#: include/classes/api/services/CTrigger.php:973
+#: include/classes/api/services/CTriggerPrototype.php:815
 msgid "Cannot create circular dependencies."
 msgstr "Çevrimsel bağımlılıklar oluşturulamaz."
 
-#: include/classes/api/services/CTrigger.php:950
+#: include/classes/api/services/CTrigger.php:945
 msgid "Cannot create dependency on trigger itself."
 msgstr "Tetikleyicinin kendisine bağımlılık oluşturulamıyor."
 
-#: include/classes/api/services/CTriggerPrototype.php:761
+#: include/classes/api/services/CTriggerPrototype.php:754
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Tetikleyici prototipin kendisine bağımlılık oluşturamazsınız."
 
@@ -1887,8 +1887,8 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "Pano silinemiyor"
 msgstr[1] "Panolar silinemiyor"
 
-#: include/classes/api/services/CTrigger.php:848
-#: include/classes/api/services/CTriggerPrototype.php:588
+#: include/classes/api/services/CTrigger.php:843
+#: include/classes/api/services/CTriggerPrototype.php:581
 msgid "Cannot delete dependency"
 msgstr "Bağımlılık silinemiyor"
 
@@ -1927,11 +1927,11 @@ msgid_plural "Cannot delete groups"
 msgstr[0] "Grup silinemiyor"
 msgstr[1] "Gruplar silinemiyor"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:754 hosts.php:775
 msgid "Cannot delete host"
 msgstr "Ana makine silinemiyor"
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1210
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -1961,7 +1961,7 @@ msgstr "Simge eşlemesi silinemiyor"
 msgid "Cannot delete image"
 msgstr "Resim silinemiyor"
 
-#: include/classes/api/services/CHost.php:999
+#: include/classes/api/services/CHost.php:997
 msgid "Cannot delete inventory."
 msgstr "Envanter silinemiyor."
 
@@ -1977,7 +1977,7 @@ msgstr "Öğe prototipi silinemiyor"
 msgid "Cannot delete item prototypes"
 msgstr "Öğe prototipleri silinemez"
 
-#: items.php:1327
+#: items.php:1332
 msgid "Cannot delete items"
 msgstr "Öğeler silinemiyor"
 
@@ -2070,12 +2070,12 @@ msgstr "Şablonlanmış öğe silinemiyor."
 msgid "Cannot delete templated items."
 msgstr "Şablonlanmış öğeler silinemiyor."
 
-#: include/classes/api/services/CTrigger.php:641
+#: include/classes/api/services/CTrigger.php:636
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Şablonlanmış \"%1$s:%2$s\" tetiği silinemiyor."
 
-#: include/classes/api/services/CTriggerPrototype.php:541
+#: include/classes/api/services/CTriggerPrototype.php:534
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
 msgstr ""
@@ -2133,8 +2133,8 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Keşif kuralı devre dışı bırakılamıyor"
 msgstr[1] "Keşif kuralları devre dışı bırakılamıyor"
 
-#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:205
-#: hosts.php:818
+#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:196
+#: hosts.php:807
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Ana makine devre dışı bırakılamıyor"
@@ -2196,8 +2196,8 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Keşif kuralı etkinleştirilemiyor"
 msgstr[1] "Keşif kuralları etkinleştirilemiyor"
 
-#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:204
-#: hosts.php:817
+#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:195
+#: hosts.php:806
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Ana makine etkinleştirilemiyor"
@@ -2405,7 +2405,7 @@ msgstr "Görünüm dosyası \"%s\" içerilemiyor."
 msgid "Cannot insert trigger expression"
 msgstr "Tetikleyici ifadesi eklenemiyor"
 
-#: include/classes/api/services/CHost.php:977
+#: include/classes/api/services/CHost.php:975
 msgid "Cannot link template"
 msgstr "Şablon bağlantısı yapılamıyor"
 
@@ -2418,7 +2418,7 @@ msgstr "Şablon bağlantısı yapılamıyor."
 msgid "Cannot logout."
 msgstr "Oturum kapatılamıyor."
 
-#: include/classes/api/services/CHost.php:835
+#: include/classes/api/services/CHost.php:841
 msgid "Cannot mass update host name."
 msgstr "Ana makine adına toplu güncelleme yapılamıyor."
 
@@ -2426,7 +2426,7 @@ msgstr "Ana makine adına toplu güncelleme yapılamıyor."
 msgid "Cannot mass update template name."
 msgstr "Şablon adına toplu güncelleme yapılamıyor."
 
-#: include/classes/api/services/CHost.php:821
+#: include/classes/api/services/CHost.php:827
 msgid "Cannot mass update visible host name."
 msgstr "Görünür ana makine adına toplu güncelleme yapılamıyor."
 
@@ -2493,7 +2493,7 @@ msgstr "\"%1$s\" parçacığı kaydedilemiyor."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Komut gönderilemiyor, Zabbix sunucusu \"%1$s\" ile bağlantıyı kontrol edin."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1339
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
 msgid "Cannot send request"
 msgstr ""
 
@@ -2532,12 +2532,12 @@ msgstr "\"%2$s\" öğesi için \"%1$s\" ayarlanamıyor."
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Şablon ekranı \"%2$s\" için \"%1$s\" ayarlanamıyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:816
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "\"%2$s\" tetikleyicisi için \"%1$s\" ayarlanamıyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:506
+#: include/classes/api/services/CTriggerGeneral.php:822
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "\"%2$s\" tetikleyici prototipi için \"%1$s\" ayarlanamıyor."
@@ -2552,9 +2552,9 @@ msgstr "\"%1$s\" öğe prototipinde uygulama prototipi için \"templateid\" alan
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "\"%1$s\" ekranında \"templateid\" ayarlanamıyor."
 
-#: include/classes/api/services/CHost.php:886
-#: include/classes/api/services/CHost.php:1764
-#: include/classes/api/services/CHost.php:1925
+#: include/classes/api/services/CHost.php:892
+#: include/classes/api/services/CHost.php:1780
+#: include/classes/api/services/CHost.php:1941
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Devre dışı envanter için envanter alanları tanımlanamaz."
 
@@ -2587,7 +2587,7 @@ msgstr "Uygulamaların bağlantısı kaldırılıp temizlenemiyor."
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Keşif kurallarının bağlantısı kaldırılıp temizlenemiyor"
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:950
 msgid "Cannot unlink template"
 msgstr "Şablonun bağlantısı kaldırılamadı"
 
@@ -2622,27 +2622,27 @@ msgstr "\"%2$s\" grafik prototipi için \"%1$s\" güncellenemiyor."
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "\"%2$s\" öğesi için \"%1$s\" güncellenemiyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:658
+#: include/classes/api/services/CTriggerGeneral.php:974
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr "Şablonlaştırılmış tetikleyici \"%2$s\" için \"%1$s\" güncellenemiyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:664
+#: include/classes/api/services/CTriggerGeneral.php:980
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Şablonlaştırılmış tetikleyici prototipi \"%2$s\" için \"%1$s\" güncellenemiyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:657
+#: include/classes/api/services/CTriggerGeneral.php:973
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "\"%2$s\" tetikleyicisi için \"%1$s\" ayarlanamıyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:663
+#: include/classes/api/services/CTriggerGeneral.php:979
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "\"%2$s\" tetikleyici prototipi için \"%1$s\" ayarlanamıyor."
 
-#: include/classes/api/services/CHost.php:1902
+#: include/classes/api/services/CHost.php:1918
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "\"%1$s\" keşfedilmiş ana makinesi için \"%2$s\" ayarlanamıyor."
@@ -2652,9 +2652,9 @@ msgstr "\"%1$s\" keşfedilmiş ana makinesi için \"%2$s\" ayarlanamıyor."
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Keşfedilmiş öğe \"%1$s\" için \"%2$s\" güncellenemiyor."
 
-#: include/classes/api/services/CTriggerGeneral.php:714
-#: include/classes/api/services/CTrigger.php:684
-#: include/classes/api/services/CTrigger.php:808
+#: include/classes/api/services/CTriggerGeneral.php:1030
+#: include/classes/api/services/CTrigger.php:679
+#: include/classes/api/services/CTrigger.php:803
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Keşfedilmiş tetikleyici \"%1$s\" için \"%2$s\" güncellenemiyor."
@@ -2760,7 +2760,7 @@ msgstr "Keşfedilen ana makine \"%1$s\" için gruplar güncellenemiyor."
 msgid "Cannot update host"
 msgstr "Ana makine güncellenemiyor"
 
-#: include/classes/api/services/CHost.php:783
+#: include/classes/api/services/CHost.php:789
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Ana makine şifreleme ayarları güncellenemiyor. Her iki yönde de bağlantı ayarları belirtilmelidir."
 
@@ -2875,7 +2875,7 @@ msgstr "Keşfedilmiş ana makine \"%1$s\" üzerindeki şablonlar güncellenemiyo
 msgid "Cannot update trigger"
 msgstr "Tetikleyici güncellenemiyor"
 
-#: include/classes/api/services/CTriggerGeneral.php:1619
+#: include/classes/api/services/CTriggerGeneral.php:1931
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "\"%1$s\" tetikleyicisi güncellenemiyor: %2$s."
@@ -2886,7 +2886,7 @@ msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Tetikleyici prototipi güncellenemiyor"
 msgstr[1] "Tetikleyici prototipleri güncellenemiyor"
 
-#: include/classes/api/services/CTriggerGeneral.php:1475
+#: include/classes/api/services/CTriggerGeneral.php:1787
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Tetikleyici prototipi \"%1$s\" güncellenemiyor: %2$s."
@@ -4686,7 +4686,7 @@ msgstr "Web senaryosu silinsin mi?"
 msgid "Deleted"
 msgstr "Silindi"
 
-#: include/classes/api/services/CHost.php:1346
+#: include/classes/api/services/CHost.php:1362
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Silindi: \"%1$s\" ana makinesi."
@@ -4889,7 +4889,7 @@ msgstr "Seçilen web senaryoları devre dışı bırakılsın mı?"
 
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:128 auditlogs.php:147
-#: include/discovery.inc.php:108 include/hosts.inc.php:1299
+#: include/discovery.inc.php:108 include/hosts.inc.php:1272
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
 #: include/items.inc.php:189 include/triggers.inc.php:2216
@@ -5209,24 +5209,24 @@ msgstr "Harita için \"%1$s\" \"name\" değeri mükerrer."
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Ekran için \"%1$s\" \"name\" değeri mükerrer."
 
-#: include/classes/api/services/CTrigger.php:1120
+#: include/classes/api/services/CTrigger.php:1115
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "\"%1$s\" tetikleyicisinde bağımlılıklar mükerrer."
 
-#: include/classes/api/services/CTriggerPrototype.php:992
+#: include/classes/api/services/CTriggerPrototype.php:985
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "\"%1$s\" tetikleyici prototipinde bağımlılıklar mükerrer."
 
-#: include/classes/api/services/CHost.php:1700
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1716
+#: include/classes/api/services/CHost.php:1971
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Mükerrer ana makine. Aynı ana makine adına (\"%s\") sahip ana makine halihazırda verilerde bulunuyor."
 
-#: include/classes/api/services/CHost.php:1707
-#: include/classes/api/services/CHost.php:1975
+#: include/classes/api/services/CHost.php:1723
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Mükerrer ana makine. Aynı görünür ana makine adlı (\"%s\") ana makine halihazırda verilerde bulunuyor."
@@ -5236,12 +5236,12 @@ msgstr "Mükerrer ana makine. Aynı görünür ana makine adlı (\"%s\") ana mak
 msgid "Duplicate severity name \"%s\"."
 msgstr "Çift kopya \"%s\" önem derecesi ismi."
 
-#: include/classes/api/services/CTriggerGeneral.php:504
+#: include/classes/api/services/CTriggerGeneral.php:820
 #, c-format
 msgid "Duplicate trigger prototype with name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:814
 #, c-format
 msgid "Duplicate trigger with name \"%1$s\"."
 msgstr ""
@@ -5453,7 +5453,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
-#: include/classes/api/services/CHost.php:1158
+#: include/classes/api/services/CHost.php:1138
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CImage.php:437
 #: include/classes/api/services/CMaintenance.php:528
@@ -5470,8 +5470,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
 #: include/classes/api/services/CTemplate.php:560
-#: include/classes/api/services/CTrigger.php:659
-#: include/classes/api/services/CTrigger.php:783
+#: include/classes/api/services/CTrigger.php:654
+#: include/classes/api/services/CTrigger.php:778
 #: include/classes/api/services/CUserMacro.php:600
 msgid "Empty input parameter."
 msgstr "Boş giriş parametresi."
@@ -5689,7 +5689,7 @@ msgstr ""
 msgid "Error"
 msgstr "Hata"
 
-#: include/db.inc.php:683
+#: include/db.inc.php:674
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "\"%1$s\" tablosu için arama isteği hatası."
@@ -6010,9 +6010,9 @@ msgstr "\"%1$s\" alanı NULL olarak ayarlanamıyor."
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:906
-#: include/classes/api/services/CHost.php:744
+#: include/classes/api/services/CHost.php:747
 #: include/classes/api/services/CTemplate.php:793
-#: include/classes/api/services/CTriggerGeneral.php:237
+#: include/classes/api/services/CTriggerGeneral.php:495
 #: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
 #, c-format
@@ -6853,7 +6853,7 @@ msgid "History"
 msgstr "Geçmiş"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1304 items.php:1317
+#: items.php:917 items.php:924 items.php:1309 items.php:1322
 msgid "History cleared"
 msgstr "Geçmiş temizlendi"
 
@@ -6938,7 +6938,7 @@ msgstr "Yatay hizalama"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1303
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -6946,7 +6946,7 @@ msgid_plural "Hosts"
 msgstr[0] "Ana makine"
 msgstr[1] "Ana makineler"
 
-#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CHost.php:854
 #: include/classes/api/services/CTemplate.php:444
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
@@ -6954,9 +6954,9 @@ msgid "Host \"%1$s\" already exists."
 msgstr "\"%1$s\" ana makinesi zaten var."
 
 #: include/classes/api/services/CHostGroup.php:1452
-#: include/classes/api/services/CHost.php:807
-#: include/classes/api/services/CHost.php:1676
-#: include/classes/api/services/CHost.php:1865
+#: include/classes/api/services/CHost.php:813
+#: include/classes/api/services/CHost.php:1692
+#: include/classes/api/services/CHost.php:1881
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "\"%1$s\" ana makinesi, ana makine grubu olmadan bulunamaz."
@@ -6982,7 +6982,7 @@ msgstr "Ana makine erişimi"
 msgid "Host added"
 msgstr "Ana makine eklendi"
 
-#: include/classes/api/services/CHostInterface.php:819
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Ana makine, aynı türde birden çok öntanımlı arayüze sahip olamaz."
 
@@ -6990,19 +6990,19 @@ msgstr "Ana makine, aynı türde birden çok öntanımlı arayüze sahip olamaz.
 msgid "Host count"
 msgstr "Ana makine sayısı"
 
-#: hosts.php:766 hosts.php:787
+#: hosts.php:754 hosts.php:775
 msgid "Host deleted"
 msgstr "Ana makine silindi"
 
-#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:202
-#: hosts.php:815
+#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:193
+#: hosts.php:804
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Ana makine devre dışı"
 msgstr[1] "Ana makineler devre dışı"
 
-#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:201
-#: hosts.php:814
+#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:192
+#: hosts.php:803
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Ana makine etkin"
@@ -7202,7 +7202,7 @@ msgstr "Ana makine alt ağ maskesi"
 msgid "Host time"
 msgstr "Ana makine zamanı"
 
-#: include/classes/api/services/CHost.php:675
+#: include/classes/api/services/CHost.php:678
 msgid "Host update failed."
 msgstr "Ana makine güncelleme başarısız."
 
@@ -7220,8 +7220,8 @@ msgstr "\"%1$s\" ID'li ana makine mevcut değil."
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "\"%1$s\" adında bir ana makine halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1795
-#: include/classes/api/services/CHost.php:2031
+#: include/classes/api/services/CHost.php:1811
+#: include/classes/api/services/CHost.php:2047
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "\"%s\" adlı ana makine zaten var."
@@ -7232,8 +7232,8 @@ msgstr "\"%s\" adlı ana makine zaten var."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "\"%1$s\" görünür adlı bir ana makine halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1801
-#: include/classes/api/services/CHost.php:2038
+#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:2054
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "\"%s\" görünen adlı ana makine zaten var."
@@ -7590,8 +7590,8 @@ msgstr ""
 msgid "Inaccessible map"
 msgstr "Erişilemeyen harita"
 
-#: include/graphs.inc.php:271 include/hosts.inc.php:658
-#: include/hosts.inc.php:827 include/httptest.inc.php:209
+#: include/graphs.inc.php:271 include/hosts.inc.php:631
+#: include/hosts.inc.php:800 include/httptest.inc.php:209
 #: include/items.inc.php:898 include/triggers.inc.php:2507
 msgid "Inaccessible template"
 msgstr ""
@@ -7856,6 +7856,7 @@ msgstr "Fonksiyona yanlış değişkenler geçildi"
 #: include/classes/api/services/CEvent.php:793
 #: include/classes/api/services/CHostInterface.php:234
 #: include/classes/api/services/CHostInterface.php:431
+#: include/classes/api/services/CHost.php:1174
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:257
@@ -7901,7 +7902,7 @@ msgstr "Yönteme yanlış değişkenler geçildi."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "\"%1$s\" öğesi için yanlış kimlik doğrulama protokolü."
 
-#: include/classes/api/services/CHostInterface.php:674
+#: include/classes/api/services/CHostInterface.php:678
 msgid "Incorrect bulk value for interface."
 msgstr "Arayüz için yanlış toplu değer."
 
@@ -7910,9 +7911,9 @@ msgstr "Arayüz için yanlış toplu değer."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için yanlış SLA hesaplaması."
 
-#: include/classes/api/services/CHost.php:830
-#: include/classes/api/services/CHost.php:1664
-#: include/classes/api/services/CHost.php:1949
+#: include/classes/api/services/CHost.php:836
+#: include/classes/api/services/CHost.php:1680
+#: include/classes/api/services/CHost.php:1965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "\"%s\" ana makine adı için yanlış karakterler kullanıldı."
@@ -8073,9 +8074,9 @@ msgstr "Yanlış resim indeksi."
 #: include/classes/api/services/CAction.php:2902
 #: include/classes/api/services/CAction.php:2914
 #: include/classes/api/services/CAction.php:2926
-#: include/classes/api/services/CHost.php:813
-#: include/classes/api/services/CHost.php:1658
-#: include/classes/api/services/CHost.php:1851
+#: include/classes/api/services/CHost.php:819
+#: include/classes/api/services/CHost.php:1674
+#: include/classes/api/services/CHost.php:1867
 #: include/classes/api/services/CImage.php:449
 #: include/classes/api/services/CImage.php:490
 #: include/classes/api/services/CProxy.php:619
@@ -8089,18 +8090,18 @@ msgstr "Yanlış resim indeksi."
 msgid "Incorrect input parameters."
 msgstr "Yanlış giriş parametreleri."
 
-#: include/classes/api/services/CHostInterface.php:586
+#: include/classes/api/services/CHostInterface.php:590
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Yanlış arayüz DNS parametresi \"%s\" sağlandı."
 
-#: include/classes/api/services/CHostInterface.php:630
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Yanlış arayüz bağlantı noktası \"%s\" sağlandı."
 
-#: include/classes/api/services/CHost.php:1770
-#: include/classes/api/services/CHost.php:1931
+#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1947
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Yanlış envanter alanı \"%s\"."
@@ -8118,7 +8119,7 @@ msgstr "Ekran öğesi için yanlış öğe ID'si \"%1$s\" sağlandı."
 msgid "Incorrect item for axis value."
 msgstr "Eksen değeri için hatalı öğe."
 
-#: include/classes/api/services/CTriggerGeneral.php:1389
+#: include/classes/api/services/CTriggerGeneral.php:1701
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "\"%2$s\" üzerindeki tetikleyici ifadesi için yanlış öğe anahtarı \"%1$s\" sağlandı."
@@ -8300,8 +8301,8 @@ msgstr "\"%1$s\" servisi için yanlış sıralama düzeni."
 msgid "Incorrect source value."
 msgstr "Yanlış kaynak değeri."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1897
+#: include/classes/api/services/CHost.php:1758
+#: include/classes/api/services/CHost.php:1913
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış durum."
@@ -8337,13 +8338,13 @@ msgstr "Yanlış tetikleyici ifadesi"
 msgid "Incorrect trigger expression."
 msgstr "Yanlış tetikleyici ifadesi."
 
-#: include/classes/api/services/CTriggerGeneral.php:1179
+#: include/classes/api/services/CTriggerGeneral.php:1491
 #: include/triggers.inc.php:633
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Yanlış tetikleyici ifadesi. \"%1$s\" ana makinesi mevcut değil veya bu ana makineye erişiminiz yok."
 
-#: include/classes/api/services/CTriggerGeneral.php:1180
+#: include/classes/api/services/CTriggerGeneral.php:1492
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Yanlış tetikleyici ifadesi. Tetikleyici ifade elemanları aynı anda bir şablona ve bir ana makineye ait olmamalıdır."
 
@@ -8355,12 +8356,12 @@ msgstr "Yanlış tetikleyici ifadesi. Tetikleyici ifade elemanları aynı anda b
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "İfadede \"%1$s\" yanlış tetikleyici işlevi sağlandı."
 
-#: include/classes/api/services/CTriggerGeneral.php:1186
+#: include/classes/api/services/CTriggerGeneral.php:1498
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Yanlış tetikleyici prototipi ifadesi. \"%1$s\" ana makinesi mevcut değil veya bu ana makineye erişiminiz yok."
 
-#: include/classes/api/services/CTriggerGeneral.php:1187
+#: include/classes/api/services/CTriggerGeneral.php:1499
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Yanlış tetikleyici prototipi ifadesi. Tetikleyici prototipi ifade elemanları aynı anda bir şablona ve bir ana makineye ait olmamalıdır."
 
@@ -8543,21 +8544,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1560
-#: include/classes/api/services/CHost.php:1566
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
-#: include/classes/api/services/CHost.php:1592
-#: include/classes/api/services/CHost.php:1598
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
-#: include/classes/api/services/CHost.php:1685
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:777
+#: include/classes/api/services/CHost.php:1576
+#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1608
+#: include/classes/api/services/CHost.php:1614
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
+#: include/classes/api/services/CHost.php:1701
+#: include/classes/api/services/CHost.php:1752
+#: include/classes/api/services/CHost.php:1890
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:216
@@ -8629,23 +8630,23 @@ msgstr ""
 #: include/classes/api/services/CScreen.php:423
 #: include/classes/api/services/CScreen.php:429
 #: include/classes/api/services/CTemplate.php:377
-#: include/classes/api/services/CTriggerGeneral.php:242
-#: include/classes/api/services/CTriggerGeneral.php:248
-#: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:556
-#: include/classes/api/services/CTriggerGeneral.php:574
-#: include/classes/api/services/CTriggerGeneral.php:581
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:594
-#: include/classes/api/services/CTriggerGeneral.php:602
-#: include/classes/api/services/CTriggerGeneral.php:784
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:801
-#: include/classes/api/services/CTriggerGeneral.php:811
-#: include/classes/api/services/CTriggerGeneral.php:819
-#: include/classes/api/services/CTriggerGeneral.php:825
-#: include/classes/api/services/CTriggerGeneral.php:833
+#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:506
+#: include/classes/api/services/CTriggerGeneral.php:516
+#: include/classes/api/services/CTriggerGeneral.php:864
+#: include/classes/api/services/CTriggerGeneral.php:872
+#: include/classes/api/services/CTriggerGeneral.php:890
+#: include/classes/api/services/CTriggerGeneral.php:897
+#: include/classes/api/services/CTriggerGeneral.php:904
+#: include/classes/api/services/CTriggerGeneral.php:910
+#: include/classes/api/services/CTriggerGeneral.php:918
+#: include/classes/api/services/CTriggerGeneral.php:1100
+#: include/classes/api/services/CTriggerGeneral.php:1109
+#: include/classes/api/services/CTriggerGeneral.php:1117
+#: include/classes/api/services/CTriggerGeneral.php:1127
+#: include/classes/api/services/CTriggerGeneral.php:1135
+#: include/classes/api/services/CTriggerGeneral.php:1141
+#: include/classes/api/services/CTriggerGeneral.php:1149
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
 #: include/classes/graphdraw/CLineGraphDraw.php:113
@@ -8765,7 +8766,7 @@ msgstr "Yükleyici adı"
 msgid "Interface"
 msgstr "Arayüz"
 
-#: include/classes/api/services/CHostInterface.php:839
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Arayüz, \"%2$s\" üzerindeki \"%1$s\" öğesiyle bağlantılı."
@@ -8815,14 +8816,14 @@ msgstr "Dahili veri depolama süresi"
 
 #: include/classes/api/services/CGraphGeneral.php:494
 #: include/classes/api/services/CGraphGeneral.php:625
-#: include/classes/api/services/CTriggerGeneral.php:300
-#: include/classes/api/services/CTriggerGeneral.php:445
-#: include/classes/api/services/CTriggerGeneral.php:510
-#: include/classes/api/services/CTriggerGeneral.php:668
-#: include/classes/api/services/CTriggerGeneral.php:898
-#: include/classes/api/services/CTriggerGeneral.php:1009
-#: include/classes/api/services/CTriggerGeneral.php:1192
-#: include/classes/api/services/CTriggerGeneral.php:1554
+#: include/classes/api/services/CTriggerGeneral.php:616
+#: include/classes/api/services/CTriggerGeneral.php:761
+#: include/classes/api/services/CTriggerGeneral.php:826
+#: include/classes/api/services/CTriggerGeneral.php:984
+#: include/classes/api/services/CTriggerGeneral.php:1214
+#: include/classes/api/services/CTriggerGeneral.php:1323
+#: include/classes/api/services/CTriggerGeneral.php:1504
+#: include/classes/api/services/CTriggerGeneral.php:1866
 #: include/classes/core/CJsonRpc.php:205
 #: include/classes/import/validators/CXmlValidatorGeneral.php:147
 #: include/classes/widgets/fields/CWidgetField.php:100
@@ -8855,7 +8856,7 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Zaman aralığı"
 
-#: include/classes/api/services/CHostInterface.php:614
+#: include/classes/api/services/CHostInterface.php:618
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr "Geçersiz IP adresi \"%1$s\"."
@@ -9160,7 +9161,7 @@ msgstr "Geçersiz görünüm adı \"%s\" verildi. İzin verilen karakterler: \"a
 msgid "Inventory"
 msgstr "Envanter"
 
-#: include/classes/api/services/CHost.php:1018
+#: include/classes/api/services/CHost.php:1016
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için envanter devre dışı."
@@ -9211,7 +9212,7 @@ msgstr "İtalyanca (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1303
+#: items.php:1308
 msgid "Item"
 msgstr "Öğe"
 
@@ -9436,13 +9437,13 @@ msgstr "\"%1$s\" anahtarlı öğe \"%2$s\" üzerinde halihazırda var."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1673 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Öğeler"
 
-#: items.php:1327
+#: items.php:1332
 msgid "Items deleted"
 msgstr "Öğeler silindi"
 
@@ -10189,7 +10190,7 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr "Zorunlu parametre eksik."
 
-#: include/hosts.inc.php:1300
+#: include/hosts.inc.php:1273
 #: include/views/administration.general.other.edit.php:58
 #: include/views/configuration.action.edit.php:1073
 #: include/views/configuration.host.edit.php:692
@@ -11176,7 +11177,7 @@ msgstr "Veri bulunamadı."
 msgid "No data."
 msgstr "Veri yok."
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\" üzerinde \"%1$s\" türü için hiçbir öntanımlı arayüz yok."
@@ -11281,8 +11282,8 @@ msgstr "Hiçbir arabirim bulunamadı."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "\"%s\" vekil sunucusu için hiçbir arayüz sağlanmadı."
 
-#: include/classes/api/services/CHost.php:1749
-#: include/classes/api/services/CHost.php:1942
+#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1958
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "\"%s\" ana makinesi için arayüz yok."
@@ -11401,11 +11402,11 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
-#: include/classes/api/services/CHostInterface.php:653
-#: include/classes/api/services/CHost.php:1127
-#: include/classes/api/services/CHost.php:1162
-#: include/classes/api/services/CHost.php:1725
-#: include/classes/api/services/CHost.php:1857
+#: include/classes/api/services/CHostInterface.php:657
+#: include/classes/api/services/CHost.php:1143
+#: include/classes/api/services/CHost.php:1178
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1873
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11466,14 +11467,14 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
-#: include/classes/api/services/CTriggerGeneral.php:730
-#: include/classes/api/services/CTrigger.php:633
-#: include/classes/api/services/CTrigger.php:677
-#: include/classes/api/services/CTrigger.php:713
-#: include/classes/api/services/CTrigger.php:801
-#: include/classes/api/services/CTriggerPrototype.php:533
-#: include/classes/api/services/CTriggerPrototype.php:711
-#: include/classes/api/services/CTriggerPrototype.php:729
+#: include/classes/api/services/CTriggerGeneral.php:1046
+#: include/classes/api/services/CTrigger.php:628
+#: include/classes/api/services/CTrigger.php:672
+#: include/classes/api/services/CTrigger.php:708
+#: include/classes/api/services/CTrigger.php:796
+#: include/classes/api/services/CTriggerPrototype.php:526
+#: include/classes/api/services/CTriggerPrototype.php:704
+#: include/classes/api/services/CTriggerPrototype.php:722
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:373
@@ -11486,7 +11487,7 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1427 items.php:1628 services.php:84
+#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Başvurulan nesne için izin yok veya nesne mevcut değil!"
 
@@ -11612,8 +11613,8 @@ msgstr "Onaysız"
 msgid "Not Templated items"
 msgstr "Şablonlanmamış öğeler"
 
-#: include/classes/api/services/CTrigger.php:1023
-#: include/classes/api/services/CTriggerPrototype.php:870
+#: include/classes/api/services/CTrigger.php:1018
+#: include/classes/api/services/CTriggerPrototype.php:863
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Tüm şablonların \"%s\" bağlantısı yok."
@@ -12752,7 +12753,7 @@ msgstr "Ana makine envanter alanını doldurur"
 msgid "Port"
 msgstr "Port"
 
-#: include/classes/api/services/CHostInterface.php:627
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr "Ana makine arayüzü için bağlantı noktası boş olamaz."
 
@@ -13507,7 +13508,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1339
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
 msgid "Request sent successfully"
 msgstr ""
 
@@ -14961,7 +14962,7 @@ msgstr "Sıralama düzeni (0->999)"
 msgid "Sort triggers by"
 msgstr "Tetikleyicileri şuna göre sırala"
 
-#: include/classes/api/CApiService.php:550
+#: include/classes/api/CApiService.php:581
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "\"%1$s\" alanına göre sıralama yapılmasına izin verilmiyor."
@@ -15357,7 +15358,7 @@ msgstr "\"%1$s\" tablosunda \"%2$s\" adlı alan yok."
 msgid "Tag"
 msgstr "Etiket"
 
-#: include/classes/api/services/CTriggerGeneral.php:268
+#: include/classes/api/services/CTriggerGeneral.php:526
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr "\"%2$s\" değerli \"%1$s\" etiketi halihazırda mevcut."
@@ -15443,7 +15444,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Şablon"
 
-#: include/classes/api/services/CHost.php:859
+#: include/classes/api/services/CHost.php:865
 #: include/classes/api/services/CTemplate.php:434
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
@@ -15521,8 +15522,8 @@ msgstr "Şablon değeri"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "\"%1$s\" aynı adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1816
-#: include/classes/api/services/CHost.php:2056
+#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:2072
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "\"%s\" ile aynı adlı şablon halihazırda mevcut."
@@ -15533,8 +15534,8 @@ msgstr "\"%s\" ile aynı adlı şablon halihazırda mevcut."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "\"%1$s\" ile aynı görünür adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1822
-#: include/classes/api/services/CHost.php:2064
+#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:2080
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "\"%s\" ile aynı görünen isimli şablon zaten var."
@@ -15974,12 +15975,13 @@ msgstr "Yönelimler"
 msgid "Trigger"
 msgstr "Tetikleyici"
 
-#: include/classes/api/services/CTriggerGeneral.php:291
+#: include/classes/api/services/CTriggerGeneral.php:575
+#: include/classes/api/services/CTriggerGeneral.php:607
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%2$s\" üzerinde \"%1$s\" tetiği zaten var."
 
-#: include/classes/api/services/CTriggerGeneral.php:1546
+#: include/classes/api/services/CTriggerGeneral.php:1858
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "\"%1$s\" tetikleyicisi farklı bağlantılara sahip şablonlara ait."
@@ -15993,7 +15995,7 @@ msgstr "\"%1$s\" tetikleyicisi, varolmayan \"%2$s\" tetikleyicisine bağımlı."
 msgid "Trigger added"
 msgstr "Tetikleyici eklendi"
 
-#: include/classes/api/services/CTrigger.php:1066
+#: include/classes/api/services/CTrigger.php:1061
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Tetikleyici, ondan devralınmış bir tetikleyiciye bağımlı olamaz."
 
@@ -16046,7 +16048,7 @@ msgstr "Tetikleyici olay ve uyarı verisi depolama süresi"
 msgid "Trigger event and alert data storage period \"%1$s\"."
 msgstr "Tetikleyici olay ve uyarı verisi depolama süresi \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:455
+#: include/classes/api/services/CTriggerGeneral.php:771
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Tetikleyici ifadesi en az bir ana makine:anahtar referansı içermelidir."
 
@@ -16087,17 +16089,18 @@ msgstr "Tetikleyicilere genel bakış"
 msgid "Trigger prototype"
 msgstr "Tetikleyici prototipi"
 
-#: include/classes/api/services/CTriggerGeneral.php:296
+#: include/classes/api/services/CTriggerGeneral.php:576
+#: include/classes/api/services/CTriggerGeneral.php:612
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%1$s\" tetikleyici prototipi halihazırda \"%2$s\" üzerinde mevcut."
 
-#: include/classes/api/services/CTriggerGeneral.php:1550
+#: include/classes/api/services/CTriggerGeneral.php:1862
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Tetikleyici prototipi \"%1$s\", farklı bağlantılara sahip şablonlara ait."
 
-#: include/classes/api/services/CTriggerGeneral.php:1469
+#: include/classes/api/services/CTriggerGeneral.php:1781
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Tetikleyici prototipi \"%1$s\", çoklu keşif kurallarından öğe prototipleri içeriyor."
@@ -16107,7 +16110,7 @@ msgstr "Tetikleyici prototipi \"%1$s\", çoklu keşif kurallarından öğe proto
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Tetikleyici prototipi \"%1$s\", var olmayan \"%2$s\" tetikleyicisine bağlı."
 
-#: include/classes/api/services/CTriggerGeneral.php:1464
+#: include/classes/api/services/CTriggerGeneral.php:1776
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Tetikleyici prototipi \"%1$s\", en az bir öğe prototipi içermelidir."
@@ -16116,7 +16119,7 @@ msgstr "Tetikleyici prototipi \"%1$s\", en az bir öğe prototipi içermelidir."
 msgid "Trigger prototype added"
 msgstr "Tetikleyici prototipi eklendi"
 
-#: include/classes/api/services/CTriggerPrototype.php:927
+#: include/classes/api/services/CTriggerPrototype.php:920
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Tetikleyici prototipi, ondan devralınmış bir tetikleyiciye bağımlı olamaz."
 
@@ -16148,7 +16151,7 @@ msgstr "Tetikleyici prototipleri silindi"
 msgid "Trigger prototypes updated"
 msgstr "Tetikleyici prototipleri güncellendi"
 
-#: include/classes/api/services/CTriggerGeneral.php:467
+#: include/classes/api/services/CTriggerGeneral.php:783
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr "Tetikleyici kurtarma ifadesi en az bir ana_makine:anahtar başvurusu içermelidir."
 
@@ -16724,7 +16727,7 @@ msgstr ""
 msgid "Updated"
 msgstr "Güncellendi"
 
-#: include/hosts.inc.php:554
+#: include/classes/api/services/CHost.php:1111
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "\"%1$s\" sunucusunun güncellenmiş durumu."
@@ -17478,7 +17481,7 @@ msgstr "Bayt cinsinden veya toplam yüzdesi olarak sanal alan boyutu. Bayt için
 msgid "Visible name"
 msgstr "Görünen isim"
 
-#: include/classes/api/services/CHost.php:1967
+#: include/classes/api/services/CHost.php:1983
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Ana makine adı eksikse görünür adı boş olamaz."
 
@@ -17678,8 +17681,8 @@ msgstr "Yaz"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için olan bağımlılıklar için yanlış alanlar."
 
-#: include/classes/api/services/CHost.php:1652
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1668
+#: include/classes/api/services/CHost.php:1861
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış alanlar."
@@ -17705,13 +17708,13 @@ msgstr "\"%1$s\" servisi için yanlış alanlar."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için olan zaman için yanlış alanlar."
 
-#: include/classes/api/services/CTriggerGeneral.php:505
-#: include/classes/api/services/CTriggerGeneral.php:662
+#: include/classes/api/services/CTriggerGeneral.php:821
+#: include/classes/api/services/CTriggerGeneral.php:978
 msgid "Wrong fields for trigger prototype."
 msgstr "Tetikleyici prototipi için yanlış alanlar."
 
-#: include/classes/api/services/CTriggerGeneral.php:499
-#: include/classes/api/services/CTriggerGeneral.php:656
+#: include/classes/api/services/CTriggerGeneral.php:815
+#: include/classes/api/services/CTriggerGeneral.php:972
 msgid "Wrong fields for trigger."
 msgstr "Tetikleyici için yanlış alanlar."
 
@@ -17719,8 +17722,8 @@ msgstr "Tetikleyici için yanlış alanlar."
 #: include/classes/api/services/CMap.php:958
 #: include/classes/api/services/CMap.php:1418
 #: include/classes/api/services/CScreenItem.php:967
-#: include/classes/api/services/CTriggerGeneral.php:530
-#: include/classes/api/services/CTriggerGeneral.php:683
+#: include/classes/api/services/CTriggerGeneral.php:846
+#: include/classes/api/services/CTriggerGeneral.php:999
 msgid "Wrong value for url field."
 msgstr "Url alanı için yanlış değer."
 
@@ -17899,8 +17902,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "\"%s\" eylem işlem genel betiği için hedef belirtmemişsiniz."
 
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:700
-#: include/classes/api/services/CHost.php:762
+#: include/classes/api/services/CHost.php:703
+#: include/classes/api/services/CHost.php:768
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:521
@@ -18080,8 +18083,8 @@ msgstr "[Ay için yanlış değer: \"%s\" ]"
 msgid "a boolean is expected"
 msgstr "bir boole bekleniyor"
 
-#: include/classes/api/services/CTriggerGeneral.php:242
-#: include/classes/api/services/CTriggerGeneral.php:258
+#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:516
 #: include/classes/api/services/CUser.php:668
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:250
@@ -18203,7 +18206,7 @@ msgstr "bir dizi veya bir string bekleniyor"
 msgid "an empty string is expected"
 msgstr "boş bir string bekleniyor"
 
-#: include/classes/api/services/CHost.php:1593
+#: include/classes/api/services/CHost.php:1609
 msgid "an even number of hexadecimal characters is expected"
 msgstr "çift sayıda onaltılık karakter bekleniyor"
 
@@ -18311,8 +18314,8 @@ msgstr "değiştirilemez"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1587
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
 #: include/classes/api/services/CItemGeneral.php:484
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
@@ -18333,11 +18336,11 @@ msgstr "değiştirilemez"
 #: include/classes/api/services/CMediatype.php:721
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CTriggerGeneral.php:248
-#: include/classes/api/services/CTriggerGeneral.php:556
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:801
-#: include/classes/api/services/CTriggerGeneral.php:819
+#: include/classes/api/services/CTriggerGeneral.php:506
+#: include/classes/api/services/CTriggerGeneral.php:872
+#: include/classes/api/services/CTriggerGeneral.php:904
+#: include/classes/api/services/CTriggerGeneral.php:1117
+#: include/classes/api/services/CTriggerGeneral.php:1135
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:536
 #: include/classes/api/services/CUser.php:679
@@ -18788,7 +18791,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1599
+#: include/classes/api/services/CHost.php:1615
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "minimum uzunluk %1$s karakter"
@@ -18840,7 +18843,7 @@ msgstr "ad"
 msgid "new"
 msgstr "yeni"
 
-#: hosts.php:1156 include/views/configuration.host.massupdate.php:83
+#: hosts.php:1145 include/views/configuration.host.massupdate.php:83
 #: include/views/configuration.item.massupdate.php:646 templates.php:531
 msgctxt "new element in multiselect"
 msgid "new"
@@ -19045,10 +19048,10 @@ msgstr "seçilen"
 msgid "short description"
 msgstr "kısa tanımlama"
 
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1612
-#: include/classes/api/services/CHost.php:1621
-#: include/classes/api/services/CHost.php:1627
+#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1628
+#: include/classes/api/services/CHost.php:1637
+#: include/classes/api/services/CHost.php:1643
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
@@ -19060,10 +19063,10 @@ msgstr "kısa tanımlama"
 #: include/classes/api/services/CMaintenance.php:711
 #: include/classes/api/services/CProxy.php:662
 #: include/classes/api/services/CProxy.php:786
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:574
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:811
+#: include/classes/api/services/CTriggerGeneral.php:864
+#: include/classes/api/services/CTriggerGeneral.php:890
+#: include/classes/api/services/CTriggerGeneral.php:1109
+#: include/classes/api/services/CTriggerGeneral.php:1127
 msgid "should be empty"
 msgstr "boş olmalı"
 
@@ -19131,8 +19134,8 @@ msgstr "\"%1$s\" şablon ID'si %2$s defa geçti"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:385
-#: include/classes/api/services/CHost.php:1686
-#: include/classes/api/services/CHost.php:1875
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1891
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CTemplate.php:378
 #: include/classes/validators/CApiInputValidator.php:867
@@ -19187,11 +19190,11 @@ msgstr "tetikleyici"
 msgid "trigger does not allow manual closing"
 msgstr "tetikleyici elle kapatmaya izin vermiyor"
 
-#: include/classes/api/services/CTriggerGeneral.php:1476
+#: include/classes/api/services/CTriggerGeneral.php:1788
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "tetikleyici prototipi başka bir şablona veya ana makineye taşınamaz"
 
-#: include/classes/api/services/CTriggerGeneral.php:1621
+#: include/classes/api/services/CTriggerGeneral.php:1933
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "bağlantılara sahip tetikleyici başka bir şablona veya ana makineye taşınamaz"
 
@@ -19234,17 +19237,17 @@ msgstr "beklenmedik metin \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CHost.php:1577
+#: include/classes/api/services/CHost.php:1583
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
-#: include/classes/api/services/CTriggerGeneral.php:582
-#: include/classes/api/services/CTriggerGeneral.php:595
-#: include/classes/api/services/CTriggerGeneral.php:603
-#: include/classes/api/services/CTriggerGeneral.php:785
-#: include/classes/api/services/CTriggerGeneral.php:826
-#: include/classes/api/services/CTriggerGeneral.php:834
+#: include/classes/api/services/CTriggerGeneral.php:898
+#: include/classes/api/services/CTriggerGeneral.php:911
+#: include/classes/api/services/CTriggerGeneral.php:919
+#: include/classes/api/services/CTriggerGeneral.php:1101
+#: include/classes/api/services/CTriggerGeneral.php:1142
+#: include/classes/api/services/CTriggerGeneral.php:1150
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr "beklenmedik değer \"%1$s\""
@@ -19322,9 +19325,9 @@ msgid "value is too long"
 msgstr "değer çok uzun"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CHost.php:772
-#: include/classes/api/services/CHost.php:1737
-#: include/classes/api/services/CHost.php:1892
+#: include/classes/api/services/CHost.php:778
+#: include/classes/api/services/CHost.php:1753
+#: include/classes/api/services/CHost.php:1908
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
