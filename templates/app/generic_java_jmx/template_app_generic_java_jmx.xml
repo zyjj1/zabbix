@@ -61,7 +61,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -120,7 +120,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -179,7 +179,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -238,7 +238,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -302,7 +302,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -366,7 +366,7 @@
                      <params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -430,7 +430,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -494,7 +494,7 @@
                      <params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -558,7 +558,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -622,7 +622,7 @@
                      <params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -686,7 +686,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -750,7 +750,7 @@
                      <params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -814,7 +814,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -878,7 +878,7 @@
                      <params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -942,7 +942,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1006,7 +1006,7 @@
                      <params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1070,7 +1070,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1129,7 +1129,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1188,7 +1188,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1247,7 +1247,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1306,7 +1306,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1365,7 +1365,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1424,7 +1424,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1483,7 +1483,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1542,7 +1542,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1601,7 +1601,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1660,7 +1660,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1719,7 +1719,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1778,7 +1778,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1837,7 +1837,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1896,7 +1896,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -1955,7 +1955,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2014,7 +2014,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2073,7 +2073,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2132,7 +2132,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2191,7 +2191,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2250,7 +2250,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2309,7 +2309,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2368,7 +2368,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2427,7 +2427,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2486,7 +2486,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2545,7 +2545,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2604,7 +2604,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2663,7 +2663,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2722,7 +2722,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2781,7 +2781,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2840,7 +2840,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2904,7 +2904,7 @@
                      <params>100</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -2968,7 +2968,7 @@
                      <params>0.001</params>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -3027,7 +3027,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -3086,7 +3086,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -3145,7 +3145,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -3204,7 +3204,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -3263,7 +3263,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
@@ -3322,7 +3322,7 @@
                <valuemap/>
                <logtimefmt/>
                <preprocessing/>
-               <jmx_endpoint/>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <timeout>3s</timeout>
                <url/>
                <query_fields/>
