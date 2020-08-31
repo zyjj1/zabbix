@@ -1589,7 +1589,7 @@ class testWebScenario extends CAPITest {
 				}
 
 				$db_httptest_items = CDBHelper::getAll(
-					'SELECT i.itemid, i.`name`, i.key_, i.`status`'.
+					'SELECT i.itemid, i.name, i.key_, i.status'.
 					' FROM items i JOIN httptestitem hti ON hti.itemid = i.itemid'.
 					' WHERE '.dbConditionInt('hti.httptestid', [$httptestid])
 				);
@@ -1610,7 +1610,7 @@ class testWebScenario extends CAPITest {
 				}
 
 				$db_httpsteps = CDBHelper::getAll(
-					'SELECT hs.httpstepid, hs.`name`'.
+					'SELECT hs.httpstepid, hs.name'.
 					' FROM httpstep hs'.
 					' WHERE '.dbConditionInt('hs.httptestid', [$httptestid])
 				);
@@ -1630,7 +1630,7 @@ class testWebScenario extends CAPITest {
 				}
 
 				$db_httpstep_items = CDBHelper::getAll(
-					'SELECT i.itemid, i.`name`, i.key_, i.`status`, hsi.httpstepid'.
+					'SELECT i.itemid, i.name, i.key_, i.status, hsi.httpstepid'.
 					' FROM items i JOIN httpstepitem hsi ON hsi.itemid = i.itemid'.
 					' WHERE '.dbConditionInt('hsi.httpstepid', $db_httpstepids)
 				);
