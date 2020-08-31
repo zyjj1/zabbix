@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-28 19:52+0300\n"
-"PO-Revision-Date: 2020-07-01 11:48+0300\n"
-"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2020-08-29 23:30+0300\n"
+"Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1593596936.000000\n"
+"X-POOTLE-MTIME: 1598736643.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:89
@@ -1512,19 +1512,19 @@ msgstr "Вычисляемое"
 
 #: include/classes/items/CHelpItems.php:673
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление среднего значения на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: include/classes/items/CHelpItems.php:681
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление максимального значения на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: include/classes/items/CHelpItems.php:677
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление минимального значения на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: include/classes/items/CHelpItems.php:685
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление суммы значений на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: jsLoader.php:146
 msgid "Calendar"
@@ -1788,7 +1788,7 @@ msgstr "Не удалось очистить историю"
 
 #: items.php:1322
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "Не удалось очистить историю: по крайней мере один из выбранных элементов данных не принадлежит к какому-либо узлу сети под наблюдением"
 
 #: include/classes/api/services/CDiscoveryRule.php:1535
 msgid "Cannot clone graph prototypes."
@@ -2361,17 +2361,17 @@ msgstr "Не удалось найти иконку \"%1$s\" используе�
 #: include/classes/import/CConfigurationImport.php:955
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Не удалось найти интерфейс \"%1$s\", используемый правилом обнаружения \"%2$s\" на \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:751
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Не удалось найти интерфейс \"%1$s\", используемый элементом данных \"%2$s\" на \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Не удалось найти интерфейс \"%1$s\", используемый \"%2$s\" прототипом элементов данных \"%3$s\" правила обнаружения на \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1564
 #, c-format
@@ -15742,7 +15742,7 @@ msgstr "Y координата элемента комплексного экр�
 #: include/classes/db/DbBackend.php:51
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr ""
+msgstr "Версия базы данных Zabbix не соответствует текущим требованиям. Ваша версия базы данных: %1$s. Требуемая версия: %2$s. Пожалуйста, обратитесь к своему системному администратору."
 
 #: include/html.inc.php:687
 #, c-format
@@ -16543,7 +16543,7 @@ msgstr "Не удалось создать файл конфигурации."
 #: include/classes/db/PostgresqlDbBackend.php:44
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
-msgstr ""
+msgstr "Не удалось определить текущую версию базы данных: %1$s."
 
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
@@ -17197,7 +17197,7 @@ msgstr "Состояние кластера VMware, <url> - URL службы VMw
 
 #: include/classes/items/CHelpItems.php:731
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr ""
+msgstr "Центры обработки данных VMware и их ID. Возвращает JSON"
 
 #: include/classes/items/CHelpItems.php:739
 #: include/classes/items/CHelpItems.php:763
@@ -19277,7 +19277,7 @@ msgstr "параметр \"%1$s\" отсутствует"
 #: include/classes/db/PostgresqlDbBackend.php:45
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr ""
+msgstr "таблица \"%1$s\" не найдена"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:106
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125
