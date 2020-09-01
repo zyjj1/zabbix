@@ -282,99 +282,29 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * Function used to create a dashboard with widgets required for the Update scenario.
 	 */
 	public function prepareUpdateData() {
+		// Form an array with widget configuration
+		$widgets = [];
+		$id = 1;
+		for ($y = 0; $y <= 25; $y += 5) {
+			for ($x = 0; $x <= 6; $x += 6) {
+				if ($id === 12) continue;
+				$widgets[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 6,
+					'height' => 5
+				];
+
+				$id++;
+			}
+		}
+
 		// Create dashboard
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Problems by severity update dashboard',
-			'widgets' => [
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 1',
-					'x' => 0,
-					'y' => 0,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 2',
-					'x' => 6,
-					'y' => 0,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 3',
-					'x' => 0,
-					'y' => 5,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 4',
-					'x' => 6,
-					'y' => 5,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 5',
-					'x' => 0,
-					'y' => 10,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 6',
-					'x' => 6,
-					'y' => 10,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 7',
-					'x' => 0,
-					'y' => 15,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 8',
-					'x' => 6,
-					'y' => 15,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 9',
-					'x' => 0,
-					'y' => 20,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 10',
-					'x' => 6,
-					'y' => 20,
-					'width' => 6,
-					'height' => 5
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 11',
-					'x' => 0,
-					'y' => 25,
-					'width' => 6,
-					'height' => 5
-				]
-			]
+			'widgets' => array_values($widgets)
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
