@@ -260,11 +260,11 @@ var chkbxRange = {
 		var selectedCountSpan = jQuery('#selected_count');
 		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
 
-		jQuery('#action_buttons button').each((_, val) => {
-			const $val = jQuery(val);
+		jQuery('#action_buttons button').each(function(key, val) {
+			var $elem = jQuery(val);
 
-			if (!$val.data('disabled')) {
-				$val.prop('disabled', count == 0);
+			if (!$elem.data('disabled')) {
+				$elem.prop('disabled', count == 0);
 			}
 		});
 	},
