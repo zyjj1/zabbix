@@ -478,10 +478,23 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 					goto session_close;
 				}
 
-				if (SSH_OK != ssh_pki_import_privkey_file(privatekey, item->password, NULL, NULL, &privkey))
+				if (SSH_OK != (rc = ssh_pki_import_privkey_file(privatekey, item->password, NULL, NULL,
+						&privkey)))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to import private key: %s",
+					if (SSH_EOF == rc)
+					{
+						SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot import private key"
+								" file \"%s\" because it does not exist or permission"
+								" denied" ,privatekey));
+						goto session_close;
+					}
+
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot import private key \"%s\"",
 							privatekey));
+
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to import private key \"%s\", rc:%d",
+							__func__, privatekey, rc);
+
 					goto session_close;
 				}
 
