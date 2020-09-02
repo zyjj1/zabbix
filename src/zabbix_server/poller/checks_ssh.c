@@ -485,7 +485,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 					{
 						SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot import private key"
 								" file \"%s\" because it does not exist or permission"
-								" denied" ,privatekey));
+								" denied", privatekey));
 						goto session_close;
 					}
 
