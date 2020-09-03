@@ -287,7 +287,9 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		$id = 1;
 		for ($y = 0; $y <= 25; $y += 5) {
 			for ($x = 0; $x <= 6; $x += 6) {
-				if ($id === 12) continue;
+				if ($id === 12) {
+					break 2;
+				}
 				$widgets[] = [
 					'type' => 'problemsbysv',
 					'name' => 'Reference widget '.$id,
