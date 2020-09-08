@@ -1287,12 +1287,11 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	if ($items) {
 		// Check items belong only to hosts.
 		$hosts_status = [];
-		foreach (zbx_objectValues($items, 'hosts') as $value) {
-			// Item can contain only one host.
-			$hosts_status[] = $value[0]['status'];
+		foreach ($items as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
 		}
 
-		if (in_array(HOST_STATUS_TEMPLATE, array_unique($hosts_status))) {
+		if (in_array(HOST_STATUS_TEMPLATE, array_keys($hosts_status))) {
 			$result = false;
 		}
 		else {
@@ -2028,12 +2027,11 @@ else {
 	// Set is_template false, when one of hosts is not template.
 	if ($data['items']) {
 		$hosts_status = [];
-		foreach (zbx_objectValues($data['items'], 'hosts') as $value) {
-			// Item can contain only one host.
-			$hosts_status[] = $value[0]['status'];
+		foreach ($data['items'] as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
 		}
-		foreach (array_unique($hosts_status) as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
 				break;
 			}
