@@ -1209,11 +1209,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{
-					if (ISSET_TEXT(&snmp_result) &&
-							0 != ((ZBX_SNMP_STR_HEX | ZBX_SNMP_STR_STRING) & val_type))
-					{
+					if (ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
-					}
 
 					str_res = GET_STR_RESULT(&snmp_result);
 				}
@@ -1277,6 +1274,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
+	unsigned char		val_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __function_name, num, level);
 
@@ -1399,13 +1397,12 @@ retry:
 			/* process received data */
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
-			{
-				(void)zbx_snmp_set_result(var, &results[j], NULL);
-			}
+				(void)zbx_snmp_set_result(var, &results[j], &val_type);
 			else
-			{
-				errcodes[j] = zbx_snmp_set_result(var, &results[j], NULL);
-			}
+				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
+
+			if (ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
+				zbx_remove_chars(results[j].text, "\r\n");
 		}
 
 		if (SUCCEED == ret)
