@@ -32,7 +32,7 @@ extern char	*CONFIG_TMPDIR;
 
 /* old official fping (2.4b2_to_ipv6) did not support source IP address */
 /* old patched versions (2.4b2_to_ipv6) provided either -I or -S options */
-/* current official fping (3.x) provides -I option for binding to an interface and -S option for source IP address */
+/* since fping 3.x it provides -I option for binding to an interface and -S option for source IP address */
 
 static unsigned char	source_ip_checked;
 static const char	*source_ip_option;
@@ -49,7 +49,7 @@ static int		fping_ipv6_supported;
 #endif
 
 #define FPING_CHECK_EXPIRED	3600	/* seconds, expire detected fping options every hour */
-time_t	fping_check_reset_at;		/* time of the last fping options expiration */
+static time_t	fping_check_reset_at;	/* time of the last fping options expiration */
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -121,7 +121,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 	size_t		i;
 	int		ret = FAIL;
 
-	for (i = 0; i < sizeof(intervals) / sizeof(*intervals); i++)
+	for (i = 0; i < ARRSIZE(intervals); i++)
 	{
 		int		ret_exec;
 		char		tmp[MAX_STRING_LEN], err[255];
@@ -145,12 +145,13 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 			goto out;
 		}
 
-#define FPING_YOU_NEED_PREFIX	"You need i >= "
-
 		/* First, check the output for suggested interval option, e. g.:          */
 		/*                                                                        */
 		/* /usr/sbin/fping: these options are too risky for mere mortals.         */
 		/* /usr/sbin/fping: You need i >= 1, p >= 20, r < 20, and t >= 50         */
+
+#define FPING_YOU_NEED_PREFIX	"You need i >= "
+
 		if (NULL != (p = strstr(out, FPING_YOU_NEED_PREFIX)))
 		{
 			p += ZBX_CONST_STRLEN(FPING_YOU_NEED_PREFIX);
@@ -160,10 +161,13 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 
 			goto out;
 		}
+
 #undef FPING_YOU_NEED_PREFIX
 
 		/* in fping 3.16 they changed "You need i >=" to "You need -i >=" */
+
 #define FPING_YOU_NEED_PREFIX	"You need -i >= "
+
 		if (NULL != (p = strstr(out, FPING_YOU_NEED_PREFIX)))
 		{
 			p += ZBX_CONST_STRLEN(FPING_YOU_NEED_PREFIX);
@@ -173,6 +177,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 
 			goto out;
 		}
+
 #undef FPING_YOU_NEED_PREFIX
 
 		/* if we get dst in the beginning of the output, the used interval is allowed, */
@@ -182,8 +187,6 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 			/* skip white spaces */
 			for (p = out; '\0' != *p && isspace(*p); p++)
 				;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "DIMBUG: diff \"%s\" vs \"%s\"", p, dst);
 
 			if (strlen(p) >= strlen(dst) && 0 == strncmp(p, dst, strlen(dst)))
 			{
