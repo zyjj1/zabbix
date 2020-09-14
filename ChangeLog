@@ -3,6 +3,7 @@ Changes for 4.0.25rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-17848] improved fping interval option detection, added log prints of detected fping options in debug mode, added options re-detection after 1 hour (dimir)
 ........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
 ........S. [ZBX-15651] fixed handling of overlapping IP addresses in network discovery received from single Zabbix proxy (vso)
 ..F....... [ZBX-18326] fixed unsupported code for internet explorer (rlataria)
