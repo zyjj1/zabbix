@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:52+0300\n"
+"POT-Creation-Date: 2020-09-18 19:51+0300\n"
 "PO-Revision-Date: 2018-11-01 00:11+0300\n"
 "Last-Translator: Rafael <rafael.amador+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1765,7 +1765,7 @@ msgstr "No puede llamar al método \"%1$s.%2$s\" sin parámetros."
 msgid "Cannot clear history"
 msgstr "No se pudo eliminar el histórico"
 
-#: items.php:1322
+#: items.php:1321
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1989,7 +1989,7 @@ msgstr "No se pudo eliminar el prototipo de ítem"
 msgid "Cannot delete item prototypes"
 msgstr "No se pudo eliminar los prototipos de ítems"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Cannot delete items"
 msgstr "No es posible eliminar los monitores"
 
@@ -2520,7 +2520,7 @@ msgstr "No pude guardar el widget: \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "No se pudo enviar la instrucción. Verifique la conexión con el servidor Zabbix \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Cannot send request"
 msgstr "No se pudo enviar la petición."
 
@@ -6883,7 +6883,7 @@ msgid "History"
 msgstr "Histórico"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1309 items.php:1322
+#: items.php:917 items.php:924 items.php:1308 items.php:1321
 msgid "History cleared"
 msgstr "Histórico eliminado"
 
@@ -6968,7 +6968,7 @@ msgstr "Alineación horizontal"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1307
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -9247,7 +9247,7 @@ msgstr "Italiano (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1308
+#: items.php:1307
 msgid "Item"
 msgstr "Monitor"
 
@@ -9472,13 +9472,13 @@ msgstr ""
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1677 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Monitores"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Items deleted"
 msgstr "Monitores eliminados"
 
@@ -11522,7 +11522,7 @@ msgstr ""
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
+#: include/func.inc.php:1803 items.php:1431 items.php:1632 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "¡Sin permisos en el objeto o éste no existe!"
 
@@ -13543,7 +13543,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Request sent successfully"
 msgstr ""
 

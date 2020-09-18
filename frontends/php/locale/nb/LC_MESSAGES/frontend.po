@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:52+0300\n"
+"POT-Creation-Date: 2020-09-18 19:51+0300\n"
 "PO-Revision-Date: 2020-02-08 23:46+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -1766,7 +1766,7 @@ msgstr "Kan ikke hente metode \"%1$s.%2$s\" uten parametere."
 msgid "Cannot clear history"
 msgstr "Kan ikke fjerne historie"
 
-#: items.php:1322
+#: items.php:1321
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1990,7 +1990,7 @@ msgstr "Kan ikke slette vareprototype"
 msgid "Cannot delete item prototypes"
 msgstr "Kan ikke slette vareprototyper"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Cannot delete items"
 msgstr "Kan ikke slette elementer"
 
@@ -2521,7 +2521,7 @@ msgstr "Kan ikke lagre widget \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Kan ikke sende kommando, sjekk tilkobling med Zabbix server \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Cannot send request"
 msgstr ""
 
@@ -6883,7 +6883,7 @@ msgid "History"
 msgstr "Historikk"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1309 items.php:1322
+#: items.php:917 items.php:924 items.php:1308 items.php:1321
 msgid "History cleared"
 msgstr "Historikk ryddet"
 
@@ -6968,7 +6968,7 @@ msgstr "Horisontal justering"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1307
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -9242,7 +9242,7 @@ msgstr "Italiensk (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1308
+#: items.php:1307
 msgid "Item"
 msgstr "artikkel"
 
@@ -9467,13 +9467,13 @@ msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\"."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1677 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "elementer"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Items deleted"
 msgstr "Elementer slettet"
 
@@ -11519,7 +11519,7 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
+#: include/func.inc.php:1803 items.php:1431 items.php:1632 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Ingen tillatelser til henvist objekt eller det eksisterer ikke!"
 
@@ -13540,7 +13540,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Request sent successfully"
 msgstr ""
 

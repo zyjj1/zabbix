@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:52+0300\n"
+"POT-Creation-Date: 2020-09-18 19:51+0300\n"
 "PO-Revision-Date: 2019-05-06 14:15+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1785,7 +1785,7 @@ msgstr "Není možné vyvolat metodu \"%1$s.%2$s\" bez parametrů."
 msgid "Cannot clear history"
 msgstr "Nelze smazat historii"
 
-#: items.php:1322
+#: items.php:1321
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -2017,7 +2017,7 @@ msgstr "Není možné smazat prototyp položky"
 msgid "Cannot delete item prototypes"
 msgstr "Není možné smazat prototypy položek"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Cannot delete items"
 msgstr "Nelze smazat položky"
 
@@ -2573,7 +2573,7 @@ msgstr "Nepodařilo se uložit widget \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Není možné poslat příkaz, zkontrolujte spojení se Zabbix serverem \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Cannot send request"
 msgstr "Nejde poslat požadavek"
 
@@ -6946,7 +6946,7 @@ msgid "History"
 msgstr "Historie"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1309 items.php:1322
+#: items.php:917 items.php:924 items.php:1308 items.php:1321
 msgid "History cleared"
 msgstr "Historie byla pročištěna"
 
@@ -7031,7 +7031,7 @@ msgstr "Vodorovné zarovnání"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1307
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -9309,7 +9309,7 @@ msgstr "Italsky (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1308
+#: items.php:1307
 msgid "Item"
 msgstr "Položka"
 
@@ -9538,13 +9538,13 @@ msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\"."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1677 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Položky"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Items deleted"
 msgstr "Položky byly smazány"
 
@@ -11599,7 +11599,7 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
+#: include/func.inc.php:1803 items.php:1431 items.php:1632 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žádné oprávnění k odkazovanému objektu nebo objekt neexistuje!"
 
@@ -13623,7 +13623,7 @@ msgstr "Obsah dotazu"
 msgid "Request body type"
 msgstr "Typ obsahu dotazu"
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Request sent successfully"
 msgstr "Požadavek byl úspěšně poslán"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:52+0300\n"
+"POT-Creation-Date: 2020-09-18 19:51+0300\n"
 "PO-Revision-Date: 2020-02-08 23:43+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: \n"
@@ -1764,7 +1764,7 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr "Не може да се изчисти историята"
 
-#: items.php:1322
+#: items.php:1321
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1992,7 +1992,7 @@ msgstr ""
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:1332
+#: items.php:1331
 msgid "Cannot delete items"
 msgstr "Не може да се изтрият елементите от данните"
 
@@ -2526,7 +2526,7 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Cannot send request"
 msgstr ""
 
@@ -6893,7 +6893,7 @@ msgid "History"
 msgstr "История"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1309 items.php:1322
+#: items.php:917 items.php:924 items.php:1308 items.php:1321
 msgid "History cleared"
 msgstr "История изчистена"
 
@@ -6978,7 +6978,7 @@ msgstr "Хоризонтално подравняване"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1307
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -9257,7 +9257,7 @@ msgstr "Италиански (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1308
+#: items.php:1307
 msgid "Item"
 msgstr "Елемент на данните"
 
@@ -9482,13 +9482,13 @@ msgstr "Ключ от елемент на данните \"%1$s\" вече съ�
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1677 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Елементи на данните "
 
-#: items.php:1332
+#: items.php:1331
 msgid "Items deleted"
 msgstr "Елементи на данните изтрити"
 
@@ -11535,7 +11535,7 @@ msgstr "Нямате право на достъп до системата."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
+#: include/func.inc.php:1803 items.php:1431 items.php:1632 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нямате право на достъп до посочения обект или той не съществува!"
 
@@ -13557,7 +13557,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Request sent successfully"
 msgstr ""
 
