@@ -1,8 +1,8 @@
 Changes for 4.0.25rc1
 
-New features:
-
 Bug fixes:
+.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
+.......PS. [ZBX-17848] fixed fping interval detection, added log prints of detected options in debug mode, re-detect options every hour (dimir)
 ........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
 ........S. [ZBX-15651] fixed handling of overlapping IP addresses in network discovery received from single Zabbix proxy (vso)
 ..F....... [ZBX-18326] fixed unsupported code for internet explorer (rlataria)

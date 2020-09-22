@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:52+0300\n"
+"POT-Creation-Date: 2020-09-18 19:51+0300\n"
 "PO-Revision-Date: 2019-07-31 14:56+0300\n"
 "Last-Translator: Christophe <ctr@pmspos.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1764,7 +1764,7 @@ msgstr "Impossible d'appeler la méthode \"%1$s.%2$s\" sans paramètres."
 msgid "Cannot clear history"
 msgstr "Impossible de nettoyer l'historique"
 
-#: items.php:1322
+#: items.php:1321
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1988,7 +1988,7 @@ msgstr "Impossible de supprimer le prototype d'élément"
 msgid "Cannot delete item prototypes"
 msgstr "Impossible de supprimer les prototypes d'éléments"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Cannot delete items"
 msgstr "Impossible de supprimer les éléments"
 
@@ -2519,7 +2519,7 @@ msgstr "Impossible de sauvegarder un widget: %1$s."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Impossible d'envoyer une commande, veuillez vérifier la connexion avec le serveur Zabbix \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Cannot send request"
 msgstr "Impossible d'envoyer la requête"
 
@@ -6880,7 +6880,7 @@ msgid "History"
 msgstr "Historique"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1309 items.php:1322
+#: items.php:917 items.php:924 items.php:1308 items.php:1321
 msgid "History cleared"
 msgstr "Historique nettoyé"
 
@@ -6965,7 +6965,7 @@ msgstr "Alignement horizontal"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1308
+#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1307
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -9239,7 +9239,7 @@ msgstr "Italien (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
 #: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1308
+#: items.php:1307
 msgid "Item"
 msgstr "Élément"
 
@@ -9464,13 +9464,13 @@ msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1678 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1677 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr "Éléments"
 
-#: items.php:1332
+#: items.php:1331
 msgid "Items deleted"
 msgstr "Éléments supprimés"
 
@@ -11514,7 +11514,7 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1432 items.php:1633 services.php:84
+#: include/func.inc.php:1803 items.php:1431 items.php:1632 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Aucune permission pour l'objet appelé ou il n'existe pas !"
 
@@ -13535,7 +13535,7 @@ msgstr "Corps de la requête"
 msgid "Request body type"
 msgstr "Type du corps de la requête"
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1344
+#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
 msgid "Request sent successfully"
 msgstr "Requête envoyée avec succès"
 
