@@ -1155,7 +1155,7 @@ class CHttpTestManager {
 	 * @param array $httptest
 	 * @param array $db_httptests
 	 */
-	protected function updateStepItems(array $httptest, array $db_httptests): void {
+	protected function updateStepItems(array $httptest, array $db_httptests) {
 		$has_applicationid = array_key_exists('applicationid', $httptest);
 		$has_status = array_key_exists('status', $httptest);
 		$has_name_changed = ($httptest['name'] !== $db_httptests[$httptest['httptestid']]['name']);
@@ -1265,7 +1265,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getTestKey(int $type, string $test_name): string {
+	protected function getTestKey($type, $test_name) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'web.test.in['.quoteItemKeyParam($test_name).',,bps]';
@@ -1286,7 +1286,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getTestName(int $type, string $test_name): string {
+	protected function getTestName($type, $test_name) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'Download speed for scenario "' . $test_name . '".';
@@ -1308,7 +1308,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getStepKey(int $type, string $test_name, string $step_name): string {
+	protected function getStepKey($type, $test_name, $step_name) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'web.test.in['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',bps]';
@@ -1330,7 +1330,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getStepName(int $type, string $test_name, string $step_name): string {
+	protected function getStepName($type, $test_name, $step_name) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'Download speed for step "' . $step_name . '" of scenario "' . $test_name . '".';
