@@ -1289,11 +1289,11 @@ class CHttpTestManager {
 	protected function getTestName($type, $test_name) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'Download speed for scenario "' . $test_name . '".';
+				return 'Download speed for scenario "'.$test_name.'".';
 			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-				return 'Failed step of scenario "' . $test_name . '".';
+				return 'Failed step of scenario "'.$test_name.'".';
 			case HTTPSTEP_ITEM_TYPE_LASTERROR:
-				return 'Last error message of scenario "' . $test_name . '".';
+				return 'Last error message of scenario "'.$test_name.'".';
 		}
 
 		return 'unknown';
@@ -1333,11 +1333,11 @@ class CHttpTestManager {
 	protected function getStepName($type, $test_name, $step_name) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'Download speed for step "' . $step_name . '" of scenario "' . $test_name . '".';
+				return 'Download speed for step "'.$step_name.'" of scenario "'.$test_name.'".';
 			case HTTPSTEP_ITEM_TYPE_TIME:
-				return 'Response time for step "' . $step_name . '" of scenario "' . $test_name . '".';
+				return 'Response time for step "'.$step_name.'" of scenario "'.$test_name.'".';
 			case HTTPSTEP_ITEM_TYPE_RSPCODE:
-				return 'Response code for step "' . $step_name . '" of scenario "' . $test_name . '".';
+				return 'Response code for step "'.$step_name.'" of scenario "'.$test_name.'".';
 		}
 
 		return 'unknown';
