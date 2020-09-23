@@ -158,7 +158,6 @@ class CHttpTestManager {
 			]);
 
 			$checkItemsUpdate = [];
-			$updateFields = [];
 			$itemids = [];
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,i.name,i.key_,hi.type'.
@@ -168,26 +167,29 @@ class CHttpTestManager {
 			);
 			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
+				$update_fields = [];
 
-				$updateFields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
-				if ($updateFields['name'] === $checkitem['name']) {
-					unset($updateFields['name']);
+				$update_fields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
+				if ($update_fields['name'] === $checkitem['name']) {
+					unset($update_fields['name']);
 				}
 
-				$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
-				if ($updateFields['key_'] === $checkitem['key_']) {
-					unset($updateFields['key_']);
+				$update_fields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
+				if ($update_fields['key_'] === $checkitem['key_']) {
+					unset($update_fields['key_']);
 				}
 
 				if (isset($httptest['status'])) {
-					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+					$update_fields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status'])
+						? ITEM_STATUS_ACTIVE
+						: ITEM_STATUS_DISABLED;
 				}
 				if (isset($httptest['delay'])) {
-					$updateFields['delay'] = $httptest['delay'];
+					$update_fields['delay'] = $httptest['delay'];
 				}
-				if (!empty($updateFields)) {
+				if (!empty($update_fields)) {
 					$checkItemsUpdate[] = [
-						'values' => $updateFields,
+						'values' => $update_fields,
 						'where' => ['itemid' => $checkitem['itemid']]
 					];
 				}
@@ -1086,7 +1088,7 @@ class CHttpTestManager {
 
 			// update item keys
 			$itemids = [];
-			$stepitemsUpdate = $updateFields = [];
+			$stepitems_update = [];
 			$dbStepItems = DBselect(
 				'SELECT i.itemid,i.name,i.key_,hi.type'.
 				' FROM items i,httpstepitem hi'.
@@ -1095,6 +1097,7 @@ class CHttpTestManager {
 			);
 			while ($stepitem = DBfetch($dbStepItems)) {
 				$itemids[] = $stepitem['itemid'];
+				$update_fields = [];
 
 				if (isset($httpTest['name']) || isset($webstep['name'])) {
 					if (!isset($httpTest['name']) || !isset($webstep['name'])) {
@@ -1107,32 +1110,34 @@ class CHttpTestManager {
 						}
 					}
 
-					$updateFields['name'] = $this->getStepName($stepitem['type'], $httpTest['name'], $webstep['name']);
-					if ($updateFields['name'] === $stepitem['name']) {
-						unset($updateFields['name']);
+					$update_fields['name'] = $this->getStepName($stepitem['type'], $httpTest['name'], $webstep['name']);
+					if ($update_fields['name'] === $stepitem['name']) {
+						unset($update_fields['name']);
 					}
 
-					$updateFields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
-					if ($updateFields['key_'] === $stepitem['key_']) {
-						unset($updateFields['key_']);
+					$update_fields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
+					if ($update_fields['key_'] === $stepitem['key_']) {
+						unset($update_fields['key_']);
 					}
 				}
 				if (isset($httpTest['status'])) {
-					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+					$update_fields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status'])
+						? ITEM_STATUS_ACTIVE
+						: ITEM_STATUS_DISABLED;
 				}
 				if (isset($httpTest['delay'])) {
-					$updateFields['delay'] = $httpTest['delay'];
+					$update_fields['delay'] = $httpTest['delay'];
 				}
-				if (!empty($updateFields)) {
-					$stepitemsUpdate[] = [
-						'values' => $updateFields,
+				if (!empty($update_fields)) {
+					$stepitems_update[] = [
+						'values' => $update_fields,
 						'where' => ['itemid' => $stepitem['itemid']]
 					];
 				}
 			}
 
-			if ($stepitemsUpdate) {
-				DB::update('items', $stepitemsUpdate);
+			if ($stepitems_update) {
+				DB::update('items', $stepitems_update);
 			}
 
 			if (array_key_exists('applicationid', $httpTest)) {
