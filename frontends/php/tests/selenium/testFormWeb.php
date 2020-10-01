@@ -21,6 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * @backup httptest
  */
@@ -363,7 +365,7 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['User', 'Password']);
+			$this->zbxTestTextNotVisible(['User', 'Password']);
 			$this->zbxTestAssertNotVisibleId('http_user');
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}

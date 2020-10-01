@@ -267,7 +267,7 @@ close_query:
  * Purpose: get performance counter index by reference value described by     *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
- * Parameters: counter_ref    - [IN] built-in performance counter             *
+ * Parameters: counter_ref - [IN] built-in performance counter                *
  *                                                                            *
  * Return value: PDH performance counter index or 0 on failure                *
  *                                                                            *

@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\Remote\RemoteWebElement;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+
 /**
  * Base class for web page elements.
  */
@@ -69,6 +73,9 @@ abstract class CBaseElement extends RemoteWebElement {
 		}
 		catch (StaleElementReferenceException $exception) {
 			return true;
+		}
+		catch (Exception $exception) {
+			// Code is not missing here.
 		}
 
 		return false;

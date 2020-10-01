@@ -347,8 +347,10 @@ class JMXItemChecker extends ItemChecker
 			try
 			{
 				logger.trace("looking for attributes of primitive types");
-				String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-				findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), values.get(attrInfo.getName()));
+				String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null :
+						attrInfo.getDescription());
+				findPrimitiveAttributes(counters, name, descr, attrInfo.getName(),
+						values.get(attrInfo.getName()));
 			}
 			catch (Exception e)
 			{
@@ -441,21 +443,27 @@ class JMXItemChecker extends ItemChecker
 		}
 	}
 
-	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws NoSuchMethodException, JSONException
+	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath,
+			Object attribute) throws NoSuchMethodException, JSONException
 	{
 		logger.trace("drilling down with attribute path '{}'", attrPath);
 
-		if (isPrimitiveAttributeType(attribute))
+		if (null == attribute || isPrimitiveAttributeType(attribute))
 		{
-			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
+			logger.trace("found attribute of a primitive type: {}", null == attribute ? "null" :
+					attribute.getClass());
 
 			JSONObject counter = new JSONObject();
 
-			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
+			String checkedDescription = null == descr ? name + "," + attrPath : descr;
+			Object checkedType = null == attribute ? JSONObject.NULL : attribute.getClass().getName();
+			Object checkedValue = null == attribute ? JSONObject.NULL : attribute.toString();
+
+			counter.put("{#JMXDESC}", checkedDescription);
 			counter.put("{#JMXOBJ}", name);
 			counter.put("{#JMXATTR}", attrPath);
-			counter.put("{#JMXTYPE}", attribute.getClass().getName());
-			counter.put("{#JMXVALUE}", attribute.toString());
+			counter.put("{#JMXTYPE}", checkedType);
+			counter.put("{#JMXVALUE}", checkedValue);
 
 			counters.put(counter);
 		}

@@ -20,6 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * @backup profiles
  */
@@ -212,10 +214,10 @@ class testPageProblems extends CLegacyWebTest {
 		// Check Tags column in result
 		$this->zbxTestAssertVisibleXpath('//thead/tr/th[text()="Tags"]');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
-		$this->zbxTestTextNotVisibleOnPage('Database');
-		$this->zbxTestTextNotVisibleOnPage('Service: abc');
-		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		$this->zbxTestTextNotVisible('Database');
+		$this->zbxTestTextNotVisible('Service: abc');
+		$this->zbxTestTextNotVisible('Tag4');
+		$this->zbxTestTextNotVisible('Tag5: 5');
 
 		// Check Show tags 2
 		$this->zbxTestClickXpath('//label[@for="filter_show_tags_2"]');
@@ -223,9 +225,9 @@ class testPageProblems extends CLegacyWebTest {
 		// Check tags in result
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
-		$this->zbxTestTextNotVisibleOnPage('Service: abc');
-		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		$this->zbxTestTextNotVisible('Service: abc');
+		$this->zbxTestTextNotVisible('Tag4');
+		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 
@@ -236,8 +238,8 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[3]', 'Service: abc');
-		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		$this->zbxTestTextNotVisible('Tag4');
+		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 	}

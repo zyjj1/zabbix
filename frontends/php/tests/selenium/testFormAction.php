@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 define('ACTION_GOOD', 0);
 define('ACTION_BAD', 1);
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * @backup actions
  */
@@ -511,7 +513,7 @@ class testFormAction extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Type of calculation');
+			$this->zbxTestTextNotVisible('Type of calculation');
 			$this->zbxTestAssertNotVisibleId('evaltype');
 		}
 

@@ -22,6 +22,9 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CWebTest.php';
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+
 /**
  * Base class for legacy Selenium tests.
  */
@@ -131,25 +134,33 @@ class CLegacyWebTest extends CWebTest {
 		}
 	}
 
-	public function zbxTestTextVisibleOnPage($strings) {
+	public function zbxTestTextVisible($strings, $context = null) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
+		}
+
+		if ($context === null) {
+			$context = $this;
 		}
 
 		foreach ($strings as $string) {
 			if (!empty($string)) {
-				$this->assertTrue($this->query('xpath://*[contains(text(),"'.$string.'")]')->count() !== 0, '"'.$string.'" must exist.');
+				$this->assertTrue($context->query('xpath://*[contains(text(),"'.$string.'")]')->count() !== 0, '"'.$string.'" must exist.');
 			}
 		}
 	}
 
-	public function zbxTestTextNotVisibleOnPage($strings) {
+	public function zbxTestTextNotVisible($strings, $context = null) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
 
+		if ($context === null) {
+			$context = $this;
+		}
+
 		foreach ($strings as $string) {
-			$elements = $this->query('xpath://*[contains(text(),"'.$string.'")]')->all();
+			$elements = $context->query('xpath:.//*[contains(text(),"'.$string.'")]')->all();
 			foreach ($elements as $element) {
 				$this->assertFalse($element->isDisplayed());
 			}
@@ -503,7 +514,8 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestLaunchOverlayDialog($header) {
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]".
+				"/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
 	}
 
 	public function zbxTestClickAndAcceptAlert($id) {

@@ -535,7 +535,7 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 			// Log in with the created or updated user.
 			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
-			$this->userLogin($data['fields']['Alias'], $password);
+			$this->page->userLogin($data['fields']['Alias'], $password);
 			// Verification of URL after login.
 			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 			// Verification of the number of rows per page parameter.
@@ -546,16 +546,18 @@ class testFormUser extends CWebTest {
 			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
-			$file = explode('/', $stylesheet->getAttribute('href'));
+			$parts = explode('/', $stylesheet->getAttribute('href'));
+			$file_time = explode('?', end($parts));
+			$file = $file_time[0];
 
 			if ($data['fields']['Theme'] === 'Dark') {
 				$this->assertEquals('dark-theme', $db_theme);
-				$this->assertEquals('dark-theme.css', end($file));
+				$this->assertEquals('dark-theme.css', $file);
 				$this->assertEquals('rgba(14, 16, 18, 1)', $color);
 			}
 			else if ($data['fields']['Theme'] === 'High-contrast light') {
 				$this->assertEquals('hc-light', $db_theme);
-				$this->assertEquals('hc-light.css', end($file));
+				$this->assertEquals('hc-light.css', $file);
 				$this->assertEquals('rgba(255, 255, 255, 1)', $color);
 			}
 
@@ -932,12 +934,12 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 
 			// Atempt to sign in with old password.
-			$this->userLogin($data['alias'],$data['old_password']);
+			$this->page->userLogin($data['alias'],$data['old_password']);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 
 			// Sign in with new password.
-			$this->userLogin($data['alias'],$data['new_password']);
+			$this->page->userLogin($data['alias'],$data['new_password']);
 			$attempt_message = CMessageElement::find()->one();
 			$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
 			$this->page->logout();
@@ -1118,7 +1120,7 @@ class testFormUser extends CWebTest {
 
 	private function setAutoLogout($data) {
 		$form = $this->query('name:userForm')->asForm()->one();
-		$auto_logout = $form->getFieldElements('Auto-logout');
+		$auto_logout = $form->getFieldContainer('Auto-logout')->children()->all();
 		/*
 		 * Auto-logout fields consists of multiple elements, the following of which will be used:
 		 *		0 - Checkbox element
@@ -1130,12 +1132,5 @@ class testFormUser extends CWebTest {
 		}
 		// Verify that Auto-login is unchecked after setting Auto-logout.
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
-	}
-
-	private function userLogin($alias, $password) {
-		$this->page->open('index.php');
-		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
-		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
 	}
 }
