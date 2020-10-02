@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 19:51+0300\n"
+"POT-Creation-Date: 2020-10-02 19:52+0300\n"
 "PO-Revision-Date: 2020-02-08 23:44+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -68,7 +68,7 @@ msgid "%1$d matches for %2$s found"
 msgstr ""
 
 #: app/controllers/CControllerWidgetProblemsView.php:56
-#: include/classes/screens/CScreenHostTriggers.php:204
+#: include/classes/screens/CScreenHostTriggers.php:199
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
@@ -336,7 +336,7 @@ msgstr[1] ""
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:155 include/blocks.inc.php:559
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1135 include/events.inc.php:250
@@ -487,7 +487,7 @@ msgstr "Toiminto päivitetty"
 
 #: app/views/monitoring.dashboard.view.php:86
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:560
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:919
 #: include/classes/screens/CScreenProblem.php:1136
@@ -759,7 +759,7 @@ msgstr "Hallinta"
 msgid "Advanced labels"
 msgstr "Edistyneet nimilaput"
 
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/events.inc.php:248
 msgid "Age"
 msgstr "Ikä"
@@ -6921,7 +6921,7 @@ msgstr ""
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
-#: include/classes/screens/CScreenHostTriggers.php:185
+#: include/classes/screens/CScreenHostTriggers.php:180
 #: include/classes/screens/CScreenHttpTest.php:115
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:914
@@ -8717,7 +8717,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
 #: include/blocks.inc.php:554 include/classes/screens/CScreenActions.php:117
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/classes/screens/CScreenProblem.php:889
 #: include/classes/screens/CScreenProblem.php:913
 #: include/views/administration.auditacts.list.php:62
@@ -9195,7 +9195,7 @@ msgstr ""
 msgid "Is online?"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:186
+#: include/classes/screens/CScreenHostTriggers.php:181
 msgid "Issue"
 msgstr ""
 
@@ -9729,7 +9729,7 @@ msgstr ""
 msgid "Last 7 days"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:187
+#: include/classes/screens/CScreenHostTriggers.php:182
 msgid "Last change"
 msgstr ""
 
@@ -11012,7 +11012,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:33 include/blocks.inc.php:434
 #: include/blocks.inc.php:633
-#: include/classes/screens/CScreenHostTriggers.php:273
+#: include/classes/screens/CScreenHostTriggers.php:268
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
@@ -13602,26 +13602,26 @@ msgid "Resolved by"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:133
-#: include/classes/screens/CScreenHostTriggers.php:239
+#: include/classes/screens/CScreenHostTriggers.php:234
 #: include/classes/screens/CScreenProblem.php:1010
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:136
-#: include/classes/screens/CScreenHostTriggers.php:242
+#: include/classes/screens/CScreenHostTriggers.php:237
 #: include/classes/screens/CScreenProblem.php:1013
 msgid "Resolved by correlation rule."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:143
-#: include/classes/screens/CScreenHostTriggers.php:249
+#: include/classes/screens/CScreenHostTriggers.php:244
 #: include/classes/screens/CScreenProblem.php:1020
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:142
-#: include/classes/screens/CScreenHostTriggers.php:248
+#: include/classes/screens/CScreenHostTriggers.php:243
 #: include/classes/screens/CScreenProblem.php:1019
 #, c-format
 msgid "Resolved by user \"%1$s\"."
@@ -17860,7 +17860,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:32 include/blocks.inc.php:434
 #: include/blocks.inc.php:633
-#: include/classes/screens/CScreenHostTriggers.php:273
+#: include/classes/screens/CScreenHostTriggers.php:268
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
