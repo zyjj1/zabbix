@@ -92,11 +92,10 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 {
 	const char	*__function_name = "get_hostid_by_host";
 
-	char		*host_esc, *ch_error, *old_metadata;
+	char		*host_esc, *ch_error, *old_metadata, *autoreg_hostid_ptr;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
-	size_t		index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __function_name, host, host_metadata);
 
@@ -196,13 +195,13 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		}
 #endif
 		old_metadata = row[6];
-		index = 7;
+		autoreg_hostid_ptr = row[7];
 #else
 		old_metadata = row[3];
-		index = 4;
+		autoreg_hostid_ptr = row[4];
 #endif
 		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(row[index]) || 0 != strcmp(old_metadata, host_metadata))
+		if (SUCCEED == DBis_null(autoreg_hostid_ptr) || 0 != strcmp(old_metadata, host_metadata))
 			db_register_host(host, ip, port, host_metadata);
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
