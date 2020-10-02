@@ -70,7 +70,13 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
+ * Parameters: sock          - [IN] open socket of server-agent connection    *
+ *             host          - [IN] host name                                 *
+ *             ip            - [IN] IP address of the host                    *
+ *             port          - [IN] port of the host                          *
+ *             host_metadata - [IN] host metadata                             *
+ *             hostid        - [OUT] host ID                                  *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -90,6 +96,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
+	size_t		index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __function_name, host, host_metadata);
 
@@ -106,7 +113,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DBselect(
 			"select h.hostid,h.status,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,"
-			"a.host_metadata"
+			"a.host_metadata,a.autoreg_hostid"
 			" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid is null and a.host=h.host"
@@ -117,7 +124,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 #else
 		DBselect(
-			"select h.hostid,h.status,h.tls_accept,a.host_metadata"
+			"select h.hostid,h.status,h.tls_accept,a.host_metadata,a.autoreg_hostid"
 			" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid is null and a.host=h.host"
@@ -189,14 +196,14 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		}
 #endif
 		old_metadata = row[6];
+		index = 7;
 #else
 		old_metadata = row[3];
+		index = 4;
 #endif
 		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata))
-		{
+		if (SUCCEED == DBis_null(row[index]) || 0 != strcmp(old_metadata, host_metadata))
 			db_register_host(host, ip, port, host_metadata);
-		}
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
 		{
