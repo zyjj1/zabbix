@@ -765,27 +765,51 @@ class CHostInterface extends CApiService {
 			$hostids[$hostData['hostid']] = $hostData['hostid'];
 		}
 
-		$dbInterfaces = API::HostInterface()->get([
+		$interfaces = API::HostInterface()->get([
 			'hostids' => $hostids,
 			'output' => ['hostid', 'main', 'type'],
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
+		$db_interfaces = $interfaces;
 
 		foreach ($interfaceIds as $interfaceId) {
-			unset($dbInterfaces[$interfaceId]);
+			unset($interfaces[$interfaceId]);
 		}
 
-		$this->checkMainInterfaces($dbInterfaces);
+		$this->checkMainInterfaces($interfaces, $db_interfaces);
 	}
 
 	/**
-	 * Check if main interfaces are correctly set for every interface type.
-	 * Each host must either have only one main interface for each interface type, or have no interface of that type at all.
+	 * Check if main interfaces are correctly set for every interface type. Each host must either have only one main
+	 * interface for each interface type, or have no interface of that type at all. If no interfaces are given, it means
+	 * the last remaining main interface is trying to be deleted. In that case use $db_interfaces as reference.
 	 *
-	 * @param array $interfaces
+	 * @param array $interfaces     Array of interfaces that are created, updated (plus DB) or deleted (plus DB).
+	 * @param array $db_interfaces  Array of interfaces from DB (used for delete only and if no interfaces are given).
 	 */
-	private function checkMainInterfaces(array $interfaces) {
+	private function checkMainInterfaces(array $interfaces, array $db_interfaces = []) {
+		if (!$interfaces && $db_interfaces) {
+			$host = API::Host()->get([
+				'output' => ['name', 'hostid'],
+				'hostids' => zbx_objectValues($db_interfaces, 'hostid'),
+				'preservekeys' => true,
+				'nopermissions' => true
+			]);
+			$host = reset($host);
+
+			foreach ($db_interfaces as $db_interface) {
+				if (bccomp($db_interface['hostid'], $host['hostid']) == 0) {
+					$type = $db_interface['type'];
+					break;
+				}
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('No default interface for "%1$s" type on "%2$s".', hostInterfaceTypeNumToName($type), $host['name'])
+			);
+		}
+
 		$interfaceTypes = [];
 		foreach ($interfaces as $interface) {
 			if (!isset($interfaceTypes[$interface['hostid']])) {
