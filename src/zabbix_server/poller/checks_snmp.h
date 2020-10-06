@@ -35,7 +35,7 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_SNMP_STR_OID	3
 #define ZBX_SNMP_STR_BITS	4
 #define ZBX_SNMP_STR_ASCII	5
-#define ZBX_SNMP_STR_UNDEFINED	6
+#define ZBX_SNMP_STR_UNDEFINED	255
 
 void	zbx_init_snmp(void);
 int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
