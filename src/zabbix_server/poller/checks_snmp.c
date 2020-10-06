@@ -717,6 +717,8 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d", __function_name, (int)var->type);
 
+	*string_type = ZBX_SNMP_STR_UNDEFINED;
+
 	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
 	{
 		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var, string_type)))
