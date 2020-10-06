@@ -322,9 +322,9 @@ int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-static zbx_int64_t	get_cpu_max_freq(int cpu_num)
+static zbx_uint64_t	get_cpu_max_freq(int cpu_num)
 {
-	zbx_int64_t	freq = FAIL;
+	zbx_uint64_t	freq = 0;
 	char		filename[MAX_STRING_LEN];
 	FILE		*f;
 
@@ -334,8 +334,8 @@ static zbx_int64_t	get_cpu_max_freq(int cpu_num)
 
 	if (NULL != f)
 	{
-		if (1 != fscanf(f, ZBX_FS_I64, &freq))
-			freq = FAIL;
+		if (1 != fscanf(f, ZBX_FS_UI64, &freq))
+			freq = 0;
 
 		fclose(f);
 	}
@@ -343,31 +343,31 @@ static zbx_int64_t	get_cpu_max_freq(int cpu_num)
 	return freq;
 }
 
-static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_int64_t maxfreq, zbx_int64_t curfreq)
+static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uint64_t maxfreq, zbx_uint64_t curfreq)
 {
 	size_t	offset = 0;
 
-	if (HW_CPU_SHOW_MAXFREQ == filter && FAIL != maxfreq)
+	if (HW_CPU_SHOW_MAXFREQ == filter && 0 != maxfreq)
 	{
 		if (HW_CPU_ALL_CPUS == cpu)
-			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_I64 "MHz", maxfreq / 1000);
+			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64 "MHz", maxfreq / 1000);
 		else
-			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_I64, maxfreq * 1000);
+			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64, maxfreq * 1000);
 	}
-	else if (HW_CPU_SHOW_CURFREQ == filter && FAIL != curfreq)
+	else if (HW_CPU_SHOW_CURFREQ == filter && 0 != curfreq)
 	{
 		if (HW_CPU_ALL_CPUS == cpu)
-			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_I64 "MHz", curfreq);
+			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64 "MHz", curfreq);
 		else
-			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_I64, curfreq * 1000000);
+			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64, curfreq * 1000000);
 	}
 	else if (HW_CPU_SHOW_ALL == filter)
 	{
-		if (FAIL != curfreq)
-			offset += zbx_snprintf(buffer + offset, size - offset, " working at " ZBX_FS_I64 "MHz", curfreq);
+		if (0 != curfreq)
+			offset += zbx_snprintf(buffer + offset, size - offset, " working at " ZBX_FS_UI64 "MHz", curfreq);
 
-		if (FAIL != maxfreq)
-			offset += zbx_snprintf(buffer + offset, size - offset, " (maximum " ZBX_FS_I64 "MHz)", maxfreq / 1000);
+		if (0 != maxfreq)
+			offset += zbx_snprintf(buffer + offset, size - offset, " (maximum " ZBX_FS_UI64 "MHz)", maxfreq / 1000);
 	}
 
 	return offset;
@@ -376,7 +376,7 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_int
 int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
-	zbx_int64_t	maxfreq = FAIL, curfreq = FAIL;
+	zbx_uint64_t	maxfreq = 0, curfreq = 0;
 	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], *param;
 	FILE		*f;
 
@@ -432,7 +432,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (-1 != cur_cpu && (HW_CPU_ALL_CPUS == cpu || cpu == cur_cpu))	/* print info about the previous cpu */
 				offset += print_freq(buffer + offset, sizeof(buffer) - offset, filter, cpu, maxfreq, curfreq);
 
-			curfreq = FAIL;
+			curfreq = 0;
 			cur_cpu = atoi(tmp);
 
 			if (HW_CPU_ALL_CPUS != cpu && cpu != cur_cpu)
@@ -441,10 +441,10 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (HW_CPU_ALL_CPUS == cpu || HW_CPU_SHOW_ALL == filter)
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\nprocessor %d:", cur_cpu);
 
-			if ((HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXFREQ == filter) &&
-					FAIL != (maxfreq = get_cpu_max_freq(cur_cpu)))
+			if (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXFREQ == filter)
 			{
-				ret = SYSINFO_RET_OK;
+				if (0 != (maxfreq = get_cpu_max_freq(cur_cpu)))
+					ret = SYSINFO_RET_OK;
 			}
 		}
 
@@ -464,7 +464,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strncmp(name, "cpu MHz", 7) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CURFREQ == filter))
 		{
 			ret = SYSINFO_RET_OK;
-			sscanf(tmp, ZBX_FS_I64, &curfreq);
+			sscanf(tmp, ZBX_FS_UI64, &curfreq);
 		}
 	}
 
