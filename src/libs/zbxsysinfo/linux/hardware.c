@@ -322,7 +322,7 @@ int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-static zbx_uint64_t	get_cpu_max_freq(int cpu_num)
+static zbx_uint64_t	get_cpu_max_freq(int cpu_num, int *status)
 {
 	zbx_uint64_t	freq = 0;
 	char		filename[MAX_STRING_LEN];
@@ -332,13 +332,16 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num)
 
 	f = fopen(filename, "r");
 
+	*status = SUCCEED;
+
 	if (NULL != f)
 	{
 		if (1 != fscanf(f, ZBX_FS_UI64, &freq))
-			freq = 0;
+			*status = FAIL;
 
 		fclose(f);
-	}
+	} else
+		*status = FAIL;
 
 	return freq;
 }
@@ -443,7 +446,10 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXFREQ == filter)
 			{
-				if (0 != (maxfreq = get_cpu_max_freq(cur_cpu)))
+				int max_freq_status;
+				maxfreq = get_cpu_max_freq(cur_cpu, &max_freq_status);
+
+				if (max_freq_status == SUCCEED)
 					ret = SYSINFO_RET_OK;
 			}
 		}
