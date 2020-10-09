@@ -97,13 +97,15 @@ class testFormLogin extends CLegacyWebTest {
 				$this->zbxTestTextPresent(['Username', 'Password']);
 				break;
 			case 'admin':
-				$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
+				$this->zbxTestAssertElementText("//form//div[@class='red']",
+					'Incorrect user name or password or account is temporarily blocked.'
+				);
 				$this->zbxTestTextPresent(['Username', 'Password']);
 				break;
 		}
 
 		if ($data['success_expected']) {
-			$this->zbxTestTextNotPresent('Login name or password is incorrect.');
+			$this->zbxTestTextNotPresent('Incorrect user name or password or account is temporarily blocked.');
 			$this->zbxTestCheckHeader('Global view');
 			$this->zbxTestTextNotPresent('Password');
 			$this->zbxTestTextNotPresent('Username');
@@ -114,7 +116,9 @@ class testFormLogin extends CLegacyWebTest {
 			$this->zbxTestTextNotPresent('Dashboard');
 		}
 		elseif ($data['dbCheck']) {
-			$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
+			$this->zbxTestAssertElementText("//form//div[@class='red']",
+				'Incorrect user name or password or account is temporarily blocked.'
+			);
 			$this->zbxTestTextPresent(['Username', 'Password']);
 			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
 			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));

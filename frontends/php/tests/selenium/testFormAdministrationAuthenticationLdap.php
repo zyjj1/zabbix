@@ -67,7 +67,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'Base DN' => 'dc=example,dc=com',
 						'Search attribute' => 'uid'
 					],
-					'error' => 'Login name or password is incorrect.'
+					'error' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			],
 			[
@@ -79,7 +79,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'Search attribute' => 'uid',
 						'Login' => 'galieleo'
 					],
-					'error' => 'Login name or password is incorrect.'
+					'error' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			],
 			[
