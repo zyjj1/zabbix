@@ -422,10 +422,14 @@ class CHostInterface extends CApiService {
 	}
 
 	protected function validateMassRemove(array $data) {
-		// check permissions
+		// Check permissions.
 		$this->checkHostPermissions($data['hostids']);
 
-		// check interfaces
+		// Check interfaces.
+		$this->checkValidator(zbx_objectValues($data['hostids'], 'hostid'), new CHostNormalValidator([
+			'message' => _('Cannot delete interface for discovered host "%1$s".')
+		]));
+
 		foreach ($data['interfaces'] as $interface) {
 			if (!isset($interface['dns']) || !isset($interface['ip']) || !isset($interface['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
