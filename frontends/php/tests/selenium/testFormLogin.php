@@ -133,7 +133,7 @@ class testFormLogin extends CLegacyWebTest {
 			$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
-			$this->zbxTestTextPresent('Login name or password is incorrect');
+			$this->zbxTestTextPresent('Incorrect user name or password or account is temporarily blocked.');
 			$this->zbxTestTextPresent('Username');
 			$this->zbxTestTextPresent('Password');
 
