@@ -426,7 +426,7 @@ class CHostInterface extends CApiService {
 		$this->checkHostPermissions($data['hostids']);
 
 		// Check interfaces.
-		$this->checkValidator(zbx_objectValues($data['hostids'], 'hostid'), new CHostNormalValidator([
+		$this->checkValidator($data['hostids'], new CHostNormalValidator([
 			'message' => _('Cannot delete interface for discovered host "%1$s".')
 		]));
 
