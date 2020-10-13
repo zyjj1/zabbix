@@ -2861,7 +2861,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
-	zbx_timespec_t			ts;
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -2915,6 +2914,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		int			*errcodes, trends_num = 0, timers_num = 0, ret = SUCCEED;
 		zbx_vector_uint64_t	itemids;
 		ZBX_DC_TREND		*trends = NULL;
+		zbx_timespec_t		ts;
 
 		*more = ZBX_SYNC_DONE;
 
