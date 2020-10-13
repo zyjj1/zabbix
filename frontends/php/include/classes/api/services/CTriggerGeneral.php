@@ -961,6 +961,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if validation failed.
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
+		$db_triggers = [];
 		if (!$triggers) {
 			return;
 		}
@@ -1040,6 +1041,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$_db_triggers = $this->createRelationMap($_db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $_db_trigger_tags, 'tags');
 
+		$db_triggers = [];
 		foreach ($triggers as $tnum => &$trigger) {
 			// check permissions
 			if (!array_key_exists($trigger['triggerid'], $_db_triggers)) {
