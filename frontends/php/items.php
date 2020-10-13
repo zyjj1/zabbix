@@ -134,7 +134,11 @@ $fields = [
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
-	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' => 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+									'(isset({add}) || isset({update})) && isset({type})'.
+										' && {type} == '.ITEM_TYPE_HTTPAGENT,
+									_('Timeout')
+								],
 	'url' =>            		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPAGENT, _('URL')],
 	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -1286,8 +1290,12 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 	if ($items) {
 		// Check items belong only to hosts.
-		$hosts_status = array_column(array_column(array_column($items, 'hosts'), 0), 'status');
-		if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
+		$hosts_status = [];
+		foreach ($items as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
+		}
+
+		if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
 			$result = false;
 		}
 		else {
@@ -2022,9 +2030,12 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['items']) {
-		$hosts_status = array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status');
-		foreach ($hosts_status as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
+		$hosts_status = [];
+		foreach ($data['items'] as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
+		}
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
 				break;
 			}
