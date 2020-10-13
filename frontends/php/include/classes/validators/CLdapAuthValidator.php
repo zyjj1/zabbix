@@ -70,12 +70,18 @@ class CLdapAuthValidator extends CValidator {
 			CLdap::ERR_SERVER_UNAVAILABLE => _('Cannot connect to LDAP server.'),
 			CLdap::ERR_BIND_FAILED => _('Cannot bind to LDAP server.'),
 			CLdap::ERR_BIND_ANON_FAILED => _('Cannot bind anonymously to LDAP server.'),
-			CLdap::ERR_USER_NOT_FOUND => _('Incorrect user name or password or account is temporarily blocked.'),
 			CLdap::ERR_OPT_PROTOCOL_FAILED => _('Setting LDAP protocol failed.'),
 			CLdap::ERR_OPT_TLS_FAILED => _('Starting TLS failed.'),
 			CLdap::ERR_OPT_REFERRALS_FAILED => _('Setting LDAP referrals to "Off" failed.'),
 			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP dereferencing mode failed.')
 		];
+
+		/**
+		 * Super-admin is allowed to see more specific error message for LDAP authentication testing purposes.
+		 */
+		$messages[CLdap::ERR_USER_NOT_FOUND] = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
+			? _('Login name or password is incorrect.')
+			: _('Incorrect user name or password or account is temporarily blocked.');
 
 		return array_key_exists($error, $messages) ? $messages[$error] : '';
 	}
