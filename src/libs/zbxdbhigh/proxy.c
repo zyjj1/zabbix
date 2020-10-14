@@ -3167,6 +3167,11 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					zbx_free(error);
 				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unknown item \"%s\" validation error",
+							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
+				}
 
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);
 				errcodes[i] = FAIL;
