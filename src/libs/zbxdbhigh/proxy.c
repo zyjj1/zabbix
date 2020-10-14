@@ -3138,7 +3138,11 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 		for (i = 0; i < values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve key \"%s\" on host \"%s\" from "
+						"configuration cache", hostkeys[i].key, hostkeys[i].host);
 				continue;
+			}
 
 			if (last_hostid != items[i].host.hostid)
 			{
