@@ -34,6 +34,13 @@ class CLdapAuthValidator extends CValidator {
 	];
 
 	/**
+	 * Switch between more detailed or more generic error message mode.
+	 *
+	 * @var type
+	 */
+	protected $detailed_errors = false;
+
+	/**
 	 * Checks if the given user name and password are valid.
 	 *
 	 * The $value array must have the following attributes:
@@ -76,10 +83,7 @@ class CLdapAuthValidator extends CValidator {
 			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP dereferencing mode failed.')
 		];
 
-		/**
-		 * Super-admin is allowed to see more specific error message for LDAP authentication testing purposes.
-		 */
-		$messages[CLdap::ERR_USER_NOT_FOUND] = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
+		$messages[CLdap::ERR_USER_NOT_FOUND] = $this->detailed_errors
 			? _('Login name or password is incorrect.')
 			: _('Incorrect user name or password or account is temporarily blocked.');
 
