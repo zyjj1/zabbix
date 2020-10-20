@@ -684,17 +684,22 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkHostInterfaces(array $interfaces, $hostid) {
-		$interfacesWithMissingData = [];
+		$interfaces_with_missing_data = [];
 
 		foreach ($interfaces as $interface) {
-			if (!isset($interface['type'], $interface['main'])) {
-				$interfacesWithMissingData[] = $interface['interfaceid'];
+			if (array_key_exists('interfaceid', $interface)) {
+				if (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+					$interfaces_with_missing_data[] = $interface['interfaceid'];
+				}
+			}
+			elseif (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 		}
 
-		if ($interfacesWithMissingData) {
+		if ($interfaces_with_missing_data) {
 			$dbInterfaces = API::HostInterface()->get([
-				'interfaceids' => $interfacesWithMissingData,
+				'interfaceids' => $interfaces_with_missing_data ? $interfaces_with_missing_data : null,
 				'output' => ['main', 'type'],
 				'preservekeys' => true,
 				'nopermissions' => true
@@ -815,6 +820,19 @@ class CHostInterface extends CApiService {
 		}
 
 		$interfaceTypes = [];
+
+		if ($db_interfaces) {
+			foreach ($db_interfaces as $db_interface) {
+				if (!array_key_exists($db_interface['hostid'], $interfaceTypes)) {
+					$interfaceTypes[$db_interface['hostid']] = [];
+				}
+
+				if (!array_key_exists($db_interface['type'], $interfaceTypes[$db_interface['hostid']])) {
+					$interfaceTypes[$db_interface['hostid']][$db_interface['type']] = ['main' => 0, 'all' => 0];
+				}
+			}
+		}
+
 		foreach ($interfaces as $interface) {
 			if (!isset($interfaceTypes[$interface['hostid']])) {
 				$interfaceTypes[$interface['hostid']] = [];
@@ -834,7 +852,8 @@ class CHostInterface extends CApiService {
 
 		foreach ($interfaceTypes as $interfaceHostId => $interfaceType) {
 			foreach ($interfaceType as $type => $counters) {
-				if ($counters['all'] && !$counters['main']) {
+				if (($counters['all'] > 0 && $counters['main'] == 0)
+						|| ($counters['all'] == 0 && $counters['main'] == 0)) {
 					$host = API::Host()->get([
 						'hostids' => $interfaceHostId,
 						'output' => ['name'],
