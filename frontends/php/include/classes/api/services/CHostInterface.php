@@ -689,7 +689,7 @@ class CHostInterface extends CApiService {
 		foreach ($interfaces as $interface) {
 			if (array_key_exists('interfaceid', $interface)) {
 				if (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
-					$interfaces_with_missing_data[] = $interface['interfaceid'];
+					$interfaces_with_missing_data[$interface['interfaceid']] = true;
 				}
 			}
 			elseif (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
@@ -699,11 +699,18 @@ class CHostInterface extends CApiService {
 
 		if ($interfaces_with_missing_data) {
 			$dbInterfaces = API::HostInterface()->get([
-				'interfaceids' => $interfaces_with_missing_data ? $interfaces_with_missing_data : null,
 				'output' => ['main', 'type'],
+				'interfaceids' => array_keys($interfaces_with_missing_data),
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
+			foreach ($interfaces_with_missing_data as $interfaceid => $tmp) {
+				if (!array_key_exists($interfaceid, $dbInterfaces)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+			}
 		}
 
 		foreach ($interfaces as $id => $interface) {
@@ -819,55 +826,83 @@ class CHostInterface extends CApiService {
 			);
 		}
 
-		$interfaceTypes = [];
+		$interface_count = [];
 
 		if ($db_interfaces) {
 			foreach ($db_interfaces as $db_interface) {
-				if (!array_key_exists($db_interface['hostid'], $interfaceTypes)) {
-					$interfaceTypes[$db_interface['hostid']] = [];
+				$hostid = $db_interface['hostid'];
+				$type = $db_interface['type'];
+
+				if (!array_key_exists($hostid, $interface_count)) {
+					$interface_count[$hostid] = [];
 				}
 
-				if (!array_key_exists($db_interface['type'], $interfaceTypes[$db_interface['hostid']])) {
-					$interfaceTypes[$db_interface['hostid']][$db_interface['type']] = ['main' => 0, 'all' => 0];
+				if (!array_key_exists($type, $interface_count[$hostid])) {
+					$interface_count[$hostid][$type] = ['main' => 0, 'all' => 0];
 				}
 			}
 		}
 
 		foreach ($interfaces as $interface) {
-			if (!isset($interfaceTypes[$interface['hostid']])) {
-				$interfaceTypes[$interface['hostid']] = [];
+			$hostid = $interface['hostid'];
+			$type = $interface['type'];
+
+			if (!array_key_exists($hostid, $interface_count)) {
+				$interface_count[$hostid] = [];
 			}
 
-			if (!isset($interfaceTypes[$interface['hostid']][$interface['type']])) {
-				$interfaceTypes[$interface['hostid']][$interface['type']] = ['main' => 0, 'all' => 0];
+			if (!array_key_exists($type, $interface_count[$hostid])) {
+				$interface_count[$hostid][$type] = ['main' => 0, 'all' => 0];
 			}
 
 			if ($interface['main'] == INTERFACE_PRIMARY) {
-				$interfaceTypes[$interface['hostid']][$interface['type']]['main']++;
+				$interface_count[$hostid][$type]['main']++;
 			}
 			else {
-				$interfaceTypes[$interface['hostid']][$interface['type']]['all']++;
+				$interface_count[$hostid][$type]['all']++;
 			}
 		}
 
-		foreach ($interfaceTypes as $interfaceHostId => $interfaceType) {
-			foreach ($interfaceType as $type => $counters) {
+		$main_interface_count = [];
+		$all_interface_count = [];
+
+		foreach ($interface_count as $hostid => $interface_type) {
+			foreach ($interface_type as $type => $counters) {
+				if (!array_key_exists($hostid, $main_interface_count)) {
+					$main_interface_count[$hostid] = 0;
+				}
+
+				$main_interface_count[$hostid] += $counters['main'];
+
+				if (!array_key_exists($hostid, $all_interface_count)) {
+					$all_interface_count[$hostid] = 0;
+				}
+
+				$all_interface_count[$hostid] += $counters['all'];
+			}
+		}
+
+		foreach ($interface_count as $hostid => $interface_type) {
+			foreach ($interface_type as $type => $counters) {
 				if (($counters['all'] > 0 && $counters['main'] == 0)
-						|| ($counters['all'] == 0 && $counters['main'] == 0)) {
+						|| ($main_interface_count[$hostid] == 0 && $all_interface_count[$hostid] == 0)) {
 					$host = API::Host()->get([
-						'hostids' => $interfaceHostId,
+						'hostids' => $hostid,
 						'output' => ['name'],
 						'preservekeys' => true,
 						'nopermissions' => true
 					]);
 					$host = reset($host);
 
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No default interface for "%1$s" type on "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,_s('No default interface for "%1$s" type on "%2$s".',
+						hostInterfaceTypeNumToName($type), $host['name']
+					));
 				}
 
 				if ($counters['main'] > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host cannot have more than one default interface of the same type.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Host cannot have more than one default interface of the same type.')
+					);
 				}
 			}
 		}
