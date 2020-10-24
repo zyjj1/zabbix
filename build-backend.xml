@@ -338,7 +338,7 @@
 			<fileset dir="." includes="zabbix-*.tar.gz"/>
 		</apply>
 		<move tofile="sources">
-			<dirset includes="zabbix-*"/>
+			<dirset dir="." includes="zabbix-*"/>
 		</move>
 		<ant antfile="../build-backend.xml" dir="sources" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
