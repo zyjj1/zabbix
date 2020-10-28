@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 19:51+0300\n"
+"POT-Creation-Date: 2020-10-09 19:52+0300\n"
 "PO-Revision-Date: 2020-02-08 23:43+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -68,7 +68,7 @@ msgid "%1$d matches for %2$s found"
 msgstr ""
 
 #: app/controllers/CControllerWidgetProblemsView.php:56
-#: include/classes/screens/CScreenHostTriggers.php:204
+#: include/classes/screens/CScreenHostTriggers.php:199
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
@@ -297,11 +297,11 @@ msgstr ""
 msgid "ADD OVERRIDE"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:437
-#: include/views/configuration.item.edit.php:564
-#: include/views/configuration.item.edit.php:571
+#: include/views/configuration.host.discovery.edit.php:439
+#: include/views/configuration.item.edit.php:566
+#: include/views/configuration.item.edit.php:573
 #: include/views/configuration.item.massupdate.php:248
-#: include/views/configuration.item.prototype.edit.php:518
+#: include/views/configuration.item.prototype.edit.php:520
 #: include/views/js/configuration.discovery.edit.js.php:110
 msgid "AES"
 msgstr ""
@@ -334,7 +334,7 @@ msgstr[1] ""
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:155 include/blocks.inc.php:559
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1135 include/events.inc.php:250
@@ -395,17 +395,17 @@ msgstr ""
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/configuration.graph.edit.php:350
-#: include/views/configuration.host.discovery.edit.php:516
-#: include/views/configuration.host.discovery.edit.php:615
+#: include/views/configuration.host.discovery.edit.php:518
+#: include/views/configuration.host.discovery.edit.php:617
 #: include/views/configuration.host.edit.php:546
 #: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.httpconf.edit.php:202
-#: include/views/configuration.item.edit.php:699
-#: include/views/configuration.item.edit.php:952
+#: include/views/configuration.item.edit.php:701
+#: include/views/configuration.item.edit.php:954
 #: include/views/configuration.item.massupdate.php:344
 #: include/views/configuration.item.massupdate.php:458
-#: include/views/configuration.item.prototype.edit.php:629
-#: include/views/configuration.item.prototype.edit.php:781
+#: include/views/configuration.item.prototype.edit.php:631
+#: include/views/configuration.item.prototype.edit.php:783
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.edit.php:170
@@ -485,7 +485,7 @@ msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:86
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:560
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:919
 #: include/classes/screens/CScreenProblem.php:1136
@@ -577,10 +577,10 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:394
 #: include/views/configuration.graph.edit.php:481
 #: include/views/configuration.host.discovery.edit.php:114
-#: include/views/configuration.host.discovery.edit.php:209
-#: include/views/configuration.host.discovery.edit.php:552
-#: include/views/configuration.host.discovery.edit.php:672
-#: include/views/configuration.host.discovery.edit.php:711
+#: include/views/configuration.host.discovery.edit.php:211
+#: include/views/configuration.host.discovery.edit.php:554
+#: include/views/configuration.host.discovery.edit.php:674
+#: include/views/configuration.host.discovery.edit.php:713
 #: include/views/configuration.host.edit.php:116
 #: include/views/configuration.host.edit.php:132
 #: include/views/configuration.host.edit.php:148
@@ -596,18 +596,18 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.httpconf.edit.php:257
 #: include/views/configuration.item.edit.php:146
-#: include/views/configuration.item.edit.php:241
-#: include/views/configuration.item.edit.php:748
-#: include/views/configuration.item.edit.php:1055
-#: include/views/configuration.item.edit.php:1102
+#: include/views/configuration.item.edit.php:243
+#: include/views/configuration.item.edit.php:750
+#: include/views/configuration.item.edit.php:1057
+#: include/views/configuration.item.edit.php:1104
 #: include/views/configuration.item.massupdate.php:158
 #: include/views/configuration.item.massupdate.php:430
 #: include/views/configuration.item.massupdate.php:496
 #: include/views/configuration.item.prototype.edit.php:134
-#: include/views/configuration.item.prototype.edit.php:229
-#: include/views/configuration.item.prototype.edit.php:665
-#: include/views/configuration.item.prototype.edit.php:884
-#: include/views/configuration.item.prototype.edit.php:917
+#: include/views/configuration.item.prototype.edit.php:231
+#: include/views/configuration.item.prototype.edit.php:667
+#: include/views/configuration.item.prototype.edit.php:886
+#: include/views/configuration.item.prototype.edit.php:919
 #: include/views/configuration.maintenance.edit.php:137
 #: include/views/configuration.maintenance.edit.php:224
 #: include/views/configuration.maintenance.edit.php:295
@@ -756,7 +756,7 @@ msgstr ""
 msgid "Advanced labels"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/events.inc.php:248
 msgid "Age"
 msgstr ""
@@ -889,10 +889,10 @@ msgstr ""
 msgid "Allow manual close"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:574
-#: include/views/configuration.item.edit.php:867
+#: include/views/configuration.host.discovery.edit.php:576
+#: include/views/configuration.item.edit.php:869
 #: include/views/configuration.item.massupdate.php:597
-#: include/views/configuration.item.prototype.edit.php:732
+#: include/views/configuration.item.prototype.edit.php:734
 msgid "Allowed hosts"
 msgstr ""
 
@@ -904,7 +904,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1139
 #: include/views/configuration.correlation.edit.php:94
-#: include/views/configuration.host.discovery.edit.php:596
+#: include/views/configuration.host.discovery.edit.php:598
 #: include/views/configuration.trigger.prototype.edit.php:130
 #: include/views/configuration.trigger.prototype.edit.php:322
 #: include/views/configuration.triggers.edit.php:151
@@ -918,7 +918,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:1138
 #: include/views/configuration.correlation.edit.php:93
-#: include/views/configuration.host.discovery.edit.php:595
+#: include/views/configuration.host.discovery.edit.php:597
 #: include/views/configuration.maintenance.edit.php:170
 #: include/views/configuration.triggers.list.php:73
 msgid "And/Or"
@@ -978,7 +978,7 @@ msgstr[1] ""
 msgid "Application error."
 msgstr ""
 
-#: include/views/configuration.item.prototype.edit.php:762
+#: include/views/configuration.item.prototype.edit.php:764
 msgid "Application prototypes"
 msgstr ""
 
@@ -1003,9 +1003,9 @@ msgstr ""
 #: include/views/configuration.host.edit.php:304
 #: include/views/configuration.host.list.php:129
 #: include/views/configuration.host.list.php:333
-#: include/views/configuration.item.edit.php:902
+#: include/views/configuration.item.edit.php:904
 #: include/views/configuration.item.list.php:70
-#: include/views/configuration.item.prototype.edit.php:747
+#: include/views/configuration.item.prototype.edit.php:749
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.template.edit.php:130
 #: include/views/configuration.template.list.php:86
@@ -1070,11 +1070,11 @@ msgstr ""
 msgid "Arithmetic"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:837
-#: include/views/configuration.item.edit.php:843
+#: include/views/configuration.item.edit.php:839
+#: include/views/configuration.item.edit.php:845
 #: include/views/configuration.item.massupdate.php:573
-#: include/views/configuration.item.prototype.edit.php:712
-#: include/views/configuration.item.prototype.edit.php:718
+#: include/views/configuration.item.prototype.edit.php:714
+#: include/views/configuration.item.prototype.edit.php:720
 msgid "As is"
 msgstr ""
 
@@ -1217,10 +1217,10 @@ msgstr ""
 #: include/views/configuration.action.edit.php:943
 #: include/views/configuration.action.edit.php:1722
 #: include/views/configuration.action.edit.php:2179
-#: include/views/configuration.host.discovery.edit.php:462
-#: include/views/configuration.item.edit.php:610
+#: include/views/configuration.host.discovery.edit.php:464
+#: include/views/configuration.item.edit.php:612
 #: include/views/configuration.item.massupdate.php:296
-#: include/views/configuration.item.prototype.edit.php:543
+#: include/views/configuration.item.prototype.edit.php:545
 msgid "Authentication method"
 msgstr ""
 
@@ -1228,18 +1228,18 @@ msgstr ""
 msgid "Authentication method changed"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:429
-#: include/views/configuration.item.edit.php:553
+#: include/views/configuration.host.discovery.edit.php:431
+#: include/views/configuration.item.edit.php:555
 #: include/views/configuration.item.massupdate.php:234
-#: include/views/configuration.item.prototype.edit.php:510
+#: include/views/configuration.item.prototype.edit.php:512
 #: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Authentication passphrase"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:422
-#: include/views/configuration.item.edit.php:547
+#: include/views/configuration.host.discovery.edit.php:424
+#: include/views/configuration.item.edit.php:549
 #: include/views/configuration.item.massupdate.php:221
-#: include/views/configuration.item.prototype.edit.php:503
+#: include/views/configuration.item.prototype.edit.php:505
 #: include/views/js/configuration.discovery.edit.js.php:92
 msgid "Authentication protocol"
 msgstr ""
@@ -1352,9 +1352,9 @@ msgid "Base colour"
 msgstr ""
 
 #: include/httptest.inc.php:28
-#: include/views/configuration.host.discovery.edit.php:285
-#: include/views/configuration.item.edit.php:326
-#: include/views/configuration.item.prototype.edit.php:314
+#: include/views/configuration.host.discovery.edit.php:287
+#: include/views/configuration.item.edit.php:328
+#: include/views/configuration.item.prototype.edit.php:316
 msgid "Basic"
 msgstr ""
 
@@ -1379,15 +1379,15 @@ msgstr ""
 msgid "Blue"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:261
-#: include/views/configuration.item.edit.php:293
-#: include/views/configuration.item.prototype.edit.php:281
-msgid "Body"
-msgstr ""
-
 #: include/views/configuration.host.discovery.edit.php:263
 #: include/views/configuration.item.edit.php:295
 #: include/views/configuration.item.prototype.edit.php:283
+msgid "Body"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:265
+#: include/views/configuration.item.edit.php:297
+#: include/views/configuration.item.prototype.edit.php:285
 msgid "Body and headers"
 msgstr ""
 
@@ -1596,7 +1596,7 @@ msgstr ""
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr ""
 
-#: host_discovery.php:474
+#: host_discovery.php:478
 msgid "Cannot add discovery rule"
 msgstr ""
 
@@ -1628,7 +1628,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr ""
 
-#: items.php:875
+#: items.php:879
 msgid "Cannot add item"
 msgstr ""
 
@@ -1637,7 +1637,7 @@ msgstr ""
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
-#: disc_prototypes.php:608
+#: disc_prototypes.php:612
 msgid "Cannot add item prototype"
 msgstr ""
 
@@ -1757,11 +1757,11 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr ""
 
-#: httpconf.php:196 httpconf.php:512 items.php:924
+#: httpconf.php:196 httpconf.php:512 items.php:928
 msgid "Cannot clear history"
 msgstr ""
 
-#: items.php:1321
+#: items.php:1325
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
@@ -1806,7 +1806,7 @@ msgid_plural "Cannot copy graphs"
 msgstr[0] ""
 msgstr[1] ""
 
-#: items.php:1266
+#: items.php:1270
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] ""
@@ -1905,11 +1905,11 @@ msgstr ""
 msgid "Cannot delete discovered application \"%1$s\"."
 msgstr ""
 
-#: discoveryconf.php:186 host_discovery.php:274
+#: discoveryconf.php:186 host_discovery.php:278
 msgid "Cannot delete discovery rule"
 msgstr ""
 
-#: discoveryconf.php:228 host_discovery.php:517
+#: discoveryconf.php:228 host_discovery.php:521
 msgid "Cannot delete discovery rules"
 msgstr ""
 
@@ -1973,19 +1973,19 @@ msgstr ""
 msgid "Cannot delete inventory."
 msgstr ""
 
-#: items.php:489
+#: items.php:493
 msgid "Cannot delete item"
 msgstr ""
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:292
 msgid "Cannot delete item prototype"
 msgstr ""
 
-#: disc_prototypes.php:650
+#: disc_prototypes.php:654
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:1331
+#: items.php:1335
 msgid "Cannot delete items"
 msgstr ""
 
@@ -2135,7 +2135,7 @@ msgid_plural "Cannot disable correlations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:213 host_discovery.php:507
+#: discoveryconf.php:213 host_discovery.php:511
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
@@ -2148,7 +2148,7 @@ msgid_plural "Cannot disable hosts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:174 items.php:1226
+#: applications.php:174 items.php:1230
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
@@ -2198,7 +2198,7 @@ msgid_plural "Cannot enable correlations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:212 host_discovery.php:506
+#: discoveryconf.php:212 host_discovery.php:510
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
@@ -2211,7 +2211,7 @@ msgid_plural "Cannot enable hosts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:173 items.php:1225
+#: applications.php:173 items.php:1229
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
@@ -2516,7 +2516,7 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
+#: host_discovery.php:288 host_discovery.php:533 items.php:896 items.php:1347
 msgid "Cannot send request"
 msgstr ""
 
@@ -2745,7 +2745,7 @@ msgstr ""
 msgid "Cannot update discovered application \"%1$s\"."
 msgstr ""
 
-#: discoveryconf.php:155 host_discovery.php:477
+#: discoveryconf.php:155 host_discovery.php:481
 msgid "Cannot update discovery rule"
 msgstr ""
 
@@ -2810,17 +2810,17 @@ msgstr ""
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:878
+#: items.php:882
 msgid "Cannot update item"
 msgstr ""
 
-#: disc_prototypes.php:611 disc_prototypes.php:637
+#: disc_prototypes.php:615 disc_prototypes.php:641
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: items.php:1202
+#: items.php:1206
 msgid "Cannot update items"
 msgstr ""
 
@@ -3004,9 +3004,9 @@ msgid "Change severity"
 msgstr ""
 
 #: include/forms.inc.php:353 include/items.inc.php:131
-#: include/views/configuration.item.edit.php:677
+#: include/views/configuration.item.edit.php:679
 #: include/views/configuration.item.massupdate.php:279
-#: include/views/configuration.item.prototype.edit.php:607
+#: include/views/configuration.item.prototype.edit.php:609
 msgid "Character"
 msgstr ""
 
@@ -3036,9 +3036,9 @@ msgstr ""
 msgid "Check expression part starting from \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:696
+#: include/views/configuration.host.discovery.edit.php:698
 #: include/views/configuration.host.discovery.list.php:155
-#: include/views/configuration.item.edit.php:1079
+#: include/views/configuration.item.edit.php:1081
 #: include/views/configuration.item.list.php:252
 msgid "Check now"
 msgstr ""
@@ -3153,7 +3153,7 @@ msgid "Clear history"
 msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:244
-#: include/views/configuration.item.edit.php:1089
+#: include/views/configuration.item.edit.php:1091
 msgid "Clear history and trends"
 msgstr ""
 
@@ -3180,13 +3180,13 @@ msgstr ""
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:110
 #: include/views/configuration.graph.edit.php:473
-#: include/views/configuration.host.discovery.edit.php:693
+#: include/views/configuration.host.discovery.edit.php:695
 #: include/views/configuration.host.edit.php:812
 #: include/views/configuration.hostgroups.edit.php:58
 #: include/views/configuration.host.prototype.edit.php:437
 #: include/views/configuration.httpconf.edit.php:237
-#: include/views/configuration.item.edit.php:1076
-#: include/views/configuration.item.prototype.edit.php:907
+#: include/views/configuration.item.edit.php:1078
+#: include/views/configuration.item.prototype.edit.php:909
 #: include/views/configuration.maintenance.edit.php:287
 #: include/views/configuration.template.edit.php:445
 #: include/views/configuration.trigger.prototype.edit.php:636
@@ -3695,10 +3695,10 @@ msgstr ""
 msgid "Content menu"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:398
-#: include/views/configuration.item.edit.php:494
+#: include/views/configuration.host.discovery.edit.php:400
+#: include/views/configuration.item.edit.php:496
 #: include/views/configuration.item.massupdate.php:193
-#: include/views/configuration.item.prototype.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:481
 #: include/views/js/configuration.discovery.edit.js.php:70
 msgid "Context name"
 msgstr ""
@@ -3707,8 +3707,8 @@ msgstr ""
 msgid "Contract number"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:303
-#: include/views/configuration.item.prototype.edit.php:291
+#: include/views/configuration.item.edit.php:305
+#: include/views/configuration.item.prototype.edit.php:293
 msgid "Convert to JSON"
 msgstr ""
 
@@ -3841,7 +3841,7 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:164
 #: include/views/configuration.host.prototype.list.php:55
 #: include/views/configuration.host.prototype.list.php:152
-#: include/views/configuration.item.prototype.edit.php:772
+#: include/views/configuration.item.prototype.edit.php:774
 #: include/views/configuration.item.prototype.list.php:59
 #: include/views/configuration.item.prototype.list.php:166
 #: include/views/configuration.trigger.prototype.edit.php:539
@@ -4008,7 +4008,7 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.correlation.edit.php:96
-#: include/views/configuration.host.discovery.edit.php:598
+#: include/views/configuration.host.discovery.edit.php:600
 msgid "Custom expression"
 msgstr ""
 
@@ -4016,10 +4016,10 @@ msgstr ""
 msgid "Custom graphs"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:557
-#: include/views/configuration.item.edit.php:753
+#: include/views/configuration.host.discovery.edit.php:559
+#: include/views/configuration.item.edit.php:755
 #: include/views/configuration.item.massupdate.php:502
-#: include/views/configuration.item.prototype.edit.php:669
+#: include/views/configuration.item.prototype.edit.php:671
 msgid "Custom intervals"
 msgstr ""
 
@@ -4068,11 +4068,11 @@ msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:436
-#: include/views/configuration.item.edit.php:563
-#: include/views/configuration.item.edit.php:570
+#: include/views/configuration.host.discovery.edit.php:438
+#: include/views/configuration.item.edit.php:565
+#: include/views/configuration.item.edit.php:572
 #: include/views/configuration.item.massupdate.php:247
-#: include/views/configuration.item.prototype.edit.php:517
+#: include/views/configuration.item.prototype.edit.php:519
 #: include/views/js/configuration.discovery.edit.js.php:109
 msgid "DES"
 msgstr ""
@@ -4445,7 +4445,7 @@ msgid "Delete dashboard?"
 msgstr ""
 
 #: include/views/configuration.discovery.edit.php:111
-#: include/views/configuration.host.discovery.edit.php:703
+#: include/views/configuration.host.discovery.edit.php:705
 msgid "Delete discovery rule?"
 msgstr ""
 
@@ -4476,11 +4476,11 @@ msgstr ""
 msgid "Delete icon map?"
 msgstr ""
 
-#: include/views/configuration.item.prototype.edit.php:908
+#: include/views/configuration.item.prototype.edit.php:910
 msgid "Delete item prototype?"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:1094
+#: include/views/configuration.item.edit.php:1096
 msgid "Delete item?"
 msgstr ""
 
@@ -4757,12 +4757,12 @@ msgstr ""
 #: include/classes/screens/CScreenEvents.php:32
 #: include/views/administration.auditlogs.list.php:76
 #: include/views/configuration.correlation.edit.php:205
-#: include/views/configuration.host.discovery.edit.php:578
+#: include/views/configuration.host.discovery.edit.php:580
 #: include/views/configuration.host.edit.php:264
 #: include/views/configuration.host.massupdate.php:161
-#: include/views/configuration.item.edit.php:934
+#: include/views/configuration.item.edit.php:936
 #: include/views/configuration.item.massupdate.php:733
-#: include/views/configuration.item.prototype.edit.php:765
+#: include/views/configuration.item.prototype.edit.php:767
 #: include/views/configuration.maintenance.edit.php:67
 #: include/views/configuration.maintenance.list.php:75
 #: include/views/configuration.template.edit.php:108
@@ -5022,27 +5022,27 @@ msgstr ""
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr ""
 
-#: discoveryconf.php:161 host_discovery.php:474
+#: discoveryconf.php:161 host_discovery.php:478
 msgid "Discovery rule created"
 msgstr ""
 
-#: discoveryconf.php:186 host_discovery.php:274
+#: discoveryconf.php:186 host_discovery.php:278
 msgid "Discovery rule deleted"
 msgstr ""
 
-#: discoveryconf.php:210 host_discovery.php:504
+#: discoveryconf.php:210 host_discovery.php:508
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:209 host_discovery.php:503
+#: discoveryconf.php:209 host_discovery.php:507
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:154 host_discovery.php:477
+#: discoveryconf.php:154 host_discovery.php:481
 msgid "Discovery rule updated"
 msgstr ""
 
@@ -5057,7 +5057,7 @@ msgstr ""
 msgid "Discovery rules"
 msgstr ""
 
-#: discoveryconf.php:228 host_discovery.php:517
+#: discoveryconf.php:228 host_discovery.php:521
 msgid "Discovery rules deleted"
 msgstr ""
 
@@ -5117,15 +5117,15 @@ msgstr ""
 msgid "Do not calculate"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:781
+#: include/views/configuration.item.edit.php:783
 #: include/views/configuration.item.massupdate.php:522
-#: include/views/configuration.item.prototype.edit.php:679
+#: include/views/configuration.item.prototype.edit.php:681
 msgid "Do not keep history"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:815
+#: include/views/configuration.item.edit.php:817
 #: include/views/configuration.item.massupdate.php:539
-#: include/views/configuration.item.prototype.edit.php:692
+#: include/views/configuration.item.prototype.edit.php:694
 msgid "Do not keep trends"
 msgstr ""
 
@@ -5625,10 +5625,10 @@ msgstr ""
 msgid "Enable selected web scenarios?"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:569
-#: include/views/configuration.item.edit.php:858
+#: include/views/configuration.host.discovery.edit.php:571
+#: include/views/configuration.item.edit.php:860
 #: include/views/configuration.item.massupdate.php:590
-#: include/views/configuration.item.prototype.edit.php:727
+#: include/views/configuration.item.prototype.edit.php:729
 msgid "Enable trapping"
 msgstr ""
 
@@ -5658,12 +5658,12 @@ msgstr ""
 #: include/views/configuration.correlation.list.php:104
 #: include/views/configuration.discovery.edit.php:99
 #: include/views/configuration.discovery.list.php:44
-#: include/views/configuration.host.discovery.edit.php:584
+#: include/views/configuration.host.discovery.edit.php:586
 #: include/views/configuration.host.edit.php:280
 #: include/views/configuration.host.list.php:194
 #: include/views/configuration.host.massupdate.php:185
 #: include/views/configuration.httpconf.edit.php:150
-#: include/views/configuration.item.edit.php:943
+#: include/views/configuration.item.edit.php:945
 #: include/views/configuration.triggers.edit.php:575
 msgid "Enabled"
 msgstr ""
@@ -5823,9 +5823,9 @@ msgid "Executed"
 msgstr ""
 
 #: include/items.inc.php:1667
-#: include/views/configuration.host.discovery.edit.php:492
-#: include/views/configuration.item.edit.php:640
-#: include/views/configuration.item.prototype.edit.php:573
+#: include/views/configuration.host.discovery.edit.php:494
+#: include/views/configuration.item.edit.php:642
+#: include/views/configuration.item.prototype.edit.php:575
 msgid "Executed script"
 msgstr ""
 
@@ -6165,8 +6165,8 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:677
-#: include/views/configuration.host.discovery.edit.php:686
+#: include/views/configuration.host.discovery.edit.php:679
+#: include/views/configuration.host.discovery.edit.php:688
 msgid "Filters"
 msgstr ""
 
@@ -6212,20 +6212,20 @@ msgstr ""
 msgid "Fixed"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:521
-#: include/views/configuration.item.edit.php:706
-#: include/views/configuration.item.edit.php:713
+#: include/views/configuration.host.discovery.edit.php:523
+#: include/views/configuration.item.edit.php:708
+#: include/views/configuration.item.edit.php:715
 #: include/views/configuration.item.massupdate.php:465
-#: include/views/configuration.item.prototype.edit.php:634
+#: include/views/configuration.item.prototype.edit.php:636
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
 msgstr ""
 
 #: app/views/popup.httpstep.php:149
-#: include/views/configuration.host.discovery.edit.php:250
-#: include/views/configuration.item.edit.php:282
-#: include/views/configuration.item.prototype.edit.php:270
+#: include/views/configuration.host.discovery.edit.php:252
+#: include/views/configuration.item.edit.php:284
+#: include/views/configuration.item.prototype.edit.php:272
 msgid "Follow redirects"
 msgstr ""
 
@@ -6251,8 +6251,8 @@ msgstr ""
 msgid "Form data"
 msgstr ""
 
-#: include/items.inc.php:1671 include/views/configuration.item.edit.php:656
-#: include/views/configuration.item.prototype.edit.php:587
+#: include/items.inc.php:1671 include/views/configuration.item.edit.php:658
+#: include/views/configuration.item.prototype.edit.php:589
 msgid "Formula"
 msgstr ""
 
@@ -6730,10 +6730,10 @@ msgstr ""
 msgid "HTTP agent"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:280
+#: include/views/configuration.host.discovery.edit.php:282
 #: include/views/configuration.httpconf.edit.php:158
-#: include/views/configuration.item.edit.php:321
-#: include/views/configuration.item.prototype.edit.php:309
+#: include/views/configuration.item.edit.php:323
+#: include/views/configuration.item.prototype.edit.php:311
 msgid "HTTP authentication"
 msgstr ""
 
@@ -6741,11 +6741,11 @@ msgstr ""
 msgid "HTTP login form"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:271
+#: include/views/configuration.host.discovery.edit.php:273
 #: include/views/configuration.httpconf.edit.php:109
 #: include/views/configuration.httpconf.list.php:93
-#: include/views/configuration.item.edit.php:312
-#: include/views/configuration.item.prototype.edit.php:300
+#: include/views/configuration.item.edit.php:314
+#: include/views/configuration.item.prototype.edit.php:302
 msgid "HTTP proxy"
 msgstr ""
 
@@ -6776,14 +6776,14 @@ msgid "Hardware sensor reading. Returns float"
 msgstr ""
 
 #: app/views/popup.httpstep.php:129
-#: include/views/configuration.host.discovery.edit.php:201
-#: include/views/configuration.host.discovery.edit.php:262
+#: include/views/configuration.host.discovery.edit.php:203
+#: include/views/configuration.host.discovery.edit.php:264
 #: include/views/configuration.httpconf.edit.php:132
-#: include/views/configuration.item.edit.php:233
-#: include/views/configuration.item.edit.php:294
+#: include/views/configuration.item.edit.php:235
+#: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:149
-#: include/views/configuration.item.prototype.edit.php:221
-#: include/views/configuration.item.prototype.edit.php:282
+#: include/views/configuration.item.prototype.edit.php:223
+#: include/views/configuration.item.prototype.edit.php:284
 msgid "Headers"
 msgstr ""
 
@@ -6859,18 +6859,18 @@ msgstr ""
 #: include/forms.inc.php:438 include/forms.inc.php:872
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:67
-#: include/views/configuration.item.prototype.list.php:55 items.php:238
+#: include/views/configuration.item.prototype.list.php:55 items.php:242
 #: jsLoader.php:265 latest.php:407 latest.php:544 latest.php:696
 msgid "History"
 msgstr ""
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
-#: items.php:917 items.php:924 items.php:1308 items.php:1321
+#: items.php:921 items.php:928 items.php:1312 items.php:1325
 msgid "History cleared"
 msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:245
-#: include/views/configuration.item.edit.php:1090
+#: include/views/configuration.item.edit.php:1092
 msgid "History clearing can take a long time. Continue?"
 msgstr ""
 
@@ -6891,9 +6891,9 @@ msgstr ""
 msgid "History of events"
 msgstr ""
 
-#: disc_prototypes.php:158 include/views/configuration.item.edit.php:778
+#: disc_prototypes.php:158 include/views/configuration.item.edit.php:780
 #: include/views/configuration.item.massupdate.php:518
-#: include/views/configuration.item.prototype.edit.php:676 items.php:59
+#: include/views/configuration.item.prototype.edit.php:678 items.php:59
 msgid "History storage period"
 msgstr ""
 
@@ -6917,7 +6917,7 @@ msgstr ""
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
-#: include/classes/screens/CScreenHostTriggers.php:185
+#: include/classes/screens/CScreenHostTriggers.php:180
 #: include/classes/screens/CScreenHttpTest.php:115
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:914
@@ -6950,7 +6950,7 @@ msgstr ""
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:917 items.php:1307
+#: include/views/reports.toptriggers.php:79 items.php:921 items.php:1311
 #: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
@@ -7097,11 +7097,11 @@ msgstr ""
 msgid "Host info"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:385
-#: include/views/configuration.item.edit.php:434
-#: include/views/configuration.item.edit.php:478
+#: include/views/configuration.host.discovery.edit.php:387
+#: include/views/configuration.item.edit.php:436
+#: include/views/configuration.item.edit.php:480
 #: include/views/configuration.item.massupdate.php:85
-#: include/views/configuration.item.prototype.edit.php:466
+#: include/views/configuration.item.prototype.edit.php:468
 msgid "Host interface"
 msgstr ""
 
@@ -7391,9 +7391,9 @@ msgid "IPMI scripts can be executed only by server."
 msgstr ""
 
 #: disc_prototypes.php:135 host_discovery.php:136
-#: include/views/configuration.host.discovery.edit.php:450
-#: include/views/configuration.item.edit.php:590
-#: include/views/configuration.item.prototype.edit.php:531 items.php:118
+#: include/views/configuration.host.discovery.edit.php:452
+#: include/views/configuration.item.edit.php:592
+#: include/views/configuration.item.prototype.edit.php:533 items.php:118
 msgid "IPMI sensor"
 msgstr ""
 
@@ -8713,7 +8713,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1881 include/actions.inc.php:1965
 #: include/blocks.inc.php:554 include/classes/screens/CScreenActions.php:117
-#: include/classes/screens/CScreenHostTriggers.php:223
+#: include/classes/screens/CScreenHostTriggers.php:218
 #: include/classes/screens/CScreenProblem.php:889
 #: include/classes/screens/CScreenProblem.php:913
 #: include/views/administration.auditacts.list.php:62
@@ -8856,13 +8856,13 @@ msgid "Internet Explorer"
 msgstr ""
 
 #: include/forms.inc.php:882 include/views/configuration.discovery.list.php:62
-#: include/views/configuration.host.discovery.edit.php:516
+#: include/views/configuration.host.discovery.edit.php:518
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.httpconf.list.php:90
-#: include/views/configuration.item.edit.php:699
+#: include/views/configuration.item.edit.php:701
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.massupdate.php:456
-#: include/views/configuration.item.prototype.edit.php:629
+#: include/views/configuration.item.prototype.edit.php:631
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.services.edit.php:170 latest.php:406
 msgid "Interval"
@@ -8952,10 +8952,10 @@ msgstr ""
 msgid "Invalid internal data storage period: %1$s."
 msgstr ""
 
-#: disc_prototypes.php:350 disc_prototypes.php:355 disc_prototypes.php:368
-#: host_discovery.php:310 host_discovery.php:315 host_discovery.php:328
-#: items.php:541 items.php:546 items.php:559 items.php:950 items.php:955
-#: items.php:968
+#: disc_prototypes.php:354 disc_prototypes.php:359 disc_prototypes.php:372
+#: host_discovery.php:314 host_discovery.php:319 host_discovery.php:332
+#: items.php:545 items.php:550 items.php:563 items.php:954 items.php:959
+#: items.php:972
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
@@ -9191,7 +9191,7 @@ msgstr ""
 msgid "Is online?"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:186
+#: include/classes/screens/CScreenHostTriggers.php:181
 msgid "Issue"
 msgstr ""
 
@@ -9223,8 +9223,8 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:241
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
-#: include/views/monitoring.screen.constructor.edit.php:787 items.php:916
-#: items.php:1307
+#: include/views/monitoring.screen.constructor.edit.php:787 items.php:920
+#: items.php:1311
 msgid "Item"
 msgstr ""
 
@@ -9270,11 +9270,11 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: items.php:875
+#: items.php:879
 msgid "Item added"
 msgstr ""
 
-#: items.php:1265
+#: items.php:1269
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] ""
@@ -9284,17 +9284,17 @@ msgstr[1] ""
 msgid "Item count"
 msgstr ""
 
-#: items.php:489
+#: items.php:493
 msgid "Item deleted"
 msgstr ""
 
-#: applications.php:171 items.php:1223
+#: applications.php:171 items.php:1227
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:170 items.php:1222
+#: applications.php:170 items.php:1226
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -9337,15 +9337,15 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: disc_prototypes.php:608
+#: disc_prototypes.php:612
 msgid "Item prototype added"
 msgstr ""
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:292
 msgid "Item prototype deleted"
 msgstr ""
 
-#: disc_prototypes.php:611 disc_prototypes.php:636
+#: disc_prototypes.php:615 disc_prototypes.php:640
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] ""
@@ -9365,11 +9365,11 @@ msgstr ""
 msgid "Item prototypes"
 msgstr ""
 
-#: disc_prototypes.php:650
+#: disc_prototypes.php:654
 msgid "Item prototypes deleted"
 msgstr ""
 
-#: items.php:878
+#: items.php:882
 msgid "Item updated"
 msgstr ""
 
@@ -9449,13 +9449,13 @@ msgstr ""
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 items.php:1677 queue.php:109
+#: include/views/inventory.host.view.php:172 items.php:1681 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:409 search.php:437
 #: search.php:466
 msgid "Items"
 msgstr ""
 
-#: items.php:1331
+#: items.php:1335
 msgid "Items deleted"
 msgstr ""
 
@@ -9467,7 +9467,7 @@ msgstr ""
 msgid "Items location"
 msgstr ""
 
-#: items.php:1202
+#: items.php:1206
 msgid "Items updated"
 msgstr ""
 
@@ -9479,10 +9479,10 @@ msgstr ""
 msgid "JMX agent"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:463
-#: include/views/configuration.item.edit.php:611
+#: include/views/configuration.host.discovery.edit.php:465
+#: include/views/configuration.item.edit.php:613
 #: include/views/configuration.item.massupdate.php:97
-#: include/views/configuration.item.prototype.edit.php:544
+#: include/views/configuration.item.prototype.edit.php:546
 msgid "JMX endpoint"
 msgstr ""
 
@@ -9497,10 +9497,10 @@ msgstr ""
 msgid "JSON Path"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:172
-#: include/views/configuration.item.edit.php:204
+#: include/views/configuration.host.discovery.edit.php:174
+#: include/views/configuration.item.edit.php:206
 #: include/views/configuration.item.massupdate.php:119
-#: include/views/configuration.item.prototype.edit.php:192
+#: include/views/configuration.item.prototype.edit.php:194
 msgid "JSON data"
 msgstr ""
 
@@ -9570,7 +9570,7 @@ msgstr ""
 msgid "June"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:563
+#: include/views/configuration.host.discovery.edit.php:565
 msgid "Keep lost resources period"
 msgstr ""
 
@@ -9641,7 +9641,7 @@ msgstr ""
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.correlation.edit.php:48
-#: include/views/configuration.host.discovery.edit.php:615
+#: include/views/configuration.host.discovery.edit.php:617
 #: include/views/js/monitoring.sysmaps.js.php:110
 #: include/views/js/monitoring.sysmaps.js.php:582
 #: include/views/js/monitoring.sysmaps.js.php:690
@@ -9725,7 +9725,7 @@ msgstr ""
 msgid "Last 7 days"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:187
+#: include/classes/screens/CScreenHostTriggers.php:182
 msgid "Last change"
 msgstr ""
 
@@ -9977,9 +9977,9 @@ msgid "Location longitude"
 msgstr ""
 
 #: include/forms.inc.php:354 include/items.inc.php:133
-#: include/views/configuration.item.edit.php:678
+#: include/views/configuration.item.edit.php:680
 #: include/views/configuration.item.massupdate.php:280
-#: include/views/configuration.item.prototype.edit.php:608
+#: include/views/configuration.item.prototype.edit.php:610
 msgid "Log"
 msgstr ""
 
@@ -9991,9 +9991,9 @@ msgstr ""
 msgid "Log file monitoring. Returns log"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:828
+#: include/views/configuration.item.edit.php:830
 #: include/views/configuration.item.massupdate.php:566
-#: include/views/configuration.item.prototype.edit.php:703
+#: include/views/configuration.item.prototype.edit.php:705
 msgid "Log time format"
 msgstr ""
 
@@ -10056,11 +10056,11 @@ msgid "MD2"
 msgstr ""
 
 #: include/hosts.inc.php:34
-#: include/views/configuration.host.discovery.edit.php:424
-#: include/views/configuration.item.edit.php:535
-#: include/views/configuration.item.edit.php:542
+#: include/views/configuration.host.discovery.edit.php:426
+#: include/views/configuration.item.edit.php:537
+#: include/views/configuration.item.edit.php:544
 #: include/views/configuration.item.massupdate.php:225
-#: include/views/configuration.item.prototype.edit.php:505
+#: include/views/configuration.item.prototype.edit.php:507
 #: include/views/js/configuration.discovery.edit.js.php:94
 msgid "MD5"
 msgstr ""
@@ -10072,7 +10072,7 @@ msgstr ""
 
 #: include/audit.inc.php:52
 #: include/views/administration.general.macros.edit.php:38
-#: include/views/configuration.host.discovery.edit.php:615
+#: include/views/configuration.host.discovery.edit.php:617
 #: include/views/hostmacros.php:46 include/views/hostmacros.php:50
 msgid "Macro"
 msgstr ""
@@ -10355,9 +10355,9 @@ msgstr ""
 msgid "Mass update shapes"
 msgstr ""
 
-#: disc_prototypes.php:48 include/views/configuration.item.edit.php:394
+#: disc_prototypes.php:48 include/views/configuration.item.edit.php:396
 #: include/views/configuration.item.massupdate.php:724
-#: include/views/configuration.item.prototype.edit.php:428 items.php:49
+#: include/views/configuration.item.prototype.edit.php:430 items.php:49
 msgid "Master item"
 msgstr ""
 
@@ -10740,9 +10740,9 @@ msgid "NNTP"
 msgstr ""
 
 #: include/httptest.inc.php:29
-#: include/views/configuration.host.discovery.edit.php:286
-#: include/views/configuration.item.edit.php:327
-#: include/views/configuration.item.prototype.edit.php:315
+#: include/views/configuration.host.discovery.edit.php:288
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.prototype.edit.php:317
 msgid "NTLM"
 msgstr ""
 
@@ -10817,7 +10817,7 @@ msgstr ""
 #: include/views/configuration.graph.list.php:87
 #: include/views/configuration.host.discovery.edit.php:46
 #: include/views/configuration.host.discovery.edit.php:110
-#: include/views/configuration.host.discovery.edit.php:205
+#: include/views/configuration.host.discovery.edit.php:207
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.host.edit.php:546
 #: include/views/configuration.host.edit.php:623
@@ -10835,16 +10835,16 @@ msgstr ""
 #: include/views/configuration.httpconf.list.php:88
 #: include/views/configuration.item.edit.php:63
 #: include/views/configuration.item.edit.php:142
-#: include/views/configuration.item.edit.php:237
-#: include/views/configuration.item.edit.php:949
+#: include/views/configuration.item.edit.php:239
+#: include/views/configuration.item.edit.php:951
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.list.php:145
 #: include/views/configuration.item.massupdate.php:154
 #: include/views/configuration.item.massupdate.php:341
 #: include/views/configuration.item.prototype.edit.php:51
 #: include/views/configuration.item.prototype.edit.php:130
-#: include/views/configuration.item.prototype.edit.php:225
-#: include/views/configuration.item.prototype.edit.php:778
+#: include/views/configuration.item.prototype.edit.php:227
+#: include/views/configuration.item.prototype.edit.php:780
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/configuration.maintenance.edit.php:40
 #: include/views/configuration.maintenance.list.php:45
@@ -10945,12 +10945,12 @@ msgid "New"
 msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:74
-#: include/views/configuration.item.edit.php:891
-#: include/views/configuration.item.prototype.edit.php:736
+#: include/views/configuration.item.edit.php:893
+#: include/views/configuration.item.prototype.edit.php:738
 msgid "New application"
 msgstr ""
 
-#: include/views/configuration.item.prototype.edit.php:750
+#: include/views/configuration.item.prototype.edit.php:752
 msgid "New application prototype"
 msgstr ""
 
@@ -11008,7 +11008,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:33 include/blocks.inc.php:434
 #: include/blocks.inc.php:633
-#: include/classes/screens/CScreenHostTriggers.php:273
+#: include/classes/screens/CScreenHostTriggers.php:268
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
@@ -11277,10 +11277,10 @@ msgstr ""
 msgid "No image"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:380
-#: include/views/configuration.item.edit.php:473
+#: include/views/configuration.host.discovery.edit.php:382
+#: include/views/configuration.item.edit.php:475
 #: include/views/configuration.item.massupdate.php:78
-#: include/views/configuration.item.prototype.edit.php:461 jsLoader.php:292
+#: include/views/configuration.item.prototype.edit.php:463 jsLoader.php:292
 msgid "No interface found"
 msgstr ""
 
@@ -11368,7 +11368,7 @@ msgstr ""
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
-#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:727
+#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:731
 #: include/classes/api/services/CAction.php:1617
 #: include/classes/api/services/CAction.php:1994
 #: include/classes/api/services/CAction.php:2971
@@ -11499,7 +11499,7 @@ msgstr ""
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1803 items.php:1431 items.php:1632 services.php:84
+#: include/func.inc.php:1803 items.php:1435 items.php:1636 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -11549,7 +11549,7 @@ msgstr ""
 msgid "No target selected"
 msgstr ""
 
-#: graphs.php:394 items.php:1270
+#: graphs.php:394 items.php:1274
 msgid "No target selected."
 msgstr ""
 
@@ -11583,17 +11583,17 @@ msgstr ""
 #: include/views/administration.general.other.edit.php:42
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.usergroups.edit.php:159
-#: include/views/configuration.host.discovery.edit.php:284
+#: include/views/configuration.host.discovery.edit.php:286
 #: include/views/configuration.host.list.php:288
 #: include/views/configuration.host.list.php:294
 #: include/views/configuration.host.list.php:306
 #: include/views/configuration.host.list.php:309
-#: include/views/configuration.item.edit.php:325
-#: include/views/configuration.item.edit.php:896
-#: include/views/configuration.item.edit.php:910
-#: include/views/configuration.item.prototype.edit.php:313
-#: include/views/configuration.item.prototype.edit.php:743
-#: include/views/configuration.item.prototype.edit.php:758
+#: include/views/configuration.item.edit.php:327
+#: include/views/configuration.item.edit.php:898
+#: include/views/configuration.item.edit.php:912
+#: include/views/configuration.item.prototype.edit.php:315
+#: include/views/configuration.item.prototype.edit.php:745
+#: include/views/configuration.item.prototype.edit.php:760
 #: include/views/configuration.trigger.prototype.edit.php:274
 #: include/views/configuration.triggers.edit.php:298
 #: include/views/js/monitoring.sysmaps.js.php:3
@@ -11841,9 +11841,9 @@ msgid "Numeral systems"
 msgstr ""
 
 #: include/forms.inc.php:352 include/items.inc.php:129
-#: include/triggers.inc.php:1886 include/views/configuration.item.edit.php:676
+#: include/triggers.inc.php:1886 include/views/configuration.item.edit.php:678
 #: include/views/configuration.item.massupdate.php:278
-#: include/views/configuration.item.prototype.edit.php:606
+#: include/views/configuration.item.prototype.edit.php:608
 msgid "Numeric (float)"
 msgstr ""
 
@@ -11852,9 +11852,9 @@ msgid "Numeric (integer)"
 msgstr ""
 
 #: include/forms.inc.php:351 include/items.inc.php:127
-#: include/views/configuration.item.edit.php:675
+#: include/views/configuration.item.edit.php:677
 #: include/views/configuration.item.massupdate.php:277
-#: include/views/configuration.item.prototype.edit.php:605
+#: include/views/configuration.item.prototype.edit.php:607
 msgid "Numeric (unsigned)"
 msgstr ""
 
@@ -12150,7 +12150,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1140
 #: include/views/configuration.correlation.edit.php:95
-#: include/views/configuration.host.discovery.edit.php:597
+#: include/views/configuration.host.discovery.edit.php:599
 #: include/views/configuration.maintenance.edit.php:171
 #: include/views/configuration.trigger.prototype.edit.php:137
 #: include/views/configuration.trigger.prototype.edit.php:329
@@ -12243,8 +12243,8 @@ msgstr ""
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:770
-#: include/views/configuration.item.edit.php:804
+#: include/views/configuration.item.edit.php:772
+#: include/views/configuration.item.edit.php:806
 msgctxt "item_form"
 msgid "Overridden by"
 msgstr ""
@@ -12499,9 +12499,9 @@ msgid "Parameter \"%1$s\" is deprecated."
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:182
-#: include/views/configuration.item.edit.php:950
+#: include/views/configuration.item.edit.php:952
 #: include/views/configuration.item.massupdate.php:342
-#: include/views/configuration.item.prototype.edit.php:779
+#: include/views/configuration.item.prototype.edit.php:781
 msgid "Parameters"
 msgstr ""
 
@@ -12554,8 +12554,8 @@ msgstr ""
 msgid "Passive"
 msgstr ""
 
-#: app/views/administration.mediatype.edit.php:163 disc_prototypes.php:227
-#: host_discovery.php:207 httpconf.php:65
+#: app/views/administration.mediatype.edit.php:163 disc_prototypes.php:231
+#: host_discovery.php:211 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
 #: include/views/administration.users.edit.php:114
 #: include/views/administration.users.edit.php:146
@@ -12565,22 +12565,22 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1749
 #: include/views/configuration.action.edit.php:2183
 #: include/views/configuration.action.edit.php:2210
-#: include/views/configuration.host.discovery.edit.php:302
-#: include/views/configuration.host.discovery.edit.php:459
-#: include/views/configuration.host.discovery.edit.php:487
+#: include/views/configuration.host.discovery.edit.php:304
+#: include/views/configuration.host.discovery.edit.php:461
+#: include/views/configuration.host.discovery.edit.php:489
 #: include/views/configuration.host.edit.php:670
 #: include/views/configuration.host.prototype.edit.php:339
 #: include/views/configuration.httpconf.edit.php:166
-#: include/views/configuration.item.edit.php:343
-#: include/views/configuration.item.edit.php:599
-#: include/views/configuration.item.edit.php:635
+#: include/views/configuration.item.edit.php:345
+#: include/views/configuration.item.edit.php:601
+#: include/views/configuration.item.edit.php:637
 #: include/views/configuration.item.massupdate.php:299
 #: include/views/configuration.item.massupdate.php:331
-#: include/views/configuration.item.prototype.edit.php:331
-#: include/views/configuration.item.prototype.edit.php:540
-#: include/views/configuration.item.prototype.edit.php:568
+#: include/views/configuration.item.prototype.edit.php:333
+#: include/views/configuration.item.prototype.edit.php:542
+#: include/views/configuration.item.prototype.edit.php:570
 #: include/views/general.login.php:64
-#: include/views/js/common.item.edit.js.php:364 items.php:194
+#: include/views/js/common.item.edit.js.php:364 items.php:198
 msgid "Password"
 msgstr ""
 
@@ -12631,10 +12631,10 @@ msgid "Performs a DNS query. Returns character string with the required type of 
 msgstr ""
 
 #: app/views/report.services.php:31
-#: include/views/configuration.host.discovery.edit.php:516
-#: include/views/configuration.item.edit.php:699
+#: include/views/configuration.host.discovery.edit.php:518
+#: include/views/configuration.item.edit.php:701
 #: include/views/configuration.item.massupdate.php:457
-#: include/views/configuration.item.prototype.edit.php:629
+#: include/views/configuration.item.prototype.edit.php:631
 #: include/views/configuration.maintenance.edit.php:77 report4.php:108
 #: srv_status.php:170
 msgid "Period"
@@ -12742,7 +12742,7 @@ msgstr ""
 msgid "Polish (pl_PL)"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:930
+#: include/views/configuration.item.edit.php:932
 msgid "Populates host inventory field"
 msgstr ""
 
@@ -12752,15 +12752,15 @@ msgstr ""
 #: include/forms.inc.php:472 include/views/configuration.action.edit.php:990
 #: include/views/configuration.action.edit.php:1764
 #: include/views/configuration.action.edit.php:2222
-#: include/views/configuration.host.discovery.edit.php:446
+#: include/views/configuration.host.discovery.edit.php:448
 #: include/views/configuration.host.edit.php:111
 #: include/views/configuration.host.edit.php:194
 #: include/views/configuration.host.list.php:113
 #: include/views/configuration.host.prototype.edit.php:86
-#: include/views/configuration.item.edit.php:585
+#: include/views/configuration.item.edit.php:587
 #: include/views/configuration.item.massupdate.php:266
-#: include/views/configuration.item.prototype.edit.php:527
-#: include/views/inventory.host.view.php:75 items.php:100 items.php:235
+#: include/views/configuration.item.prototype.edit.php:529
+#: include/views/inventory.host.view.php:75 items.php:100 items.php:239
 #: setup.php:50
 msgid "Port"
 msgstr ""
@@ -12794,14 +12794,14 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:1068
-#: include/views/configuration.item.prototype.edit.php:897
+#: include/views/configuration.item.edit.php:1070
+#: include/views/configuration.item.prototype.edit.php:899
 msgid "Preprocessing"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:1063
+#: include/views/configuration.item.edit.php:1065
 #: include/views/configuration.item.massupdate.php:438
-#: include/views/configuration.item.prototype.edit.php:892
+#: include/views/configuration.item.prototype.edit.php:894
 msgid "Preprocessing steps"
 msgstr ""
 
@@ -12852,18 +12852,18 @@ msgstr ""
 msgid "Primary POC screen name"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:441
-#: include/views/configuration.item.edit.php:580
+#: include/views/configuration.host.discovery.edit.php:443
+#: include/views/configuration.item.edit.php:582
 #: include/views/configuration.item.massupdate.php:257
-#: include/views/configuration.item.prototype.edit.php:522
+#: include/views/configuration.item.prototype.edit.php:524
 #: include/views/js/configuration.discovery.edit.js.php:115
 msgid "Privacy passphrase"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:434
-#: include/views/configuration.item.edit.php:574
+#: include/views/configuration.host.discovery.edit.php:436
+#: include/views/configuration.item.edit.php:576
 #: include/views/configuration.item.massupdate.php:243
-#: include/views/configuration.item.prototype.edit.php:515
+#: include/views/configuration.item.prototype.edit.php:517
 #: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Privacy protocol"
 msgstr ""
@@ -12878,10 +12878,10 @@ msgstr ""
 #: include/views/configuration.action.edit.php:969
 #: include/views/configuration.action.edit.php:1741
 #: include/views/configuration.action.edit.php:2203
-#: include/views/configuration.host.discovery.edit.php:481
-#: include/views/configuration.item.edit.php:629
+#: include/views/configuration.host.discovery.edit.php:483
+#: include/views/configuration.item.edit.php:631
 #: include/views/configuration.item.massupdate.php:323
-#: include/views/configuration.item.prototype.edit.php:562
+#: include/views/configuration.item.prototype.edit.php:564
 msgid "Private key file"
 msgstr ""
 
@@ -13077,20 +13077,20 @@ msgstr ""
 #: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.edit.php:1718
 #: include/views/configuration.action.edit.php:2184
-#: include/views/configuration.host.discovery.edit.php:460
-#: include/views/configuration.item.edit.php:600
+#: include/views/configuration.host.discovery.edit.php:462
+#: include/views/configuration.item.edit.php:602
 #: include/views/configuration.item.massupdate.php:300
-#: include/views/configuration.item.prototype.edit.php:541
+#: include/views/configuration.item.prototype.edit.php:543
 msgid "Public key"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:961
 #: include/views/configuration.action.edit.php:1732
 #: include/views/configuration.action.edit.php:2195
-#: include/views/configuration.host.discovery.edit.php:474
-#: include/views/configuration.item.edit.php:622
+#: include/views/configuration.host.discovery.edit.php:476
+#: include/views/configuration.item.edit.php:624
 #: include/views/configuration.item.massupdate.php:315
-#: include/views/configuration.item.prototype.edit.php:555
+#: include/views/configuration.item.prototype.edit.php:557
 msgid "Public key file"
 msgstr ""
 
@@ -13123,10 +13123,10 @@ msgid "RMCP+"
 msgstr ""
 
 #: app/views/popup.httpstep.php:82
-#: include/views/configuration.host.discovery.edit.php:171
-#: include/views/configuration.item.edit.php:203
+#: include/views/configuration.host.discovery.edit.php:173
+#: include/views/configuration.item.edit.php:205
 #: include/views/configuration.item.massupdate.php:118
-#: include/views/configuration.item.prototype.edit.php:191
+#: include/views/configuration.item.prototype.edit.php:193
 msgid "Raw data"
 msgstr ""
 
@@ -13269,7 +13269,7 @@ msgid "Regular"
 msgstr ""
 
 #: include/audit.inc.php:49 include/items.inc.php:1709
-#: include/views/configuration.host.discovery.edit.php:615
+#: include/views/configuration.host.discovery.edit.php:617
 msgid "Regular expression"
 msgstr ""
 
@@ -13349,20 +13349,20 @@ msgstr ""
 #: include/views/configuration.correlation.edit.php:76
 #: include/views/configuration.correlation.edit.php:230
 #: include/views/configuration.host.discovery.edit.php:131
-#: include/views/configuration.host.discovery.edit.php:226
-#: include/views/configuration.host.discovery.edit.php:545
-#: include/views/configuration.host.discovery.edit.php:658
+#: include/views/configuration.host.discovery.edit.php:228
+#: include/views/configuration.host.discovery.edit.php:547
+#: include/views/configuration.host.discovery.edit.php:660
 #: include/views/configuration.item.edit.php:163
-#: include/views/configuration.item.edit.php:258
-#: include/views/configuration.item.edit.php:740
-#: include/views/configuration.item.edit.php:1046
+#: include/views/configuration.item.edit.php:260
+#: include/views/configuration.item.edit.php:742
+#: include/views/configuration.item.edit.php:1048
 #: include/views/configuration.item.massupdate.php:170
 #: include/views/configuration.item.massupdate.php:421
 #: include/views/configuration.item.massupdate.php:489
 #: include/views/configuration.item.prototype.edit.php:151
-#: include/views/configuration.item.prototype.edit.php:246
-#: include/views/configuration.item.prototype.edit.php:658
-#: include/views/configuration.item.prototype.edit.php:875
+#: include/views/configuration.item.prototype.edit.php:248
+#: include/views/configuration.item.prototype.edit.php:660
+#: include/views/configuration.item.prototype.edit.php:877
 #: include/views/configuration.maintenance.edit.php:95
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.maintenance.edit.php:213
@@ -13506,21 +13506,21 @@ msgstr ""
 msgid "Reports"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:181
-#: include/views/configuration.item.edit.php:213
+#: include/views/configuration.host.discovery.edit.php:183
+#: include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:128
-#: include/views/configuration.item.prototype.edit.php:201
+#: include/views/configuration.item.prototype.edit.php:203
 msgid "Request body"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:169
-#: include/views/configuration.item.edit.php:201
+#: include/views/configuration.host.discovery.edit.php:171
+#: include/views/configuration.item.edit.php:203
 #: include/views/configuration.item.massupdate.php:114
-#: include/views/configuration.item.prototype.edit.php:189
+#: include/views/configuration.item.prototype.edit.php:191
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:892 items.php:1343
+#: host_discovery.php:288 host_discovery.php:533 items.php:896 items.php:1347
 msgid "Request sent successfully"
 msgstr ""
 
@@ -13552,9 +13552,9 @@ msgid "Required server performance, new values per second"
 msgstr ""
 
 #: app/views/popup.httpstep.php:165
-#: include/views/configuration.host.discovery.edit.php:242
-#: include/views/configuration.item.edit.php:274
-#: include/views/configuration.item.prototype.edit.php:262
+#: include/views/configuration.host.discovery.edit.php:244
+#: include/views/configuration.item.edit.php:276
+#: include/views/configuration.item.prototype.edit.php:264
 msgid "Required status codes"
 msgstr ""
 
@@ -13598,26 +13598,26 @@ msgid "Resolved by"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:133
-#: include/classes/screens/CScreenHostTriggers.php:239
+#: include/classes/screens/CScreenHostTriggers.php:234
 #: include/classes/screens/CScreenProblem.php:1010
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:136
-#: include/classes/screens/CScreenHostTriggers.php:242
+#: include/classes/screens/CScreenHostTriggers.php:237
 #: include/classes/screens/CScreenProblem.php:1013
 msgid "Resolved by correlation rule."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:143
-#: include/classes/screens/CScreenHostTriggers.php:249
+#: include/classes/screens/CScreenHostTriggers.php:244
 #: include/classes/screens/CScreenProblem.php:1020
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:142
-#: include/classes/screens/CScreenHostTriggers.php:248
+#: include/classes/screens/CScreenHostTriggers.php:243
 #: include/classes/screens/CScreenProblem.php:1019
 #, c-format
 msgid "Resolved by user \"%1$s\"."
@@ -13657,9 +13657,9 @@ msgstr ""
 msgid "Result type"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:259
-#: include/views/configuration.item.edit.php:291
-#: include/views/configuration.item.prototype.edit.php:279
+#: include/views/configuration.host.discovery.edit.php:261
+#: include/views/configuration.item.edit.php:293
+#: include/views/configuration.item.prototype.edit.php:281
 msgid "Retrieve mode"
 msgstr ""
 
@@ -13824,11 +13824,11 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:425
-#: include/views/configuration.item.edit.php:536
-#: include/views/configuration.item.edit.php:543
+#: include/views/configuration.host.discovery.edit.php:427
+#: include/views/configuration.item.edit.php:538
+#: include/views/configuration.item.edit.php:545
 #: include/views/configuration.item.massupdate.php:226
-#: include/views/configuration.item.prototype.edit.php:506
+#: include/views/configuration.item.prototype.edit.php:508
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "SHA"
 msgstr ""
@@ -13872,18 +13872,18 @@ msgid "SNMP"
 msgstr ""
 
 #: disc_prototypes.php:100 host_discovery.php:100 include/forms.inc.php:453
-#: include/views/configuration.host.discovery.edit.php:391
-#: include/views/configuration.item.edit.php:487
-#: include/views/configuration.item.prototype.edit.php:472
+#: include/views/configuration.host.discovery.edit.php:393
+#: include/views/configuration.item.edit.php:489
+#: include/views/configuration.item.prototype.edit.php:474
 #: include/views/js/configuration.discovery.edit.js.php:62 items.php:98
 msgid "SNMP OID"
 msgstr ""
 
 #: disc_prototypes.php:95 host_discovery.php:95 include/forms.inc.php:428
-#: include/views/configuration.host.discovery.edit.php:403
-#: include/views/configuration.item.edit.php:500
+#: include/views/configuration.host.discovery.edit.php:405
+#: include/views/configuration.item.edit.php:502
 #: include/views/configuration.item.massupdate.php:185
-#: include/views/configuration.item.prototype.edit.php:484
+#: include/views/configuration.item.prototype.edit.php:486
 #: include/views/js/configuration.discovery.edit.js.php:48 items.php:96
 msgid "SNMP community"
 msgstr ""
@@ -13924,9 +13924,9 @@ msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr ""
 
 #: include/items.inc.php:1669
-#: include/views/configuration.host.discovery.edit.php:499
-#: include/views/configuration.item.edit.php:648
-#: include/views/configuration.item.prototype.edit.php:580
+#: include/views/configuration.host.discovery.edit.php:501
+#: include/views/configuration.item.edit.php:650
+#: include/views/configuration.item.prototype.edit.php:582
 msgid "SQL query"
 msgstr ""
 
@@ -13953,40 +13953,40 @@ msgstr ""
 msgid "SSH agent"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:328
+#: include/views/configuration.host.discovery.edit.php:330
 #: include/views/configuration.httpconf.edit.php:175
-#: include/views/configuration.item.edit.php:369
-#: include/views/configuration.item.prototype.edit.php:357
+#: include/views/configuration.item.edit.php:371
+#: include/views/configuration.item.prototype.edit.php:359
 msgid "SSL certificate file"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:337
+#: include/views/configuration.host.discovery.edit.php:339
 #: include/views/configuration.httpconf.edit.php:178
-#: include/views/configuration.item.edit.php:377
-#: include/views/configuration.item.prototype.edit.php:365
+#: include/views/configuration.item.edit.php:379
+#: include/views/configuration.item.prototype.edit.php:367
 msgid "SSL key file"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:345
+#: include/views/configuration.host.discovery.edit.php:347
 #: include/views/configuration.httpconf.edit.php:181
-#: include/views/configuration.item.edit.php:385
-#: include/views/configuration.item.prototype.edit.php:373
+#: include/views/configuration.item.edit.php:387
+#: include/views/configuration.item.prototype.edit.php:375
 msgid "SSL key password"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:87
-#: include/views/configuration.host.discovery.edit.php:319
+#: include/views/configuration.host.discovery.edit.php:321
 #: include/views/configuration.httpconf.edit.php:172
-#: include/views/configuration.item.edit.php:360
-#: include/views/configuration.item.prototype.edit.php:348
+#: include/views/configuration.item.edit.php:362
+#: include/views/configuration.item.prototype.edit.php:350
 msgid "SSL verify host"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:86
-#: include/views/configuration.host.discovery.edit.php:310
+#: include/views/configuration.host.discovery.edit.php:312
 #: include/views/configuration.httpconf.edit.php:169
-#: include/views/configuration.item.edit.php:351
-#: include/views/configuration.item.prototype.edit.php:339
+#: include/views/configuration.item.edit.php:353
+#: include/views/configuration.item.prototype.edit.php:341
 msgid "SSL verify peer"
 msgstr ""
 
@@ -14036,11 +14036,11 @@ msgstr ""
 msgid "Scheduled check"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:522
-#: include/views/configuration.item.edit.php:707
-#: include/views/configuration.item.edit.php:714
+#: include/views/configuration.host.discovery.edit.php:524
+#: include/views/configuration.item.edit.php:709
+#: include/views/configuration.item.edit.php:716
 #: include/views/configuration.item.massupdate.php:466
-#: include/views/configuration.item.prototype.edit.php:635
+#: include/views/configuration.item.prototype.edit.php:637
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
@@ -14252,19 +14252,19 @@ msgstr ""
 msgid "Seconds"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:421
-#: include/views/configuration.item.edit.php:529
+#: include/views/configuration.host.discovery.edit.php:423
+#: include/views/configuration.item.edit.php:531
 #: include/views/configuration.item.massupdate.php:209
-#: include/views/configuration.item.prototype.edit.php:502
+#: include/views/configuration.item.prototype.edit.php:504
 #: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Security level"
 msgstr ""
 
 #: include/forms.inc.php:432
-#: include/views/configuration.host.discovery.edit.php:409
-#: include/views/configuration.item.edit.php:506
+#: include/views/configuration.host.discovery.edit.php:411
+#: include/views/configuration.item.edit.php:508
 #: include/views/configuration.item.massupdate.php:201
-#: include/views/configuration.item.prototype.edit.php:490
+#: include/views/configuration.item.prototype.edit.php:492
 #: include/views/js/configuration.discovery.edit.js.php:76
 msgid "Security name"
 msgstr ""
@@ -14291,7 +14291,7 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:269
 #: include/views/configuration.item.edit.php:91
 #: include/views/configuration.item.prototype.edit.php:79
-#: include/views/configuration.item.prototype.edit.php:392
+#: include/views/configuration.item.prototype.edit.php:394
 #: include/views/configuration.services.edit.php:90
 #: include/views/js/monitoring.sysmaps.js.php:190
 #: include/views/js/monitoring.sysmaps.js.php:209
@@ -14312,7 +14312,7 @@ msgstr ""
 #: app/views/popup.triggerexpr.php:75
 #: include/views/configuration.graph.edit.php:208
 #: include/views/configuration.graph.edit.php:290
-#: include/views/configuration.item.prototype.edit.php:410
+#: include/views/configuration.item.prototype.edit.php:412
 msgid "Select prototype"
 msgstr ""
 
@@ -14749,9 +14749,9 @@ msgstr ""
 msgid "Show unavailable maps"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:856
+#: include/views/configuration.item.edit.php:858
 #: include/views/configuration.item.massupdate.php:583
-#: include/views/configuration.item.prototype.edit.php:725
+#: include/views/configuration.item.prototype.edit.php:727
 msgid "Show value"
 msgstr ""
 
@@ -15171,12 +15171,12 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:782
-#: include/views/configuration.item.edit.php:816
+#: include/views/configuration.item.edit.php:784
+#: include/views/configuration.item.edit.php:818
 #: include/views/configuration.item.massupdate.php:523
 #: include/views/configuration.item.massupdate.php:540
-#: include/views/configuration.item.prototype.edit.php:680
-#: include/views/configuration.item.prototype.edit.php:693
+#: include/views/configuration.item.prototype.edit.php:682
+#: include/views/configuration.item.prototype.edit.php:695
 msgid "Storage period"
 msgstr ""
 
@@ -15611,9 +15611,9 @@ msgid "Test string"
 msgstr ""
 
 #: include/forms.inc.php:355 include/items.inc.php:135
-#: include/items.inc.php:1707 include/views/configuration.item.edit.php:679
+#: include/items.inc.php:1707 include/views/configuration.item.edit.php:681
 #: include/views/configuration.item.massupdate.php:281
-#: include/views/configuration.item.prototype.edit.php:609
+#: include/views/configuration.item.prototype.edit.php:611
 #: include/views/js/monitoring.sysmaps.js.php:306
 #: include/views/js/monitoring.sysmaps.js.php:460
 msgid "Text"
@@ -15839,11 +15839,12 @@ msgstr ""
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr ""
 
-#: app/views/popup.httpstep.php:157
+#: app/views/popup.httpstep.php:157 disc_prototypes.php:172
+#: host_discovery.php:151
 #: include/views/configuration.host.discovery.edit.php:162
 #: include/views/configuration.httpconf.edit.php:196
 #: include/views/configuration.item.edit.php:194
-#: include/views/configuration.item.prototype.edit.php:182
+#: include/views/configuration.item.prototype.edit.php:182 items.php:140
 msgid "Timeout"
 msgstr ""
 
@@ -15954,9 +15955,9 @@ msgstr ""
 msgid "Trend data storage period \"%1$s\"."
 msgstr ""
 
-#: disc_prototypes.php:164 include/views/configuration.item.edit.php:812
+#: disc_prototypes.php:164 include/views/configuration.item.edit.php:814
 #: include/views/configuration.item.massupdate.php:535
-#: include/views/configuration.item.prototype.edit.php:689 items.php:76
+#: include/views/configuration.item.prototype.edit.php:691 items.php:76
 msgid "Trend storage period"
 msgstr ""
 
@@ -15964,7 +15965,7 @@ msgstr ""
 #: include/forms.inc.php:457 include/forms.inc.php:877
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/configuration.item.list.php:68
-#: include/views/configuration.item.prototype.list.php:56 items.php:239
+#: include/views/configuration.item.prototype.list.php:56 items.php:243
 #: latest.php:408
 msgid "Trends"
 msgstr ""
@@ -16277,17 +16278,17 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:336
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.discovery.edit.php:61
-#: include/views/configuration.host.discovery.edit.php:516
+#: include/views/configuration.host.discovery.edit.php:518
 #: include/views/configuration.host.discovery.list.php:58
 #: include/views/configuration.item.edit.php:73
 #: include/views/configuration.item.edit.php:78
-#: include/views/configuration.item.edit.php:699
+#: include/views/configuration.item.edit.php:701
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.massupdate.php:42
 #: include/views/configuration.item.massupdate.php:455
 #: include/views/configuration.item.prototype.edit.php:61
 #: include/views/configuration.item.prototype.edit.php:66
-#: include/views/configuration.item.prototype.edit.php:629
+#: include/views/configuration.item.prototype.edit.php:631
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.services.edit.php:170
@@ -16323,17 +16324,17 @@ msgstr ""
 #: include/views/configuration.action.edit.php:118
 #: include/views/configuration.action.edit.php:1144
 #: include/views/configuration.correlation.edit.php:91
-#: include/views/configuration.host.discovery.edit.php:592
+#: include/views/configuration.host.discovery.edit.php:594
 msgid "Type of calculation"
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:200
 #: app/controllers/CControllerPopupGeneric.php:263 include/forms.inc.php:348
-#: include/forms.inc.php:842 include/views/configuration.item.edit.php:667
-#: include/views/configuration.item.edit.php:673
+#: include/forms.inc.php:842 include/views/configuration.item.edit.php:669
+#: include/views/configuration.item.edit.php:675
 #: include/views/configuration.item.massupdate.php:274
-#: include/views/configuration.item.prototype.edit.php:597
-#: include/views/configuration.item.prototype.edit.php:603
+#: include/views/configuration.item.prototype.edit.php:599
+#: include/views/configuration.item.prototype.edit.php:605
 msgid "Type of information"
 msgstr ""
 
@@ -16351,7 +16352,7 @@ msgid "UNKNOWN"
 msgstr ""
 
 #: app/views/popup.httpstep.php:48 app/views/popup.triggerwizard.php:124
-#: disc_prototypes.php:171 host_discovery.php:152
+#: disc_prototypes.php:175 host_discovery.php:156
 #: include/classes/widgets/CWidgetConfig.php:50
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
 #: include/screens.inc.php:44
@@ -16364,7 +16365,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:569
 #: include/views/js/monitoring.sysmaps.js.php:254
 #: include/views/monitoring.screen.constructor.edit.php:843
-#: include/views/monitoring.sysmap.edit.php:230 items.php:139 jsLoader.php:279
+#: include/views/monitoring.sysmap.edit.php:230 items.php:143 jsLoader.php:279
 msgid "URL"
 msgstr ""
 
@@ -16476,9 +16477,9 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
-#: include/views/configuration.item.edit.php:684
+#: include/views/configuration.item.edit.php:686
 #: include/views/configuration.item.massupdate.php:288
-#: include/views/configuration.item.prototype.edit.php:614
+#: include/views/configuration.item.prototype.edit.php:616
 msgid "Units"
 msgstr ""
 
@@ -16683,15 +16684,15 @@ msgstr ""
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:108
 #: include/views/configuration.graph.edit.php:457
-#: include/views/configuration.host.discovery.edit.php:707
+#: include/views/configuration.host.discovery.edit.php:709
 #: include/views/configuration.host.edit.php:810
 #: include/views/configuration.hostgroups.edit.php:57
 #: include/views/configuration.host.massupdate.php:371
 #: include/views/configuration.host.prototype.edit.php:435
 #: include/views/configuration.httpconf.edit.php:253
-#: include/views/configuration.item.edit.php:1098
+#: include/views/configuration.item.edit.php:1100
 #: include/views/configuration.item.massupdate.php:743
-#: include/views/configuration.item.prototype.edit.php:906
+#: include/views/configuration.item.prototype.edit.php:908
 #: include/views/configuration.maintenance.edit.php:134
 #: include/views/configuration.maintenance.edit.php:285
 #: include/views/configuration.services.edit.php:355
@@ -16715,12 +16716,12 @@ msgstr ""
 
 #: discoveryconf.php:39 disc_prototypes.php:53 host_discovery.php:54
 #: include/forms.inc.php:394 include/views/configuration.discovery.edit.php:59
-#: include/views/configuration.host.discovery.edit.php:506
+#: include/views/configuration.host.discovery.edit.php:508
 #: include/views/configuration.httpconf.edit.php:79
-#: include/views/configuration.item.edit.php:689
+#: include/views/configuration.item.edit.php:691
 #: include/views/configuration.item.massupdate.php:510
-#: include/views/configuration.item.prototype.edit.php:619 items.php:53
-#: items.php:237
+#: include/views/configuration.item.prototype.edit.php:621 items.php:53
+#: items.php:241
 msgid "Update interval"
 msgstr ""
 
@@ -16972,13 +16973,13 @@ msgstr ""
 #: include/views/configuration.action.edit.php:953
 #: include/views/configuration.action.edit.php:1724
 #: include/views/configuration.action.edit.php:2187
-#: include/views/configuration.host.discovery.edit.php:294
-#: include/views/configuration.host.discovery.edit.php:469
-#: include/views/configuration.item.edit.php:335
-#: include/views/configuration.item.edit.php:617
+#: include/views/configuration.host.discovery.edit.php:296
+#: include/views/configuration.host.discovery.edit.php:471
+#: include/views/configuration.item.edit.php:337
+#: include/views/configuration.item.edit.php:619
 #: include/views/configuration.item.massupdate.php:307
-#: include/views/configuration.item.prototype.edit.php:323
-#: include/views/configuration.item.prototype.edit.php:550 items.php:84
+#: include/views/configuration.item.prototype.edit.php:325
+#: include/views/configuration.item.prototype.edit.php:552 items.php:84
 msgid "User name"
 msgstr ""
 
@@ -17045,10 +17046,10 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:94
 #: app/views/administration.mediatype.edit.php:158
-#: app/views/administration.mediatype.list.php:93 disc_prototypes.php:221
-#: host_discovery.php:201 include/views/configuration.host.edit.php:666
+#: app/views/administration.mediatype.list.php:93 disc_prototypes.php:225
+#: host_discovery.php:205 include/views/configuration.host.edit.php:666
 #: include/views/configuration.host.prototype.edit.php:336
-#: include/views/general.login.php:60 index.php:33 items.php:188
+#: include/views/general.login.php:60 index.php:33 items.php:192
 msgid "Username"
 msgstr ""
 
@@ -17297,14 +17298,14 @@ msgstr ""
 #: include/views/administration.general.macros.edit.php:38
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/configuration.host.discovery.edit.php:110
-#: include/views/configuration.host.discovery.edit.php:205
+#: include/views/configuration.host.discovery.edit.php:207
 #: include/views/configuration.httpconf.edit.php:119
 #: include/views/configuration.httpconf.edit.php:137
 #: include/views/configuration.item.edit.php:142
-#: include/views/configuration.item.edit.php:237
+#: include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:154
 #: include/views/configuration.item.prototype.edit.php:130
-#: include/views/configuration.item.prototype.edit.php:225
+#: include/views/configuration.item.prototype.edit.php:227
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:167
 #: include/views/hostmacros.php:50 include/views/monitoring.history.php:152
@@ -17758,10 +17759,10 @@ msgstr ""
 msgid "XML XPath"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:173
-#: include/views/configuration.item.edit.php:205
+#: include/views/configuration.host.discovery.edit.php:175
+#: include/views/configuration.item.edit.php:207
 #: include/views/configuration.item.massupdate.php:120
-#: include/views/configuration.item.prototype.edit.php:193
+#: include/views/configuration.item.prototype.edit.php:195
 msgid "XML data"
 msgstr ""
 
@@ -17856,7 +17857,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:221
 #: include/actions.inc.php:32 include/blocks.inc.php:434
 #: include/blocks.inc.php:633
-#: include/classes/screens/CScreenHostTriggers.php:273
+#: include/classes/screens/CScreenHostTriggers.php:268
 #: include/classes/screens/CScreenProblem.php:1082
 #: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
@@ -18489,7 +18490,7 @@ msgstr ""
 msgid "does not equal"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:632
+#: include/views/configuration.host.discovery.edit.php:634
 #: include/views/js/configuration.host.discovery.edit.js.php:25
 msgid "does not match"
 msgstr ""
@@ -18531,10 +18532,10 @@ msgstr ""
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:765
 #: include/views/configuration.item.edit.php:767
-#: include/views/configuration.item.edit.php:799
+#: include/views/configuration.item.edit.php:769
 #: include/views/configuration.item.edit.php:801
+#: include/views/configuration.item.edit.php:803
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr ""
@@ -18698,9 +18699,9 @@ msgstr ""
 msgid "left"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:991
+#: include/views/configuration.item.edit.php:993
 #: include/views/configuration.item.massupdate.php:379
-#: include/views/configuration.item.prototype.edit.php:820
+#: include/views/configuration.item.prototype.edit.php:822
 #: include/views/js/common.item.edit.js.php:151
 #: include/views/js/configuration.item.massupdate.js.php:176
 msgid "list of characters"
@@ -18755,7 +18756,7 @@ msgstr ""
 msgid "map"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:631
+#: include/views/configuration.host.discovery.edit.php:633
 #: include/views/js/configuration.host.discovery.edit.js.php:24
 msgid "matches"
 msgstr ""
@@ -18837,11 +18838,11 @@ msgid "must contain at least one low-level discovery macro"
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:125
-#: include/views/configuration.host.discovery.edit.php:220
+#: include/views/configuration.host.discovery.edit.php:222
 #: include/views/configuration.item.edit.php:157
-#: include/views/configuration.item.edit.php:252
+#: include/views/configuration.item.edit.php:254
 #: include/views/configuration.item.prototype.edit.php:145
-#: include/views/configuration.item.prototype.edit.php:240
+#: include/views/configuration.item.prototype.edit.php:242
 #: include/views/js/configuration.httpconf.edit.js.php:41
 msgid "name"
 msgstr ""
@@ -18894,9 +18895,9 @@ msgstr ""
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:964
+#: include/views/configuration.item.edit.php:966
 #: include/views/configuration.item.massupdate.php:355
-#: include/views/configuration.item.prototype.edit.php:793
+#: include/views/configuration.item.prototype.edit.php:795
 #: include/views/js/common.item.edit.js.php:142
 #: include/views/js/configuration.item.massupdate.js.php:45
 #: include/views/js/configuration.item.massupdate.js.php:167
@@ -18959,25 +18960,25 @@ msgstr ""
 msgid "other"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:979
+#: include/views/configuration.item.edit.php:981
 #: include/views/configuration.item.massupdate.php:368
-#: include/views/configuration.item.prototype.edit.php:808
+#: include/views/configuration.item.prototype.edit.php:810
 #: include/views/js/common.item.edit.js.php:49
 #: include/views/js/configuration.item.massupdate.js.php:46
 msgid "output"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:997
+#: include/views/configuration.item.edit.php:999
 #: include/views/configuration.item.massupdate.php:385
-#: include/views/configuration.item.prototype.edit.php:826
+#: include/views/configuration.item.prototype.edit.php:828
 #: include/views/js/common.item.edit.js.php:159
 #: include/views/js/configuration.item.massupdate.js.php:184
 msgid "path"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:1002
+#: include/views/configuration.item.edit.php:1004
 #: include/views/configuration.item.massupdate.php:390
-#: include/views/configuration.item.prototype.edit.php:831
+#: include/views/configuration.item.prototype.edit.php:833
 #: include/views/js/common.item.edit.js.php:48
 #: include/views/js/common.item.edit.js.php:166
 #: include/views/js/configuration.item.massupdate.js.php:191
@@ -19005,7 +19006,7 @@ msgstr ""
 msgid "regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:654
+#: include/views/configuration.host.discovery.edit.php:656
 #: include/views/js/configuration.host.discovery.edit.js.php:29
 msgid "regular expression"
 msgstr ""
@@ -19081,9 +19082,9 @@ msgstr ""
 msgid "show icon mappings"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:851
+#: include/views/configuration.item.edit.php:853
 #: include/views/configuration.item.massupdate.php:577
-#: include/views/configuration.item.prototype.edit.php:723
+#: include/views/configuration.item.prototype.edit.php:725
 msgid "show value mappings"
 msgstr ""
 
@@ -19280,11 +19281,11 @@ msgstr ""
 #: include/views/configuration.action.edit.php:366
 #: include/views/configuration.correlation.edit.php:152
 #: include/views/configuration.host.discovery.edit.php:129
-#: include/views/configuration.host.discovery.edit.php:224
+#: include/views/configuration.host.discovery.edit.php:226
 #: include/views/configuration.item.edit.php:161
-#: include/views/configuration.item.edit.php:256
+#: include/views/configuration.item.edit.php:258
 #: include/views/configuration.item.prototype.edit.php:149
-#: include/views/configuration.item.prototype.edit.php:244
+#: include/views/configuration.item.prototype.edit.php:246
 #: include/views/configuration.maintenance.edit.php:210
 #: include/views/configuration.trigger.prototype.edit.php:500
 #: include/views/configuration.trigger.prototype.massupdate.php:146
