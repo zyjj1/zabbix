@@ -102,8 +102,7 @@ if ($data['userid'] == 0 || $data['change_password']) {
 
 	$password1 = (new CPassBox('password1', $data['password1']))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autocomplete', 'off');
+		->setAriaRequired();
 
 	if (!$form_autofocus) {
 		$form_autofocus = true;
@@ -122,7 +121,6 @@ if ($data['userid'] == 0 || $data['change_password']) {
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
-				->setAttribute('autocomplete', 'off')
 		)
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 
