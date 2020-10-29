@@ -118,7 +118,7 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot reload stalled element selected as a part of multi-element selection.');
 		}
 
-		if ($this->parent !== null) {
+		if ($this->parent !== null && $this->parent->isStalled()) {
 			$this->parent->reload();
 		}
 
@@ -509,8 +509,19 @@ class CElement extends CBaseElement implements IWaitable {
 				throw $exception;
 			}
 
-			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+			$this->forceClick();
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Force click on element.
+	 *
+	 * @return $this
+	 */
+	public function forceClick() {
+		CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 
 		return $this;
 	}
@@ -614,6 +625,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asMultiline($options);
 		}
 
+		if (in_array('input-group', $class)) {
+			return $this->asInputGroup($options);
+		}
+
 		CTest::addWarning('No specific element was detected');
 
 		return $this;
@@ -641,6 +656,13 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function checkValue($expected, $raise_exception = true) {
 		$value = $this->getValue();
+		if ($value === null) {
+			if ($raise_exception) {
+				throw new Exception('Cannot get value of the non-interactable element.');
+			}
+
+			return false;
+		}
 
 		if (is_array($value)) {
 			if (!is_array($expected)) {
@@ -660,11 +682,11 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($expected != $value && $raise_exception) {
-			if (!is_scalar($value)) {
+			if (!is_scalar($value) || is_bool($value)) {
 				$value = json_encode($value);
 			}
 
-			if (!is_scalar($expected)) {
+			if (!is_scalar($expected) || is_bool($expected)) {
 				$expected = json_encode($expected);
 			}
 
