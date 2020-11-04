@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-30 19:52+0200\n"
-"PO-Revision-Date: 2020-08-31 01:39+0300\n"
+"PO-Revision-Date: 2020-11-04 06:13+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1598830757.000000\n"
+"X-POOTLE-MTIME: 1604463200.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:89
@@ -1946,7 +1946,7 @@ msgstr "イメージを削除できません"
 #: include/classes/api/services/CHostInterface.php:430
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたホスト\"%1$s\"のインターフェースを削除できません。"
 
 #: include/classes/api/services/CHost.php:997
 msgid "Cannot delete inventory."
@@ -3025,7 +3025,7 @@ msgstr "ファイル存在チェック。ファイルが存在しない場合は
 
 #: include/classes/items/CHelpItems.php:723
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "ホストがICMP pingでアクセス可能かチェック。ICMP pingに失敗した場合は「0」を返し、ICMP pingに成功した場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:451
