@@ -3169,7 +3169,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "unknown item \"%s\" validation error",
+					zabbix_log(LOG_LEVEL_DEBUG, "unknown validation error for item \"%s\"",
 							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
 				}
 
