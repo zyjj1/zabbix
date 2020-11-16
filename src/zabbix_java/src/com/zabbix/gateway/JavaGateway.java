@@ -29,9 +29,6 @@ import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.util.Properties;
-
 public class JavaGateway
 {
 	private static final Logger logger = LoggerFactory.getLogger(JavaGateway.class);
@@ -48,28 +45,6 @@ public class JavaGateway
 		{
 			System.out.println("unsupported command line options");
 			System.exit(1);
-		}
-
-		try
-		{
-			String property = System.getProperty("zabbix.propertiesFile");
-
-			if (null != property)
-			{
-				Properties props = new Properties(System.getProperties());
-				FileInputStream inStream = new FileInputStream(property);
-
-				props.load(inStream);
-				inStream.close();
-
-				System.setProperties(props);
-				logger.info("retrieved properties from file '{}'", property);
-			}
-		}
-		catch (Exception e)
-		{
-			logger.error("caught fatal exception: {}", ZabbixException.getRootCauseMessage(e));
-			logger.debug("error caused by", e);
 		}
 
 		logger.info("Zabbix Java Gateway {} (revision {}) has started", GeneralInformation.VERSION, GeneralInformation.REVISION);

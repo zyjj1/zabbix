@@ -25,6 +25,10 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+
+import java.util.Properties;
+
 class ConfigurationManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationManager.class);
@@ -34,6 +38,7 @@ class ConfigurationManager
 	static final String LISTEN_PORT = "listenPort";
 	static final String START_POLLERS = "startPollers";
 	static final String TIMEOUT = "timeout";
+	static final String PROPERTIES_FILE = "propertiesFile";
 
 	private static ConfigurationParameter[] parameters =
 	{
@@ -73,7 +78,29 @@ class ConfigurationManager
 				null),
 		new ConfigurationParameter(TIMEOUT, ConfigurationParameter.TYPE_INTEGER, 3,
 				new IntegerValidator(1, 30),
-				null)
+				null),
+		new ConfigurationParameter(PROPERTIES_FILE, ConfigurationParameter.TYPE_FILE, null,
+				null,
+				new PostInputValidator()
+				{
+					@Override
+					public void execute(Object value)
+					{
+						try
+						{
+							Properties props = new Properties(System.getProperties());
+							FileInputStream inStream = new FileInputStream((File)value);
+							props.load(inStream);
+							inStream.close();
+			
+							System.setProperties(props);
+						}
+						catch (IOException e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+				}),
 	};
 
 	static void parseConfiguration()
