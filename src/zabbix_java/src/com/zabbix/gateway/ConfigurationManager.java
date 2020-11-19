@@ -21,12 +21,10 @@ package com.zabbix.gateway;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.FileInputStream;
-
 import java.util.Properties;
 
 class ConfigurationManager
@@ -98,6 +96,10 @@ class ConfigurationManager
 						catch (IOException e)
 						{
 							throw new RuntimeException(e);
+						}
+						catch (SecurityException e)
+						{
+							throw new SecurityException(e);
 						}
 					}
 				}),
