@@ -47,8 +47,7 @@ jQuery(function($) {
 			this.prepareNext(timeout);
 
 			this.$elem = $elem;
-			this.elm_margins = parseInt($elem.css('padding-left'), 10) + parseInt($elem.css('padding-right'), 10)
-				+ parseInt($elem.css('margin-left'), 10) + parseInt($elem.css('margin-right'), 10);
+			this.elm_margins = $elem.outerWidth(true) - $elem.width();
 			this.updateWidth();
 			this.$elem.on('mouseenter', this.hideMessage.bind(this));
 			$(window).on('resize', this.updateWidth.bind(this));
@@ -110,7 +109,7 @@ jQuery(function($) {
 
 		updateWidth: function() {
 			this.$elem.css({
-				width: window.innerWidth - this.elm_margins
+				width: window.innerWidth - (window.innerWidth - document.documentElement.clientWidth) - this.elm_margins
 			});
 		}
 	};
