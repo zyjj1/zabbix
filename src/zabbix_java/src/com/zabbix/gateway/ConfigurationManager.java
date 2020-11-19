@@ -99,7 +99,7 @@ class ConfigurationManager
 						}
 						catch (SecurityException e)
 						{
-							throw new SecurityException(e);
+							throw new RuntimeException(e);
 						}
 					}
 				}),
