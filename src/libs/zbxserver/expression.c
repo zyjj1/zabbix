@@ -1317,7 +1317,7 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
