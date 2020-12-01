@@ -340,7 +340,8 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num, int *status)
 			*status = FAIL;
 
 		fclose(f);
-	} else
+	}
+	else
 		*status = FAIL;
 
 	return freq;
@@ -446,10 +447,11 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXFREQ == filter)
 			{
-				int max_freq_status;
+				int	max_freq_status;
+
 				maxfreq = get_cpu_max_freq(cur_cpu, &max_freq_status);
 
-				if (max_freq_status == SUCCEED)
+				if (SUCCEED == max_freq_status)
 					ret = SYSINFO_RET_OK;
 			}
 		}
