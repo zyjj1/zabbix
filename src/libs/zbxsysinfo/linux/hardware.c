@@ -324,7 +324,7 @@ int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static zbx_uint64_t	get_cpu_max_freq(int cpu_num, int *status)
 {
-	zbx_uint64_t	freq = 0;
+	zbx_uint64_t	freq = ZBX_MAX_UINT64;
 	char		filename[MAX_STRING_LEN];
 	FILE		*f;
 
@@ -332,12 +332,13 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num, int *status)
 
 	f = fopen(filename, "r");
 
-	*status = SUCCEED;
 
 	if (NULL != f)
 	{
 		if (1 != fscanf(f, ZBX_FS_UI64, &freq))
 			*status = FAIL;
+		else
+			*status = SUCCEED;
 
 		fclose(f);
 	}
@@ -351,14 +352,14 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 {
 	size_t	offset = 0;
 
-	if (HW_CPU_SHOW_MAXFREQ == filter && 0 != maxfreq)
+	if (HW_CPU_SHOW_MAXFREQ == filter && ZBX_MAX_UINT64 != maxfreq)
 	{
 		if (HW_CPU_ALL_CPUS == cpu)
 			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64 "MHz", maxfreq / 1000);
 		else
 			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64, maxfreq * 1000);
 	}
-	else if (HW_CPU_SHOW_CURFREQ == filter && 0 != curfreq)
+	else if (HW_CPU_SHOW_CURFREQ == filter && ZBX_MAX_UINT64 != curfreq)
 	{
 		if (HW_CPU_ALL_CPUS == cpu)
 			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64 "MHz", curfreq);
@@ -367,10 +368,10 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 	}
 	else if (HW_CPU_SHOW_ALL == filter)
 	{
-		if (0 != curfreq)
+		if (ZBX_MAX_UINT64 != curfreq)
 			offset += zbx_snprintf(buffer + offset, size - offset, " working at " ZBX_FS_UI64 "MHz", curfreq);
 
-		if (0 != maxfreq)
+		if (ZBX_MAX_UINT64 != maxfreq)
 			offset += zbx_snprintf(buffer + offset, size - offset, " (maximum " ZBX_FS_UI64 "MHz)", maxfreq / 1000);
 	}
 
@@ -380,7 +381,7 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
-	zbx_uint64_t	maxfreq = 0, curfreq = 0;
+	zbx_uint64_t	maxfreq = ZBX_MAX_UINT64, curfreq = ZBX_MAX_UINT64;
 	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], *param;
 	FILE		*f;
 
