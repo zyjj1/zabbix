@@ -332,7 +332,6 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num, int *status)
 
 	f = fopen(filename, "r");
 
-
 	if (NULL != f)
 	{
 		if (1 != fscanf(f, ZBX_FS_UI64, &freq))
@@ -437,7 +436,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (-1 != cur_cpu && (HW_CPU_ALL_CPUS == cpu || cpu == cur_cpu))	/* print info about the previous cpu */
 				offset += print_freq(buffer + offset, sizeof(buffer) - offset, filter, cpu, maxfreq, curfreq);
 
-			curfreq = 0;
+			curfreq = ZBX_MAX_UINT64;
 			cur_cpu = atoi(tmp);
 
 			if (HW_CPU_ALL_CPUS != cpu && cpu != cur_cpu)
