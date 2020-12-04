@@ -1,8 +1,40 @@
-Changes for 4.0.26rc1
+Changes for 4.0.28rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.27
+
+4.0.27rc1 was released as 4.0.27 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.27rc1
+
+New features:
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
+
+Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.26
+
+4.0.26rc1 was released as 4.0.26 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.26rc1
+
+Bug fixes:
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
 ........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
 ..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
 ..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
