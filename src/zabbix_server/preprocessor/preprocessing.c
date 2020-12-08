@@ -678,22 +678,22 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 
 	if (ITEM_STATE_NORMAL == state)
 	{
-		if (ISSET_STR(result))
+		if (0 != ISSET_STR(result))
 			value_len = strlen(result->str);
 
-		if (ISSET_TEXT(result))
+		if (0 != ISSET_TEXT(result))
 		{
 			if (value_len < (len = strlen(result->text)))
 				value_len = len;
 		}
 
-		if (ISSET_LOG(result))
+		if (0 != ISSET_LOG(result))
 		{
 			if (value_len < (len = strlen(result->log->value)))
 				value_len = len;
 		}
 
-		if (ZBX_MAX_RECV_DATA_SIZE < len)
+		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
 		{
 			result = NULL;
 			state = ITEM_STATE_NOTSUPPORTED;
