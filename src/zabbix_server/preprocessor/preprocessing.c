@@ -63,18 +63,18 @@ static int			cached_values;
  ******************************************************************************/
 static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_field_t *fields, int count)
 {
-	int 		i;
-	zbx_uint32_t	field_size, data_size = 0;
-	unsigned char	*offset = NULL;
+	int 			i;
+	zbx_uint32_t		data_size = 0;
+	zbx_uint64_t		field_size;
+	unsigned char		*offset = NULL;
+	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)__UINT32_C(0);
 
 	if (NULL != message)
 	{
-		const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)__UINT32_C(0);
-
 		/* recursive call to calculate required buffer size */
 		data_size = message_pack_data(NULL, fields, count);
 
-		if (max_uint32 - message->size < data_size)
+		if (0 == data_size || max_uint32 - message->size < data_size)
 			return 0;
 
 		message->size += data_size;
@@ -107,10 +107,14 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 			{
 				field_size = (NULL != fields[i].value) ? strlen((const char *)fields[i].value) + 1 : 0;
 				fields[i].size = field_size;
+
 				field_size += sizeof(zbx_uint32_t);
 			}
 
-			data_size += field_size;
+			if (field_size + data_size > max_uint32)
+				return 0;
+
+			data_size += (zbx_uint32_t)field_size;
 		}
 	}
 
