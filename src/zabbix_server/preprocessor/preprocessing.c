@@ -106,7 +106,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 			if (PACKED_FIELD_STRING == fields[i].type)
 			{
 				field_size = (NULL != fields[i].value) ? strlen((const char *)fields[i].value) + 1 : 0;
-				fields[i].size = field_size;
+				fields[i].size = (zbx_uint32_t)field_size;
 
 				field_size += sizeof(zbx_uint32_t);
 			}
