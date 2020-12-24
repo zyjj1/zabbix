@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-20 19:52+0200\n"
+"POT-Creation-Date: 2020-12-04 19:51+0200\n"
 "PO-Revision-Date: 2020-11-16 01:36+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -85,7 +85,7 @@ msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$sアイテム"
 
-#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1993
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -7840,10 +7840,10 @@ msgstr "設定項目が間違っています"
 #: include/classes/api/services/CItemGeneral.php:1248
 #: include/classes/api/services/CItemGeneral.php:1266
 #: include/classes/api/services/CItemGeneral.php:1288
-#: include/classes/api/services/CItemGeneral.php:1314
-#: include/classes/api/services/CItemGeneral.php:1327
-#: include/classes/api/services/CItemGeneral.php:1356
-#: include/classes/api/services/CItemGeneral.php:1370
+#: include/classes/api/services/CItemGeneral.php:1320
+#: include/classes/api/services/CItemGeneral.php:1333
+#: include/classes/api/services/CItemGeneral.php:1362
+#: include/classes/api/services/CItemGeneral.php:1376
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:117
 #: include/classes/api/services/CMapElement.php:129
@@ -8411,7 +8411,7 @@ msgstr "不正なユーザー名やパスワードまたはアカウントは一
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:528
-#: include/classes/api/services/CItemGeneral.php:1964
+#: include/classes/api/services/CItemGeneral.php:1970
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8559,20 +8559,20 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1277
 #: include/classes/api/services/CItemGeneral.php:1292
-#: include/classes/api/services/CItemGeneral.php:1301
-#: include/classes/api/services/CItemGeneral.php:1319
-#: include/classes/api/services/CItemGeneral.php:1332
-#: include/classes/api/services/CItemGeneral.php:1339
+#: include/classes/api/services/CItemGeneral.php:1307
+#: include/classes/api/services/CItemGeneral.php:1325
+#: include/classes/api/services/CItemGeneral.php:1338
 #: include/classes/api/services/CItemGeneral.php:1345
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1375
-#: include/classes/api/services/CItemGeneral.php:1611
-#: include/classes/api/services/CItemGeneral.php:1631
-#: include/classes/api/services/CItemGeneral.php:1638
-#: include/classes/api/services/CItemGeneral.php:1648
-#: include/classes/api/services/CItemGeneral.php:1728
-#: include/classes/api/services/CItemGeneral.php:1742
-#: include/classes/api/services/CItemGeneral.php:1903
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1617
+#: include/classes/api/services/CItemGeneral.php:1637
+#: include/classes/api/services/CItemGeneral.php:1644
+#: include/classes/api/services/CItemGeneral.php:1654
+#: include/classes/api/services/CItemGeneral.php:1734
+#: include/classes/api/services/CItemGeneral.php:1748
+#: include/classes/api/services/CItemGeneral.php:1909
 #: include/classes/api/services/CItem.php:771
 #: include/classes/api/services/CItem.php:779
 #: include/classes/api/services/CItemPrototype.php:942
@@ -8987,15 +8987,15 @@ msgstr "パラメータの数が正しくありません。"
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1926
-#: include/classes/api/services/CItemGeneral.php:1934
-#: include/classes/api/services/CItemGeneral.php:1943
-#: include/classes/api/services/CItemGeneral.php:1950
-#: include/classes/api/services/CItemGeneral.php:1981
-#: include/classes/api/services/CItemGeneral.php:1986
-#: include/classes/api/services/CItemGeneral.php:1996
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:1925
+#: include/classes/api/services/CItemGeneral.php:1932
+#: include/classes/api/services/CItemGeneral.php:1940
+#: include/classes/api/services/CItemGeneral.php:1949
+#: include/classes/api/services/CItemGeneral.php:1956
+#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1992
+#: include/classes/api/services/CItemGeneral.php:2002
+#: include/classes/api/services/CItemGeneral.php:2031
 #: include/classes/api/services/CUser.php:668
 #: include/classes/api/services/CUser.php:679
 #: include/classes/validators/CApiInputValidator.php:250
@@ -9223,7 +9223,7 @@ msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1307
-#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1618
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "アイテム\"%1$s\"が存在しないかアクセス権限がありません"
@@ -9396,7 +9396,7 @@ msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にす�
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不明なアイテムとしてすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:1495
+#: include/classes/api/services/CItemGeneral.php:1501
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
@@ -9473,8 +9473,8 @@ msgstr "JSON Path"
 msgid "JSON data"
 msgstr "JSONデータ"
 
-#: include/classes/api/services/CItemGeneral.php:1996
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:2002
+#: include/classes/api/services/CItemGeneral.php:2031
 msgid "JSON is expected"
 msgstr "JSONで指定してください"
 
@@ -12010,7 +12010,7 @@ msgstr "管理者だけがスライドショーの所有者を設定できます
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "有効なホストのアイテムのみカウント"
 
-#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1387
 msgid "Only one change step is allowed."
 msgstr "変更できるのは1つのステップだけです。"
 
@@ -17754,7 +17754,7 @@ msgstr "XMLデータ"
 msgid "XML is empty"
 msgstr "XMLが空です"
 
-#: include/classes/api/services/CItemGeneral.php:1981
+#: include/classes/api/services/CItemGeneral.php:1987
 msgid "XML is expected"
 msgstr "XMLで指定してください"
 
@@ -18109,7 +18109,7 @@ msgid "a number is too large"
 msgstr "数字が大きすぎます"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1302
+#: include/classes/api/services/CItemGeneral.php:1308
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "数値で指定してください"
@@ -18178,8 +18178,8 @@ msgstr "すべてのメディア"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1943
+#: include/classes/api/services/CItemGeneral.php:1925
+#: include/classes/api/services/CItemGeneral.php:1949
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:390
 #: include/classes/validators/CApiInputValidator.php:522
@@ -18317,8 +18317,8 @@ msgstr "変更できません"
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1292
-#: include/classes/api/services/CItemGeneral.php:1319
-#: include/classes/api/services/CItemGeneral.php:1332
+#: include/classes/api/services/CItemGeneral.php:1325
+#: include/classes/api/services/CItemGeneral.php:1338
 #: include/classes/api/services/CMapElement.php:122
 #: include/classes/api/services/CMapElement.php:147
 #: include/classes/api/services/CMapElement.php:185
@@ -18352,7 +18352,7 @@ msgstr "変更できません"
 msgid "cannot be empty"
 msgstr "空白は指定できません"
 
-#: include/classes/api/services/CItemGeneral.php:1935
+#: include/classes/api/services/CItemGeneral.php:1941
 msgid "cannot convert to JSON, result value too long"
 msgstr "JSONに変換できません、結果の値が長すぎます"
 
@@ -18369,7 +18369,7 @@ msgstr "change() - 最新値と前回値との差分"
 msgid "check expression starting from \"%1$s\""
 msgstr "\"%1$s\"から始まる条件式を確認してください"
 
-#: include/classes/api/services/CItemGeneral.php:1649
+#: include/classes/api/services/CItemGeneral.php:1655
 #: include/classes/import/CConfigurationImport.php:2715
 msgid "circular item dependency is not allowed"
 msgstr "循環するアイテムの依存関係は許可されていません"
@@ -18503,7 +18503,7 @@ msgstr "JSONの解析に失敗しました"
 msgid "first"
 msgstr "第1"
 
-#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1346
 msgid "first parameter is expected"
 msgstr "最初のパラメータを指定してください"
 
@@ -18562,7 +18562,7 @@ msgstr "ホストが無効"
 msgid "host pattern"
 msgstr "ホストパターン"
 
-#: include/classes/api/services/CItemGeneral.php:1632
+#: include/classes/api/services/CItemGeneral.php:1638
 msgid "hostid of dependent item and master item should match"
 msgstr "依存アイテムとマスターアイテムのhostidを一致させてください"
 
@@ -18762,11 +18762,11 @@ msgstr "最大"
 msgid "max() - Maximum value for period T"
 msgstr "max() - 期間Tでの最大値"
 
-#: include/classes/api/services/CItemGeneral.php:1743
+#: include/classes/api/services/CItemGeneral.php:1749
 msgid "maximum dependent items count reached"
 msgstr "依存アイテムの数が最大数に達しました"
 
-#: include/classes/api/services/CItemGeneral.php:1729
+#: include/classes/api/services/CItemGeneral.php:1735
 #: include/classes/import/CConfigurationImport.php:2669
 #: include/classes/import/CConfigurationImport.php:2730
 msgid "maximum number of dependency levels reached"
@@ -18861,8 +18861,8 @@ msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし
 msgid "none"
 msgstr "なし"
 
-#: include/classes/api/services/CItemGeneral.php:1926
-#: include/classes/api/services/CItemGeneral.php:1950
+#: include/classes/api/services/CItemGeneral.php:1932
+#: include/classes/api/services/CItemGeneral.php:1956
 msgid "nonempty key and value pair expected"
 msgstr "空ではないキーと値のペアを指定してください"
 
@@ -19017,7 +19017,7 @@ msgstr "右"
 msgid "root"
 msgstr "ルート"
 
-#: include/classes/api/services/CItemGeneral.php:1639
+#: include/classes/api/services/CItemGeneral.php:1645
 msgid "ruleid of dependent item and master item should match"
 msgstr "依存アイテムとマスターアイテムのruleidを一致させてください"
 
@@ -19031,7 +19031,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr "第2"
 
-#: include/classes/api/services/CItemGeneral.php:1346
+#: include/classes/api/services/CItemGeneral.php:1352
 msgid "second parameter is expected"
 msgstr "第2引数を指定してください"
 
@@ -19051,9 +19051,9 @@ msgstr "説明"
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1375
-#: include/classes/api/services/CItemGeneral.php:1903
+#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1909
 #: include/classes/api/services/CMaintenance.php:488
 #: include/classes/api/services/CMaintenance.php:711
 #: include/classes/api/services/CProxy.php:662

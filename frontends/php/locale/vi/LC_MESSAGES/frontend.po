@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-20 19:52+0200\n"
+"POT-Creation-Date: 2020-12-04 19:51+0200\n"
 "PO-Revision-Date: 2020-05-01 15:52+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -85,7 +85,7 @@ msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$s mục"
 
-#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1993
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -7848,10 +7848,10 @@ msgstr "Đối số không chính xác được thông qua hàm."
 #: include/classes/api/services/CItemGeneral.php:1248
 #: include/classes/api/services/CItemGeneral.php:1266
 #: include/classes/api/services/CItemGeneral.php:1288
-#: include/classes/api/services/CItemGeneral.php:1314
-#: include/classes/api/services/CItemGeneral.php:1327
-#: include/classes/api/services/CItemGeneral.php:1356
-#: include/classes/api/services/CItemGeneral.php:1370
+#: include/classes/api/services/CItemGeneral.php:1320
+#: include/classes/api/services/CItemGeneral.php:1333
+#: include/classes/api/services/CItemGeneral.php:1362
+#: include/classes/api/services/CItemGeneral.php:1376
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:117
 #: include/classes/api/services/CMapElement.php:129
@@ -8419,7 +8419,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:528
-#: include/classes/api/services/CItemGeneral.php:1964
+#: include/classes/api/services/CItemGeneral.php:1970
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8567,20 +8567,20 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1277
 #: include/classes/api/services/CItemGeneral.php:1292
-#: include/classes/api/services/CItemGeneral.php:1301
-#: include/classes/api/services/CItemGeneral.php:1319
-#: include/classes/api/services/CItemGeneral.php:1332
-#: include/classes/api/services/CItemGeneral.php:1339
+#: include/classes/api/services/CItemGeneral.php:1307
+#: include/classes/api/services/CItemGeneral.php:1325
+#: include/classes/api/services/CItemGeneral.php:1338
 #: include/classes/api/services/CItemGeneral.php:1345
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1375
-#: include/classes/api/services/CItemGeneral.php:1611
-#: include/classes/api/services/CItemGeneral.php:1631
-#: include/classes/api/services/CItemGeneral.php:1638
-#: include/classes/api/services/CItemGeneral.php:1648
-#: include/classes/api/services/CItemGeneral.php:1728
-#: include/classes/api/services/CItemGeneral.php:1742
-#: include/classes/api/services/CItemGeneral.php:1903
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1617
+#: include/classes/api/services/CItemGeneral.php:1637
+#: include/classes/api/services/CItemGeneral.php:1644
+#: include/classes/api/services/CItemGeneral.php:1654
+#: include/classes/api/services/CItemGeneral.php:1734
+#: include/classes/api/services/CItemGeneral.php:1748
+#: include/classes/api/services/CItemGeneral.php:1909
 #: include/classes/api/services/CItem.php:771
 #: include/classes/api/services/CItem.php:779
 #: include/classes/api/services/CItemPrototype.php:942
@@ -8995,15 +8995,15 @@ msgstr "Số đối số không hợp lệ của các tham số."
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1926
-#: include/classes/api/services/CItemGeneral.php:1934
-#: include/classes/api/services/CItemGeneral.php:1943
-#: include/classes/api/services/CItemGeneral.php:1950
-#: include/classes/api/services/CItemGeneral.php:1981
-#: include/classes/api/services/CItemGeneral.php:1986
-#: include/classes/api/services/CItemGeneral.php:1996
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:1925
+#: include/classes/api/services/CItemGeneral.php:1932
+#: include/classes/api/services/CItemGeneral.php:1940
+#: include/classes/api/services/CItemGeneral.php:1949
+#: include/classes/api/services/CItemGeneral.php:1956
+#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1992
+#: include/classes/api/services/CItemGeneral.php:2002
+#: include/classes/api/services/CItemGeneral.php:2031
 #: include/classes/api/services/CUser.php:668
 #: include/classes/api/services/CUser.php:679
 #: include/classes/validators/CApiInputValidator.php:250
@@ -9231,7 +9231,7 @@ msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Item \"%1$s\" không tồn tại trên template \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1307
-#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1618
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "Item \"%1$s\" không tồn tại hoặc bạn không có quyền truy cập vào item này"
@@ -9404,7 +9404,7 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là mô
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là phần tử item chưa biết"
 
-#: include/classes/api/services/CItemGeneral.php:1495
+#: include/classes/api/services/CItemGeneral.php:1501
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -9481,8 +9481,8 @@ msgstr "JSON Path"
 msgid "JSON data"
 msgstr "JSON data"
 
-#: include/classes/api/services/CItemGeneral.php:1996
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:2002
+#: include/classes/api/services/CItemGeneral.php:2031
 msgid "JSON is expected"
 msgstr "Yêu cầu JSON"
 
@@ -12018,7 +12018,7 @@ msgstr "Chỉ quản trị viên mới có thể đặt chủ sở hữu slide s
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Chỉ các item được gán đến host đã kích hoạt mới được tính"
 
-#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1387
 msgid "Only one change step is allowed."
 msgstr "Chỉ một bước thay đổi được cho phép."
 
@@ -17762,7 +17762,7 @@ msgstr "Dữ liệu XML"
 msgid "XML is empty"
 msgstr "XML trống"
 
-#: include/classes/api/services/CItemGeneral.php:1981
+#: include/classes/api/services/CItemGeneral.php:1987
 msgid "XML is expected"
 msgstr "Yêu cầu XML"
 
@@ -18117,7 +18117,7 @@ msgid "a number is too large"
 msgstr "một số là quá lớn"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1302
+#: include/classes/api/services/CItemGeneral.php:1308
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "một giá trị số được mong đợi"
@@ -18186,8 +18186,8 @@ msgstr "Tất cả media"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1943
+#: include/classes/api/services/CItemGeneral.php:1925
+#: include/classes/api/services/CItemGeneral.php:1949
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:390
 #: include/classes/validators/CApiInputValidator.php:522
@@ -18325,8 +18325,8 @@ msgstr "Không thể thay đổi"
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1292
-#: include/classes/api/services/CItemGeneral.php:1319
-#: include/classes/api/services/CItemGeneral.php:1332
+#: include/classes/api/services/CItemGeneral.php:1325
+#: include/classes/api/services/CItemGeneral.php:1338
 #: include/classes/api/services/CMapElement.php:122
 #: include/classes/api/services/CMapElement.php:147
 #: include/classes/api/services/CMapElement.php:185
@@ -18360,7 +18360,7 @@ msgstr "Không thể thay đổi"
 msgid "cannot be empty"
 msgstr "Không thể để trống"
 
-#: include/classes/api/services/CItemGeneral.php:1935
+#: include/classes/api/services/CItemGeneral.php:1941
 msgid "cannot convert to JSON, result value too long"
 msgstr "không thể chuyển đổi sang JSON, giá trị kết quả quá dài"
 
@@ -18377,7 +18377,7 @@ msgstr "thay đổi() - Sự khác biệt giữa giá trị cuối cùng và gi�
 msgid "check expression starting from \"%1$s\""
 msgstr "kiểm tra biểu thức bắt đầu từ \"%1$s\""
 
-#: include/classes/api/services/CItemGeneral.php:1649
+#: include/classes/api/services/CItemGeneral.php:1655
 #: include/classes/import/CConfigurationImport.php:2715
 msgid "circular item dependency is not allowed"
 msgstr "phụ thuộc item không được phép"
@@ -18511,7 +18511,7 @@ msgstr "thất bại trong việc phân tích JSON"
 msgid "first"
 msgstr "đầu tiên"
 
-#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1346
 msgid "first parameter is expected"
 msgstr "tham số đầu tiên được mong đợi"
 
@@ -18570,7 +18570,7 @@ msgstr "Máy chủ không được theo dõi"
 msgid "host pattern"
 msgstr "Mẫu máy chủ"
 
-#: include/classes/api/services/CItemGeneral.php:1632
+#: include/classes/api/services/CItemGeneral.php:1638
 msgid "hostid of dependent item and master item should match"
 msgstr "id máy chủ của item phụ thuộc và item chủ phải phù hợp"
 
@@ -18770,11 +18770,11 @@ msgstr "max"
 msgid "max() - Maximum value for period T"
 msgstr "max() - Giá trị tối đa cho giai đoạn T"
 
-#: include/classes/api/services/CItemGeneral.php:1743
+#: include/classes/api/services/CItemGeneral.php:1749
 msgid "maximum dependent items count reached"
 msgstr "số lượng phụ thuộc tối đa đạt đến"
 
-#: include/classes/api/services/CItemGeneral.php:1729
+#: include/classes/api/services/CItemGeneral.php:1735
 #: include/classes/import/CConfigurationImport.php:2669
 #: include/classes/import/CConfigurationImport.php:2730
 msgid "maximum number of dependency levels reached"
@@ -18869,8 +18869,8 @@ msgstr "nodata() - Không có dữ liệu nhận được trong khoảng thời 
 msgid "none"
 msgstr "Không có "
 
-#: include/classes/api/services/CItemGeneral.php:1926
-#: include/classes/api/services/CItemGeneral.php:1950
+#: include/classes/api/services/CItemGeneral.php:1932
+#: include/classes/api/services/CItemGeneral.php:1956
 msgid "nonempty key and value pair expected"
 msgstr "cặp khóa và giá trị dự kiến không được để trống"
 
@@ -19025,7 +19025,7 @@ msgstr "Bên phải "
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1639
+#: include/classes/api/services/CItemGeneral.php:1645
 msgid "ruleid of dependent item and master item should match"
 msgstr "quy tắc của item phụ thuộc và item chủ phải phù hợp"
 
@@ -19039,7 +19039,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr "giây"
 
-#: include/classes/api/services/CItemGeneral.php:1346
+#: include/classes/api/services/CItemGeneral.php:1352
 msgid "second parameter is expected"
 msgstr "tham số thứ hai được kì vọng"
 
@@ -19059,9 +19059,9 @@ msgstr "Mô tả ngắn"
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1375
-#: include/classes/api/services/CItemGeneral.php:1903
+#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1909
 #: include/classes/api/services/CMaintenance.php:488
 #: include/classes/api/services/CMaintenance.php:711
 #: include/classes/api/services/CProxy.php:662

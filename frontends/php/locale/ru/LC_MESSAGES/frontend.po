@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-20 19:52+0200\n"
+"POT-Creation-Date: 2020-12-04 19:51+0200\n"
 "PO-Revision-Date: 2020-08-29 23:30+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -91,7 +91,7 @@ msgstr[0] "%1$s элемент данных"
 msgstr[1] "%1$s элемента данных"
 msgstr[2] "%1$s элементов данных"
 
-#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1993
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -7981,10 +7981,10 @@ msgstr "В функцию переданы некорректные аргуме
 #: include/classes/api/services/CItemGeneral.php:1248
 #: include/classes/api/services/CItemGeneral.php:1266
 #: include/classes/api/services/CItemGeneral.php:1288
-#: include/classes/api/services/CItemGeneral.php:1314
-#: include/classes/api/services/CItemGeneral.php:1327
-#: include/classes/api/services/CItemGeneral.php:1356
-#: include/classes/api/services/CItemGeneral.php:1370
+#: include/classes/api/services/CItemGeneral.php:1320
+#: include/classes/api/services/CItemGeneral.php:1333
+#: include/classes/api/services/CItemGeneral.php:1362
+#: include/classes/api/services/CItemGeneral.php:1376
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:117
 #: include/classes/api/services/CMapElement.php:129
@@ -8552,7 +8552,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:528
-#: include/classes/api/services/CItemGeneral.php:1964
+#: include/classes/api/services/CItemGeneral.php:1970
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8700,20 +8700,20 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1277
 #: include/classes/api/services/CItemGeneral.php:1292
-#: include/classes/api/services/CItemGeneral.php:1301
-#: include/classes/api/services/CItemGeneral.php:1319
-#: include/classes/api/services/CItemGeneral.php:1332
-#: include/classes/api/services/CItemGeneral.php:1339
+#: include/classes/api/services/CItemGeneral.php:1307
+#: include/classes/api/services/CItemGeneral.php:1325
+#: include/classes/api/services/CItemGeneral.php:1338
 #: include/classes/api/services/CItemGeneral.php:1345
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1375
-#: include/classes/api/services/CItemGeneral.php:1611
-#: include/classes/api/services/CItemGeneral.php:1631
-#: include/classes/api/services/CItemGeneral.php:1638
-#: include/classes/api/services/CItemGeneral.php:1648
-#: include/classes/api/services/CItemGeneral.php:1728
-#: include/classes/api/services/CItemGeneral.php:1742
-#: include/classes/api/services/CItemGeneral.php:1903
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1617
+#: include/classes/api/services/CItemGeneral.php:1637
+#: include/classes/api/services/CItemGeneral.php:1644
+#: include/classes/api/services/CItemGeneral.php:1654
+#: include/classes/api/services/CItemGeneral.php:1734
+#: include/classes/api/services/CItemGeneral.php:1748
+#: include/classes/api/services/CItemGeneral.php:1909
 #: include/classes/api/services/CItem.php:771
 #: include/classes/api/services/CItem.php:779
 #: include/classes/api/services/CItemPrototype.php:942
@@ -9128,15 +9128,15 @@ msgstr "Ошибочное количество параметров."
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1926
-#: include/classes/api/services/CItemGeneral.php:1934
-#: include/classes/api/services/CItemGeneral.php:1943
-#: include/classes/api/services/CItemGeneral.php:1950
-#: include/classes/api/services/CItemGeneral.php:1981
-#: include/classes/api/services/CItemGeneral.php:1986
-#: include/classes/api/services/CItemGeneral.php:1996
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:1925
+#: include/classes/api/services/CItemGeneral.php:1932
+#: include/classes/api/services/CItemGeneral.php:1940
+#: include/classes/api/services/CItemGeneral.php:1949
+#: include/classes/api/services/CItemGeneral.php:1956
+#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1992
+#: include/classes/api/services/CItemGeneral.php:2002
+#: include/classes/api/services/CItemGeneral.php:2031
 #: include/classes/api/services/CUser.php:668
 #: include/classes/api/services/CUser.php:679
 #: include/classes/validators/CApiInputValidator.php:250
@@ -9364,7 +9364,7 @@ msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" не существует у шаблона \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1307
-#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1618
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "Элемент данных \"%1$s\" не существует или у вас нет прав доступа к нему"
@@ -9545,7 +9545,7 @@ msgstr "Элемент данных с ключем \"%1$s\" уже сущест
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
 
-#: include/classes/api/services/CItemGeneral.php:1495
+#: include/classes/api/services/CItemGeneral.php:1501
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
@@ -9622,8 +9622,8 @@ msgstr "JSON Path"
 msgid "JSON data"
 msgstr "JSON данные"
 
-#: include/classes/api/services/CItemGeneral.php:1996
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:2002
+#: include/classes/api/services/CItemGeneral.php:2031
 msgid "JSON is expected"
 msgstr "Ожидается JSON"
 
@@ -12181,7 +12181,7 @@ msgstr "Только администраторы могут указывать 
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Подсчитываются только элементы данных у активированных узлов сети"
 
-#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1387
 msgid "Only one change step is allowed."
 msgstr "Разрешен только один шаг изменения."
 
@@ -17957,7 +17957,7 @@ msgstr "XML данные"
 msgid "XML is empty"
 msgstr "XML пустой"
 
-#: include/classes/api/services/CItemGeneral.php:1981
+#: include/classes/api/services/CItemGeneral.php:1987
 msgid "XML is expected"
 msgstr "Ожидается XML"
 
@@ -18312,7 +18312,7 @@ msgid "a number is too large"
 msgstr "число слишком большое"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1302
+#: include/classes/api/services/CItemGeneral.php:1308
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "ожидается цифровое значение"
@@ -18381,8 +18381,8 @@ msgstr "все способы оповещения"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1943
+#: include/classes/api/services/CItemGeneral.php:1925
+#: include/classes/api/services/CItemGeneral.php:1949
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:390
 #: include/classes/validators/CApiInputValidator.php:522
@@ -18520,8 +18520,8 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1292
-#: include/classes/api/services/CItemGeneral.php:1319
-#: include/classes/api/services/CItemGeneral.php:1332
+#: include/classes/api/services/CItemGeneral.php:1325
+#: include/classes/api/services/CItemGeneral.php:1338
 #: include/classes/api/services/CMapElement.php:122
 #: include/classes/api/services/CMapElement.php:147
 #: include/classes/api/services/CMapElement.php:185
@@ -18555,7 +18555,7 @@ msgstr "нельзя изменить"
 msgid "cannot be empty"
 msgstr "не может быть пустым"
 
-#: include/classes/api/services/CItemGeneral.php:1935
+#: include/classes/api/services/CItemGeneral.php:1941
 msgid "cannot convert to JSON, result value too long"
 msgstr "не удалось сконвертировать в JSON, значение результата слишком длинное"
 
@@ -18572,7 +18572,7 @@ msgstr "change() - Разница между последним и предыд�
 msgid "check expression starting from \"%1$s\""
 msgstr "проверьте выражение начиная с \"%1$s\""
 
-#: include/classes/api/services/CItemGeneral.php:1649
+#: include/classes/api/services/CItemGeneral.php:1655
 #: include/classes/import/CConfigurationImport.php:2715
 msgid "circular item dependency is not allowed"
 msgstr "закольцованная зависимость элементов данных не разрешена"
@@ -18706,7 +18706,7 @@ msgstr "ошибка при разборе JSON"
 msgid "first"
 msgstr "первый"
 
-#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1346
 msgid "first parameter is expected"
 msgstr "ожидается первый параметр"
 
@@ -18765,7 +18765,7 @@ msgstr "узел сети без наблюдения"
 msgid "host pattern"
 msgstr "шаблон узла сети"
 
-#: include/classes/api/services/CItemGeneral.php:1632
+#: include/classes/api/services/CItemGeneral.php:1638
 msgid "hostid of dependent item and master item should match"
 msgstr "hostid зависимого элемента данных и мастер элемента данных должны совпадать"
 
@@ -18965,11 +18965,11 @@ msgstr "макс"
 msgid "max() - Maximum value for period T"
 msgstr "max() - Максимальное значение за период Т"
 
-#: include/classes/api/services/CItemGeneral.php:1743
+#: include/classes/api/services/CItemGeneral.php:1749
 msgid "maximum dependent items count reached"
 msgstr "достигнуто максимальное количество зависимых элементов данных"
 
-#: include/classes/api/services/CItemGeneral.php:1729
+#: include/classes/api/services/CItemGeneral.php:1735
 #: include/classes/import/CConfigurationImport.php:2669
 #: include/classes/import/CConfigurationImport.php:2730
 msgid "maximum number of dependency levels reached"
@@ -19064,8 +19064,8 @@ msgstr "nodata() - Отсутствие полученных данных за �
 msgid "none"
 msgstr "нет"
 
-#: include/classes/api/services/CItemGeneral.php:1926
-#: include/classes/api/services/CItemGeneral.php:1950
+#: include/classes/api/services/CItemGeneral.php:1932
+#: include/classes/api/services/CItemGeneral.php:1956
 msgid "nonempty key and value pair expected"
 msgstr "ожидался не пустая пара ключа и значения"
 
@@ -19220,7 +19220,7 @@ msgstr "справа"
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1639
+#: include/classes/api/services/CItemGeneral.php:1645
 msgid "ruleid of dependent item and master item should match"
 msgstr "ruleid зависимого элемента данных и основного элемента данных должны совпадать"
 
@@ -19234,7 +19234,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr "второй"
 
-#: include/classes/api/services/CItemGeneral.php:1346
+#: include/classes/api/services/CItemGeneral.php:1352
 msgid "second parameter is expected"
 msgstr "ожидается второй параметр"
 
@@ -19254,9 +19254,9 @@ msgstr "краткое описание"
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1375
-#: include/classes/api/services/CItemGeneral.php:1903
+#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1909
 #: include/classes/api/services/CMaintenance.php:488
 #: include/classes/api/services/CMaintenance.php:711
 #: include/classes/api/services/CProxy.php:662
