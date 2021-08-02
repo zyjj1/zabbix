@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -800,7 +800,7 @@ class testHostPrototype extends CAPITest {
 
 	/**
 	 * @dataProvider hostprototype_update_interfaces_data
-	 * @on-after after_update_interfaces
+	 * @onAfter after_update_interfaces
 	 */
 	public function testHostPrototype_Update_Interfaces($create_interfaces, $update_interfaces, $expected_error) {
 		$host_prototype = $this->call('hostprototype.create', [

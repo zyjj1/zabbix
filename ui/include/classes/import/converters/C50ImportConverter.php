@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,7 +173,7 @@ class C50ImportConverter extends CConverter {
 	 */
 	protected static function convertPreprocessingSteps(array $preprocessing_steps): array {
 		foreach ($preprocessing_steps as &$preprocessing_step) {
-			$preprocessing_step['parameters'] = ($preprocessing_step['type'] == ZBX_PREPROC_SCRIPT)
+			$preprocessing_step['parameters'] = ($preprocessing_step['type'] === CXmlConstantName::JAVASCRIPT)
 				? [$preprocessing_step['params']]
 				: explode("\n", $preprocessing_step['params']);
 			unset($preprocessing_step['params']);

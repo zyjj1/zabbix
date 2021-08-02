@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@
 
 		$('#update').click(function() {
 			if (removed) {
-				return confirm(<?= json_encode(_('Are you sure you want to delete')) ?> + ' ' + removed + ' '
+				return confirm(<?= json_encode(_('Are you sure you want to delete?')) ?> + ' ' + removed + ' '
 					+ <?= json_encode(_('macro(s)')) ?> + '?'
 				);
 			}

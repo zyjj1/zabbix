@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,10 +38,27 @@
 		]))
 	?>
 </script>
+
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate(); ?>
+</script>
+
 <script type="text/javascript">
 	(function($) {
 		$(function() {
 			$('#inventory-filter').dynamicRows({ template: '#inventory-filter-row' });
+
+			$('#filter-tags')
+				.dynamicRows({ template: '#filter-tag-row-tmpl' })
+				.on('afteradd.dynamicRows', function() {
+					var rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+			});
+
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
+			});
 		});
 	})(jQuery);
 </script>

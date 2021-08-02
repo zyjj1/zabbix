@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@ class CControllerQueueOverview extends CController {
 				ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMP,
 				ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_AGGREGATE,
 				ITEM_TYPE_EXTERNAL,
 				ITEM_TYPE_DB_MONITOR,
 				ITEM_TYPE_HTTPAGENT,

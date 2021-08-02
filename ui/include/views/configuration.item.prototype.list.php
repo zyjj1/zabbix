@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,9 +62,9 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
-		_('Applications'),
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
@@ -129,19 +129,6 @@ foreach ($data['items'] as $item) {
 		->addClass(itemIndicatorStyle($item['status']))
 		->addSID();
 
-	if (!empty($item['applications'])) {
-		order_result($item['applications'], 'name');
-
-		$applications = zbx_objectValues($item['applications'], 'name');
-		$applications = implode(', ', $applications);
-		if (empty($applications)) {
-			$applications = '';
-		}
-	}
-	else {
-		$applications = '';
-	}
-
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
 	}
@@ -158,9 +145,9 @@ foreach ($data['items'] as $item) {
 
 	$item_menu = CMenuPopupHelper::getItemPrototype(['itemid' => $item['itemid'], 'context' => $data['context']]);
 
-	$wizard = (new CSpan(
-		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)
-	))->addClass(ZBX_STYLE_REL_CONTAINER);
+	$wizard = (new CButton(null))
+		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+		->setMenuPopup($item_menu);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
@@ -187,9 +174,9 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		$applications,
 		$status,
-		$discover
+		$discover,
+		$data['tags'][$item['itemid']]
 	]);
 }
 

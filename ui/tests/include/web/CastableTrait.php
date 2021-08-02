@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,6 +98,17 @@ trait CastableTrait {
 	 */
 	public function asForm($options = []) {
 		return $this->cast(CFormElement::class, $options);
+	}
+
+	/**
+	 * Cast object to Fluid form element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFluidFormElement
+	 */
+	public function asFluidForm($options = []) {
+		return $this->cast(CFluidFormElement::class, $options);
 	}
 
 	/**

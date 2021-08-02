@@ -22,8 +22,10 @@ SUBDIRS = \
 	scripts \
 	preprocessor \
 	availability \
-	lld
-
+	lld \
+	reporter \
+	service 
+	
 sbin_PROGRAMS = zabbix_server
 
 noinst_LIBRARIES = libzbxserver.a
@@ -54,6 +56,8 @@ zabbix_server_LDADD = \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
+	trapper/libzbxtrapper_server.a \
+	reporter/libzbxreporter.a \
 	snmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
@@ -65,6 +69,7 @@ zabbix_server_LDADD = \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
 	availability/libavailability.a \
+	service/libservice.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
@@ -74,17 +79,20 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_builddir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
+	$(top_builddir)/src/libs/zbxself/libzbxself_server.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxmedia/libzbxmedia.a \
+	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
@@ -104,7 +112,8 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver_server.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a
+	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_builddir)/src/libs/zbxservice/libzbxservice.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a

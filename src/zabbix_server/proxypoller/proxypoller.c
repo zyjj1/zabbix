@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 				}
 				else
 				{
-					ret = zbx_send_proxy_data_response(proxy, &s, NULL);
+					ret = zbx_send_proxy_data_response(proxy, &s, NULL, ZBX_PROXY_UPLOAD_UNDEFINED);
 
 					if (SUCCEED == ret)
 						*data = zbx_strdup(*data, s.buffer);
@@ -254,6 +254,8 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 	{
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
@@ -491,7 +493,7 @@ static int	process_proxy(void)
 			proxy.addr = proxy.addr_orig;
 
 			port = zbx_strdup(port, proxy.port_orig);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 					&port, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(port, &proxy.port))
 			{
@@ -510,10 +512,14 @@ static int	process_proxy(void)
 
 			if (proxy.proxy_data_nextcheck <= now)
 			{
+
 				int	more;
 
 				do
 				{
+					if (FAIL == zbx_hc_check_proxy(proxy.hostid))
+						goto error;
+
 					if (SUCCEED != (ret = proxy_get_data(&proxy, &more)))
 						goto error;
 				}

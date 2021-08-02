@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,10 +69,23 @@ class CWidgetHelper {
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
-			->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
-				->setOnDocumentReady()
-			);
+			->addItem(
+				(new CScriptTag('
+					$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());
 
+					document
+						.getElementById("widget-dialogue-form")
+						.addEventListener("change", (e) => {
+							const is_trimmable = e.target.matches(
+								\'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])\'
+							);
+
+							if (is_trimmable) {
+								e.target.value = e.target.value.trim();
+							}
+						}, {capture: true});
+				'))->setOnDocumentReady()
+			);
 
 		if ($field_rf_rate !== null) {
 			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
@@ -471,21 +484,35 @@ class CWidgetHelper {
 		$i = 0;
 
 		foreach ($tags as $tag) {
+			$zselect_operator = (new CSelect($field->getName().'['.$i.'][operator]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue($tag['operator'])
+				->setFocusableElementId($field->getName().'-'.$i.'-operator-select')
+				->setId($field->getName().'_'.$i.'_operator');
+
+			if (!$enabled) {
+				$zselect_operator->setDisabled();
+			}
+
 			$tags_table->addRow([
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
 					->setEnabled($enabled),
-				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
-					->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-					->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-					->setModern(true)
-					->setEnabled($enabled),
+				$zselect_operator,
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
+					->setId($field->getName().'_'.$i.'_value')
 					->setEnabled($enabled),
 				(new CCol(
 					(new CButton($field->getName().'['.$i.'][remove]', _('Remove')))
@@ -523,14 +550,23 @@ class CWidgetHelper {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field)),
-			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
+			(new CSelect($field->getName().'[#{rowNum}][operator]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue(TAG_OPERATOR_LIKE)
+				->setFocusableElementId($field->getName().'-#{rowNum}-operator-select')
+				->setId($field->getName().'_#{rowNum}_operator'),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field)),
+				->setAriaRequired(self::isAriaRequired($field))
+				->setId($field->getName().'_#{rowNum}_value'),
 			(new CCol(
 				(new CButton($field->getName().'[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -550,31 +586,6 @@ class CWidgetHelper {
 		return (new CDateSelector($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
-	}
-
-	/**
-	 * @param CWidgetFieldApplication $field
-	 *
-	 * @return array
-	 */
-	public static function getApplicationSelector($field) {
-		$popup_options = json_encode($field->getFilterParameters());
-
-		if ($field->filter_preselect_host_field) {
-			$popup_options = 'jQuery.extend('.
-				$popup_options.', getFirstMultiselectValue("'.$field->filter_preselect_host_field.'"))';
-		}
-
-		return [
-			(new CTextBox($field->getName(), $field->getValue()))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field))
-				->addClass('simple-textbox'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton($field->getName().'_select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", '.$popup_options.', null, this);')
-		];
 	}
 
 	/**
@@ -662,7 +673,7 @@ class CWidgetHelper {
 				(new CDiv(
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->addClass(ZBX_STYLE_BTN_REMOVE)
 						->removeId()
 				))
 					->addClass(ZBX_STYLE_COLUMN_5)
@@ -770,7 +781,7 @@ class CWidgetHelper {
 				[
 					'name' => _('ADD OVERRIDE'),
 					'options' => [
-						['name' => _('Base colour'), 'callback' => 'addOverride', 'args' => ['color', '']],
+						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '']],
 
 						['name' => _('Width').'/0', 'callback' => 'addOverride', 'args' => ['width', 0]],
 						['name' => _('Width').'/1', 'callback' => 'addOverride', 'args' => ['width', 1]],
@@ -873,7 +884,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#overrides-row",'.
 					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
@@ -1014,7 +1025,7 @@ class CWidgetHelper {
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->addClass(ZBX_STYLE_BTN_REMOVE)
 						->removeId()
 				]))->addClass(ZBX_STYLE_COLUMN_5)
 			]))
@@ -1027,7 +1038,7 @@ class CWidgetHelper {
 					// Left column fields.
 					(new CDiv(
 						(new CFormList())
-							->addRow(_('Base colour'),
+							->addRow(_('Base color'),
 								(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
 									->appendColorPickerJs(false)
 							)
@@ -1258,7 +1269,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#dataset-row",'.
 					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.

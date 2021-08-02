@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,6 +76,10 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const WORK_PERIOD = 'work_period';
 	public const X_FRAME_OPTIONS = 'x_frame_options';
 	public const SESSION_KEY = 'session_key';
+	public const URL = 'url';
+	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
+	public const DBVERSION_STATUS = 'dbversion_status';
+	public const AUDITLOG_ENABLED = 'auditlog_enabled';
 
 	/**
 	 * Settings API object parameters array.
@@ -96,7 +100,8 @@ class CSettingsHelper extends CConfigGeneralHelper {
 				: API::Settings()->get(['output' => 'extend']);
 		}
 		else if (!$is_global && $param && !array_key_exists($param, self::$params)) {
-			self::$params = API::Settings()->get(['output' => 'extend']) + self::$params;
+			$settings = API::Settings()->get(['output' => 'extend']);
+			self::$params = is_array($settings) ? ($settings + self::$params) : false;
 		}
 
 		if (self::$params === false) {

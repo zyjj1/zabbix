@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ function getGraphByGraphId($graphId) {
 		return $dbGraph;
 	}
 
-	error(_s('No graph item with graphid "%1$s".', $graphId));
+	error(_s('No graph item with graph ID "%1$s".', $graphId));
 
 	return false;
 }

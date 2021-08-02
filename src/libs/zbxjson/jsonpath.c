@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,9 @@
 #include "json.h"
 #include "json_parser.h"
 #include "jsonpath.h"
+#include "zbxvariant.h"
 
 #include "../zbxalgo/vectorimpl.h"
-
-ZBX_VECTOR_DECL(var, zbx_variant_t)
-ZBX_VECTOR_IMPL(var, zbx_variant_t)
 
 typedef struct
 {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,8 @@ else {
 	$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
 
 	$widget->addItem(
-		(new CFilter((new CUrl('graphs.php'))->setArgument('context', $data['context'])))
+		(new CFilter())
+			->setResetUrl((new CUrl('graphs.php'))->setArgument('context', $data['context']))
 			->setProfile($data['profileIdx'])
 			->setActiveTab($data['active_tab'])
 			->addvar('context', $data['context'])

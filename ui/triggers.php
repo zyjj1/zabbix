@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.tab-indicators.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.tab-indicators.js', 'class.tagfilteritem.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -184,15 +184,13 @@ if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 }
 
 $tags = getRequest('tags', []);
+
+// Unset empty and inherited tags.
 foreach ($tags as $key => $tag) {
-	// remove empty new tag lines
 	if ($tag['tag'] === '' && $tag['value'] === '') {
 		unset($tags[$key]);
-		continue;
 	}
-
-	// remove inherited tags
-	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 		unset($tags[$key]);
 	}
 	else {

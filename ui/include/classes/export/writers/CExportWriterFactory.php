@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ class CExportWriterFactory {
 	const YAML = 'yaml';
 	const XML = 'xml';
 	const JSON = 'json';
+	const RAW = 'raw';
 
 	/**
 	 * Get the writer object for specified type.
@@ -45,6 +46,9 @@ class CExportWriterFactory {
 
 			case self::JSON:
 				return new CJsonExportWriter();
+
+			case self::RAW:
+				return new CRawExportWriter();
 
 			default:
 				throw new Exception('Incorrect export writer type.');

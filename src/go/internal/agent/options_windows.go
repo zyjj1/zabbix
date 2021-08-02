@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package agent
 
 type AgentOptions struct {
 	LogType                string   `conf:"optional,default=file"`
-	LogFile                string   `conf:"optional,default=/tmp/zabbix_agent2.log"`
+	LogFile                string   `conf:"optional,default=c:\\zabbix_agent2.log"`
 	LogFileSize            int      `conf:"optional,range=0:1024,default=1"`
 	DebugLevel             int      `conf:"optional,range=0:5,default=3"`
 	PidFile                string   `conf:"optional"`

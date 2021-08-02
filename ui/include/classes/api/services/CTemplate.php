@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,11 +90,11 @@ class CTemplate extends CHostGeneral {
 			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
 			'selectTags'				=> null,
+			'selectValueMaps'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -104,6 +104,7 @@ class CTemplate extends CHostGeneral {
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -273,9 +274,10 @@ class CTemplate extends CHostGeneral {
 					$result = $template['rowscount'];
 				}
 			}
-			else{
+			else {
 				$template['templateid'] = $template['hostid'];
-				unset($template['hostid']);
+				// Templates share table with hosts and host prototypes. Therefore remove template unrelated fields.
+				unset($template['hostid'], $template['discover']);
 
 				$result[$template['templateid']] = $template;
 			}
@@ -299,6 +301,24 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid']
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * Add template.
 	 *
 	 * @param array $templates
@@ -306,65 +326,90 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function create(array $templates) {
-		$templates = zbx_toArray($templates);
-
 		$this->validateCreate($templates);
 
-		$templateIds = [];
+		$ins_templates = [];
 
-		foreach ($templates as $key => $template) {
-			$templates[$key]['groups'] = zbx_toArray($template['groups']);
-		}
-
-		foreach ($templates as $template) {
-			// if visible name is not given or empty it should be set to host name
-			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+		foreach ($templates as &$template) {
+			// If visible name is not given or empty it should be set to host name.
+			if (!array_key_exists('name', $template) || trim($template['name']) === '') {
 				$template['name'] = $template['host'];
 			}
 
-			$newTemplateIds = DB::insert('hosts', [[
-				'host' => $template['host'],
-				'name' => $template['name'],
-				'description' => isset($template['description']) ? $template['description'] : null,
-				'status' => HOST_STATUS_TEMPLATE
-			]]);
+			$ins_templates[] = array_intersect_key($template, array_flip(['uuid', 'host', 'name', 'description']))
+				+ ['status' => HOST_STATUS_TEMPLATE];
+		}
+		unset($template);
 
-			$templateId = reset($newTemplateIds);
+		$hosts_groups = [];
+		$hosts_tags = [];
+		$templates_hostids = [];
+		$hostids = [];
 
-			$templateIds[] = $templateId;
+		$templateids = DB::insert('hosts', $ins_templates);
 
-			foreach ($template['groups'] as $group) {
-				$hostGroupId = get_dbid('hosts_groups', 'hostgroupid');
+		foreach ($templates as $index => &$template) {
+			$template['templateid'] = $templateids[$index];
 
-				$result = DBexecute(
-					'INSERT INTO hosts_groups (hostgroupid,hostid,groupid)'.
-					' VALUES ('.zbx_dbstr($hostGroupId).','.zbx_dbstr($templateId).','.zbx_dbstr($group['groupid']).')'
-				);
+			foreach (zbx_toArray($template['groups']) as $group) {
+				$hosts_groups[] = [
+					'hostid' => $template['templateid'],
+					'groupid' => $group['groupid']
+				];
+			}
 
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group.'));
+			if (array_key_exists('tags', $template)) {
+				foreach (zbx_toArray($template['tags']) as $tag) {
+					$hosts_tags[] = ['hostid' => $template['templateid']] + $tag;
 				}
 			}
 
-			if (array_key_exists('tags', $template) && $template['tags']) {
-				$this->createTags([$templateId => zbx_toArray($template['tags'])]);
+			if (array_key_exists('templates', $template)) {
+				foreach (zbx_toArray($template['templates']) as $link_template) {
+					$templates_hostids[$link_template['templateid']][] = $template['templateid'];
+				}
 			}
 
-			$template['templateid'] = $templateId;
-
-			$result = $this->massAdd([
-				'templates' => $template,
-				'templates_link' => isset($template['templates']) ? $template['templates'] : null,
-				'macros' => isset($template['macros']) ? $template['macros'] : null,
-				'hosts' => isset($template['hosts']) ? $template['hosts'] : null
-			]);
-
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
+			if (array_key_exists('hosts', $template)) {
+				foreach (zbx_toArray($template['hosts']) as $host) {
+					$templates_hostids[$template['templateid']][] = $host['hostid'];
+					$hostids[$host['hostid']] = true;
+				}
 			}
 		}
+		unset($template);
 
-		return ['templateids' => $templateIds];
+		DB::insertBatch('hosts_groups', $hosts_groups);
+
+		if ($hosts_tags) {
+			DB::insert('host_tag', $hosts_tags);
+		}
+
+		$this->createHostMacros($templates);
+
+		if ($hostids) {
+			$this->checkHostPermissions(array_keys($hostids));
+		}
+
+		while ($templates_hostids) {
+			$templateid = key($templates_hostids);
+			$link_hostids = reset($templates_hostids);
+			$link_templateids = [$templateid];
+			unset($templates_hostids[$templateid]);
+
+			foreach ($templates_hostids as $templateid => $hostids) {
+				if ($link_hostids === $hostids) {
+					$link_templateids[] = $templateid;
+					unset($templates_hostids[$templateid]);
+				}
+			}
+
+			$this->link($link_templateids, $link_hostids);
+		}
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templates);
+
+		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
 	/**
@@ -374,10 +419,22 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $templates) {
+	protected function validateCreate(array &$templates) {
+		$templates = zbx_toArray($templates);
+
+		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+			]],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
 		$groupIds = [];
 
-		foreach ($templates as &$template) {
+		foreach ($templates as $index => &$template) {
 			// check if hosts have at least 1 group
 			if (!isset($template['groups']) || !$template['groups']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -397,6 +454,13 @@ class CTemplate extends CHostGeneral {
 				}
 
 				$groupIds[$group['groupid']] = $group['groupid'];
+			}
+
+			if (array_key_exists('macros', $template)) {
+				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.($index + 1).'/macros',
+						$error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
 			}
 		}
 		unset($template);
@@ -494,6 +558,36 @@ class CTemplate extends CHostGeneral {
 				$this->validateTags($template);
 			}
 		}
+
+		$this->checkAndAddUuid($templates);
+	}
+
+	/**
+	 * Check that no duplicate UUID is being added. Add UUID to all templates, if it doesn't exist.
+	 *
+	 * @param array $templates_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$templates_to_create): void {
+		foreach ($templates_to_create as &$template) {
+			if (!array_key_exists('uuid', $template)) {
+				$template['uuid'] = generateUuidV4();
+			}
+		}
+		unset($template);
+
+		$db_uuid = DB::select('hosts', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($templates_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -504,30 +598,22 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function update(array $templates) {
-		$templates = zbx_toArray($templates);
+		$this->validateUpdate($templates, $db_templates);
 
-		$this->validateUpdate($templates);
+		$this->updateHostMacros($templates, $db_templates);
 
-		$macros = [];
 		foreach ($templates as &$template) {
-			if (isset($template['macros'])) {
-				$macros[$template['templateid']] = zbx_toArray($template['macros']);
+			unset($template['macros']);
 
-				unset($template['macros']);
+			// if visible name is not given or empty it should be set to host name
+			if (array_key_exists('host', $template) && (!array_key_exists('name', $template)
+						|| trim($template['name']) === '')) {
+				$template['name'] = $template['host'];
 			}
 		}
 		unset($template);
 
-		if ($macros) {
-			API::UserMacro()->replaceMacros($macros);
-		}
-
 		foreach ($templates as $template) {
-			// if visible name is not given or empty it should be set to host name
-			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
-				$template['name'] = $template['host'];
-			}
-
 			$templateCopy = $template;
 
 			$template['templates_link'] = array_key_exists('templates', $template) ? $template['templates'] : null;
@@ -542,7 +628,9 @@ class CTemplate extends CHostGeneral {
 
 		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
-		return ['templateids' => zbx_objectValues($templates, 'templateid')];
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templates, $db_templates);
+
+		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
 	/**
@@ -552,17 +640,33 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $templates) {
-		$dbTemplates = $this->get([
-			'output' => ['templateid'],
-			'templateids' => zbx_objectValues($templates, 'templateid'),
+	protected function validateUpdate(array &$templates, array &$db_templates = null) {
+		$templates = zbx_toArray($templates);
+
+		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
+			'hostmacroid' =>	['type' => API_ID],
+			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
+		$db_templates = $this->get([
+			'output' => ['templateid', 'host', 'name', 'description'],
+			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($templates as $template) {
-			if (!isset($dbTemplates[$template['templateid']])) {
+		foreach ($templates as $index => &$template) {
+			if (!array_key_exists($template['templateid'], $db_templates)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+
+			if (array_key_exists('uuid', $template)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
 			}
 
 			// Property 'auto_compress' is not supported for templates.
@@ -574,6 +678,19 @@ class CTemplate extends CHostGeneral {
 			if (array_key_exists('tags', $template)) {
 				$this->validateTags($template);
 			}
+
+			if (array_key_exists('macros', $template)) {
+				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.($index + 1).'/macros',
+						$error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
+		unset($template);
+
+		if (array_column($templates, 'macros')) {
+			$db_templates = $this->getHostMacros($db_templates);
+			$templates = $this->validateHostMacros($templates, $db_templates);
 		}
 	}
 
@@ -590,17 +707,15 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$options = [
+		$db_templates = $this->get([
+			'output' => ['templateid', 'name'],
 			'templateids' => $templateids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		];
-		$delTemplates = $this->get($options);
-		foreach ($templateids as $templateid) {
-			if (!isset($delTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		]);
+
+		if (array_diff_key(array_flip($templateids), $db_templates)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		API::Template()->unlink($templateids, null, true);
@@ -707,17 +822,6 @@ class CTemplate extends CHostGeneral {
 			API::HttpTest()->delete(array_keys($delHttpTests), true);
 		}
 
-		// Applications
-		$delApplications = API::Application()->get([
-			'templateids' => $templateids,
-			'output' => ['applicationid'],
-			'nopermissions' => 1,
-			'preservekeys' => true
-		]);
-		if (!empty($delApplications)) {
-			API::Application()->delete(array_keys($delApplications), true);
-		}
-
 		// Get host prototype operations from LLD overrides where this template is linked.
 		$lld_override_operationids = [];
 
@@ -780,49 +884,13 @@ class CTemplate extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $templateids]);
 
 		// TODO: remove info from API
-		foreach ($delTemplates as $template) {
-			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
+		foreach ($db_templates as $db_template) {
+			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
-	}
-
-	/**
-	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
-	 *
-	 * @param array $hostids    an array of host or template IDs
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given hosts.
-	 *
-	 * @return void
-	 */
-	protected function checkHostPermissions(array $hostids) {
-		if ($hostids) {
-			$hostids = array_unique($hostids);
-
-			$count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count == count($hostids)) {
-				return;
-			}
-
-			$count += $this->get([
-				'countOutput' => true,
-				'templateids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
 	}
 
 	/**
@@ -1229,15 +1297,21 @@ class CTemplate extends CHostGeneral {
 		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($templates, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $templates, 'templates', $options['limitSelects']);
 			}
 			else {
@@ -1258,15 +1332,21 @@ class CTemplate extends CHostGeneral {
 		// Adding Hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Host()->get([
+						'output' => $options['selectHosts'],
+						'hostids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {

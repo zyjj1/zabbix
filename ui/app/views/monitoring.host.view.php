@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
+$this->addJsFile('class.tagfilteritem.js');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();

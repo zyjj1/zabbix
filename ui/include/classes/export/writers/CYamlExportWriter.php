@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,11 +31,11 @@ class CYamlExportWriter extends CExportWriter {
 	 * Known issues:
 	 *   - Symfony dumpers second parameter makes the YAML output either too vertical or too horizontal.
 	 *
-	 * @param array $array
+	 * @param mixed $input  Input data. Array or string.
 	 *
 	 * @return string
 	 */
-	public function write(array $array): string {
-		return Yaml::dump($array, 100, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+	public function write($input): string {
+		return Yaml::dump($input, 100, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 	}
 }

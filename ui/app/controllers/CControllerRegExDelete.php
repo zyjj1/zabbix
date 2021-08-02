@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,6 @@
 
 
 class CControllerRegExDelete extends CController {
-
-	protected function init() {
-		$this->disableSIDValidation();
-	}
 
 	protected function checkInput() {
 		$fields = [
@@ -62,13 +58,13 @@ class CControllerRegExDelete extends CController {
 		$regexpids = zbx_objectValues($this->db_regexes, 'regexpid');
 		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regexpids));
 
-		if ($result) {
-			foreach ($this->db_regexes as $regex) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
-					'Id ['.$regex['regexpid'].'] '._('Name').' ['.$regex['name'].']'
-				);
-			}
-		}
+		// if ($result) {
+		// 	foreach ($this->db_regexes as $regex) {
+		// 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
+		// 			'Id ['.$regex['regexpid'].'] '._('Name').' ['.$regex['name'].']'
+		// 		);
+		// 	}
+		// }
 
 		$result = DBend($result);
 

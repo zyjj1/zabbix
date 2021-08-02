@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,16 +38,16 @@ const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
 
 const char	*usage_message[] = {
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-N]", "[-r]", "-i input-file",
-	NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "-k key", "-o value",
-	NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-N]", "[-r]",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "-k key", "-o value", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]", "[-N]", "[-r]",
 	"-i input-file", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "-k key",
+	"-o value", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]",
+	"[-N]", "[-r]", "-i input-file", NULL,
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect cert", "--tls-ca-file CA-file",
-	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -56,8 +56,8 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert", "--tls-ca-file CA-file",
-	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13] cipher-string",
@@ -66,9 +66,10 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
-	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
-	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect cert", "--tls-ca-file CA-file", "[--tls-crl-file CRL-file]",
+	"[--tls-server-cert-issuer cert-issuer]", "[--tls-server-cert-subject cert-subject]",
+	"--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -76,9 +77,10 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
-	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect cert", "--tls-ca-file CA-file", "[--tls-crl-file CRL-file]",
+	"[--tls-server-cert-issuer cert-issuer]", "[--tls-server-cert-subject cert-subject]",
+	"--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -86,7 +88,7 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect psk",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -95,7 +97,7 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -104,8 +106,8 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect psk", "--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -113,8 +115,8 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect psk", "--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -129,6 +131,13 @@ const char	*usage_message[] = {
 };
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
+
+static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
+
+#define CONFIG_SENDER_TIMEOUT_MIN	1
+#define CONFIG_SENDER_TIMEOUT_MAX	300
+#define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
+#define CONFIG_SENDER_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MAX)
 
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
@@ -150,6 +159,10 @@ const char	*help_message[] = {
 	"  -I --source-address IP-address   Specify source IP address. When used",
 	"                             together with --config, overrides \"SourceIP\"",
 	"                             parameter specified in agentd configuration file",
+	"",
+	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_SENDER_TIMEOUT_MIN_STR "-"
+			CONFIG_SENDER_TIMEOUT_MAX_STR " seconds",
+	"                             (default: " ZBX_STR(GET_SENDER_TIMEOUT) " seconds)",
 	"",
 	"  -s --host host             Specify host name the item belongs to (as",
 	"                             registered in Zabbix frontend). Host IP address",
@@ -280,6 +293,8 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* parameter '--tls-cipher' from sender com
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+
 /* COMMAND LINE OPTIONS */
 
 /* long options */
@@ -290,6 +305,7 @@ static struct zbx_option	longopts[] =
 	{"port",			1,	NULL,	'p'},
 	{"host",			1,	NULL,	's'},
 	{"source-address",		1,	NULL,	'I'},
+	{"timeout",			1,	NULL,	't'},
 	{"key",				1,	NULL,	'k'},
 	{"value",			1,	NULL,	'o'},
 	{"input-file",			1,	NULL,	'i'},
@@ -314,7 +330,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:I:z:p:s:k:o:TNi:rvhV";
+static char	shortopts[] = "c:I:t:z:p:s:k:o:TNi:rvhV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -343,10 +359,11 @@ zbx_send_destinations_t;
 static zbx_send_destinations_t	*destinations = NULL;		/* list of servers to send data to */
 static int			destinations_count = 0;
 
-#if !defined(_WINDOWS)
-static void	send_signal_handler(int sig)
-{
+volatile sig_atomic_t	sig_exiting = 0;
 
+#if !defined(_WINDOWS)
+static void	sender_signal_handler(int sig)
+{
 #define CASE_LOG_WARNING(signal) \
 	case signal:							\
 		zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
@@ -368,6 +385,24 @@ static void	send_signal_handler(int sig)
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
 	_exit(FAIL);
+}
+
+static void	main_signal_handler(int sig)
+{
+	if (0 == sig_exiting)
+	{
+		int	i;
+
+		sig_exiting = 1;
+
+		for (i = 0; i < destinations_count; i++)
+		{
+			pid_t	child = *(destinations[i].thread);
+
+			if (ZBX_THREAD_HANDLE_NULL != child)
+				kill(child, sig);
+		}
+	}
 }
 #endif
 
@@ -601,21 +636,21 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	char			*tls_arg1, *tls_arg2;
 	zbx_socket_t		sock;
 
+#if !defined(_WINDOWS)
+	signal(SIGINT, sender_signal_handler);
+	signal(SIGQUIT, sender_signal_handler);
+	signal(SIGTERM, sender_signal_handler);
+	signal(SIGHUP, sender_signal_handler);
+	signal(SIGALRM, sender_signal_handler);
+	signal(SIGPIPE, sender_signal_handler);
+#endif
+
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* take TLS data passed from 'main' thread */
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
-#endif
-
-#if !defined(_WINDOWS)
-	signal(SIGINT, send_signal_handler);
-	signal(SIGQUIT, send_signal_handler);
-	signal(SIGTERM, send_signal_handler);
-	signal(SIGHUP, send_signal_handler);
-	signal(SIGALRM, send_signal_handler);
-	signal(SIGPIPE, send_signal_handler);
 #endif
 	switch (configured_tls_connect_mode)
 	{
@@ -639,7 +674,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
-			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			CONFIG_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
@@ -837,6 +872,8 @@ static void	zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 
@@ -950,6 +987,16 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 			case 'r':
 				REAL_TIME = 1;
+				break;
+			case 't':
+				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_SENDER_TIMEOUT,
+						sizeof(CONFIG_SENDER_TIMEOUT), CONFIG_SENDER_TIMEOUT_MIN,
+						CONFIG_SENDER_TIMEOUT_MAX))
+				{
+					zbx_error("Invalid timeout, valid range %d:%d seconds",
+							CONFIG_SENDER_TIMEOUT_MIN, CONFIG_SENDER_TIMEOUT_MAX);
+					exit(EXIT_FAILURE);
+				}
 				break;
 			case 'v':
 				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)
@@ -1374,7 +1421,6 @@ int	main(int argc, char **argv)
 
 	if (NULL != CONFIG_FILE)
 		zbx_load_config(CONFIG_FILE);
-
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
@@ -1409,7 +1455,14 @@ int	main(int argc, char **argv)
 		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
 	}
-
+#if !defined(_WINDOWS)
+	signal(SIGINT, main_signal_handler);
+	signal(SIGQUIT, main_signal_handler);
+	signal(SIGTERM, main_signal_handler);
+	signal(SIGHUP, main_signal_handler);
+	signal(SIGALRM, main_signal_handler);
+	signal(SIGPIPE, main_signal_handler);
+#endif
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
@@ -1477,7 +1530,7 @@ int	main(int argc, char **argv)
 
 		ret = SUCCEED;
 
-		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
+		while (0 == sig_exiting && (SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
 				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
 			char		hostname[MAX_STRING_LEN], clock[32];
@@ -1731,6 +1784,7 @@ exit:
 #if !defined(_WINDOWS) && defined(HAVE_PTHREAD_PROCESS_SHARED)
 	zbx_locks_disable();
 #endif
+
 	if (FAIL == ret)
 		ret = EXIT_FAILURE;
 

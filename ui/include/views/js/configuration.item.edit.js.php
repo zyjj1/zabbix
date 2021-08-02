@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,6 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 					&& type != <?= ITEM_TYPE_ZABBIX_ACTIVE ?>
 					&& type != <?= ITEM_TYPE_SIMPLE ?>
 					&& type != <?= ITEM_TYPE_INTERNAL ?>
-					&& type != <?= ITEM_TYPE_AGGREGATE ?>
 					&& type != <?= ITEM_TYPE_DB_MONITOR ?>
 					&& type != <?= ITEM_TYPE_SNMPTRAP ?>
 					&& type != <?= ITEM_TYPE_JMX ?>
@@ -105,7 +104,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 				var type = $(this).val();
 				old_value = value_type.val();
 
-				if (type == <?= ITEM_TYPE_AGGREGATE ?> || type == <?= ITEM_TYPE_CALCULATED ?>) {
+				if (type == <?= ITEM_TYPE_CALCULATED ?>) {
 					if (!(old_value == <?= ITEM_VALUE_TYPE_UINT64 ?> || old_value == <?= ITEM_VALUE_TYPE_FLOAT ?>)) {
 						value_type.val(<?= ITEM_VALUE_TYPE_UINT64 ?>);
 					}

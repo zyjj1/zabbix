@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 		-1 => 'All',
 		AUDIT_ACTION_ADD => 'Add',
 		AUDIT_ACTION_DELETE => 'Delete',
-		AUDIT_ACTION_DISABLE => 'Disable',
-		AUDIT_ACTION_ENABLE => 'Enable',
 		AUDIT_ACTION_EXECUTE => 'Execute',
 		AUDIT_ACTION_LOGIN => 'Login',
 		AUDIT_ACTION_LOGOUT => 'Logout',
@@ -40,14 +38,11 @@ class testPageReportsAudit extends CLegacyWebTest {
 	private $resourcetypes = [
 		-1 => 'All',
 		AUDIT_RESOURCE_ACTION => 'Action',
-		AUDIT_RESOURCE_APPLICATION => 'Application',
 		AUDIT_RESOURCE_AUTOREGISTRATION => 'Autoregistration',
-		AUDIT_RESOURCE_ZABBIX_CONFIG => 'Configuration of Zabbix',
 		AUDIT_RESOURCE_DASHBOARD => 'Dashboard',
 		AUDIT_RESOURCE_DISCOVERY_RULE => 'Discovery rule',
 		AUDIT_RESOURCE_CORRELATION => 'Event correlation',
 		AUDIT_RESOURCE_GRAPH => 'Graph',
-		AUDIT_RESOURCE_GRAPH_ELEMENT => 'Graph element',
 		AUDIT_RESOURCE_GRAPH_PROTOTYPE => 'Graph prototype',
 		AUDIT_RESOURCE_HOST => 'Host',
 		AUDIT_RESOURCE_HOST_GROUP => 'Host group',
@@ -63,10 +58,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 		AUDIT_RESOURCE_MODULE => 'Module',
 		AUDIT_RESOURCE_PROXY => 'Proxy',
 		AUDIT_RESOURCE_REGEXP => 'Regular expression',
-		AUDIT_RESOURCE_SCREEN => 'Screen',
 		AUDIT_RESOURCE_SCRIPT => 'Script',
 		AUDIT_RESOURCE_IT_SERVICE => 'Service',
-		AUDIT_RESOURCE_SLIDESHOW => 'Slide show',
 		AUDIT_RESOURCE_TEMPLATE => 'Template',
 		AUDIT_RESOURCE_TRIGGER => 'Trigger',
 		AUDIT_RESOURCE_TRIGGER_PROTOTYPE => 'Trigger prototype',
@@ -121,14 +114,9 @@ class testPageReportsAudit extends CLegacyWebTest {
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_ACTION],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
-			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
-			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
-			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
-			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
-			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MACRO],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MACRO],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MACRO],
@@ -147,19 +135,12 @@ class testPageReportsAudit extends CLegacyWebTest {
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
-			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCREEN],
-			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCREEN],
-			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCREEN],
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCRIPT],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCRIPT],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCRIPT],
-			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW],
-			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW],
-			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW],
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
-			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
-			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ZABBIX_CONFIG]
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP]
 		];
 	}
 
@@ -200,7 +181,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 				case 'Authentication':
 				case 'Configuration of Zabbix':
-					$this->assertEquals(['Add', 'Delete', 'Disable', 'Enable', 'Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Add', 'Delete', 'Execute', 'Login', 'Logout'], $disabled);
 					break;
 
 				case 'Discovery rule':
@@ -219,21 +200,21 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				case 'Script':
-					$this->assertEquals(['Disable', 'Enable', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Login', 'Logout'], $disabled);
 					break;
 
 				case 'User':
-					$this->assertEquals(['Disable', 'Enable', 'Execute'], $disabled);
+					$this->assertEquals(['Execute'], $disabled);
 					break;
 
 				default:
-					$this->assertEquals(['Disable', 'Enable', 'Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Execute', 'Login', 'Logout'], $disabled);
 			}
 		}
 	}
 
 	/**
-	 * @backup-once globalmacro
+	 * @backupOnce globalmacro
 	 */
 	public function testPageReportsAudit_UpdateMacroDescription() {
 		// Update Macro description.
@@ -266,7 +247,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 			'Resource' => 'Macro',
 			'Action' => 'Update',
 			'ID' => 11,
-			'Details' => "globalmacro.description: Test description 1 => New Updated Description"
+			'Details' => "usermacro.description: Test description 1 => New Updated Description"
 		];
 
 		foreach ($audit as $column => $value) {

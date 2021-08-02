@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -487,7 +487,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function zbxTestLaunchOverlayDialog($header) {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]".
-				"/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
+				"/div[@class='dashboard-widget-head']/h4[text()='$header']"));
 	}
 
 	public function zbxTestClickAndAcceptAlert($id) {

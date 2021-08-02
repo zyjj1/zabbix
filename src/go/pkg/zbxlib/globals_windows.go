@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/str.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/alias.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o
@@ -57,6 +58,8 @@ char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
 int	CONFIG_UNSAFE_USER_PARAMETERS= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS= 0;
 char *CONFIG_SOURCE_IP = NULL;
+
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;
 const char	title_message[] = "agent";

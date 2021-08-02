@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
- * @on-before removeGuestFromDisabledGroup
- * @on-after addGuestToDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup
+ * @onAfter addGuestToDisabledGroup
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
@@ -413,7 +413,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
 						'Default login form' => 'Zabbix login form',
-						'Case sensitive login' => true
+						'Case-sensitive login' => true
 					],
 					'pages' => [
 						[
@@ -438,7 +438,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
 						'Default login form' => 'Zabbix login form',
-						'Case sensitive login' => false
+						'Case-sensitive login' => false
 					],
 					'pages' => [
 						[
@@ -499,7 +499,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * @dataProvider getHttpData
 	 * @backup config
-	 * @on-after removeConfigurationFiles
+	 * @onAfter removeConfigurationFiles
 	 *
 	 * Internal authentication with HTTP settings.
 	 */
@@ -542,19 +542,20 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			$session = $session_cookie['sessionid'];
 
 			$user_data = CDBHelper::getRow(
-				'SELECT u.alias'.
+				'SELECT u.username'.
 				' FROM users u,sessions s'.
 				' WHERE u.userid=s.userid'.
 					' AND sessionid='.zbx_dbstr($session)
 			);
 			if (array_key_exists('user_case_sensitive', $data)) {
-				$this->assertEquals($user_data['alias'], $data['user_case_sensitive']);
+				$this->assertEquals($user_data['username'], $data['user_case_sensitive']);
 			}
 			else {
-				$this->assertEquals($user_data['alias'], $alias);
+				$this->assertEquals($user_data['username'], $alias);
 			}
 
 			$this->page->logout();
+			$this->page->reset();
 			$this->page->open('index.php?form=default');
 		}
 	}
@@ -595,7 +596,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	private function setHttpConfiguration($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
-		$this->assertPageTitle('Configuration of authentication');
+		$this->page->assertTitle('Configuration of authentication');
 
 		// Fill fields in 'HTTP settings' tab.
 		$form = $this->query('name:form_auth')->asForm()->one();
@@ -604,7 +605,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$form->fill($http_options);
 
 		// Check disabled or enabled fields.
-		$fields = ['Default login form', 'Remove domain name', 'Case sensitive login'];
+		$fields = ['Default login form', 'Remove domain name', 'Case-sensitive login'];
 		foreach ($fields as $field) {
 			$this->assertTrue($form->getField($field)->isEnabled($http_options['Enable HTTP authentication']));
 		}

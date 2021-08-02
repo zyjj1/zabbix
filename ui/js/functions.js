@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,13 +93,6 @@ function testUserSound(idx) {
 	}
 	else {
 		AudioControl.playLoop(sound, document.getElementById('messages_timeout').value);
-	}
-}
-
-function removeObjectById(id) {
-	var obj = document.getElementById(id);
-	if (obj != null && typeof(obj) == 'object') {
-		obj.parentNode.removeChild(obj);
 	}
 }
 
@@ -486,7 +479,8 @@ function overlayDialogueDestroy(dialogueid) {
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
 
 		removeFromOverlaysStack(dialogueid);
-		jQuery.publish('overlay.close', {dialogueid: dialogueid});
+
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.close', {detail: {dialogueid}}));
 	}
 }
 
@@ -538,36 +532,47 @@ function overlayDialogue(params, trigger_elmnt) {
 /**
  * Execute script.
  *
- * @param string hostid				host id
- * @param string scriptid			script id
- * @param string confirmation		confirmation text
+ * @param string scriptid			Script ID.
+ * @param string confirmation		Confirmation text.
  * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
+ * @param string hostid				Host ID.
+ * @param string eventid			Event ID.
  */
-function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
+function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
 	var execute = function() {
+		var popup_options = {scriptid: scriptid};
+
 		if (hostid !== null) {
-			PopUp('popup.scriptexec', {
-				hostid: hostid,
-				scriptid: scriptid
-			}, null, trigger_elmnt);
+			popup_options.hostid = hostid;
+		}
+
+		if (eventid !== null) {
+			popup_options.eventid = eventid;
+		}
+
+		if (Object.keys(popup_options).length === 2) {
+			PopUp('popup.scriptexec', popup_options, null, trigger_elmnt);
 		}
 	};
 
 	if (confirmation.length > 0) {
 		overlayDialogue({
 			'title': t('Execution confirmation'),
-			'content': jQuery('<span>').text(confirmation),
+			'content': jQuery('<span>')
+				.addClass('confirmation-msg')
+				.text(confirmation),
+			'class': 'modal-popup modal-popup-small',
 			'buttons': [
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'focused': (hostid === null),
+					'focused': (hostid === null && eventid === null),
 					'action': function() {}
 				},
 				{
 					'title': t('Execute'),
-					'enabled': (hostid !== null),
-					'focused': (hostid !== null),
+					'enabled': (hostid !== null || eventid !== null),
+					'focused': (hostid !== null || eventid !== null),
 					'action': function() {
 						execute();
 					}
@@ -725,7 +730,8 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		show_details = false;
 	}
 
-	var	$list = jQuery('<ul>'),
+	var	$list = jQuery('<ul>')
+			.addClass('list-dashed'),
 		$msg_details = jQuery('<div>')
 			.addClass('msg-details')
 			.append($list),
@@ -808,14 +814,15 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 /**
  * Download svg graph as .png image.
  *
- * @param {object} $dom_node    jQuery svg node to download.
- * @param {string} file_name    File name.
+ * @param {SVGElement} svg
+ * @param {string}     file_name
  */
-function downloadSvgImage($dom_node, file_name) {
-	var canvas = document.createElement('canvas'),
+function downloadSvgImage(svg, file_name) {
+	var $dom_node = jQuery(svg),
+		canvas = document.createElement('canvas'),
 		labels = $dom_node.next('.svg-graph-legend'),
 		$clone = $dom_node.clone(),
-		$container = $dom_node.closest('.dashbrd-grid-widget-content'),
+		$container = $dom_node.closest('.dashboard-grid-widget-content'),
 		image = new Image,
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
@@ -838,7 +845,7 @@ function downloadSvgImage($dom_node, file_name) {
 	image.onload = function() {
 		context2d.drawImage(image, 0, 0);
 		a.href = canvas.toDataURL('image/png');
-		a.rel = 'noopener';
+		a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 		a.download = file_name;
 		a.target = '_blank';
 		a.click();
@@ -860,17 +867,102 @@ function downloadSvgImage($dom_node, file_name) {
 }
 
 /**
- * Download classic graph as .png image.
+ * Download classic image as given file name.
  *
- * @param {object} $dom_node    jQuery svg node to download.
- * @param {string} file_name    File name.
+ * @param {HTMLImageElement} img
+ * @param {string}           file_name
  */
-function downloadPngImage($dom_node, file_name) {
+function downloadPngImage(img, file_name) {
 	var a = document.createElement('a');
 
-	a.href = $dom_node.attr('src');
-	a.rel = 'noopener';
+	a.href = img.src;
+	a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 	a.download = file_name;
 	a.target = '_blank';
 	a.click();
+}
+
+/**
+ * Writes text into primary clipboard. Provides fallback for insecure context.
+ *
+ * @param {string} text  Text to write.
+ */
+function writeTextClipboard(text) {
+	if (window.isSecureContext) {
+		return window.navigator.clipboard.writeText(text);
+	}
+
+	const textarea = document.createElement('textarea');
+
+	textarea.value = text;
+	textarea.style.position = 'fixed';
+	document.body.appendChild(textarea);
+	textarea.select();
+	document.execCommand('copy');
+	textarea.remove();
+}
+
+function urlEncodeData(parameters, prefix = '') {
+	const result = [];
+
+	for (let [name, value] of Object.entries(parameters)) {
+		if (value === undefined) {
+			continue;
+		}
+
+		if (value === null) {
+			value = '';
+		}
+
+		const prefixed_name = prefix !== '' ? `${prefix}[${name}]` : name;
+
+		if (Array.isArray(value) || (typeof value === 'object')) {
+			const result_part = urlEncodeData(value, prefixed_name);
+
+			if (result_part !== '') {
+				result.push(result_part);
+			}
+		}
+		else {
+			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
+		}
+	};
+
+	return result.join('&');
+}
+
+function getFormFields(form) {
+	const fields = {};
+
+	for (let [key, value] of new FormData(form)) {
+		const key_parts = [...key.matchAll(/[^\[\]]*[^\[\]]|\[\]/g)];
+
+		let key_fields = fields;
+
+		for (let i = 0; i < key_parts.length; i++) {
+			const key_part = key_parts[i][0];
+
+			if (i < key_parts.length - 1 && key_parts[i + 1][0] === '[]') {
+				if (!(key_part in key_fields)) {
+					key_fields[key_part] = [];
+				}
+
+				key_fields[key_part].push(value);
+
+				break;
+			}
+
+			if (i == key_parts.length - 1) {
+				key_fields[key_part] = value;
+			}
+			else {
+				if (!(key_part in key_fields)) {
+					key_fields[key_part] = {};
+				}
+				key_fields = key_fields[key_part];
+			}
+		}
+	}
+
+	return fields;
 }

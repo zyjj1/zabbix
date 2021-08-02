@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ typedef struct
 zbx_snmpidx_mapping_t;
 
 static zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
+static char		zbx_snmp_init_done;
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
@@ -355,6 +356,45 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session *session)
+{
+	int	ret = SUCCEED;
+
+	switch (item->snmpv3_authprotocol)
+	{
+		case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
+			session->securityAuthProto = usmHMACMD5AuthProtocol;
+			session->securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA1:
+			session->securityAuthProto = usmHMACSHA1AuthProtocol;
+			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			break;
+#ifdef HAVE_NETSNMP_STRONG_AUTH
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA224:
+			session->securityAuthProto = usmHMAC128SHA224AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC128SHA224AuthProtocol);
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA256:
+			session->securityAuthProto = usmHMAC192SHA256AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC192SHA256AuthProtocol);
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA384:
+			session->securityAuthProto = usmHMAC256SHA384AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC256SHA384AuthProtocol);
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA512:
+			session->securityAuthProto = usmHMAC384SHA512AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC384SHA512AuthProtocol);
+			break;
+#endif
+		default:
+			ret = FAIL;
+	}
+
+	return ret;
+}
+
 static char	*zbx_get_snmp_type_error(u_char type)
 {
 	switch (type)
@@ -500,23 +540,11 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 			case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
 
-				switch (item->snmpv3_authprotocol)
+				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
 				{
-					case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
-						/* set the authentication protocol to MD5 */
-						session.securityAuthProto = usmHMACMD5AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
-						break;
-					case ITEM_SNMPV3_AUTHPROTOCOL_SHA:
-						/* set the authentication protocol to SHA */
-						session.securityAuthProto = usmHMACSHA1AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
-						break;
-					default:
-						zbx_snprintf(error, max_error_len,
-								"Unsupported authentication protocol [%d]",
-								item->snmpv3_authprotocol);
-						goto end;
+					zbx_snprintf(error, max_error_len, "Unsupported authentication protocol [%d]",
+							item->snmpv3_authprotocol);
+					goto end;
 				}
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
@@ -534,23 +562,11 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 			case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
 
-				switch (item->snmpv3_authprotocol)
+				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
 				{
-					case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
-						/* set the authentication protocol to MD5 */
-						session.securityAuthProto = usmHMACMD5AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
-						break;
-					case ITEM_SNMPV3_AUTHPROTOCOL_SHA:
-						/* set the authentication protocol to SHA */
-						session.securityAuthProto = usmHMACSHA1AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
-						break;
-					default:
-						zbx_snprintf(error, max_error_len,
-								"Unsupported authentication protocol [%d]",
-								item->snmpv3_authprotocol);
-						goto end;
+					zbx_snprintf(error, max_error_len, "Unsupported authentication protocol [%d]",
+							item->snmpv3_authprotocol);
+					goto end;
 				}
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
@@ -572,11 +588,33 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						session.securityPrivProto = usmDESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
 						break;
-					case ITEM_SNMPV3_PRIVPROTOCOL_AES:
-						/* set the privacy protocol to AES */
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES128:
+						/* set the privacy protocol to AES128 */
 						session.securityPrivProto = usmAESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
 						break;
+#ifdef HAVE_NETSNMP_STRONG_PRIV
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES192:
+						/* set the privacy protocol to AES192 */
+						session.securityPrivProto = usmAES192PrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES192PrivProtocol);
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES256:
+						/* set the privacy protocol to AES256 */
+						session.securityPrivProto = usmAES256PrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES256PrivProtocol);
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES192C:
+						/* set the privacy protocol to AES192 (Cisco version) */
+						session.securityPrivProto = usmAES192CiscoPrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES192CiscoPrivProtocol);
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES256C:
+						/* set the privacy protocol to AES256 (Cisco version) */
+						session.securityPrivProto = usmAES256CiscoPrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES256CiscoPrivProtocol);
+						break;
+#endif
 					default:
 						zbx_snprintf(error, max_error_len,
 								"Unsupported privacy protocol [%d]",
@@ -642,7 +680,7 @@ static void	zbx_snmp_close_session(struct snmp_session *session)
 static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type)
 {
 	const char	*hint;
-	char		buffer[MAX_STRING_LEN];
+	char		buffer[MAX_BUFFER_LEN];
 	char		*strval_dyn = NULL;
 	struct tree	*subtree;
 	unsigned char	type;
@@ -2069,6 +2107,26 @@ int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poll
 	return errcode;
 }
 
+static void	zbx_init_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	if (1 == zbx_snmp_init_done)
+		return;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	init_snmp(progname);
+	zbx_snmp_init_done = 1;
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type)
 {
 	struct snmp_session	*ss;
@@ -2078,6 +2136,8 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
+
+	zbx_init_snmp();	/* avoid high CPU usage by only initializing SNMP once used */
 
 	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
@@ -2139,22 +2199,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_init_snmp(void)
-{
-	sigset_t	mask, orig_mask;
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-
-	init_snmp(progname);
-
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
-}
-
 static void	zbx_shutdown_snmp(void)
 {
 	sigset_t	mask, orig_mask;
@@ -2167,6 +2211,7 @@ static void	zbx_shutdown_snmp(void)
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	snmp_shutdown(progname);
+	zbx_snmp_init_done = 0;
 
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
@@ -2175,9 +2220,12 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]", get_process_type_string(process_type),
 			process_num);
+
+	if (0 == zbx_snmp_init_done)
+		return;
+
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
-	zbx_init_snmp();
 }
 
 #endif	/* HAVE_NETSNMP */

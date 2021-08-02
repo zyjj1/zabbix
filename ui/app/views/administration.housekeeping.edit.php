@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,15 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow(
+		(new CLabel(_('Service data storage period'), 'hk_events_service'))->setAsteriskMark(),
+		(new CTextBox('hk_events_service', $data['hk_events_service'], false,
+			DB::getFieldLength('config', 'hk_events_service')
+		))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setEnabled($data['hk_events_mode'] == 1)
+			->setAriaRequired()
+	)
+	->addRow(
 		(new CLabel(_('Internal data storage period'), 'hk_events_internal'))->setAsteriskMark(),
 		(new CTextBox('hk_events_internal', $data['hk_events_internal'], false,
 			DB::getFieldLength('config', 'hk_events_internal')
@@ -94,19 +103,6 @@ $house_keeper_tab = (new CFormList())
 		(new CTextBox('hk_services', $data['hk_services'], false, DB::getFieldLength('config', 'hk_services')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_services_mode'] == 1)
-			->setAriaRequired()
-	)
-	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
-	->addRow(
-		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
-		(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
-	)
-	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_audit'))
-			->setAsteriskMark(),
-		(new CTextBox('hk_audit', $data['hk_audit'], false, DB::getFieldLength('config', 'hk_audit')))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setEnabled($data['hk_audit_mode'] == 1)
 			->setAriaRequired()
 	)
 	->addRow((new CTag('h4', true, _('User sessions')))->addClass('input-section-header'))
@@ -164,7 +160,6 @@ $house_keeper_tab = (new CFormList())
 				new CLabel(_('Enable compression'), 'compression_status'),
 				(new CCheckBox('compression_status'))
 					->setChecked($data['compression_status'] == 1)
-					->setEnabled($data['compression_availability'] == 1)
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))
@@ -173,24 +168,26 @@ $house_keeper_tab = (new CFormList())
 					DB::getFieldLength('config', 'compress_older')
 				))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-					->setEnabled($data['compression_availability'] == 1 && $data['compression_status'] == 1)
+					->setEnabled($data['compression_status'] == 1)
 					->setAriaRequired()
 			);
-
-		if ($data['compression_availability'] == 0) {
-			$house_keeper_tab->addRow('',
-				(new CSpan(_('Compression is not available due to incompatible DB version')))->addClass(ZBX_STYLE_RED)
-			);
-		}
 	}
 
-$house_keeper_view = (new CTabView())
-	->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
-	->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[new CButton('resetDefaults', _('Reset defaults'))]
-	));
+
+$house_keeper_tab
+	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
+	->addRow(new CLink(_('Audit settings'), (new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit'))
+);
+
+$form->addItem(
+	(new CTabView())
+		->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
+		->setFooter(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			[new CButton('resetDefaults', _('Reset defaults'))]
+		))
+);
 
 $widget
-	->addItem($form->addItem($house_keeper_view))
+	->addItem($form)
 	->show();

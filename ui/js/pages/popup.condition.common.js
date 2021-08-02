@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2020 Zabbix SIA
+ ** Copyright (C) 2001-2021 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -94,4 +94,20 @@ function validateConditionPopup(overlay) {
 				submitConditionPopup(response, overlay);
 			}
 		});
+}
+
+function selectServices() {
+	const overlay = PopUp('popup.services', {
+		title: t('Add parent services'),
+	}, 'services', document.activeElement);
+
+	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+		const data = [];
+
+		for (const service of e.detail) {
+			data.push({id: service.serviceid, name: service.name});
+		}
+
+		$('#service-new-condition').multiSelect('addData', data);
+	});
 }

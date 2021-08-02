@@ -1,10 +1,10 @@
 
-# Template DB PostgreSQL
+# PostgreSQL by user parameters
 
 ## Overview
 
 Templates to monitor PostgreSQL by Zabbix.\
-This template was tested on Zabbix 4.2.1 and PostgreSQL vesions 9.6, 10 and 11 on Linux and Windows.
+This template was tested on Zabbix 4.2.1 and PostgreSQL versions 9.6, 10 and 11 on Linux and Windows.
 
 ## Setup
 
@@ -59,7 +59,7 @@ This template was tested on Zabbix 4.2.1 and PostgreSQL vesions 9.6, 10 and 11 o
     *:5432:postgres:zbx_monitor:<PASSWORD>
     ```
 
-6. Import `template_db_postgresql.xml` to Zabbix and link it to the target host
+6. Import `template_db_postgresql.yaml` to Zabbix and link it to the target host
 
 ## Zabbix configuration
 

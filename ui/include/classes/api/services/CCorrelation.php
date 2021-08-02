@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1188,7 +1188,7 @@ class CCorrelation extends CApiService {
 
 		if (count($conditions) != count(array_unique($conditions, SORT_REGULAR))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Conditions duplicates for correlation "%1$s".', $correlation['name'])
+				_s('Duplicate conditions for correlation "%1$s".', $correlation['name'])
 			);
 		}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@ int	CONFIG_PREPROCMAN_FORKS		= 1;
 int	CONFIG_PREPROCESSOR_FORKS	= 3;
 int	CONFIG_HISTORYPOLLER_FORKS	= 5;
 int	CONFIG_AVAILMAN_FORKS		= 1;
+int	CONFIG_SERVICEMAN_FORKS		= 0;
+int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 0;
 
 int	CONFIG_LISTEN_PORT		= 0;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -68,6 +70,7 @@ int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
+int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
 int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_VMWARE_FREQUENCY		= 60;
@@ -108,6 +111,7 @@ char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
 char	*CONFIG_EXPORT_DIR		= NULL;
+char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -172,6 +176,9 @@ char	*CONFIG_SOCKET_PATH			= NULL;
 char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
+
+/* not used in tests, defined for linking with comms.c */
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	title_message[] = "mock_title_message";
 const char	*usage_message[] = {"mock_usage_message", NULL};

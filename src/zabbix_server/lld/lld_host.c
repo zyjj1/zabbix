@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3188,7 +3188,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 {
 	int		i;
 	zbx_lld_host_t	*host;
-	char		*err;
+	char		*err = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

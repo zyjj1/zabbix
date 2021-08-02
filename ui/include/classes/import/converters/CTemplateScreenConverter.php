@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,17 @@ class CTemplateScreenConverter extends CConverter {
 	 * Average height of screen legend.
 	 */
 	private const SCREEN_LEGEND_HEIGHT = 215;
+
+	/**
+	 * Legacy screen resource types.
+	 */
+	private const SCREEN_RESOURCE_TYPE_GRAPH = 0;
+	private const SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH = 1;
+	private const SCREEN_RESOURCE_TYPE_PLAIN_TEXT = 3;
+	private const SCREEN_RESOURCE_TYPE_CLOCK = 7;
+	private const SCREEN_RESOURCE_TYPE_URL = 11;
+	private const SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH = 19;
+	private const SCREEN_RESOURCE_TYPE_LLD_GRAPH = 20;
 
 	/**
 	 * Convert template screen definition to template dashboard definition.
@@ -116,9 +127,10 @@ class CTemplateScreenConverter extends CConverter {
 	 */
 	private static function getValidScreenItems(array $screen_items): array {
 		return array_filter($screen_items, function(array $screen_item): bool {
-			return in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_GRAPH,
-				SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH,
-				SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_URL
+			return in_array($screen_item['resourcetype'], [self::SCREEN_RESOURCE_TYPE_CLOCK,
+				self::SCREEN_RESOURCE_TYPE_GRAPH, self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH,
+				self::SCREEN_RESOURCE_TYPE_LLD_GRAPH, self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH,
+				self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT, self::SCREEN_RESOURCE_TYPE_URL
 			]);
 		});
 	}
@@ -375,15 +387,25 @@ class CTemplateScreenConverter extends CConverter {
 		$height = $screen_item['height'];
 
 		// Convert graph inner height to outer height.
-		if (in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH,
-				SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH])) {
+		if (in_array($screen_item['resourcetype'], [self::SCREEN_RESOURCE_TYPE_GRAPH,
+				self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH, self::SCREEN_RESOURCE_TYPE_LLD_GRAPH,
+				self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH])) {
 			// Transform graph screen item with height of at least 100px to occupy minimum 5 grid rows.
 			$height += self::SCREEN_LEGEND_HEIGHT;
 		}
 
+		if ($screen_item['resourcetype'] == self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT) {
+			// Constants are synchronised with the same algorithm in DB upgrade patch converter.
+			$show_lines = min($screen_item['elements'], 25);
+			$rows = 2 + $show_lines / 2.5;
+		}
+		else {
+			$rows = $height / self::WIDGET_ROW_HEIGHT;
+		}
+
 		return self::limitWidgetSize([
 			'width' => round($width / self::DISPLAY_WIDTH * DASHBOARD_MAX_COLUMNS),
-			'height' => round($height / self::WIDGET_ROW_HEIGHT)
+			'height' => round($rows)
 		]);
 	}
 
@@ -398,23 +420,23 @@ class CTemplateScreenConverter extends CConverter {
 	 */
 	private static function getMinWidgetSize(int $resourcetype): array {
 		switch ($resourcetype) {
-			case SCREEN_RESOURCE_CLOCK:
+			case self::SCREEN_RESOURCE_TYPE_CLOCK:
 				return [
 					'width' => 1,
 					'height' => 2
 				];
 
-			case SCREEN_RESOURCE_GRAPH:
-			case SCREEN_RESOURCE_SIMPLE_GRAPH:
-			case SCREEN_RESOURCE_LLD_GRAPH:
-			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_LLD_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH:
 				return [
 					'width' => 4,
 					'height' => 4
 				];
 
-			case SCREEN_RESOURCE_PLAIN_TEXT:
-			case SCREEN_RESOURCE_URL:
+			case self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT:
+			case self::SCREEN_RESOURCE_TYPE_URL:
 				return [
 					'width' => 4,
 					'height' => 2
@@ -456,7 +478,7 @@ class CTemplateScreenConverter extends CConverter {
 		];
 
 		switch ($screen_item['resourcetype']) {
-			case SCREEN_RESOURCE_CLOCK:
+			case self::SCREEN_RESOURCE_TYPE_CLOCK:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -472,7 +494,7 @@ class CTemplateScreenConverter extends CConverter {
 				}
 				break;
 
-			case SCREEN_RESOURCE_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -486,7 +508,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				break;
 
-			case SCREEN_RESOURCE_SIMPLE_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -500,7 +522,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				break;
 
-			case SCREEN_RESOURCE_LLD_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_LLD_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -524,7 +546,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				break;
 
-			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+			case self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -548,7 +570,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				break;
 
-			case SCREEN_RESOURCE_PLAIN_TEXT:
+			case self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
@@ -567,7 +589,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				break;
 
-			case SCREEN_RESOURCE_URL:
+			case self::SCREEN_RESOURCE_TYPE_URL:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_URL;
 				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,

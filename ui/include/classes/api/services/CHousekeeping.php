@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ class CHousekeeping extends CApiService {
 	/**
 	 * @var array
 	 */
-	private $output_fields = ['hk_events_mode', 'hk_events_trigger', 'hk_events_internal', 'hk_events_discovery',
-		'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode', 'hk_audit', 'hk_sessions_mode',
-		'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history', 'hk_trends_mode', 'hk_trends_global',
-		'hk_trends', 'db_extension', 'compression_status', 'compress_older', 'compression_availability'
+	private $output_fields = ['hk_events_mode', 'hk_events_trigger', 'hk_events_service', 'hk_events_internal',
+		'hk_events_discovery', 'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode', 'hk_audit',
+		'hk_sessions_mode', 'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history', 'hk_trends_mode',
+		'hk_trends_global', 'hk_trends', 'db_extension', 'compression_status', 'compress_older'
 	];
 
 	/**
@@ -97,8 +97,8 @@ class CHousekeeping extends CApiService {
 		$upd_config = [];
 
 		// strings
-		$field_names = ['hk_events_trigger', 'hk_events_internal', 'hk_events_discovery', 'hk_events_autoreg',
-			'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'
+		$field_names = ['hk_events_trigger', 'hk_events_service', 'hk_events_internal', 'hk_events_discovery',
+			'hk_events_autoreg', 'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $hk) && $hk[$field_name] !== $db_hk[$field_name]) {
@@ -143,6 +143,7 @@ class CHousekeeping extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'hk_events_mode' =>			['type' => API_INT32, 'in' => '0,1'],
 			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_service' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_internal' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_discovery' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_autoreg' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
@@ -170,7 +171,7 @@ class CHousekeeping extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$output_fields = array_diff($this->output_fields, ['db_extension', 'compression_availability']);
+		$output_fields = array_diff($this->output_fields, ['db_extension']);
 		$output_fields[] = 'configid';
 
 		return DB::select('config', ['output' => $output_fields])[0];

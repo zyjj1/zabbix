@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,8 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'charts.view')))
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'charts.view'))
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],

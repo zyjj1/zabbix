@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,6 +92,21 @@ class testDiscoveryRule extends CAPITest {
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+			],
+			'Test  LLD rule with unsupported item type' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule with unsupported item type',
+					'key_' => 'api_lld_rule_with_unsupported_item_type',
+					'hostid' => '50009',
+					'type' => '100',
+					'interfaceid' => '50022',
+					'delay' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.implode(', ', [
+					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				]).'.'
 			]
 		];
 
@@ -99,18 +114,94 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	public static function discoveryrule_create_data_valid() {
-		return [
-			'Test valid LLD rule with default properties' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule default',
-					'key_' => 'apilldruledefault',
+		$valid_item_types = [
+			ITEM_TYPE_ZABBIX => '50022',
+			ITEM_TYPE_TRAPPER => null,
+			ITEM_TYPE_SIMPLE => '50022',
+			ITEM_TYPE_INTERNAL => null,
+			ITEM_TYPE_ZABBIX_ACTIVE => null,
+			ITEM_TYPE_EXTERNAL => '50022',
+			ITEM_TYPE_DB_MONITOR => null,
+			ITEM_TYPE_IPMI => '50031',
+			ITEM_TYPE_SSH => '50022',
+			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_JMX => '50030',
+			ITEM_TYPE_DEPENDENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
+			ITEM_TYPE_SNMP => '50029'
+		];
+
+		$item_type_tests = [];
+		foreach ($valid_item_types as $type => $interfaceid) {
+			switch ($type) {
+				case ITEM_TYPE_IPMI:
+					$params = [
+						'ipmi_sensor' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_TELNET:
+				case ITEM_TYPE_SSH:
+					$params = [
+						'username' => 'username',
+						'authtype' => ITEM_AUTHTYPE_PASSWORD
+					];
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$params = [
+						'master_itemid' => '150151',
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_JMX:
+					$params = [
+						'username' => 'username',
+						'password' => 'password'
+					];
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$params = [
+						'url' => 'http://0.0.0.0'
+					];
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$params = [
+						'snmp_oid' => '1.2.3'
+					];
+					break;
+
+				default:
+					$params = [];
+					break;
+			}
+
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
+			$item_type_tests['Test valid LLD rule with item type '.$type] = [
+				'discoveryrule' => $params + [
+					'name' => 'API LLD rule of type '.$type,
+					'key_' => 'api_lld_rule_of_type_'.$type,
 					'hostid' => '50009',
-					'type' => ITEM_TYPE_ZABBIX,
-					'interfaceid' => '50022',
+					'type' => (string) $type,
 					'delay' => '30s'
 				],
 				'expected_error' => null
-			],
+			];
+		}
+
+		return [
 			'Test 0 update interval for mqtt.get key of Active agent type' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule mqtt',
@@ -130,7 +221,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			]
-		];
+		] + $item_type_tests;
 
 		// TODO: add other properties, multiple rules, duplicates etc.
 	}
@@ -1222,6 +1313,19 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "params": value of third parameter must be one of '.ZBX_PREPROC_CSV_NO_HEADER.', '.ZBX_PREPROC_CSV_HEADER.'.'
+			],
+			'Test non-empty preprocessing parameters for ZBX_PREPROC_XML_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_XML_TO_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": should be empty.'
 			]
 		];
 	}
@@ -1486,6 +1590,19 @@ class testDiscoveryRule extends CAPITest {
 						[
 							'type' => ZBX_PREPROC_CSV_TO_JSON,
 							'params' => ",\n\"\n0",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_XML_TO_JSON having empty parameters' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_XML_TO_JSON,
+							'params' => '',
 							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 							'error_handler_params' => ''
 						]
@@ -2943,8 +3060,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test overrides and override operations are deleted.' => [
 				['133763'],
-				['101', '102'],
-				['101', '102', '103', '104', '105', '106'],
+				['1001', '1002'],
+				['1001', '1002', '1003', '1004', '1005', '1006'],
 				null
 			]
 		];
@@ -3385,7 +3502,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]).'.'
 			],
 			// LLD rule override operation
 			'Test /1/overrides/1/operations/1/operationobject type is validated.' => [
@@ -3436,7 +3553,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": value must be one of opstatus, opdiscover, opperiod, ophistory, optrends.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": value must be one of opstatus, opdiscover, opperiod, ophistory, optrends, optag.'
 			],
 			// LLD rule override operation status
 			'Test /1/overrides/1/operations/1/opstatus/status is mandatory.' => [
@@ -4132,26 +4249,6 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1/tag": cannot be empty.'
-			],
-			'Test /1/overrides/1/operations/1/optag is is not supported for item prototype object.' => [
-				'discoveryrules' => [
-					$new_lld_overrides([
-						[
-							'name' => 'override',
-							'step' => 1,
-							'operations' => [
-								[
-									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
-									'optag' => [
-										['tag' => 'www']
-									]
-								]
-							]
-						]
-					])
-				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
 			],
 			'Test /1/overrides/1/operations/1/optag is is not supported for graph prototype object.' => [
 				'discoveryrules' => [

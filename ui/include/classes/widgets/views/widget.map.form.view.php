@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,10 +37,6 @@ $scripts = [];
 // Map widget reference.
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
 $form->addVar($field->getName(), $field->getValue());
-
-if ($field->getValue() === '') {
-	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
-}
 
 // Source.
 $form_list->addRow(

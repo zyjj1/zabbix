@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,20 +40,12 @@ class Manager extends CRegistryFactory {
 		if (!self::$instance) {
 			$class = __CLASS__;
 			self::$instance = new $class([
-				'application' => 'CApplicationManager',
 				'history' => 'CHistoryManager',
 				'httptest' => 'CHttpTestManager'
 			]);
 		}
 
 		return self::$instance;
-	}
-
-	/**
-	 * @return CApplicationManager
-	 */
-	public static function Application() {
-		return self::getInstance()->getObject('application');
 	}
 
 	/**

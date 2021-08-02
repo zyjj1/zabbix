@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,8 @@ $select_groupby = (new CSelect('filter_groupby'))
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
 	->addItem(
-		(new CFilter(new CUrl('hostinventoriesoverview.php')))
+		(new CFilter())
+			->setResetUrl(new CUrl('hostinventoriesoverview.php'))
 			->setProfile('web.hostinventoriesoverview.filter')
 			->setActiveTab(CProfile::get('web.hostinventoriesoverview.filter.active', 1))
 			->addFilterTab(_('Filter'), [

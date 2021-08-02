@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
+require_once dirname(__FILE__).'/testValuemaps.php';
+require_once dirname(__FILE__).'/testTriggerLinking.php';
+require_once dirname(__FILE__).'/testGraphLinking.php';
 
 class IntegrationTests {
 	public static function suite() {
@@ -32,6 +35,9 @@ class IntegrationTests {
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
+		$suite->addTestSuite('testValuemaps');
+		$suite->addTestSuite('testTriggerLinking');
+		$suite->addTestSuite('testGraphLinking');
 
 		return $suite;
 	}

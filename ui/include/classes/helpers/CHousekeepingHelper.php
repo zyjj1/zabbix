@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 class CHousekeepingHelper extends CConfigGeneralHelper {
 
 	public const COMPRESS_OLDER = 'compress_older';
-	public const COMPRESSION_AVAILABILITY = 'compression_availability';
 	public const COMPRESSION_STATUS = 'compression_status';
 	public const DB_EXTENSION = 'db_extension';
 	public const HK_AUDIT = 'hk_audit';
@@ -35,6 +34,7 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 	public const HK_EVENTS_INTERNAL = 'hk_events_internal';
 	public const HK_EVENTS_MODE = 'hk_events_mode';
 	public const HK_EVENTS_TRIGGER = 'hk_events_trigger';
+	public const HK_EVENTS_SERVICE = 'hk_events_service';
 	public const HK_HISTORY = 'hk_history';
 	public const HK_HISTORY_GLOBAL = 'hk_history_global';
 	public const HK_HISTORY_MODE = 'hk_history_mode';

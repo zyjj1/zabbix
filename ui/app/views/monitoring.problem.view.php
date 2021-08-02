@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ $options = [
 			'show' => $data['filter']['show'],
 			'groupids' => $data['filter']['groupids'],
 			'hostids' => $data['filter']['hostids'],
-			'application' => $data['filter']['application'],
 			'triggerids' => $data['filter']['triggerids'],
 			'name' => $data['filter']['name'],
 			'severities' => $data['filter']['severities'],
@@ -82,6 +81,7 @@ if ($data['action'] === 'problem.view') {
 	$this->addJsFile('layout.mode.js');
 	$this->addJsFile('class.tabfilter.js');
 	$this->addJsFile('class.tabfilteritem.js');
+	$this->addJsFile('class.tagfilteritem.js');
 
 	$this->enableLayoutModes();
 	$web_layout_mode = $this->getLayoutMode();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -491,7 +491,8 @@ else {
 	unset($trigger);
 
 	$reportWidget->addItem(
-		(new CFilter(new CUrl('report2.php')))
+		(new CFilter())
+			->setResetUrl(new CUrl('report2.php'))
 			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('mode', $report_mode))->removeId())

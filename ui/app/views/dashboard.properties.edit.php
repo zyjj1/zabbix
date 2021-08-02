@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,9 @@ $form = (new CForm())
 	->cleanItems()
 	->setName('dashboard_properties_form')
 	->addItem(getMessages());
+
+// Submit button is needed to enable submit event on Enter on inputs.
+$form->addItem((new CInput('submit', 'dashboard_properties_submit'))->addStyle('display: none;'));
 
 $form_list = new CFormList();
 
@@ -64,6 +67,21 @@ $form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		->setAttribute('autofocus', 'autofocus')
 );
 
+$display_period_select = (new CSelect('display_period'))
+	->setValue($data['dashboard']['display_period'])
+	->setFocusableElementId('display_period')
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+foreach (DASHBOARD_DISPLAY_PERIODS as $period) {
+	$display_period_select->addOption(new CSelectOption($period, secondsToPeriod($period)));
+}
+
+$form_list->addRow(new CLabel(_('Default page display period'), 'display_period'), $display_period_select);
+
+$form_list->addRow(new CLabel(_('Start slideshow automatically'), 'auto_start'),
+	(new CCheckBox('auto_start'))->setChecked($data['dashboard']['auto_start'] == 1)
+);
+
 $form->addItem($form_list);
 
 $output = [
@@ -74,7 +92,7 @@ $output = [
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'dashboard.applyProperties(overlay);'
+			'action' => 'ZABBIX.Dashboard.applyProperties();'
 		]
 	]
 ];

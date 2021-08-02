@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ class CWebTest extends CTest {
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
 		// Suppress browser error on a test case level.
-		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignore-browser-errors');
+		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignoreBrowserErrors');
 		self::$supress_suite_errors = ($supress_suite_errors !== null);
 
 		// Browsers supported by test suite.
@@ -198,7 +198,7 @@ class CWebTest extends CTest {
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 		if ($method_annotations !== null) {
 			// Suppress browser error on a test case level.
-			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignore-browser-errors');
+			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignoreBrowserErrors');
 			$this->supress_case_errors = ($supress_case_errors !== null);
 		}
 
@@ -279,30 +279,6 @@ class CWebTest extends CTest {
 	 */
 	public function query($type, $locator = null) {
 		return $this->page->query($type, $locator);
-	}
-
-	/**
-	 * Check page title text.
-	 *
-	 * @param string $title		page title
-	 */
-	public function assertPageTitle($title) {
-		global $ZBX_SERVER_NAME;
-
-		if ($ZBX_SERVER_NAME !== '') {
-			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
-		}
-
-		$this->assertEquals($title, $this->page->getTitle());
-	}
-
-	/**
-	 * Check page header
-	 *
-	 * @param string $header	page header to be compared
-	 */
-	public function assertPageHeader($header) {
-		$this->assertEquals($header, $this->query('xpath://h1[@id="page-title-general"]')->one()->getText());
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ static void	tfc_free_slot(zbx_tfc_slot_t *slot)
 	cache->free_head = index;
 }
 
-static zbx_tfc_slot_t	*tfc_alloc_slot()
+static zbx_tfc_slot_t	*tfc_alloc_slot(void)
 {
 	zbx_uint32_t	index;
 
@@ -289,7 +289,7 @@ static void	tfc_free_data(zbx_tfc_data_t *data)
  * Purpose: ensure there is a free slot available                             *
  *                                                                            *
  ******************************************************************************/
-static void	tfc_reserve_slot()
+static void	tfc_reserve_slot(void)
 {
 	if (UINT32_MAX == cache->free_head && cache->slots_num == cache->free_slot)
 	{

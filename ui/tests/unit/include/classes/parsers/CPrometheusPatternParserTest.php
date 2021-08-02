@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,14 @@
 **/
 
 
-class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CPrometheusPatternParserTest extends TestCase {
 
 	/**
 	 * An array of Prometheus patterns and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			// success
 			[
@@ -363,6 +365,21 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{label1="value1\\\\"}'
+				]
+			],
+			// Operators != and !~.
+			[
+				'{label1!="value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1!="value1"}'
+				]
+			],
+			[
+				'{label1!~"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1!~"value1"}'
 				]
 			],
 			// partial success
@@ -765,12 +782,33 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
+			],
+			[
+				'{label1~"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{label1!"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{label1!', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

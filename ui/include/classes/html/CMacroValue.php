@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ class CMacroValue extends CInput {
 			]))
 				->addClass($dropdown_btn_class)
 				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
-				->setAttribute('title', _('Change type'));
+				->setAttribute('aria-label', _('Change type'));
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)

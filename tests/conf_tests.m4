@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2020 Zabbix SIA
+# Copyright (C) 2001-2021 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ AC_DEFUN([CONF_TESTS],[
 		tests/libs/zbxdbcache/Makefile
 		tests/libs/zbxdbhigh/Makefile
 		tests/libs/zbxhistory/Makefile
+		tests/libs/zbxeval/Makefile
 		tests/libs/zbxjson/Makefile
 		tests/libs/zbxsysinfo/Makefile
 		tests/libs/zbxsysinfo/linux/Makefile

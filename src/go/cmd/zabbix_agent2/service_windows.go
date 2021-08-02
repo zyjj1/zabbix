@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -463,7 +463,7 @@ loop:
 				closeChan <- true
 				break loop
 			default:
-				log.Warningf("unsupported windows service command received")
+				log.Debugf("unsupported windows service command '%s' received", getCmdName(c.Cmd))
 			}
 		case <-stopChan:
 			changes <- svc.Status{State: svc.StopPending}
@@ -477,4 +477,39 @@ loop:
 	}
 
 	return
+}
+
+func getCmdName(cmd svc.Cmd) string {
+	switch cmd {
+	case svc.Stop:
+		return "Stop"
+	case svc.Pause:
+		return "Pause"
+	case svc.Continue:
+		return "Continue"
+	case svc.Interrogate:
+		return "Interrogate"
+	case svc.Shutdown:
+		return "Shutdown"
+	case svc.ParamChange:
+		return "ParamChange"
+	case svc.NetBindAdd:
+		return "NetBindAdd"
+	case svc.NetBindRemove:
+		return "NetBindRemove"
+	case svc.NetBindEnable:
+		return "NetBindEnable"
+	case svc.NetBindDisable:
+		return "NetBindDisable"
+	case svc.DeviceEvent:
+		return "DeviceEvent"
+	case svc.HardwareProfileChange:
+		return "HardwareProfileChange"
+	case svc.PowerEvent:
+		return "PowerEvent"
+	case svc.SessionChange:
+		return "SessionChange"
+	default:
+		return "unknown"
+	}
 }

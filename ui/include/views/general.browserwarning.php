@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,24 +51,24 @@
 					<p>New browsers usually come with support for new technologies, increasing web page speed, better privacy settings and so on. They also resolve security and functional issues.</p>
 					<ul>
 						<li>
-							<a target="_blank" href="http://www.google.com/chrome"><div class="<?= ZBX_STYLE_BROWSER_LOGO_CHROME ?>"></div></a>
-							<a target="_blank" href="http://www.google.com/chrome">Google Chrome</a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.google.com/chrome"><div class="<?= ZBX_STYLE_BROWSER_LOGO_CHROME ?>"></div></a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.google.com/chrome">Google Chrome</a>
 						</li>
 						<li>
-							<a target="_blank" href="http://www.mozilla.org/firefox"><div class="<?= ZBX_STYLE_BROWSER_LOGO_FF ?>"></div></a>
-							<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.mozilla.org/firefox"><div class="<?= ZBX_STYLE_BROWSER_LOGO_FF ?>"></div></a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
 						</li>
 						<li>
-							<a target="_blank" href="https://www.microsoft.com/en-us/edge"><div class="<?= ZBX_STYLE_BROWSER_LOGO_ED ?>"></div></a>
-							<a target="_blank" href="https://www.microsoft.com/en-us/edge">Microsoft Edge</a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="https://www.microsoft.com/en-us/edge"><div class="<?= ZBX_STYLE_BROWSER_LOGO_ED ?>"></div></a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="https://www.microsoft.com/en-us/edge">Microsoft Edge</a>
 						</li>
 						<li>
-							<a target="_blank" href="http://www.opera.com/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_OPERA ?>"></div></a>
-							<a target="_blank" href="http://www.opera.com/download">Opera browser</a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.opera.com/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_OPERA ?>"></div></a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.opera.com/download">Opera browser</a>
 						</li>
 						<li>
-							<a target="_blank" href="http://www.apple.com/safari/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_SAFARI ?>"></div></a>
-							<a target="_blank" href="http://www.apple.com/safari/download">Apple Safari</a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.apple.com/safari/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_SAFARI ?>"></div></a>
+							<a target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>" href="http://www.apple.com/safari/download">Apple Safari</a>
 						</li>
 					</ul>
 					<div class="<?= ZBX_STYLE_BROWSER_WARNING_FOOTER ?>">

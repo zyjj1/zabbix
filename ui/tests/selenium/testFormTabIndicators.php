@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,6 +84,12 @@ class testFormTabIndicators extends CWebTest {
 							'table_selector' => 'id:tbl_macros',
 							'field_type' => 'multifield_table',
 							'count' => 3
+						],
+						[
+							'name' => 'Value mapping',
+							'entries' => ['1st value mapping', '2nd value mapping', '3rd value mapping'],
+							'field_type' => 'value_mapping',
+							'count' => 3
 						]
 					]
 				]
@@ -164,6 +170,12 @@ class testFormTabIndicators extends CWebTest {
 								'old_value' => 'No encryption'
 							],
 							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'Value mapping',
+							'entries' => ['1st value mapping', '2nd value mapping', '3rd value mapping'],
+							'field_type' => 'value_mapping',
+							'count' => 3
 						]
 					]
 				]
@@ -314,7 +326,7 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'count' => 6
+							'count' => 4
 						]
 					]
 				]
@@ -322,7 +334,7 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=33800&context=host&form=create',
+					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host&form=create',
 					'form' => 'name:triggersForm',
 					'tabs' => [
 						[
@@ -351,7 +363,7 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'count' => 6
+							'count' => 4
 						]
 					]
 				]
@@ -751,6 +763,8 @@ class testFormTabIndicators extends CWebTest {
 
 	public function testFormTabIndicators_CheckUserGroupIndicators() {
 		$this->page->login()->open('zabbix.php?action=usergroup.edit')->waitUntilReady();
+		$permissions_table = $this->query('id:group-right-table')->one();
+		$tag_table = $this->query('id:tag-filter-table')->one();
 
 		// Check status indicator in Permissions tab.
 		$form = $this->query('id:user-group-form')->asForm()->one();
@@ -765,6 +779,7 @@ class testFormTabIndicators extends CWebTest {
 		$permission_level->fill('Read');
 		$add_button = $form->query('id:new-group-right-table')->query('button:Add')->one();
 		$add_button->click();
+		$permissions_table->waitUntilReloaded();
 		$tab_selector->waitUntilReady();
 		$this->assertTabIndicator($tab_selector, true);
 
@@ -772,6 +787,7 @@ class testFormTabIndicators extends CWebTest {
 		$group_selector->fill('Discovered hosts');
 		$permission_level->fill('None');
 		$add_button->click();
+		$permissions_table->waitUntilReloaded();
 		$tab_selector->waitUntilReady();
 		$this->assertTabIndicator($tab_selector, false);
 
@@ -783,7 +799,7 @@ class testFormTabIndicators extends CWebTest {
 		// Add tag filter for Discovered hosts group and check indicator.
 		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
 		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
-		$tab_selector->waitUntilReady();
+		$tag_table->waitUntilReloaded();
 		$this->assertTabIndicator($tab_selector, true);
 
 		// Remove the tag filter for Discovered hosts group and check indicator.
@@ -812,42 +828,69 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	/**
-	 * @on-before-once prepareServiceData
+	 * @onBeforeOnce prepareServiceData
 	 */
 	public function testFormTabIndicators_CheckServiceIndicators() {
-		$this->page->login()->open('services.php?form=1&parentname=root')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=service.list.edit')->waitUntilReady();
 
-		// Check status indicator in Dependencies tab.
-		$form = $this->query('id:services-form')->asForm()->one();
-		$form->selectTab('Dependencies');
-		$tab_selector = $form->query('xpath:.//a[text()="Dependencies"]')->one();
+		// Check status indicator in Child services tab.
+		$this->query('button:Create service')->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one();
+		$form->selectTab('Child services');
+		$tab_selector = $form->query('xpath:.//a[text()="Child services"]')->one();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Add service ependencies and check dependency count indicator.
-		$dependencies_field = $form->getFieldContainer('Depends on');
-		$dependencies_field->query('button:Add')->one()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-		$overlay->query('id:all_services')->asCheckbox()->one()->check();
+		// Add child services and check child service count indicator.
+		$child_services_tab = $form->query('id:child-services-tab')->one();
+		$child_services_tab->query('button:Add')->one()->click();
+		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
-		COverlayDialogElement::ensureNotPresent();
+		$overlay->waitUntilNotVisible();
 		$this->assertTabIndicator($tab_selector, 2);
 
-		// Remove all dependencies and check count indicator.
-		$dependencies_field->query('button:Remove')->all()->click();
+		// Remove all child services and check count indicator.
+		$child_services_tab->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Open Time tab and check count indicator.
-		$form->selectTab('Time');
-		$tab_selector = $form->query('xpath:.//a[text()="Time"]')->one();
+		// Open SLA tab and check count indicator.
+		$form->selectTab('SLA');
+		$tab_selector = $form->query('id:tab_sla-tab')->one();
+		$this->assertTabIndicator($tab_selector, false);
+
+		// Add Show SLA and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, true);
+
+		// Remove the Show SLA and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, false);
+
+		// Open Tags tab and check count indicator.
+		$form->selectTab('Tags');
+		$tab_selector = $form->query('id:tab_tags-tab')->one();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Add a time period and check count indicator.
-		$form->getField('Period type')->select('One-time downtime');
-		$form->getFieldContainer('New service time')->query('button:Add')->one()->click();
-		$this->assertTabIndicator($tab_selector, 1);
+		// Add Tags and check count indicator.
+		$tags = [
+			[
+				'tag' => '!@#$%^&*()_+<>,.\/',
+				'value' => '!@#$%^&*()_+<>,.\/'
+			],
+			[
+				'tag' => 'tag1',
+				'value' => 'value1'
+			],
+			[
+				'tag' => 'tag2'
+			]
+		];
+		$form->query('id:tags-table')->asMultifieldTable()->one()->fill($tags);
+		$this->assertTabIndicator($tab_selector, 3);
 
-		// Remove the added time period and check count indicator.
-		$form->getFieldContainer('Service times')->query('button:Remove')->one()->click();
+		// Remove the tags and check count indicator.
+		$form->query('id:tags-table')->one()->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 	}
 
@@ -940,11 +983,26 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
-					$form->query('class:remove-btn')->all()->click();
+					$form->query('class:btn-remove')->all()->click();
 				}
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {
 						$form->query($tab['button'])->one()->click();
+					}
+				}
+				break;
+
+			case 'value_mapping':
+				if ($action === USER_ACTION_REMOVE) {
+					$form->query('xpath://table[@id="valuemap-table"]//button[text()="Remove"]')->all()->click();
+				}
+				else {
+					foreach ($tab['entries'] as $field_value) {
+						$form->query('id:valuemap_add')->one()->click();
+						$valuemap_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
+						$valuemap_form->submit();
+						COverlayDialogElement::ensureNotPresent();
 					}
 				}
 				break;

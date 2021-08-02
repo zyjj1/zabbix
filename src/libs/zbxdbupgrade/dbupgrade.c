@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,6 +123,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_TEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
+			break;
+		case ZBX_TYPE_CUID:
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
 			break;
 		default:
 			assert(0);
@@ -544,8 +547,11 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 
 	if (NULL != old_field && (zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type) ||
 			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type) ||
-			(ZBX_TYPE_TEXT == field->type && ZBX_TYPE_SHORTTEXT == old_field->type)))
+			(ZBX_TYPE_TEXT == field->type && (ZBX_TYPE_SHORTTEXT == old_field->type ||
+				ZBX_TYPE_CHAR == old_field->type))))
+	{
 		return DBmodify_field_type_with_copy(table_name, field);
+	}
 #endif
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
@@ -783,6 +789,8 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -806,6 +814,8 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(5010), "5.2 development"},
 	{DBPATCH_VERSION(5020), "5.2 maintenance"},
 	{DBPATCH_VERSION(5030), "5.4 development"},
+	{DBPATCH_VERSION(5040), "5.4 maintenance"},
+	{DBPATCH_VERSION(5050), "6.0 development"},
 	{NULL}
 };
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class testTriggerExpressions extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Check table headers presence in tesing dialog.
-		$table_headers = ['Expression Variable Elements', 'Result type', 'Value',
+		$table_headers = ['Expression variable elements', 'Result type', 'Value',
 						'Expression', 'Result', 'Error'];
 
 		foreach ($table_headers as $header) {

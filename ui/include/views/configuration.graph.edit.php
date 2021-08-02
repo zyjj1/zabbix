@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -376,7 +376,7 @@ $items_table = (new CTable())
 			))
 				->addClass('table-col-y-axis-side')
 			: null,
-		(new CTableColumn(_('Colour')))->addClass('table-col-colour'),
+		(new CTableColumn(_('Color')))->addClass('table-col-colour'),
 		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 

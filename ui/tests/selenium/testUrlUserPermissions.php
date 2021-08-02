@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
- * @on-before removeGuestFromDisabledGroup
- * @on-after addGuestToDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup
+ * @onAfter addGuestToDisabledGroup
  */
 class testUrlUserPermissions extends CLegacyWebTest {
 
@@ -130,56 +130,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'screens.php',
-				'title' =>	'Configuration of screens',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screenconf.php',
-				'title' =>	'Configuration of screens',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php?elementid=200001',
-				'title' =>	'Custom screens [refreshed every 30 sec.]',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php?elementid=200000',
-				'title' =>	'Custom screens [refreshed every 30 sec.]',
-				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'slideconf.php',
-				'title' =>	'Configuration of slide shows',
-				'header' =>	'Slide shows',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'zabbix.php?action=map.view',
 				'title' =>	'Configuration of network maps',
 				'header' =>	'Maps',
@@ -218,8 +168,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'srv_status.php',
-				'title' =>	'Services [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?action=service.list',
+				'title' =>	'Services',
 				'header' =>	'Services',
 				'users' => [
 					'guest' => true,
@@ -378,16 +328,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?action=application.list',
-				'title' =>	'Configuration of applications',
-				'header' => 'Applications',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'items.php?context=host',
 				'title' =>	'Configuration of items',
 				'header' => 'Items',
@@ -527,8 +467,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'services.php',
-				'title' =>	'Configuration of services',
+				'url' => 'zabbix.php?action=service.list.edit',
+				'title' =>	'Services',
 				'header' => 'Services',
 				'users' => [
 					'guest' => false,
@@ -585,15 +525,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'zabbix.php?action=macros.edit',
 				'title' =>	'Configuration of macros',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=valuemap.list',
-				'title' =>	'Configuration of value mapping',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -745,8 +676,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	}
 
 	/**
-	 * @on-before addGuestToDisabledGroup
-	 * @on-after removeGuestFromDisabledGroup
+	 * @onBefore addGuestToDisabledGroup
+	 * @onAfter removeGuestFromDisabledGroup
 	 *
 	 * @dataProvider data
 	 */

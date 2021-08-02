@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,10 +22,9 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  *
- * @on-before setDefaultWidgetType
+ * @onBefore setDefaultWidgetType
  */
 class testDashboardGraphWidget extends CWebTest {
 
@@ -36,7 +35,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -47,9 +46,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Set "Graph" as default widget type.
 	 */
 	public function setDefaultWidgetType() {
-		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashbrd.last_widget_type\' AND userid=\'1\'');
+		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashboard.last_widget_type\' AND userid=\'1\'');
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
-				' VALUES (99999,1,\'web.dashbrd.last_widget_type\',\'svggraph\',3)');
+				' VALUES (99999,1,\'web.dashboard.last_widget_type\',\'svggraph\',3)');
 	}
 
 	/**
@@ -143,7 +142,7 @@ class testDashboardGraphWidget extends CWebTest {
 			case 'Data set':
 				// Remove data set.
 				if (CTestArrayHelper::get($data, 'remove_data_set', false)) {
-					$form->query('xpath://button[@class="remove-btn"]')->one()->click();
+					$form->query('xpath://button[@class="btn-remove"]')->one()->click();
 				}
 				break;
 
@@ -166,7 +165,7 @@ class testDashboardGraphWidget extends CWebTest {
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
-				'//button[@class="dialogue-widget-save"]')->one()->waitUntilClickable();
+				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];
@@ -193,12 +192,12 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Data set": cannot be empty.'
 				]
 			],
-			// Base colour field validation.
+			// Base color field validation.
 			[
 				[
 					'Data set' => [
 						[
-							'Base colour' => ''
+							'Base color' => ''
 						]
 					],
 					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
@@ -208,20 +207,20 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Data set' => [
 						[
-							'Base colour' => '00000!'
+							'Base color' => '00000!'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
 				[
 					'Data set' => [
 						[
-							'Base colour' => '00000'
+							'Base color' => '00000'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -364,10 +363,10 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Zabbix*',
 							'item' => 'Agent ping',
-							'Base colour' => '00000'
+							'Base color' => '00000'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -524,7 +523,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-31 15:53:07',
+						'From' => '2021-07-04 15:53:07',
 						'To' => ''
 					],
 					'error' => 'Invalid parameter "To": cannot be empty.'
@@ -535,7 +534,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Time period' => [
 						'Set custom time period' => true,
 						'From' => '',
-						'To' => '2019-07-31 15:53:07'
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": cannot be empty.',
@@ -549,7 +548,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Time period' => [
 						'Set custom time period' => true,
 						'From' => '1',
-						'To' => '2019-07-31 15:53:07'
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": a time range is expected.',
@@ -561,7 +560,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-31 15:53:07',
+						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
@@ -571,8 +570,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '5:53:06 2019-07-31',
-						'To' => '2019-07-31 15:53:07'
+						'From' => '5:53:06 2021-07-31',
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": a time range is expected.',
@@ -584,8 +583,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-02-30 00:00:00',
-						'To' => '2019-07-31 15:53:07'
+						'From' => '2021-02-30 00:00:00',
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": a time range is expected.',
@@ -597,8 +596,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-05-02 00:00:00',
-						'To' => '2019-25-09 00:00:00'
+						'From' => '2021-05-02 00:00:00',
+						'To' => '2021-25-09 00:00:00'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
@@ -607,8 +606,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-05-02 00:00:00',
-						'To' => '2019.07.31 15:53:07'
+						'From' => '2021-05-02 00:00:00',
+						'To' => '2021.07.31 15:53:07'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
@@ -617,7 +616,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-04 12:53:00',
+						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
@@ -628,18 +627,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-04 12:53:00',
-						'To' => '2019-07-04 12:52:59'
-					],
-					'error' => 'Minimum time period to display is 1 minute.'
-				]
-			],
-			[
-				[
-					'Time period' => [
-						'Set custom time period' => true,
-						'From' => '2019-07-04 12:53:00',
-						'To' => '2019-07-04 12:52:59'
+						'From' => '2021-07-04 12:53:00',
+						'To' => '2021-07-04 12:52:59'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
@@ -923,13 +912,13 @@ class testDashboardGraphWidget extends CWebTest {
 
 	public static function getOverridesValidationData() {
 		return [
-			// Base colour field validation.
+			// Base color field validation.
 			[
 				[
 					'Overrides' => [
 						[
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
@@ -942,11 +931,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000!',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -955,11 +944,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -1109,7 +1098,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
@@ -1453,7 +1442,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-							'Base colour' => '009688',
+							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
@@ -1467,7 +1456,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-							'Base colour' => '000000',
+							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
 							'Point size' => '1',
@@ -1516,7 +1505,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1533,7 +1522,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Points'],
 								['Transparency', '2'],
@@ -1741,7 +1730,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
-							'Base colour' => '009688',
+							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
@@ -1752,7 +1741,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-							'Base colour' => '000000',
+							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Bar',
 							'Transparency' => '10',
@@ -1808,7 +1797,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1825,7 +1814,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Bar'],
 								['Transparency', '2'],
@@ -2219,7 +2208,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
-		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
+		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 						->asOverlayDialog()->one();
 		$overlay->close();
 
@@ -2227,7 +2216,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
@@ -2330,7 +2319,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$tag_elements = [
 			'id:evaltype',				// Tag type.
 			'id:tags_0_tag',			// Tag name.
-			'id:tags_0_operator_0',		// Tag operator.
+			'id:tags_0_operator',		// Tag operator.
 			'id:tags_0_value',			// Tag value
 			'id:tags_0_remove',			// Tag remove button.
 			'id:tags_add'				// Tagg add button.

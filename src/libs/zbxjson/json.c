@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,16 +134,24 @@ void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
 	zbx_json_addarray(j, NULL);
 }
 
-void	zbx_json_clean(struct zbx_json *j)
+static void	zbx_json_setempty(struct zbx_json *j)
 {
-	assert(j);
-
 	j->buffer_offset = 0;
 	j->buffer_size = 0;
 	j->status = ZBX_JSON_EMPTY;
 	j->level = 0;
 	*j->buffer = '\0';
+}
 
+void	zbx_json_cleanarray(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
+	zbx_json_addarray(j, NULL);
+}
+
+void	zbx_json_clean(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
 	zbx_json_addobject(j, NULL);
 }
 
@@ -875,11 +883,11 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 
 	while ('\0' != *p)
 	{
+		unsigned int	nbytes, i;
+		unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
+
 		switch (*p)
 		{
-			unsigned int	nbytes, i;
-			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
-
 			case '\\':
 				++p;
 				if (0 == (nbytes = zbx_json_decode_character(&p, uc)))
@@ -1294,4 +1302,9 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 out:
 	zbx_jsonpath_clear(&jsonpath);
 	return ret;
+}
+
+zbx_json_type_t	zbx_json_valuetype(const char *p)
+{
+	return __zbx_json_type(p);
 }

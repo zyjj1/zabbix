@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ class CEvent extends CApiService {
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
 	 * @param array $options['eventids']
-	 * @param array $options['applicationids']
 	 * @param array $options['status']
 	 * @param bool  $options['editable']
 	 * @param array $options['count']
@@ -77,7 +76,6 @@ class CEvent extends CApiService {
 			'eventids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
-			'applicationids'			=> null,
 			'objectids'					=> null,
 
 			'editable'					=> false,
@@ -126,7 +124,8 @@ class CEvent extends CApiService {
 			zbx_value2array($options['value']);
 		}
 
-		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
+		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
+				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['value'] === null) {
 				$options['value'] = ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null)
 					? [TRIGGER_VALUE_TRUE]
@@ -287,7 +286,8 @@ class CEvent extends CApiService {
 			}
 		}
 
-		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
+		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
+				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null) {
 				if ($options['value'][0] == TRIGGER_VALUE_TRUE) {
 					$sqlParts['where'][] =
@@ -327,9 +327,8 @@ class CEvent extends CApiService {
 		}
 
 		// objectids
-		if ($options['objectids'] !== null
-				&& in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
-
+		if ($options['objectids'] !== null && in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM,
+				EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
 			zbx_value2array($options['objectids']);
 			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 
@@ -382,31 +381,10 @@ class CEvent extends CApiService {
 			}
 		}
 
-		// applicationids
-		if ($options['applicationids'] !== null) {
-			zbx_value2array($options['applicationids']);
-
-			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['f'] = 'functions f';
-				$sqlParts['from']['ia'] = 'items_applications ia';
-				$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sqlParts['where']['f-ia'] = 'f.itemid=ia.itemid';
-				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			}
-			// items
-			elseif ($options['object'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['ia'] = 'items_applications ia';
-				$sqlParts['where']['e-ia'] = 'e.objectid=ia.itemid';
-				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			}
-			// ignore this filter for lld rules
-		}
-
 		// severities
 		if ($options['severities'] !== null) {
 			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
 				zbx_value2array($options['severities']);
 				$sqlParts['where'][] = dbConditionInt('e.severity', $options['severities']);
 			}
@@ -985,6 +963,9 @@ class CEvent extends CApiService {
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = [];
+			$relationMap = new CRelationMap();
+
 			// trigger events
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$query = DBselect(
@@ -1009,17 +990,21 @@ class CEvent extends CApiService {
 				);
 			}
 
-			$relationMap = new CRelationMap();
 			while ($relation = DBfetch($query)) {
 				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
 			}
 
-			$hosts = API::Host()->get([
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
@@ -1048,6 +1033,9 @@ class CEvent extends CApiService {
 				case EVENT_OBJECT_LLDRULE:
 					$api = API::DiscoveryRule();
 					break;
+				case EVENT_OBJECT_SERVICE:
+					$api = API::Service();
+					break;
 			}
 
 			$objects = $api->get([
@@ -1061,16 +1049,22 @@ class CEvent extends CApiService {
 
 		// adding alerts
 		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
+			$alerts = [];
 			$relationMap = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
-			$alerts = API::Alert()->get([
-				'output' => $options['select_alerts'],
-				'selectMediatypes' => API_OUTPUT_EXTEND,
-				'alertids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$alerts = API::Alert()->get([
+					'output' => $options['select_alerts'],
+					'selectMediatypes' => API_OUTPUT_EXTEND,
+					'alertids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true,
+					'sortfield' => 'clock',
+					'sortorder' => ZBX_SORT_DOWN
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $alerts, 'alerts');
 		}
 
@@ -1089,7 +1083,7 @@ class CEvent extends CApiService {
 				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 
 				// if the user data is requested via extended output or specified fields, join the users table
-				$userFields = ['alias', 'name', 'surname'];
+				$userFields = ['username', 'name', 'surname'];
 				$requestUserData = [];
 				foreach ($userFields as $userField) {
 					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -216,6 +216,18 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 == strcmp(opt, ZBX_SECRETS_RELOAD))
 	{
 		command = ZBX_RTC_SECRETS_RELOAD;
+		scope = 0;
+		data = 0;
+	}
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 == strcmp(opt, ZBX_SERVICE_CACHE_RELOAD))
+	{
+		command = ZBX_RTC_SERVICE_CACHE_RELOAD;
+		scope = 0;
+		data = 0;
+	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) && 0 == strcmp(opt, ZBX_TRIGGER_HOUSEKEEPER_EXECUTE))
+	{
+		command = ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE;
 		scope = 0;
 		data = 0;
 	}

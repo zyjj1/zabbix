@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
 				'Author' => 'Работник Заббикса',
-				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
+				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 				'Status' => 'Disabled'
 			]
 		];
@@ -172,7 +172,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Name' => 'шестой модуль',
 					'Version' => 'бета 2',
 					'Author' => 'Работник Заббикса',
-					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
+					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 					'Directory' => 'module_number_6',
 					'Namespace' => 'Example_F',
 					'Homepage' => '-',
@@ -311,14 +311,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					]
 				]
 			],
-			// Enable шестой модуль - Top level menu Reports and menu entry Screens are removed.
+			// Enable шестой модуль - Top level menu Reports and menu entry Maps are removed.
 			[
 				[
 					[
 						'module_name' => 'шестой модуль',
 						'remove' => true,
 						'top_menu_entry' => 'Reports',
-						'menu_entry' => 'Screens'
+						'menu_entry' => 'Maps'
 					]
 				]
 			]
@@ -547,8 +547,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// If module adds single or multiple menu entries, open each corresponding view, check view header and URL.
 		$top_entry = CTestArrayHelper::get($module, 'top_menu_entry', 'Monitoring');
 
+		$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
 		foreach ($module['menu_entries'] as $entry) {
-			$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
 			sleep(1);
 			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
@@ -564,7 +564,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 * If enabling the module removes a menu entry, the function checks that it is back after disabling the module.
 	 */
 	private function assertModuleDisabled($module) {
-		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
+		$xpath = 'xpath://ul[@class="menu-main"]//li/a[text()="';
 		// If module removes a menu entry or top level menu entry, check that entries are back after disabling the module.
 		if (CTestArrayHelper::get($module, 'remove', false)) {
 			$this->assertEquals(1, $this->query($xpath.$module['menu_entry'].'"]')->count());

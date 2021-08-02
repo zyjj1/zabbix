@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ typedef enum
 	ZBX_MUTEX_SELFMON,
 	ZBX_MUTEX_CPUSTATS,
 	ZBX_MUTEX_DISKSTATS,
-	ZBX_MUTEX_ITSERVICES,
 	ZBX_MUTEX_VALUECACHE,
 	ZBX_MUTEX_VMWARE,
 	ZBX_MUTEX_SQLITE3,
@@ -57,6 +56,7 @@ zbx_mutex_name_t;
 typedef enum
 {
 	ZBX_RWLOCK_CONFIG = 0,
+	ZBX_RWLOCK_VALUECACHE,
 	ZBX_RWLOCK_COUNT,
 }
 zbx_rwlock_name_t;

@@ -47,6 +47,7 @@
 		<replace file="ui/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DATA_SOURCES_DIR}" value="${basedir}/ui/tests/selenium/data/sources/"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
@@ -56,6 +57,7 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+                <chmod file="ui/conf/zabbix.conf.php" perm="go+w"/>
 	</target>
 
 	<target name="create-saml-configs">
@@ -85,7 +87,9 @@
 
 	<target name="init-frontend-modules">
 		<!-- Copy modules directory for selenium tests -->
-		<copydir forceoverwrite="true" src="ui/tests/selenium/modules" dest="ui/modules"/>
+		<copy todir="ui/modules" overwrite="true">
+			<fileset dir="ui/tests/selenium/modules"/>
+		</copy>
 	</target>
 
 	<target name="make-dbschema">

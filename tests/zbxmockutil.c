@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "module.h"
+#include "zbxvariant.h"
 
 #include <malloc.h>
 
@@ -161,9 +162,6 @@ int	zbx_mock_str_to_item_type(const char *str)
 
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX_ACTIVE"))
 		return ITEM_TYPE_ZABBIX_ACTIVE;
-
-	if (0 == strcmp(str, "ITEM_TYPE_AGGREGATE"))
-		return ITEM_TYPE_AGGREGATE;
 
 	if (0 == strcmp(str, "ITEM_TYPE_HTTPTEST"))
 		return ITEM_TYPE_HTTPTEST;

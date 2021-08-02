@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,9 @@ void	zbx_mock_test_entry(void **state)
 	/* set small cache size to force smaller cache free request size (5% of cache size) */
 	CONFIG_VALUE_CACHE_SIZE = ZBX_KIBIBYTE;
 
+	err = zbx_locks_create(&error);
+	zbx_mock_assert_result_eq("Lock initialization failed", SUCCEED, err);
+
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 
@@ -89,6 +92,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_history_record_reserve(&returned, 1);
 	err = zbx_vc_get_value(itemid, value_type, &ts, &returned.values[0]);
+	zbx_vc_flush_stats();
 	returned.values_num = 1;
 	zbx_mock_assert_result_eq("zbx_vc_get_values() return value", SUCCEED, err);
 

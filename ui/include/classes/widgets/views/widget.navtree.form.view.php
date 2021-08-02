@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,10 +37,6 @@ $scripts = [];
 // Map widget reference.
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
 $form->addItem((new CVar($field->getName(), $field->getValue()))->removeId());
-
-if ($field->getValue() === '') {
-	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
-}
 
 // Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
 $field = $fields['navtree'];

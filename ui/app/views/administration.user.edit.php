@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ $this->includeJsFile(($data['action'] === 'user.edit')
 $this->addJsFile('multiselect.js');
 $this->addJsFile('class.tab-indicators.js');
 
+$widget = new CWidget();
+
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
 }
@@ -38,9 +40,11 @@ else {
 	$widget_name = _('User profile').NAME_DELIMITER;
 	$widget_name .= ($data['name'] !== '' || $data['surname'] !== '')
 		? $data['name'].' '.$data['surname']
-		: $data['alias'];
+		: $data['username'];
+	$widget->setTitleSubmenu(getUserSettingsSubmenu());
 }
-$widget = (new CWidget())->setTitle($widget_name);
+
+$widget->setTitle($widget_name);
 $tabs = new CTabView();
 
 if ($data['form_refresh'] == 0) {
@@ -60,20 +64,20 @@ $user_form_list = new CFormList('user_form_list');
 
 if ($data['action'] === 'user.edit') {
 	$user_form_list
-		->addRow((new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
-			(new CTextBox('alias', $data['alias']))
-				->setReadonly($data['db_user']['alias'] === ZBX_GUEST_USER)
+		->addRow((new CLabel(_('Username'), 'username'))->setAsteriskMark(),
+			(new CTextBox('username', $data['username']))
+				->setReadonly($data['db_user']['username'] === ZBX_GUEST_USER)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
+				->setAttribute('maxlength', DB::getFieldLength('users', 'username'))
 		)
 		->addRow(_x('Name', 'user first name'),
 			(new CTextBox('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
 		)
-		->addRow(_('Surname'),
+		->addRow(_('Last name'),
 			(new CTextBox('surname', $data['surname']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
@@ -109,8 +113,50 @@ if ($data['change_password']) {
 		$password1->setAttribute('autofocus', 'autofocus');
 	}
 
+	$password_requirements = [];
+
+	if ($data['password_requirements']['min_length'] > 1) {
+		$password_requirements[] = _s('must be at least %1$d characters long',
+			$data['password_requirements']['min_length']
+		);
+	}
+
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_CASE) {
+		$password_requirements[] = new CListItem([
+			_('must contain at least one lowercase and one uppercase Latin letter'),
+			' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
+			(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+		]);
+	}
+
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_DIGITS) {
+		$password_requirements[] = new CListItem([
+			_('must contain at least one digit'),
+			' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+		]);
+	}
+
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_SPECIAL) {
+		$password_requirements[] = new CListItem([
+			_('must contain at least one special character'),
+			' (', (new CSpan(' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+		]);
+	}
+
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_SIMPLE) {
+		$password_requirements[] = _("must not contain user's name, surname or username");
+		$password_requirements[] = _('must not be one of common or context-specific passwords');
+	}
+
+	$password_hint_icon = $password_requirements
+		? makeHelpIcon([
+			_('Password requirements:'),
+			(new CList($password_requirements))->addClass(ZBX_STYLE_LIST_DASHED)
+		])
+		: null;
+
 	$user_form_list
-		->addRow((new CLabel(_('Password'), 'password1'))->setAsteriskMark(), [
+		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
 			// Hidden dummy login field for protection against chrome error when password autocomplete.
 			(new CInput('text', null, null))
 				->setAttribute('tabindex', '-1')
@@ -127,7 +173,7 @@ if ($data['change_password']) {
 else {
 	$user_form_list->addRow(_('Password'),
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER)
+			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -147,7 +193,7 @@ $theme_select = (new CSelect('theme'))
 	->addOption(new CSelectOption(THEME_DEFAULT, _('System default')));
 
 $language_error = null;
-if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
+if ($data['action'] === 'user.edit' && $data['db_user']['username'] === ZBX_GUEST_USER) {
 	$lang_select
 		->setName(null)
 		->setReadonly();
@@ -205,7 +251,7 @@ $user_form_list
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
-if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {
+if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$user_form_list->addRow(_('Auto-login'),

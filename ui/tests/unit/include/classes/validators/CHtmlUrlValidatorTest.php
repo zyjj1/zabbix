@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@
 **/
 
 
-class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
-	public function setUp() {
+use PHPUnit\Framework\TestCase;
+
+class CHtmlUrlValidatorTest extends TestCase {
+	protected function setUp(): void {
 		$settings = $this->createMock(CSettings::class);
 		$settings->method('get')
 			->will($this->returnValue([

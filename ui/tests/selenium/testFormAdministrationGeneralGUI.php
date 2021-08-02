@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	public $form_selector = 'xpath://form[contains(@action, "gui.update")]';
 
 	public $default = [
-		'Default language' => 'English (en_GB)',
-		'Default time zone' => 'System: (UTC+02:00) Europe/Riga',
+		'Default language' => 'English (en_US)',
+		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
 		'Limit for search and filter results' => '1000',
 		'Max number of columns and rows in overview tables' => '50',
@@ -44,7 +44,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	];
 
 	public $db_default = [
-		'default_lang' => 'en_GB',
+		'default_lang' => 'en_US',
 		'default_timezone' => 'system',
 		'default_theme' => 'blue-theme',
 		'search_limit' => 1000,
@@ -74,8 +74,8 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public function testFormAdministrationGeneralGUI_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$this->assertPageTitle('Configuration of GUI');
-		$this->assertPageHeader('GUI');
+		$this->page->assertTitle('Configuration of GUI');
+		$this->page->assertHeader('GUI');
 
 		$limits = [
 			'search_limit' => 6,
@@ -123,7 +123,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Default language' => 'English (en_US)',
-						'Default time zone' => '(UTC+00:00) UTC',
+						'Default time zone' => 'UTC',
 						'Default theme' => 'Dark',
 						'Limit for search and filter results' => '1',
 						'Max number of columns and rows in overview tables' => '5',
@@ -270,7 +270,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Default time zone' => 'System: (UTC+02:00) Europe/Riga',
+						'Default time zone' => 'System',
 						'Default theme' => 'High-contrast dark',
 						'Max history display period' => '604800',
 						'Time filter default period' => '315360000',
@@ -352,7 +352,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Default time zone' => '(UTC+14:00) Pacific/Kiritimati',
+						'Default time zone' => 'Pacific/Kiritimati',
 						'Default theme' => 'High-contrast light',
 						'Limit for search and filter results' => '999999',
 						'Max number of columns and rows in overview tables' => '999999',
@@ -932,7 +932,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Limit for search and filter results' => '2'
 					],
 					'link' => 'templates.php?filter_name=cisco',
-					'row_count' => 2,
+					'row_count' => 2
 				]
 			],
 			[
@@ -941,7 +941,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max number of columns and rows in overview tables' => '5'
 					],
 					'link' => 'overview.php',
-					'row_count' => 6,		// Plus 1 info row in table.
+					'row_count' => 6		// Plus 1 info row in table.
 				]
 			],
 			[
@@ -1012,8 +1012,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			case 'Max period for time selector':
 				$this->query('id:from')->one()->fill('now-5y');
 				$this->query('button:Apply')->one()->click();
-				$this->assertEquals('Maximum time period to display is 366 days.',
-				$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+				// Days count for the case when current or past year is leap year.
+				$days_count = CDateTimeHelper::countDays();
+				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
+						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
 				break;
 		}
 	}

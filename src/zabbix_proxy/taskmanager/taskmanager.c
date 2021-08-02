@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,11 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 		ZBX_DBROW2UINT64(alertid, row[11]);
 	}
 
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, 0 == alertid ? &info : NULL, error, sizeof(error))))
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, 0 == alertid ? &info : NULL,
+			error, sizeof(error), NULL)))
+	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
+	}
 	else
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
 
@@ -417,10 +420,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-
-#ifdef HAVE_NETSNMP
-	zbx_init_snmp();
-#endif
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();

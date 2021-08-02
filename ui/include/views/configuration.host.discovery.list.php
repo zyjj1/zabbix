@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ if ($data['hostid'] != 0) {
 }
 
 // Add filter tab.
-$filter = (new CFilter((new CUrl('host_discovery.php'))->setArgument('context', $data['context'])))
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('host_discovery.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addvar('context', $data['context']);
@@ -69,10 +70,10 @@ $filter_column1 = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
-					'enrich_parent_groups' => true,
+					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -89,7 +90,7 @@ $filter_column1 = (new CFormList())
 				'parameters' => [
 					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_hostids_',
 					'editable' => true
 				]
@@ -115,9 +116,7 @@ zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 
 $lld_types = item_type2str();
-unset($lld_types[ITEM_TYPE_AGGREGATE], $lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED],
-	$lld_types[ITEM_TYPE_SNMPTRAP]
-);
+unset($lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED], $lld_types[ITEM_TYPE_SNMPTRAP]);
 
 $type_select->addOptions(CSelect::createOptionsFromArray($lld_types));
 
@@ -323,7 +322,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 $button_list = [
 	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?')],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')],
+	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')]
 ];
 
 if ($data['context'] === 'host') {

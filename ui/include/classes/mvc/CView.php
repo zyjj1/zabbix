@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,13 @@ class CView {
 	 * @var boolean
 	 */
 	private $layout_modes_enabled = false;
+
+	/**
+	 * Explicitly set layout mode.
+	 *
+	 * @var int
+	 */
+	private $layout_mode;
 
 	/**
 	 * View name.
@@ -198,12 +205,25 @@ class CView {
 	}
 
 	/**
-	 * Get current layout mode if layout modes were enabled for this view, or ZBX_LAYOUT_NORMAL otherwise.
+	 * Set layout mode explicitly.
+	 *
+	 * @param int $layout_mode  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
+	 */
+	public function setLayoutMode(int $layout_mode): void {
+		$this->layout_mode = $layout_mode;
+	}
+
+	/**
+	 * Get current layout mode.
 	 *
 	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
 	 */
 	public function getLayoutMode() {
-		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;
+		if ($this->layout_modes_enabled) {
+			return ($this->layout_mode !== null) ? $this->layout_mode : CViewHelper::loadLayoutMode();
+		}
+
+		return ZBX_LAYOUT_NORMAL;
 	}
 
 	/**

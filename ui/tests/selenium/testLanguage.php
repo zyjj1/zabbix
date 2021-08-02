@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,12 +65,12 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'field' => [
-						'Default language' => 'Английский (en_GB)'
+						'Язык по умолчанию' => 'Английский (en_US)'
 					],
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
 					'body_lang' => 'en',
-					'defaultdb_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO,
 					'login_info' => [
 							'name' => 'Username',
@@ -85,7 +85,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getGuiData
 	 */
 	public function testLanguage_Gui($data) {
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->page->open('zabbix.php?action=gui.edit');
 
 		// Change default language.
@@ -124,21 +124,21 @@ class testLanguage extends CWebTest {
 					'body_lang' => 'ru',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'ru_RU',
-					'defaultdb_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO
 				]
 			],
 			[
 				[
 					'field' => [
-						'Язык' => 'Английский (en_GB)'
+						'Язык' => 'Английский (en_US)'
 					],
 					'message' => 'Пользователь обновлен',
 					'page_title' => 'Dashboard',
 					'body_lang' => 'en',
 					'menu_lang' => 'en',
-					'userdb_lang' => 'en_GB',
-					'defaultdb_lang' => 'en_GB',
+					'userdb_lang' => 'en_US',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO_RUS
 				]
 			],
@@ -152,7 +152,7 @@ class testLanguage extends CWebTest {
 					'body_lang' => 'en',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'default',
-					'defaultdb_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO
 				]
 			]
@@ -176,7 +176,7 @@ class testLanguage extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
-		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.zbx_dbstr('user-zabbix')));
+		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.zbx_dbstr('user-zabbix')));
 
 
 		// After logout, login menu has system language.
@@ -194,52 +194,52 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'testRU',
+						'Username' => 'testRU',
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Language' => 'Russian (ru_RU)'
 					],
 					'page_title' => 'Панель',
 					'body_lang' => 'ru',
 					'userdb_lang' => 'ru_RU',
-					'defaultdb_lang' => 'en_GB'
+					'defaultdb_lang' => 'en_US'
 				]
 			],
 			[
 				[
 					'fields' => [
-						'Alias' => 'testDEF',
+						'Username' => 'testDEF',
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Language' => 'System default'
 					],
 					'page_title' => 'Dashboard',
 					'body_lang' => 'en',
 					'userdb_lang' => 'default',
-					'defaultdb_lang' => 'en_GB'
+					'defaultdb_lang' => 'en_US'
 				]
 			],
 			[
 				[
 					'fields' => [
-						'Alias' => 'testENG',
+						'Username' => 'testENG',
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
-						'Language' => 'English (en_GB)'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
+						'Language' => 'English (en_US)'
 					],
 					'page_title' => 'Dashboard',
 					'body_lang' => 'en',
-					'userdb_lang' => 'en_GB',
-					'defaultdb_lang' => 'en_GB'
+					'userdb_lang' => 'en_US',
+					'defaultdb_lang' => 'en_US'
 				]
 			]
 		];
@@ -249,7 +249,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getCreateUserData
 	 */
 	public function testLanguage_CreateUser($data) {
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
@@ -258,17 +258,17 @@ class testLanguage extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
-		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
-		$this->assertPageTitle($data['page_title']);
+		$this->page->userLogin($data['fields']['Username'], $data['fields']['Password']);
+		$this->page->assertTitle($data['page_title']);
 		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
-		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.
-				zbx_dbstr($data['fields']['Alias'])));
+		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.
+				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
 	}
 
 	private function checkLanguage($message, $page_title, $body_lang, $defaultdb_lang) {
 		$this->assertMessage(TEST_GOOD, $message);
-		$this->assertPageTitle($page_title);
+		$this->page->assertTitle($page_title);
 		$this->assertEquals($body_lang, $this->query('xpath://body')->one()->getAttribute('lang'));
 		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT default_lang FROM config'));
 	}

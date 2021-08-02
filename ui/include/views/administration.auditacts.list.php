@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,8 @@ $filterColumn->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
 ]);
 
 $auditWidget->addItem(
-	(new CFilter(new CUrl('auditacts.php')))
+	(new CFilter())
+		->setResetUrl(new CUrl('auditacts.php'))
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])

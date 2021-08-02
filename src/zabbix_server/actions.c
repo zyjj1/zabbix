@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -704,7 +704,7 @@ static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 		return NOTSUPPORTED;
 
 	period = zbx_strdup(NULL, condition->value);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
+	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
 			MACRO_TYPE_COMMON, NULL, 0);
 
 	for (i = 0; i < esc_events->values_num; i++)
@@ -817,101 +817,6 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 	zbx_vector_uint64_destroy(&eventids);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: check_application_condition                                      *
- *                                                                            *
- * Purpose: check application condition                                       *
- *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
- *             condition  - [IN/OUT] condition for matching, outputs          *
- *                                   event ids that match condition           *
- *                                                                            *
- * Return value: SUCCEED - supported operator                                 *
- *               NOTSUPPORTED - not supported operator                        *
- *                                                                            *
- ******************************************************************************/
-static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
-{
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_vector_uint64_t	objectids;
-	zbx_uint64_t		objectid;
-	int			i;
-
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_LIKE != condition->op &&
-			CONDITION_OPERATOR_NOT_LIKE != condition->op)
-	{
-		return NOTSUPPORTED;
-	}
-
-	zbx_vector_uint64_create(&objectids);
-
-	get_object_ids(esc_events, &objectids);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct t.triggerid,a.name"
-			" from applications a,items_applications i,functions f,triggers t"
-			" where a.applicationid=i.applicationid"
-			" and i.itemid=f.itemid"
-			" and f.triggerid=t.triggerid"
-			" and");
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", objectids.values, objectids.values_num);
-
-	result = DBselect("%s", sql);
-
-	switch (condition->op)
-	{
-		case CONDITION_OPERATOR_EQUAL:
-			while (NULL != (row = DBfetch(result)))
-			{
-				if (0 == strcmp(row[1], condition->value))
-				{
-					ZBX_STR2UINT64(objectid, row[0]);
-					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
-				}
-			}
-			break;
-		case CONDITION_OPERATOR_LIKE:
-			while (NULL != (row = DBfetch(result)))
-			{
-				if (NULL != strstr(row[1], condition->value))
-				{
-					ZBX_STR2UINT64(objectid, row[0]);
-					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
-				}
-			}
-			break;
-		case CONDITION_OPERATOR_NOT_LIKE:
-			while (NULL != (row = DBfetch(result)))
-			{
-				if (NULL != strstr(row[1], condition->value))
-				{
-					ZBX_STR2UINT64(objectid, row[0]);
-
-					if (FAIL != (i = zbx_vector_uint64_search(&objectids, objectid,
-							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-					{
-						zbx_vector_uint64_remove_noorder(&objectids, i);
-					}
-				}
-			}
-
-			for (i = 0; i < objectids.values_num; i++)
-				add_condition_match(esc_events, condition, objectids.values[i], EVENT_OBJECT_TRIGGER);
-			break;
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_destroy(&objectids);
-	zbx_free(sql);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1042,9 +947,6 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 			break;
 		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 			ret = check_acknowledged_condition(esc_events, condition);
-			break;
-		case CONDITION_TYPE_APPLICATION:
-			ret = check_application_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_EVENT_TAG:
 			check_condition_event_tag(esc_events, condition);
@@ -2611,124 +2513,6 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 
 /******************************************************************************
  *                                                                            *
- * Function: check_intern_application_condition                               *
- *                                                                            *
- * Purpose: check application condition for internal events                   *
- *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
- *             condition  - [IN/OUT] condition for matching, outputs          *
- *                                   event ids that match condition           *
- *                                                                            *
- * Return value: SUCCEED - supported operator                                 *
- *               NOTSUPPORTED - not supported operator                        *
- *                                                                            *
- ******************************************************************************/
-static int	check_intern_application_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
-{
-	char			*sql = NULL;
-	size_t			sql_alloc = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE}, i, j;
-	zbx_vector_uint64_t	objectids[3];
-	zbx_uint64_t		objectid;
-
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_LIKE != condition->op &&
-			CONDITION_OPERATOR_NOT_LIKE != condition->op)
-		return NOTSUPPORTED;
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-		zbx_vector_uint64_create(&objectids[i]);
-
-	get_object_ids_internal(esc_events, objectids, objects, (int)ARRSIZE(objects));
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-	{
-		size_t	sql_offset = 0;
-
-		if (0 == objectids[i].values_num)
-			continue;
-
-		if (EVENT_OBJECT_TRIGGER == objects[i])
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct t.triggerid,a.name"
-					" from applications a,items_applications i,functions f,triggers t"
-					" where a.applicationid=i.applicationid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and");
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
-					objectids[i].values, objectids[i].values_num);
-		}
-		else	/* EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE */
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct i.itemid,a.name"
-					" from applications a,items_applications i"
-					" where a.applicationid=i.applicationid"
-						" and");
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
-					objectids[i].values, objectids[i].values_num);
-		}
-
-		result = DBselect("%s", sql);
-
-		switch (condition->op)
-		{
-			case CONDITION_OPERATOR_EQUAL:
-				while (NULL != (row = DBfetch(result)))
-				{
-					if (0 == strcmp(row[1], condition->value))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-						add_condition_match(esc_events, condition, objectid, objects[i]);
-					}
-				}
-				break;
-			case CONDITION_OPERATOR_LIKE:
-				while (NULL != (row = DBfetch(result)))
-				{
-					if (NULL != strstr(row[1], condition->value))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-						add_condition_match(esc_events, condition, objectid, objects[i]);
-					}
-				}
-				break;
-			case CONDITION_OPERATOR_NOT_LIKE:
-				while (NULL != (row = DBfetch(result)))
-				{
-					if (NULL != strstr(row[1], condition->value))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-						if (FAIL != (j = zbx_vector_uint64_search(&objectids[i], objectid,
-								ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-						{
-							zbx_vector_uint64_remove_noorder(&objectids[i], j);
-						}
-					}
-				}
-
-				for (j = 0; j < objectids[i].values_num; j++)
-					add_condition_match(esc_events, condition, objectids[i].values[j], objects[i]);
-				break;
-		}
-		DBfree_result(result);
-	}
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-		zbx_vector_uint64_destroy(&objectids[i]);
-
-	zbx_free(sql);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: check_internal_condition                                         *
  *                                                                            *
  * Purpose: check if internal event matches single condition                  *
@@ -2759,8 +2543,13 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 		case CONDITION_TYPE_HOST:
 			ret = check_intern_host_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_APPLICATION:
-			ret = check_intern_application_condition(esc_events, condition);
+		case CONDITION_TYPE_EVENT_TAG:
+			check_condition_event_tag(esc_events, condition);
+			ret = SUCCEED;
+			break;
+		case CONDITION_TYPE_EVENT_TAG_VALUE:
+			check_condition_event_tag_value(esc_events,condition);
+			ret = SUCCEED;
 			break;
 		default:
 			ret = FAIL;
@@ -3817,7 +3606,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		ZBX_STR2UCHAR(action->eventsource, row[3]);
 
 		tmp = zbx_strdup(NULL, row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 				MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
 		{

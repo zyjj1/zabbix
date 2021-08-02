@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
- * @on-before prepareUpdateData
+ * @onBefore prepareUpdateData
  */
 class testFormHost extends CWebTest {
 
@@ -193,9 +193,16 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-
 		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost with items']);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		// Check tabs available in the form
+		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
+		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
+		foreach ($tabs as $tab) {
+			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).
+					"]")->one()->isValid());
+		}
+
 		// Host form fields maxlength attribute.
 		foreach (['Host name' => 128, 'Visible name' => 128, 'Description' => 65535] as $field => $maxlength) {
 			$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));
@@ -574,7 +581,62 @@ class testFormHost extends CWebTest {
 							'type' => 'Agent',
 							'ip' => '127.2.2.2',
 							'port' => '222',
-							'default' => true
+							'Default' => true
+						]
+					]
+				]
+			],
+			// Different versions of SNMP interface and encryption.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with different versions of SNMP interface',
+						'Groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv1',
+							'SNMP community' => 'test'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_TEST}'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA224'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA256',
+							'Privacy protocol' => 'AES192'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA384',
+							'Privacy protocol' => 'AES192C'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA512',
+							'Privacy protocol' => 'AES256C'
 						]
 					]
 				]
@@ -611,9 +673,9 @@ class testFormHost extends CWebTest {
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'ccc',
-							'Privacy protocol' => 'AES',
+							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => 'ddd',
 							'Use bulk requests' => false
 						],
@@ -648,7 +710,7 @@ class testFormHost extends CWebTest {
 							'dns' => '1444',
 							'Connect to' => 'DNS',
 							'port' => '500',
-							'default' => true
+							'Default' => true
 						]
 					]
 				]
@@ -1049,7 +1111,7 @@ class testFormHost extends CWebTest {
 							'dns' => 'agent',
 							'Connect to' => 'DNS',
 							'port' => '10054',
-							'default' => true
+							'Default' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1062,11 +1124,11 @@ class testFormHost extends CWebTest {
 							'Context name' => 'zabbix',
 							'Security name' => 'selenium',
 							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES',
+							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => '456test',
-							'default' => true
+							'Default' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1075,7 +1137,7 @@ class testFormHost extends CWebTest {
 							'dns' => 'ipmi',
 							'Connect to' => 'DNS',
 							'port' => '500',
-							'default' => true
+							'Default' => true
 						]
 					]
 				]
@@ -1131,7 +1193,7 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
 							'Use bulk requests' => true
 						],
@@ -1465,8 +1527,14 @@ class testFormHost extends CWebTest {
 							'dns' => '',
 							'Connect to' => 'IP',
 							'port' => '122',
-							'SNMP version' => 'SNMPv1',
-							'SNMP community' => 'zabbix',
+							'SNMP version' => 'SNMPv3',
+							'Context name' => 'zabbix',
+							'Security name' => 'selenium',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA256',
+							'Authentication passphrase' => 'test123',
+							'Privacy protocol' => 'AES256',
+							'Privacy passphrase' => '456test',
 							'Use bulk requests' => false
 						]
 					]
@@ -1661,7 +1729,7 @@ class testFormHost extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host deleted');
 				// Check if all host records have been deleted.
-				$tables=['hosts', 'interface', 'items', 'applications', 'hostmacro', 'hosts_groups', 'hosts_templates',
+				$tables=['hosts', 'interface', 'items', 'hostmacro', 'hosts_groups', 'hosts_templates',
 					'maintenances_hosts', 'host_inventory'];
 				foreach ($tables as $table) {
 					$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM '.$table.' WHERE hostid='.$hostid));

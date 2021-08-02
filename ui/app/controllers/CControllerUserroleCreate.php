@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,13 +37,13 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_monitoring_hosts' => 'in 0,1',
 			'ui_monitoring_overview' => 'in 0,1',
 			'ui_monitoring_latest_data' => 'in 0,1',
-			'ui_monitoring_screens' => 'in 0,1',
 			'ui_monitoring_maps' => 'in 0,1',
 			'ui_monitoring_discovery' => 'in 0,1',
 			'ui_monitoring_services' => 'in 0,1',
 			'ui_inventory_overview' => 'in 0,1',
 			'ui_inventory_hosts' => 'in 0,1',
 			'ui_reports_system_info' => 'in 0,1',
+			'ui_reports_scheduled_reports' => 'in 0,1',
 			'ui_reports_availability_report' => 'in 0,1',
 			'ui_reports_top_triggers' => 'in 0,1',
 			'ui_reports_audit' => 'in 0,1',
@@ -56,7 +56,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_configuration_actions' => 'in 0,1',
 			'ui_configuration_event_correlation' => 'in 0,1',
 			'ui_configuration_discovery' => 'in 0,1',
-			'ui_configuration_services' => 'in 0,1',
 			'ui_administration_general' => 'in 0,1',
 			'ui_administration_proxies' => 'in 0,1',
 			'ui_administration_authentication' => 'in 0,1',
@@ -74,6 +73,9 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'actions_change_severity' => 'in 0,1',
 			'actions_add_problem_comments' => 'in 0,1',
 			'actions_execute_scripts' => 'in 0,1',
+			'actions_manage_api_tokens' => 'in 0,1',
+			'actions_manage_scheduled_reports' => 'in 0,1',
+			'actions_manage_services' => 'in 0,1',
 			'modules' => 'array',
 			'api_mode' => 'in 0,1',
 			'api_methods' => 'array'

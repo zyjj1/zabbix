@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -420,7 +420,7 @@ func (p *Plugin) exportServices(params []string) (result interface{}, err error)
 	}
 
 	stateFilter := stateFlagAll
-	if len(params) > 1 && params[1] != "" {
+	if len(params) > 1 && params[1] != "all" && params[1] != "" {
 		switch params[1] {
 		case "stopped":
 			stateFilter = stateFlagStopped

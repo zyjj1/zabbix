@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ class testPageTriggerUrl extends CWebTest {
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
 						'Configuration' => 'triggers.php?form=update&triggerid=100035',
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
 						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
 						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
 					],
 					'background' => "high-bg"
@@ -73,7 +73,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Find trigger and open trigger overlay dialogue.
 		$table->query('link', $data['trigger'])->one()->click();
-		$this->checkTriggerUrl(false, $data, false);
+		$this->checkTriggerUrl(false, $data);
 	}
 
 	/**
@@ -124,7 +124,7 @@ class testPageTriggerUrl extends CWebTest {
 	/**
 	 * Check resolved trigger context menu on overview page, when {EVENT.ID} macro can't be resolved.
 	 *
-	 * @on-after resetFilter
+	 * @onAfter resetFilter
 	 */
 	public function testPageTriggerUrl_OverviewPageResolvedTrigger() {
 		$filter = [
@@ -192,56 +192,6 @@ class testPageTriggerUrl extends CWebTest {
 
 	/**
 	 * @dataProvider getTriggerLinkData
-	 * Check trigger url in screen item Trigger overview.
-	 */
-	public function testPageTriggerUrl_ScreensTriggerOverview($data) {
-		$name = 'Trigger overview';
-		$this->page->login()->open('screens.php?elementid=200021');
-		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
-		$table = $screen_item->query('class:list-table')->asTable()->one();
-		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $data['trigger']);
-
-		// Open trigger context menu.
-		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
-		$this->checkTriggerUrl(true, $data);
-	}
-
-	/**
-	 * @dataProvider getTriggerLinkData
-	 * Check trigger url in screen item Host issues.
-	 */
-	public function testPageTriggerUrl_ScreensHostIssues($data) {
-		$name = 'Host issues';
-		$this->page->login()->open('screens.php?elementid=200021');
-		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
-		$table = $screen_item->query('class:list-table')->asTable()->one();
-
-		// Find trigger and open trigger overlay.
-		$table->query('link', $data['trigger'])->one()->click();
-		$this->checkTriggerUrl(false, $data, false);
-	}
-
-	/**
-	 * @dataProvider getTriggerLinkData
-	 * Check trigger url in screen item Host group issues.
-	 */
-	public function testPageTriggerUrl_ScreensHostGroupIssues($data) {
-		$name = 'Host issues';
-		$this->page->login()->open('screens.php?elementid=200021');
-		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
-		$table = $screen_item->query('class:list-table')->asTable()->one();
-
-		// Find trigger and open trigger overlay.
-		$table->query('link', $data['trigger'])->one()->click();
-		$this->checkTriggerUrl(false, $data, false);
-	}
-
-	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Event details page.
 	 */
 	public function testPageTriggerUrl_EventDetails($data) {
@@ -281,7 +231,7 @@ class testPageTriggerUrl extends CWebTest {
 		}
 		else {
 			// Follow trigger link in overlay dialogue.
-			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
 			$hintbox->query('link', $data['links']['Trigger URL'])->one()->click();
 		}
 

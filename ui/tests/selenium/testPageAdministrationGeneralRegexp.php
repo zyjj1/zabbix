@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,8 +56,8 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 		$this->assertEquals([
-			'GUI', 'Autoregistration', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros',
-			'Value mapping','Trigger displaying options', 'Modules', 'Other'
+			'GUI', 'Autoregistration', 'Housekeeping', 'Audit log', 'Images', 'Icon mapping', 'Regular expressions', 'Macros',
+			'Trigger displaying options', 'Modules', 'API tokens', 'Other'
 		], $popup_menu->getItems()->asText());
 
 		$this->zbxTestAssertElementPresentXpath('//button[text()="New regular expression"]');
@@ -88,7 +88,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allRegexps
-	 * @backup-once regexps
+	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
@@ -106,7 +106,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	/**
-	 * @backup-once regexps
+	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');

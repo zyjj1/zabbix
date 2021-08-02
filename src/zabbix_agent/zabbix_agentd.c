@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,6 +92,8 @@ char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
 char	*CONFIG_TLS_CIPHER_ALL		= NULL;
 char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* not used in agent, defined for linking with tls.c */
 char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in agent, defined for linking with tls.c */
+
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
@@ -294,6 +296,8 @@ int	CONFIG_LLDWORKER_FORKS		= 0;
 int	CONFIG_ALERTDB_FORKS		= 0;
 int	CONFIG_HISTORYPOLLER_FORKS	= 0;
 int	CONFIG_AVAILMAN_FORKS		= 0;
+int	CONFIG_SERVICEMAN_FORKS		= 0;
+int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 0;
 
 char	*opt = NULL;
 
@@ -949,6 +953,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
+		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 
@@ -1269,6 +1275,7 @@ void	zbx_free_service_resources(int ret)
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
+	zbx_deinit_modbus();
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();

@@ -48,6 +48,8 @@ struct zbx_ipc_client
 	zbx_uint64_t		id;
 	unsigned char		state;
 
+	void			*userdata;
+
 	zbx_uint32_t		refcount;
 };
 
@@ -1326,6 +1328,23 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_ipc_socket_connected                                         *
+ *                                                                            *
+ * Purpose: check if socket is opened                                         *
+ *                                                                            *
+ * Parameters: csocket      - [OUT] the IPC socket to the service             *
+ *                                                                            *
+ * Return value: SUCCEED - the socket was successfully opened                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ipc_socket_connected(const zbx_ipc_socket_t *csocket)
+{
+	return 0 < csocket->fd ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_ipc_message_free                                             *
  *                                                                            *
  * Purpose: frees the resources allocated to store IPC message data           *
@@ -1806,6 +1825,16 @@ zbx_uint64_t	zbx_ipc_client_id(const zbx_ipc_client_t *client)
 	return client->id;
 }
 
+void	zbx_ipc_client_set_userdata(zbx_ipc_client_t *client, void *userdata)
+{
+	client->userdata = userdata;
+}
+
+void	*zbx_ipc_client_get_userdata(zbx_ipc_client_t *client)
+{
+	return client->userdata;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ipc_async_socket_open                                        *
@@ -1879,6 +1908,7 @@ void	zbx_ipc_async_socket_close(zbx_ipc_async_socket_t *asocket)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ipc_client_free(asocket->client);
+	asocket->client = NULL;
 
 	event_free(asocket->ev_timer);
 	event_base_free(asocket->ev);
@@ -2063,9 +2093,9 @@ out:
  *                                                                            *
  * Function: zbx_ipc_async_socket_check_unsent                                *
  *                                                                            *
- * Purpose: checks if there are data to be sent                               *
+ * Purpose: check if there are data to be sent                                *
  *                                                                            *
- * Parameters: client  - [IN] the IPC service client                          *
+ * Parameters: asocket - [IN] the asynchronous IPC service socket             *
  *                                                                            *
  * Return value: SUCCEED - there are messages queued to be sent               *
  *               FAIL    - all data has been sent                             *
@@ -2074,6 +2104,26 @@ out:
 int	zbx_ipc_async_socket_check_unsent(zbx_ipc_async_socket_t *asocket)
 {
 	return (0 == asocket->client->tx_bytes ? FAIL : SUCCEED);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipc_async_socket_connected                                   *
+ *                                                                            *
+ * Purpose: check if socket is connected                                      *
+ *                                                                            *
+ * Parameters: asocket - [IN] the asynchronous IPC service socket             *
+ *                                                                            *
+ * Return value: SUCCEED - socket is connected                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ipc_async_socket_connected(zbx_ipc_async_socket_t *asocket)
+{
+	if (NULL == asocket->client)
+		return FAIL;
+
+	return zbx_ipc_client_connected(asocket->client);
 }
 
 /******************************************************************************

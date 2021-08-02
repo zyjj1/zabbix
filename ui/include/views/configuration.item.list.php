@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,12 @@ $widget = (new CWidget())
 if ($data['hostid'] != 0) {
 	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
 }
-$widget->addItem($data['main_filter']);
+
+$widget->addItem(new CPartial('configuration.filter.items', [
+	'filter_data' => $data['filter_data'],
+	'subfilter' => $data['subfilter'],
+	'context' => $data['context']
+]));
 
 $url = (new CUrl('items.php'))
 	->setArgument('context', $data['context'])
@@ -84,8 +89,8 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
-		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags'),
 		($data['context'] === 'host') ? _('Info') : null
 	]);
 
@@ -224,11 +229,9 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
-	$wizard = (new CSpan(
-		(new CButton(null))
-			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]))
-	))->addClass(ZBX_STYLE_REL_CONTAINER);
+	$wizard = (new CButton(null))
+		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
@@ -272,8 +275,8 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		CHtml::encode($item['applications_list']),
 		$status,
+		$data['tags'][$item['itemid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }

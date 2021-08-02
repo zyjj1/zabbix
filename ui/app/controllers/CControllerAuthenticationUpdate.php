@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ class CControllerAuthenticationUpdate extends CController {
 			->setArgument('action', 'authentication.edit')
 			->getUrl()
 		);
-
-		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {
@@ -70,7 +68,9 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_sign_logout_responses' =>	'in 0,1',
 			'saml_encrypt_nameid' =>		'in 0,1',
 			'saml_encrypt_assertions' =>	'in 0,1',
-			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
+			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'passwd_min_length' =>			'int32',
+			'passwd_check_rules' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -174,7 +174,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			$login = $ldap_validator->validate([
-				'user' => $this->getInput('ldap_test_user', CWebUser::$data['alias']),
+				'username' => $this->getInput('ldap_test_user', CWebUser::$data['username']),
 				'password' => $this->getInput('ldap_test_password', '')
 			]);
 
@@ -230,6 +230,26 @@ class CControllerAuthenticationUpdate extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION);
 	}
 
+	/**
+	 * In case of error, convert array back to integer (string) so edit form does not fail.
+	 *
+	 * @return array
+	 */
+	public function getInputAll() {
+		$input = parent::getInputAll();
+		$rules = $input['passwd_check_rules'];
+		$input['passwd_check_rules'] = 0x00;
+
+		foreach ($rules as $rule) {
+			$input['passwd_check_rules'] |= $rule;
+		}
+
+		// CNewValidator thinks int32 must be a string type integer.
+		$input['passwd_check_rules'] = (string) $input['passwd_check_rules'];
+
+		return $input;
+	}
+
 	protected function doAction() {
 		$auth_valid = ($this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED)
 			? $this->validateLdap()
@@ -283,7 +303,9 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES,
 			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
 			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
-			CAuthenticationHelper::SAML_CASE_SENSITIVE
+			CAuthenticationHelper::SAML_CASE_SENSITIVE,
+			CAuthenticationHelper::PASSWD_MIN_LENGTH,
+			CAuthenticationHelper::PASSWD_CHECK_RULES
 		];
 		$auth = [];
 		foreach ($auth_params as $param) {
@@ -294,7 +316,9 @@ class CControllerAuthenticationUpdate extends CController {
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
-			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED
+			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
+			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
@@ -344,6 +368,14 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$data = $fields + $auth;
 		$this->getInputs($data, array_keys($fields));
+
+		$rules = $data['passwd_check_rules'];
+		$data['passwd_check_rules'] = 0x00;
+
+		foreach ($rules as $rule) {
+			$data['passwd_check_rules'] |= $rule;
+		}
+
 		$data = array_diff_assoc($data, $auth);
 
 		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {

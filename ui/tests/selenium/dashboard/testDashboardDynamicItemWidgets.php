@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)']
 //						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 					]
 				]
@@ -126,7 +126,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)']
 //						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 					]
 				]
@@ -274,8 +274,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	}
 
 	/**
-	 * @on-before createTestFile
-	 * @on-after removeTestFile
+	 * @onBefore createTestFile
+	 * @onAfter removeTestFile
 	 *
 	 * @dataProvider getWidgetsData
 	 */
@@ -296,8 +296,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 		}
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		// Show hidden headings of graph prototype.
-		$this->page->getDriver()->executeScript('var elements = document.getElementsByClassName("dashbrd-grid-iterator");'.
-				' for (var i = 0; i < elements.length; i++) elements[i].className+=" dashbrd-grid-iterator-focus";'
+		$this->page->getDriver()->executeScript('var elements = document.getElementsByClassName("dashboard-grid-iterator");'.
+				' for (var i = 0; i < elements.length; i++) elements[i].className+=" dashboard-grid-iterator-focus";'
 		);
 
 		$this->assertWidgetContent($data['widgets']);

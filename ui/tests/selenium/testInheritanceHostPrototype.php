@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,10 +219,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @param array $data	test case data from data provider
 	 */
 	private function sqlForHostPrototypeCompare($data) {
-		$sql = 'SELECT host, status, name, disable_until, error, available, errors_from, lastaccess, ipmi_authtype,'.
-				' ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, snmp_disable_until,'.
-				' snmp_available, ipmi_errors_from, ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
-				' jmx_errors_from, jmx_error, description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
+		$sql = 'SELECT host, status, name, lastaccess, ipmi_authtype,'.
+				' ipmi_privilege, ipmi_username, ipmi_password,'.
+				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
 				' tls_psk_identity, tls_psk, auto_compress, flags'.
 				' FROM hosts'.
 				' WHERE flags=2 AND hostid IN ('.
@@ -587,10 +586,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->assertFalse($this->query('id:macros_'.$i.'_description')->one()->isEnabled());
 		}
 
-		// Check that added macros are written in DB 2 times: for template and for linked host.
-		foreach ($macros as $macro) {
-			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM hostmacro WHERE macro='.zbx_dbstr($macro['macro'])));
-		}
+		$sql = 'SELECT macro,type,value,description FROM hostmacro WHERE hostid=%d ORDER BY hostmacroid';
+		$this->assertSame(CDBHelper::getHash(vsprintf($sql, $template_prototype_id)),
+			CDBHelper::getHash(vsprintf($sql, $host_prototype_id))
+		);
 	}
 
 		public static function getDeleteData() {

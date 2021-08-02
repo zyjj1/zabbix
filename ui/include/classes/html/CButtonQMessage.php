@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class CButtonQMessage extends CSubmit {
 
 	public function setMessage($value = null) {
 		if (is_null($value)) {
-			$value = _('Are you sure you want perform this action?');
+			$value = _('Are you sure you want to perform this action?');
 		}
 		// if message will contain single quotes, it will break everything, so it must be escaped
 		$this->msg = zbx_jsvalue(

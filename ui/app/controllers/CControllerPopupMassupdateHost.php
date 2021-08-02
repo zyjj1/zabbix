@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateHost extends CController {
-
-	protected function init() {
-		$this->disableSIDvalidation();
-	}
+class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract {
 
 	protected function checkInput() {
 		$fields = [
@@ -46,6 +42,13 @@ class CControllerPopupMassupdateHost extends CController {
 			'tls_subject' => 'string',
 			'tls_psk_identity' => 'string',
 			'tls_psk' => 'string',
+			'valuemaps' => 'array',
+			'valuemap_remove' => 'array',
+			'valuemap_remove_except' => 'in 1',
+			'valuemap_remove_all' => 'in 1',
+			'valuemap_rename' => 'array',
+			'valuemap_update_existing' => 'in 1',
+			'valuemap_add_missing' => 'in 1',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
 			'macros_remove' => 'in 0,1',
@@ -55,6 +58,7 @@ class CControllerPopupMassupdateHost extends CController {
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_RENAME, ZBX_ACTION_REMOVE_ALL]),
 			'inventory_mode' => 'in '.implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]),
 			'status' => 'in '.implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]),
 			'tls_connect' => 'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
@@ -82,21 +86,17 @@ class CControllerPopupMassupdateHost extends CController {
 	protected function checkPermissions() {
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => $this->getInput('ids', []),
+			'hostids' => $this->getInput('ids'),
 			'editable' => true
 		]);
 
-		if (!$hosts) {
-			return false;
-		}
-
-		return true;
+		return count($hosts) > 0;
 	}
 
 	protected function doAction() {
 		if ($this->hasInput('update')) {
 			$output = [];
-			$hostids = $this->getInput('ids', []);
+			$hostids = $this->getInput('ids');
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -118,7 +118,7 @@ class CControllerPopupMassupdateHost extends CController {
 
 				// filter only normal and discovery created hosts
 				$options = [
-					'output' => ['hostid', 'inventory_mode'],
+					'output' => ['hostid', 'inventory_mode', 'flags'],
 					'hostids' => $hostids,
 					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 				];
@@ -237,9 +237,6 @@ class CControllerPopupMassupdateHost extends CController {
 					}
 				}
 
-				$host_macros_add = [];
-				$host_macros_update = [];
-				$host_macros_remove = [];
 				foreach ($hosts as &$host) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -289,7 +286,12 @@ class CControllerPopupMassupdateHost extends CController {
 						}
 					}
 
-					if (array_key_exists('inventory_mode', $new_values)) {
+					/*
+					 * Inventory mode cannot be changed for discovered hosts. If discovered host has disabled inventory
+					 * mode, inventory values also cannot be changed.
+					 */
+					if (array_key_exists('inventory_mode', $new_values)
+							&& $host['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						$host['inventory'] = $host_inventory;
 					}
 					elseif ($host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
@@ -332,45 +334,33 @@ class CControllerPopupMassupdateHost extends CController {
 					if (array_key_exists('macros', $visible)) {
 						switch ($mass_update_macros) {
 							case ZBX_ACTION_ADD:
-								if ($macros) {
-									$update_existing = $this->getInput('macros_add', 0);
+								$update_existing = (bool) getRequest('macros_add', 0);
+								$host['macros'] = array_column($host['macros'], null, 'hostmacroid');
+								$host_macros_by_macro = array_column($host['macros'], null, 'macro');
 
-									foreach ($macros as $macro) {
-										foreach ($host['macros'] as $host_macro) {
-											if ($macro['macro'] === $host_macro['macro']) {
-												if ($update_existing) {
-													$macro['hostmacroid'] = $host_macro['hostmacroid'];
-													$host_macros_update[] = $macro;
-												}
-
-												continue 2;
-											}
-										}
-
-										$macro['hostid'] = $host['hostid'];
-										$host_macros_add[] = $macro;
+								foreach ($macros as $macro) {
+									if (!array_key_exists($macro['macro'], $host_macros_by_macro)) {
+										$host['macros'][] = $macro;
+									}
+									elseif ($update_existing) {
+										$hostmacroid = $host_macros_by_macro[$macro['macro']]['hostmacroid'];
+										$host['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
 									}
 								}
 								break;
 
-							case ZBX_ACTION_REPLACE: // In Macros its update.
-								if ($macros) {
-									$add_missing = $this->getInput('macros_update', 0);
+							case ZBX_ACTION_REPLACE:
+								$add_missing = (bool) getRequest('macros_update', 0);
+								$host['macros'] = array_column($host['macros'], null, 'hostmacroid');
+								$host_macros_by_macro = array_column($host['macros'], null, 'macro');
 
-									foreach ($macros as $macro) {
-										foreach ($host['macros'] as $host_macro) {
-											if ($macro['macro'] === $host_macro['macro']) {
-												$macro['hostmacroid'] = $host_macro['hostmacroid'];
-												$host_macros_update[] = $macro;
-
-												continue 2;
-											}
-										}
-
-										if ($add_missing) {
-											$macro['hostid'] = $host['hostid'];
-											$host_macros_add[] = $macro;
-										}
+								foreach ($macros as $macro) {
+									if (array_key_exists($macro['macro'], $host_macros_by_macro)) {
+										$hostmacroid = $host_macros_by_macro[$macro['macro']]['hostmacroid'];
+										$host['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
+									}
+									elseif ($add_missing) {
+										$host['macros'][] = $macro;
 									}
 								}
 								break;
@@ -378,15 +368,12 @@ class CControllerPopupMassupdateHost extends CController {
 							case ZBX_ACTION_REMOVE:
 								if ($macros) {
 									$except_selected = $this->getInput('macros_remove', 0);
+									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
+									$macros_by_macro = array_column($macros, null, 'macro');
 
-									$macro_names = array_column($macros, 'macro');
-
-									foreach ($host['macros'] as $host_macro) {
-										if ((!$except_selected && in_array($host_macro['macro'], $macro_names))
-												|| ($except_selected && !in_array($host_macro['macro'], $macro_names))) {
-											$host_macros_remove[] = $host_macro['hostmacroid'];
-										}
-									}
+									$host['macros'] = $except_selected
+										? array_intersect_key($host_macros_by_macro, $macros_by_macro)
+										: array_diff_key($host_macros_by_macro, $macros_by_macro);
 								}
 								break;
 
@@ -399,41 +386,33 @@ class CControllerPopupMassupdateHost extends CController {
 								break;
 						}
 
-						if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
-							unset($host['macros']);
-						}
+						$host['macros'] = array_values($host['macros']);
 					}
 
 					unset($host['parentTemplates']);
 
 					$host = $new_values + $host;
+
+					/*
+					 * API prevents changing host inventory_mode for discovered hosts. However, inventory values can
+					 * still be updated if inventory mode allows it.
+					 */
+					if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+						unset($host['inventory_mode']);
+					}
+					unset($host['flags']);
 				}
 				unset($host);
 
-				if (!API::Host()->update($hosts)) {
+				$result = $hosts ? (bool) API::Host()->update($hosts) : true;
+
+				if ($result === false) {
 					throw new Exception();
 				}
 
-				/**
-				 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
-				 * API::Host->update() results in loss of secret macro values.
-				 */
-				if ($host_macros_remove) {
-					if (!API::UserMacro()->delete($host_macros_remove)) {
-						throw new Exception();
-					}
-				}
-
-				if ($host_macros_add) {
-					if (!API::UserMacro()->create($host_macros_add)) {
-						throw new Exception();
-					}
-				}
-
-				if ($host_macros_update) {
-					if (!API::UserMacro()->update($host_macros_update)) {
-						throw new Exception();
-					}
+				// Value mapping.
+				if (array_key_exists('valuemaps', $visible)) {
+					$this->updateValueMaps($hostids);
 				}
 
 				DBend(true);
@@ -467,7 +446,7 @@ class CControllerPopupMassupdateHost extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'ids' => $this->getInput('ids', []),
+				'ids' => $this->getInput('ids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => 'hosts.php'
 			];
@@ -478,6 +457,13 @@ class CControllerPopupMassupdateHost extends CController {
 					'status' => [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]
 				],
 				'sortfield' => 'host'
+			]);
+
+			$data['discovered_host'] = !(bool) API::Host()->get([
+				'output' => [],
+				'hostids' => $data['ids'],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+				'limit' => 1
 			]);
 
 			$this->setResponse(new CControllerResponseData($data));

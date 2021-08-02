@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
 #include "dbcache.h"
 
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
+int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error);
 
-int	zbx_trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
-		char **error);
+int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error);
 int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error);
 
 int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);

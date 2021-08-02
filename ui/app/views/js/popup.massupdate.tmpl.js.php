@@ -1,7 +1,7 @@
 <?php  declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,20 @@
  * @var CView $this
  */
 ?>
+<?= (new CScriptTemplate('valuemap-rename-row-tmpl'))->addItem(
+	(new CRow([
+		(new CTextBox('valuemap_rename[#{rowNum}][from]', '', false, DB::getFieldLength('valuemap', 'name')))
+			->addStyle('width: 100%;'),
+		(new CTextBox('valuemap_rename[#{rowNum}][to]', '', false, DB::getFieldLength('valuemap', 'name')))
+			->addStyle('width: 100%;'),
+		(new CCol(
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove'))
+		)
+			->addClass(ZBX_STYLE_TOP)
+	]))->addClass('form_row')
+); ?>
 
 <script type="text/x-jquery-tmpl" id="macro-row-tmpl">
 	<?= (new CRow([
@@ -88,7 +102,7 @@
 	<tr id="dependency_#{triggerid}" data-triggerid="#{triggerid}">
 		<td>
 			<input type="hidden" name="dependencies[]" id="dependencies_#{triggerid}" value="#{triggerid}">
-			<a href="#{url}" target="_blank">#{name}</a>
+			<a href="#{url}" target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>">#{name}</a>
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<?= (new CButton('remove', _('Remove')))

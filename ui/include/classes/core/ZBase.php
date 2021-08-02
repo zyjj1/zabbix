@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,16 +145,13 @@ class ZBase {
 		require_once 'include/hostgroups.inc.php';
 		require_once 'include/hosts.inc.php';
 		require_once 'include/httptest.inc.php';
-		require_once 'include/ident.inc.php';
 		require_once 'include/images.inc.php';
 		require_once 'include/items.inc.php';
 		require_once 'include/maintenances.inc.php';
 		require_once 'include/maps.inc.php';
 		require_once 'include/media.inc.php';
-		require_once 'include/services.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
-		require_once 'include/valuemap.inc.php';
 	}
 
 	/**
@@ -176,6 +173,13 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
+				$file = basename($_SERVER['SCRIPT_NAME']);
+				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
+
+				if ($action_name === 'notifications.get') {
+					CWebUser::disableSessionExtension();
+				}
+
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
@@ -190,15 +194,17 @@ class ZBase {
 				$this->initComponents();
 				$this->initModuleManager();
 
-				$file = basename($_SERVER['SCRIPT_NAME']);
-				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
-
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name, $_GET,
+					->setSelectedByAction($action_name, $_REQUEST,
+						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+					);
+
+				$this->component_registry->get('menu.user')
+					->setSelectedByAction($action_name, $_REQUEST,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 
@@ -210,7 +216,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales('en_gb');
+				$this->initLocales('en_us');
 				break;
 
 			case self::EXEC_MODE_SETUP:
@@ -289,6 +295,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
 			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/data',
 			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
@@ -320,7 +327,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/macros',
-			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/html/pageheader',
 			$this->rootDir.'/include/classes/html/svg',
@@ -417,9 +423,7 @@ class ZBase {
 	public function initLocales(string $lang): void {
 		init_mbstrings();
 
-		$default_locales = [
-			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-		];
+		$default_locales = ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252'];
 
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user
@@ -439,7 +443,7 @@ class ZBase {
 				}
 			}
 
-			if (!$locale_found && $lang !== 'en_GB' && $lang !== 'en_gb') {
+			if (!$locale_found && strtolower($lang) !== strtolower(ZBX_DEFAULT_LANG)) {
 				setlocale(LC_ALL, $default_locales);
 				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
@@ -644,7 +648,7 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
+	 * Set layout mode using URL parameters.
 	 */
 	private function setLayoutModeByUrl() {
 		if (hasRequest('kiosk')) {

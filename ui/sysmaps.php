@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
@@ -184,7 +183,6 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		$messageSuccess = _('Network map updated');
 		$messageFailed = _('Cannot update network map');
-		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		if (getRequest('form') === 'full_clone') {
@@ -192,7 +190,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-					'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+					'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'tags', 'evaltype'
 				],
 				'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
 					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
@@ -215,11 +213,9 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		$messageSuccess = _('Network map added');
 		$messageFailed = _('Cannot add network map');
-		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit($auditAction, AUDIT_RESOURCE_MAP, 'Name ['.$map['name'].']');
 		unset($_REQUEST['form']);
 	}
 
@@ -253,10 +249,6 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 
 	if ($result) {
 		unset($_REQUEST['form']);
-
-		foreach ($maps as $map) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
-		}
 	}
 
 	$result = DBend($result);
@@ -309,7 +301,7 @@ if (hasRequest('form')) {
 	}
 
 	$data['users'] = API::User()->get([
-		'output' => ['userid', 'alias', 'name', 'surname'],
+		'output' => ['userid', 'username', 'name', 'surname'],
 		'userids' => $userids,
 		'preservekeys' => true
 	]);

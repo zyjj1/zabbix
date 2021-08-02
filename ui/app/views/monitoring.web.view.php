@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,9 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('multiselect.js');
+$this->addJsFile('class.tagfilteritem.js');
 
+$this->includeJsFile('monitoring.web.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -39,7 +41,8 @@ $web_layout_mode = $this->getLayoutMode();
 		(new CTag('nav', true, get_icon('kioskmode', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'web.view')))
+	->addItem((new CFilter())
+		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'web.view'))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'web.view'))->removeId())
@@ -81,7 +84,13 @@ $web_layout_mode = $this->getLayoutMode();
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
+				),
+			(new CFormList())->addRow(_('Tags'),
+				CTagFilterFieldHelper::getTagFilterField([
+					'evaltype' => $data['filter']['evaltype'],
+					'tags' => $data['filter']['tags']
+				])
+			)
 		])
 	)
 	->addItem($data['screen_view'])

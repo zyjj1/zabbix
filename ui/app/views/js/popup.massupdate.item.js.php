@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -161,37 +161,5 @@
 	$(obj.querySelector('#custom_intervals')).dynamicRows({
 		template: '#custom-intervals-tmpl'
 	});
-})();
-
-// Applications.
-(() => {
-	const app_elem = document.querySelector('#applications_div');
-
-	if (!app_elem) {
-		return false;
-	}
-
-	let obj = app_elem;
-	if (app_elem.tagName === 'SPAN') {
-		obj = app_elem.originalObject;
-	}
-
-	const cb = (event) => {
-		$('#applications_').multiSelect('modify', {
-			'addNew': ( event.currentTarget.value == <?= ZBX_ACTION_ADD ?> ||  event.currentTarget.value == <?= ZBX_ACTION_REPLACE ?>)
-		});
-	};
-
-	[...obj.querySelectorAll('input[name=massupdate_app_action]')].map((elem) => elem.addEventListener('change', cb));
-
-	<?php if (array_key_exists('parent_discoveryid', $data)): ?>
-		const cb_prototype = (event) => {
-			$('#application_prototypes_').multiSelect('modify', {
-				'addNew': ( event.currentTarget.value == <?= ZBX_ACTION_ADD ?> ||  event.currentTarget.value == <?= ZBX_ACTION_REPLACE ?>)
-			});
-		};
-
-		[...obj.querySelectorAll('input[name=massupdate_app_prot_action]')].map((elem) => elem.addEventListener('change', cb_prototype));
-	<?php endif ?>
 })();
 </script>

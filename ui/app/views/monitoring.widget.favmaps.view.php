@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,14 +35,14 @@ foreach ($data['maps'] as $map) {
 			: $map['label'],
 		(new CButton())
 			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
-			->addClass(ZBX_STYLE_REMOVE_BTN)
+			->addClass(ZBX_STYLE_BTN_REMOVE)
 			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $map['label']))
 			->removeId()
 	]);
 }
 
 $output = [
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $table->toString()
 ];
 

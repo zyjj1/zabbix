@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,20 +68,9 @@ else {
 }
 
 $output = [
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $table->toString()
 ];
-
-if ($data['initial_load']) {
-	$output['script_inline'] =
-		'if (typeof refreshProblemsBySvWidget !== typeof(Function)) {'.
-			'function refreshProblemsBySvWidget(event, response, overlay) {'.
-				'refreshWidgetOnAcknowledgeCreate("problemsbysv", response, overlay);'.
-			'}'.
-
-			'$.subscribe("acknowledge.create", refreshProblemsBySvWidget);'.
-		'}';
-}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ else {
 				->setArgument('action', 'macros.edit')
 				->getUrl()
 			))
-			->setAttribute('target', '_blank');
+			->setTarget('_blank');
 		$link = [' (', $link, ')'];
 	}
 
@@ -139,7 +139,7 @@ else {
 					'templates.php?form=update&templateid='.$macro['template']['templateid'])
 				)
 					->addClass('unknown')
-					->setAttribute('target', '_blank');
+					->setTarget('_blank');
 			}
 			else {
 				$link = new CSpan(CHtml::encode($macro['template']['name']));

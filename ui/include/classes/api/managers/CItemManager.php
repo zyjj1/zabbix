@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,11 +192,6 @@ class CItemManager {
 		if ($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			CTriggerPrototypeManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
-
-		DB::delete('screens_items', [
-			'resourceid' => $del_itemids,
-			'resourcetype' => [SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK]
-		]);
 
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.graphids',

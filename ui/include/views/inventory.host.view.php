@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,13 +179,6 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 		->setArgument('form', 'update')
 		->setArgument('hostid', $data['host']['hostid'])
 	);
-	$applicationsLink = new CLink(_('Applications'),
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'application.list')
-			->setArgument('filter_set', '1')
-			->setArgument('filter_hostids', [$data['host']['hostid']])
-	);
-
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')
@@ -219,7 +212,6 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 }
 else {
 	$hostLink = _('Host');
-	$applicationsLink = _('Application');
 	$itemsLink = _('Items');
 	$triggersLink = _('Triggers');
 	$graphsLink = _('Graphs');
@@ -230,7 +222,6 @@ else {
 $overviewFormList->addRow(_('Configuration'),
 	new CHorList([
 		$hostLink,
-		(new CSpan([$applicationsLink, CViewHelper::showNum($data['host']['applications'])])),
 		(new CSpan([$itemsLink, CViewHelper::showNum($data['host']['items'])])),
 		(new CSpan([$triggersLink, CViewHelper::showNum($data['host']['triggers'])])),
 		(new CSpan([$graphsLink, CViewHelper::showNum($data['host']['graphs'])])),

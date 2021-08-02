@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	use TableTrait;
 
 	const DICROVERY_RULE_ID = 90001;
-	const HOST_PROTOTYPES_COUNT = 10;
+	const HOST_PROTOTYPES_COUNT = 8;
 
 	public function testPageHostPrototypes_CheckLayout() {
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('xpath://form[@name="hosts"]/table[@class="list-table"]')->asTable()->one();
 		$headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
 		$this->assertSame($headers, $table->getHeadersText());
 

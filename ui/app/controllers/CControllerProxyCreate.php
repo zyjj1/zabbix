@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,12 +101,6 @@ class CControllerProxyCreate extends CController {
 		DBstart();
 
 		$result = API::Proxy()->create([$proxy]);
-
-		if ($result) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY,
-				'['.$this->getInput('host', '').'] ['.reset($result['proxyids']).']'
-			);
-		}
 
 		$result = DBend($result);
 

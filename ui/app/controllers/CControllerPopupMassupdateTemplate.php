@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateTemplate extends CController {
-
-	protected function init() {
-		$this->disableSIDvalidation();
-	}
+class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstract {
 
 	protected function checkInput() {
 		$fields = [
@@ -36,11 +32,19 @@ class CControllerPopupMassupdateTemplate extends CController {
 			'tags' => 'array',
 			'macros' => 'array',
 			'linked_templates' => 'array',
+			'valuemaps' => 'array',
+			'valuemap_remove' => 'array',
+			'valuemap_remove_except' => 'in 1',
+			'valuemap_remove_all' => 'in 1',
+			'valuemap_rename' => 'array',
+			'valuemap_update_existing' => 'in 1',
+			'valuemap_add_missing' => 'in 1',
 			'mass_action_tpls' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_clear_tpls' => 'in 0,1',
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_RENAME, ZBX_ACTION_REMOVE_ALL]),
 			'description' => 'string',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
@@ -180,9 +184,6 @@ class CControllerPopupMassupdateTemplate extends CController {
 					$new_values['description'] = $this->getInput('description');
 				}
 
-				$template_macros_add = [];
-				$template_macros_update = [];
-				$template_macros_remove = [];
 				foreach ($templates as &$template) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -265,45 +266,33 @@ class CControllerPopupMassupdateTemplate extends CController {
 					if (array_key_exists('macros', $visible)) {
 						switch ($mass_update_macros) {
 							case ZBX_ACTION_ADD:
-								if ($macros) {
-									$update_existing = $this->getInput('macros_add', 0);
+								$update_existing = (bool) getRequest('macros_add', 0);
+								$template['macros'] = array_column($template['macros'], null, 'hostmacroid');
+								$template_macros_by_macro = array_column($template['macros'], null, 'macro');
 
-									foreach ($macros as $macro) {
-										foreach ($template['macros'] as $template_macro) {
-											if ($macro['macro'] === $template_macro['macro']) {
-												if ($update_existing) {
-													$macro['hostmacroid'] = $template_macro['hostmacroid'];
-													$template_macros_update[] = $macro;
-												}
-
-												continue 2;
-											}
-										}
-
-										$macro['hostid'] = $template['templateid'];
-										$template_macros_add[] = $macro;
+								foreach ($macros as $macro) {
+									if (!array_key_exists($macro['macro'], $template_macros_by_macro)) {
+										$template['macros'][] = $macro;
+									}
+									elseif ($update_existing) {
+										$hostmacroid = $template_macros_by_macro[$macro['macro']]['hostmacroid'];
+										$template['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
 									}
 								}
 								break;
 
-							case ZBX_ACTION_REPLACE: // In Macros its update.
-								if ($macros) {
-									$add_missing = $this->getInput('macros_update', 0);
+							case ZBX_ACTION_REPLACE:
+								$add_missing = (bool) getRequest('macros_update', 0);
+								$template['macros'] = array_column($template['macros'], null, 'hostmacroid');
+								$template_macros_by_macro = array_column($template['macros'], null, 'macro');
 
-									foreach ($macros as $macro) {
-										foreach ($template['macros'] as $template_macro) {
-											if ($macro['macro'] === $template_macro['macro']) {
-												$macro['hostmacroid'] = $template_macro['hostmacroid'];
-												$template_macros_update[] = $macro;
-
-												continue 2;
-											}
-										}
-
-										if ($add_missing) {
-											$macro['hostid'] = $template['templateid'];
-											$template_macros_add[] = $macro;
-										}
+								foreach ($macros as $macro) {
+									if (array_key_exists($macro['macro'], $template_macros_by_macro)) {
+										$hostmacroid = $template_macros_by_macro[$macro['macro']]['hostmacroid'];
+										$template['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
+									}
+									elseif ($add_missing) {
+										$template['macros'][] = $macro;
 									}
 								}
 								break;
@@ -311,16 +300,12 @@ class CControllerPopupMassupdateTemplate extends CController {
 							case ZBX_ACTION_REMOVE:
 								if ($macros) {
 									$except_selected = $this->getInput('macros_remove', 0);
+									$template_macros_by_macro = array_column($template['macros'], null, 'macro');
+									$macros_by_macro = array_column($macros, null, 'macro');
 
-									$macro_names = array_column($macros, 'macro');
-
-									foreach ($template['macros'] as $template_macro) {
-										if ((!$except_selected && in_array($template_macro['macro'], $macro_names))
-												|| ($except_selected
-													&& !in_array($template_macro['macro'], $macro_names))) {
-											$template_macros_remove[] = $template_macro['hostmacroid'];
-										}
-									}
+									$template['macros'] = $except_selected
+										? array_intersect_key($template_macros_by_macro, $macros_by_macro)
+										: array_diff_key($template_macros_by_macro, $macros_by_macro);
 								}
 								break;
 
@@ -333,9 +318,7 @@ class CControllerPopupMassupdateTemplate extends CController {
 								break;
 						}
 
-						if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
-							unset($template['macros']);
-						}
+						$template['macros'] = array_values($template['macros']);
 					}
 
 					unset($template['parentTemplates']);
@@ -348,26 +331,9 @@ class CControllerPopupMassupdateTemplate extends CController {
 					throw new Exception();
 				}
 
-				/**
-				 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
-				 * API::Template->update() results in loss of secret macro values.
-				 */
-				if ($template_macros_remove) {
-					if (!API::UserMacro()->delete($template_macros_remove)) {
-						throw new Exception();
-					}
-				}
-
-				if ($template_macros_add) {
-					if (!API::UserMacro()->create($template_macros_add)) {
-						throw new Exception();
-					}
-				}
-
-				if ($template_macros_update) {
-					if (!API::UserMacro()->update($template_macros_update)) {
-						throw new Exception();
-					}
+				// Value mapping.
+				if (array_key_exists('valuemaps', $visible)) {
+					$this->updateValueMaps($templateids);
 				}
 			}
 			catch (Exception $e) {

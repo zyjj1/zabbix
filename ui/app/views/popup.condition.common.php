@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,15 @@ switch ($data['type']) {
 		$operators_by_condition = [];
 		$action_conditions = [];
 		foreach ($data['allowed_conditions'] as $type) {
-			$action_conditions[$type] = condition_type2str($type);
+			if ($data['source'] == EVENT_SOURCE_SERVICE && $type == CONDITION_TYPE_EVENT_TAG) {
+				$action_conditions[$type] = _('Service tag name');
+			}
+			elseif ($data['source'] == EVENT_SOURCE_SERVICE && $type == CONDITION_TYPE_EVENT_TAG_VALUE) {
+				$action_conditions[$type] = _('Service tag value');
+			}
+			else {
+				$action_conditions[$type] = condition_type2str($type);
+			}
 
 			foreach (get_operators_by_conditiontype($type) as $value) {
 				$operators_by_condition[$type][$value] = condition_operator2str($value);
@@ -299,7 +307,7 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Tag'), $new_condition_value);
+					->addRow((new CLabel(_('Tag')))->setAsteriskMark(), $new_condition_value);
 				break;
 
 			// Tag value form elements.
@@ -315,7 +323,7 @@ switch ($data['type']) {
 				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_list
-					->addRow(_('Tag'), $new_condition_value2)
+					->addRow((new CLabel(_('Tag')))->setAsteriskMark(), $new_condition_value2)
 					->addRow(_('Operator'), $operator)
 					->addRow(_('Value'), $new_condition_value);
 				break;
@@ -515,21 +523,6 @@ switch ($data['type']) {
 					->addRow(_('Proxy'), $proxy_multiselect);
 				break;
 
-			// Application form elements.
-			case CONDITION_TYPE_APPLICATION:
-				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($operators_by_condition[$condition_type] as $key => $value) {
-					$operator->addValue($value, $key);
-				}
-				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-
-				$inline_js .= $new_condition_value->getPostJS();
-
-				$form_list
-					->addRow(_('Operator'), $operator)
-					->addRow(_('Value'), $new_condition_value);
-				break;
-
 			// Received value form elements.
 			case CONDITION_TYPE_DVALUE:
 				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -596,6 +589,8 @@ switch ($data['type']) {
 			case CONDITION_TYPE_HOST_NAME:
 			// Host metadata form elements.
 			case CONDITION_TYPE_HOST_METADATA:
+			// Service name form elements.
+			case CONDITION_TYPE_SERVICE_NAME:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_LIKE))->setModern(true);
 				foreach ($operators_by_condition[$condition_type] as $key => $value) {
 					$operator->addValue($value, $key);
@@ -606,7 +601,7 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Value'), $new_condition_value);
+					->addRow((new CLabel(_('Value')))->setAsteriskMark(), $new_condition_value);
 				break;
 
 			// Event type form elements.
@@ -623,6 +618,31 @@ switch ($data['type']) {
 						->setFocusableElementId('label-condition-event-type')
 						->addOptions(CSelect::createOptionsFromArray(eventType()))
 					);
+				break;
+
+			// Service form elements.
+			case CONDITION_TYPE_SERVICE:
+				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
+				foreach ($operators_by_condition[CONDITION_TYPE_SERVICE] as $key => $value) {
+					$operator->addValue($value, $key);
+				}
+
+				$service_multiselect = (new CMultiSelect([
+					'name' => 'value[]',
+					'object_name' => 'services',
+					'custom_select' => true
+				]))
+					->setId('service-new-condition')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+
+				$inline_js .= $service_multiselect->getPostJS().
+					'$("#service-new-condition")
+						.multiSelect("getSelectButton")
+						.addEventListener("click", selectServices);';
+
+				$form_list
+					->addRow(_('Operator'), $operator)
+					->addRow((new CLabel(_('Services')))->setAsteriskMark(), $service_multiselect);
 				break;
 		}
 		break;

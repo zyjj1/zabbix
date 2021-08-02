@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,48 +30,13 @@ if (!$filter_tags) {
 	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 
-$filter_tags_table = (new CTable())
-	->setId('filter-tags')
-	->addRow((new CCol(
-		(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-			->setModern(true)
-		))->setColSpan(4)
-	);
+$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
+	'evaltype' => $data['filter']['evaltype'],
+	'tags' => $filter_tags
+]);
 
-$i = 0;
-foreach ($filter_tags as $tag) {
-	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setModern(true),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-
-	$i++;
-}
-$filter_tags_table->addRow(
-	(new CCol(
-		(new CButton('filter_tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-	))->setColSpan(3)
-);
-
-$filter = new CFilter(new CUrl('templates.php'));
-$filter
+$filter = (new CFilter())
+	->setResetUrl(new CUrl('templates.php'))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -86,7 +51,7 @@ $filter
 						'parameters' => [
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'templated_hosts' => 1,
 							'editable' => 1,
@@ -106,7 +71,7 @@ $filter
 							'srctbl' => 'templates',
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_templates_'
 						]
 					]
@@ -131,9 +96,8 @@ $widget = (new CWidget())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", jQuery.extend('.
-						json_encode(['rules_preset' => 'template']).', null), null, this);'
-					)
+					->onClick('return PopUp("popup.import", {rules_preset: "template"}, null, this);')
+					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -151,7 +115,6 @@ $table = (new CTableInfo())
 			(new CUrl('templates.php'))->getUrl()
 		),
 		_('Hosts'),
-		_('Applications'),
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
@@ -238,15 +201,6 @@ foreach ($data['templates'] as $template) {
 				)
 				: _('Hosts'),
 			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
-		],
-		[
-			new CLink(_('Applications'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'application.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-			),
-			CViewHelper::showNum($template['applications'])
 		],
 		[
 			new CLink(_('Items'),

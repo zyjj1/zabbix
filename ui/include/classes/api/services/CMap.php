@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -554,16 +554,17 @@ class CMap extends CMapElement {
 	 * Validates the input parameters for the delete() method.
 	 *
 	 * @param array $sysmapids
+	 * @param array $db_maps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $sysmapids) {
+	protected function validateDelete(array $sysmapids, array &$db_maps = null) {
 		if (!$sysmapids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$db_maps = $this->get([
-			'output' => ['sysmapid'],
+			'output' => ['sysmapid', 'name'],
 			'sysmapids' => $sysmapids,
 			'editable' => true,
 			'preservekeys' => true
@@ -641,7 +642,7 @@ class CMap extends CMapElement {
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
 		// Continue to check 2 more mandatory fields and other optional fields.
-		foreach ($maps as $map) {
+		foreach ($maps as $map_index => $map) {
 			// Check mandatory fields "width" and "height".
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -814,7 +815,7 @@ class CMap extends CMapElement {
 
 					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Duplicate usrgrpid "%1$s" in user groups for map "%2$s".',
+							'Duplicate "usrgrpid" "%1$s" in user groups for map "%2$s".',
 							$share['usrgrpid'],
 							$map['name']
 						));
@@ -973,7 +974,7 @@ class CMap extends CMapElement {
 					}
 
 					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
 					unset($url_names[$url['name']]);
@@ -989,6 +990,10 @@ class CMap extends CMapElement {
 						_('No permissions to referred object or it does not exist!')
 					);
 				}
+
+				foreach (array_values($map['selements']) as $selement_index => $selement) {
+					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
+				}
 			}
 
 			// Map selement links.
@@ -998,7 +1003,7 @@ class CMap extends CMapElement {
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid1'],
 							$map['name']
 						));
@@ -1006,7 +1011,7 @@ class CMap extends CMapElement {
 
 					if (!in_array($link['selementid2'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid2'],
 							$map['name']
 						));
@@ -1104,7 +1109,7 @@ class CMap extends CMapElement {
 		$expandproblem_types = [SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL];
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
-		foreach ($maps as $map) {
+		foreach ($maps as $map_index => $map) {
 			// Check if owner can be set.
 			if (array_key_exists('userid', $map)) {
 				if ($map['userid'] === '' || $map['userid'] === null || $map['userid'] === false) {
@@ -1277,7 +1282,7 @@ class CMap extends CMapElement {
 
 					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Duplicate usrgrpid "%1$s" in user groups for map "%2$s".',
+							'Duplicate "usrgrpid" "%1$s" in user groups for map "%2$s".',
 							$share['usrgrpid'],
 							$map['name']
 						));
@@ -1444,7 +1449,7 @@ class CMap extends CMapElement {
 					}
 
 					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
 					unset($urlNames[$url['name']]);
@@ -1455,6 +1460,12 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
+			if (array_key_exists('selements', $map)) {
+				foreach (array_values($map['selements']) as $selement_index => $selement) {
+					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
+				}
+			}
+
 			// Map selement links.
 			if (array_key_exists('links', $map) && $map['links']) {
 				$selementids = zbx_objectValues($map['selements'], 'selementid');
@@ -1462,7 +1473,7 @@ class CMap extends CMapElement {
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid1'],
 							$map['name']
 						));
@@ -1470,7 +1481,7 @@ class CMap extends CMapElement {
 
 					if (!in_array($link['selementid2'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid2'],
 							$map['name']
 						));
@@ -1487,6 +1498,38 @@ class CMap extends CMapElement {
 		unset($map);
 
 		$this->validateCircularReference($maps);
+	}
+
+	/**
+	 * Validate Map element tag properties.
+	 *
+	 * @param array  $selement['evaltype']
+	 * @param array  $selement['tags']
+	 * @param string $selement['tags'][]['tag']
+	 * @param string $selement['tags'][]['value']
+	 * @param int    $selement['tags'][]['operator']
+	 * @param string $path
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	protected function validateSelementTags(array $selement, string $path): void {
+		if (!array_key_exists('tags', $selement)) {
+			return;
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'evaltype'	=>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => DB::getDefault('sysmaps_elements', 'evaltype')],
+			'tags'		=>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
+				'value'		=>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
+				'operator'	=>		['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
+			]]
+		]];
+
+		$data = array_intersect_key($selement, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $data, $path, $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -1619,6 +1662,11 @@ class CMap extends CMapElement {
 		unset($map);
 
 		$sysmapids = DB::insert('sysmaps', $maps);
+
+		foreach ($maps as $key => &$map) {
+			$map['sysmapid'] = $sysmapids[$key];
+		}
+		unset($map);
 
 		$shared_users = [];
 		$shared_user_groups = [];
@@ -1794,6 +1842,8 @@ class CMap extends CMapElement {
 		if ($shapes) {
 			$this->createShapes($shapes);
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAP, $maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2251,6 +2301,8 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($link_triggers_to_update);
 		}
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAP, $maps, $db_maps);
+
 		return ['sysmapids' => $sysmapids];
 	}
 
@@ -2262,15 +2314,11 @@ class CMap extends CMapElement {
 	 * @return array
 	 */
 	public function delete(array $sysmapids) {
-		$this->validateDelete($sysmapids);
+		$this->validateDelete($sysmapids, $db_maps);
 
 		DB::delete('sysmaps_elements', [
 			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
-		]);
-		DB::delete('screens_items', [
-			'resourceid' => $sysmapids,
-			'resourcetype' => SCREEN_RESOURCE_MAP
 		]);
 		DB::delete('profiles', [
 			'idx' => 'web.maps.sysmapid',
@@ -2282,6 +2330,8 @@ class CMap extends CMapElement {
 			'value_id' => $sysmapids
 		]);
 		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2389,6 +2439,26 @@ class CMap extends CMapElement {
 				if (!is_null($options['expandUrls'])) {
 					$resolve_opt = ['resolve_element_urls' => true];
 					$selements = CMacrosResolverHelper::resolveMacrosInMapElements($selements, $resolve_opt);
+				}
+			}
+
+			if ($this->outputIsRequested('tags', $options['selectSelements']) && $selements) {
+				$db_tags = DBselect(
+					'SELECT selementid, tag, value, operator'.
+					' FROM sysmaps_element_tag'.
+					' WHERE '.dbConditionInt('selementid', array_keys($selements))
+				);
+
+				array_walk($selements, function (&$selement) {
+					$selement['tags'] = [];
+				});
+
+				while ($db_tag = DBfetch($db_tags)) {
+					$selements[$db_tag['selementid']]['tags'][] = [
+						'tag' => $db_tag['tag'],
+						'value' => $db_tag['value'],
+						'operator' => $db_tag['operator']
+					];
 				}
 			}
 
@@ -2691,20 +2761,25 @@ class CMap extends CMapElement {
 
 		// Adding user shares.
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$userids = [];
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
-			// Get all allowed users.
-			$related_users = API::User()->get([
-				'output' => ['userid'],
-				'userids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relation_map->getRelatedIds();
 
-			$related_userids = zbx_objectValues($related_users, 'userid');
+			if ($related_ids) {
+				// Get all allowed users.
+				$users = API::User()->get([
+					'output' => ['userid'],
+					'userids' => $related_ids,
+					'preservekeys' => true
+				]);
 
-			if ($related_userids) {
+				$userids = zbx_objectValues($users, 'userid');
+			}
+
+			if ($userids) {
 				$users = API::getApiService()->select('sysmap_user', [
 					'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid']),
-					'filter' => ['sysmapid' => $sysmapIds, 'userid' => $related_userids],
+					'filter' => ['sysmapid' => $sysmapIds, 'userid' => $userids],
 					'preservekeys' => true
 				]);
 
@@ -2731,20 +2806,25 @@ class CMap extends CMapElement {
 
 		// Adding user group shares.
 		if ($options['selectUserGroups'] !== null && $options['selectUserGroups'] != API_OUTPUT_COUNT) {
+			$groupids = [];
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'usrgrpid', 'sysmap_usrgrp');
-			// Get all allowed groups.
-			$related_groups = API::UserGroup()->get([
-				'output' => ['usrgrpid'],
-				'usrgrpids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relation_map->getRelatedIds();
 
-			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
+			if ($related_ids) {
+				// Get all allowed groups.
+				$groups = API::UserGroup()->get([
+					'output' => ['usrgrpid'],
+					'usrgrpids' => $related_ids,
+					'preservekeys' => true
+				]);
 
-			if ($related_groupids) {
+				$groupids = zbx_objectValues($groups, 'usrgrpid');
+			}
+
+			if ($groupids) {
 				$user_groups = API::getApiService()->select('sysmap_usrgrp', [
 					'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid']),
-					'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $related_groupids],
+					'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $groupids],
 					'preservekeys' => true
 				]);
 
