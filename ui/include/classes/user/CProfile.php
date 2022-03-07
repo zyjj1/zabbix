@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,9 @@ class CProfile {
 
 			foreach (self::$insert as $idx => $profile) {
 				foreach ($profile as $idx2 => $data) {
-					$result &= self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					if (!self::insertDB($idx, $data['value'], $data['type'], $idx2)) {
+						$result = false;
+					}
 				}
 			}
 
@@ -73,7 +75,9 @@ class CProfile {
 			foreach (self::$update as $idx => $profile) {
 				ksort($profile);
 				foreach ($profile as $idx2 => $data) {
-					$result &= self::updateDB($idx, $data['value'], $data['type'], $idx2);
+					if (!self::updateDB($idx, $data['value'], $data['type'], $idx2)) {
+						$result = false;
+					}
 				}
 			}
 
@@ -184,6 +188,8 @@ class CProfile {
 
 			self::$profiles[$idx][$row['idx2']] = $row[$value_type];
 		}
+
+		ksort(self::$profiles[$idx], SORT_NUMERIC);
 
 		return array_key_exists($idx2, self::$profiles[$idx]) ? self::$profiles[$idx][$idx2] : $default_value;
 	}

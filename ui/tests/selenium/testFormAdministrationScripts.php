@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,31 +63,30 @@ class testFormAdministrationScripts extends CWebTest {
 				]
 			],
 			// Remove trailing spaces.
-			// Uncomment this after ZBX-18271 is fixed.
-//			[
-//				[
-//					'trim' => true,
-//					'fields' =>  [
-//						'Name' => 'Test trailing spaces',
-//						'Type' => 'Webhook',
-//						'Script' => 'Webhook Script'
-//					],
-//					'Parameters' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 1,
-//							'Name' => 'name',
-//							'Value' => '   trimmed    value    '
-//						],
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'Name' => '   trimmed     name    ',
-//							'Value' => 'value'
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'trim' => true,
+					'fields' =>  [
+						'Name' => 'Test trailing spaces',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'name',
+							'Value' => '   trimmed    value    '
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   trimmed     name    ',
+							'Value' => 'value'
+						]
+					]
+				]
+			],
 			[
 				[
 					'fields' =>  [
@@ -182,46 +181,45 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
-			// Uncomment this after ZBX-18271 is fixed.
-//			[
-//				[
-//					'fields' =>  [
-//						'Name' => 'Test parameters',
-//						'Type' => 'Webhook',
-//						'Script' => 'Webhook Script',
-//						'Timeout' => '1s',
-//					],
-//					'Parameters' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'Name' => '!@#$%^&*()_+<>,.\/',
-//							'Value' => '!@#$%^&*()_+<>,.\/'
-//						],
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 1,
-//							'Name' => str_repeat('n', 255),
-//							'Value' => str_repeat('v', 2048)
-//						],
-//						[
-//							'Name' => '{$MACRO:A}',
-//							'Value' => '{$MACRO:A}'
-//						],
-//						[
-//							'Name' => '{$USERMACRO}',
-//							'Value' => ''
-//						],
-//						[
-//							'Name' => '{HOST.HOST}'
-//						],
-//						[
-//							'Name' => 'Имя',
-//							'Value' => 'Значение'
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Test parameters',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '1s'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '!@#$%^&*()_+<>,.\/',
+							'Value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => str_repeat('n', 255),
+							'Value' => str_repeat('v', 2048)
+						],
+						[
+							'Name' => '{$MACRO:A}',
+							'Value' => '{$MACRO:A}'
+						],
+						[
+							'Name' => '{$USERMACRO}',
+							'Value' => ''
+						],
+						[
+							'Name' => '{HOST.HOST}'
+						],
+						[
+							'Name' => 'Имя',
+							'Value' => 'Значение'
+						]
+					]
+				]
+			],
 			[
 				[
 					'fields' =>  [

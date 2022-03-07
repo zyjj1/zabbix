@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CCookieSession implements SessionHandlerInterface {
 	public const COOKIE_NAME = ZBX_SESSION_NAME;
 
 	/**
-	 * Class consturctor. Set session handlers and start session.
+	 * Class constructor. Set session handlers and start session.
 	 */
 	public function __construct() {
 		// Set use standard cookie PHPSESSID to false.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js',
-	'class.tab-indicators.js', 'class.tagfilteritem.js'
-];
+$page['scripts'] = ['multilineinput.js', 'items.js', 'class.tagfilteritem.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -557,12 +555,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['delay']));
+					error(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
 				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['period']));
+					error(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
 				}
 
@@ -575,7 +573,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					error(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
 				}
 
@@ -590,62 +588,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		$preprocessing = getRequest('preprocessing', []);
-
-		foreach ($preprocessing as &$step) {
-			switch ($step['type']) {
-				case ZBX_PREPROC_MULTIPLIER:
-				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-					$step['params'] = trim($step['params'][0]);
-					break;
-
-				case ZBX_PREPROC_RTRIM:
-				case ZBX_PREPROC_LTRIM:
-				case ZBX_PREPROC_TRIM:
-				case ZBX_PREPROC_XPATH:
-				case ZBX_PREPROC_JSONPATH:
-				case ZBX_PREPROC_VALIDATE_REGEX:
-				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-				case ZBX_PREPROC_ERROR_FIELD_JSON:
-				case ZBX_PREPROC_ERROR_FIELD_XML:
-				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				case ZBX_PREPROC_SCRIPT:
-					$step['params'] = $step['params'][0];
-					break;
-
-				case ZBX_PREPROC_VALIDATE_RANGE:
-				case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					foreach ($step['params'] as &$param) {
-						$param = trim($param);
-					}
-					unset($param);
-
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				case ZBX_PREPROC_REGSUB:
-				case ZBX_PREPROC_ERROR_FIELD_REGEX:
-				case ZBX_PREPROC_STR_REPLACE:
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				// ZBX-16642
-				case ZBX_PREPROC_CSV_TO_JSON:
-					if (!array_key_exists(2, $step['params'])) {
-						$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
-					}
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				default:
-					$step['params'] = '';
-			}
-
-			$step += [
-				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-				'error_handler_params' => ''
-			];
-		}
-		unset($step);
+		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
 
 		if (hasRequest('add')) {
 			$item = [
@@ -953,41 +896,9 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 }
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
-	$result = false;
+	$result = (bool) API::History()->clear([getRequest('itemid')]);
 
-	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
-		$error_message = _('History cleanup is not supported if compression is enabled');
-	}
-	else {
-		$error_message = _('Cannot clear history');
-		$itemId = getRequest('itemid');
-
-		$items = API::Item()->get([
-			'output' => ['itemid', 'key_', 'value_type'],
-			'itemids' => [$itemId],
-			'selectHosts' => ['name'],
-			'editable' => true
-		]);
-
-		if ($items) {
-			DBstart();
-
-			$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
-
-			// if ($result) {
-			// 	$item = reset($items);
-			// 	$host = reset($item['hosts']);
-
-			// 	add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
-			// 		_('Host').' ['.$host['name'].'] '._('History cleared')
-			// 	);
-			// }
-
-			$result = DBend($result);
-		}
-	}
-
-	show_messages($result, _('History cleared'), $error_message);
+	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massenable', 'item.massdisable']) && hasRequest('group_itemid')) {
 	$itemids = getRequest('group_itemid');
@@ -1061,59 +972,13 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
-	$result = false;
+	$result = (bool) API::History()->clear(getRequest('group_itemid'));
 
-	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
-		$error_message = _('History cleanup is not supported if compression is enabled');
-	}
-	else {
-		$error_message = _('Cannot clear history: at least one of the selected items doesn\'t belong to any monitored host');
-
-		$itemIds = getRequest('group_itemid');
-
-		$items = API::Item()->get([
-			'output' => ['itemid', 'key_', 'value_type'],
-			'itemids' => $itemIds,
-			'selectHosts' => ['name', 'status'],
-			'editable' => true
-		]);
-
-		if ($items) {
-			// Check items belong only to hosts.
-			$hosts_status = [];
-			foreach ($items as $item) {
-				$hosts_status[$item['hosts'][0]['status']] = true;
-			}
-
-			if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
-				$result = false;
-			}
-			else {
-				DBstart();
-
-				$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
-
-				// if ($result) {
-				// 	foreach ($items as $item) {
-				// 		$host = reset($item['hosts']);
-
-				// 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				// 			_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-				// 				_('History cleared')
-				// 		);
-				// 	}
-				// }
-
-				$result = DBend($result);
-
-				if ($result) {
-					uncheckTableRows(getRequest('checkbox_hash'));
-				}
-			}
-		}
+	if ($result) {
+		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 
-	show_messages($result, _('History cleared'), $error_message);
+	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	$group_itemid = getRequest('group_itemid');
@@ -1184,6 +1049,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		$host = $item['hosts'][0];
 		unset($item['hosts']);
 
+		$i = 0;
 		foreach ($item['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -1191,6 +1057,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 
@@ -1244,6 +1111,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
 	$data = getItemFormData($item, ['form' => $form_action]);
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
@@ -1270,11 +1138,6 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 
 	$data['display_interfaces'] = ($data['host']['status'] == HOST_STATUS_MONITORED
 			|| $data['host']['status'] == HOST_STATUS_NOT_MONITORED);
-
-	// Sort interfaces to be listed starting with one selected as 'main'.
-	CArrayHelper::sort($data['interfaces'], [
-		['field' => 'main', 'order' => ZBX_SORT_DOWN]
-	]);
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 /**
  * @var CView $this
  */
+
+$this->includeJsFile('inventory.host.view.js.php');
 
 // Overview tab.
 $overviewFormList = new CFormList();
@@ -142,9 +144,9 @@ $overviewFormList->addRow(_('Monitoring'),
 		$data['allowed_ui_latest_data']
 			? new CLink(_('Latest data'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $data['host']['hostid'])
-				->setArgument('filter_show_details', '1')
-				->setArgument('filter_set', '1')
+				->setArgument('hostids[]', $data['host']['hostid'])
+				->setArgument('show_details', '1')
+				->setArgument('filter_name', '')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']
@@ -158,11 +160,9 @@ $overviewFormList->addRow(_('Monitoring'),
 			? new CLink(_('Graphs'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'charts.view')
-					->setArgument('filter_set', '1')
-					->setArgument('view_as', HISTORY_GRAPH)
-					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 					->setArgument('filter_hostids', [$data['host']['hostid']])
-			)
+					->setArgument('filter_set', '1')
+		)
 			: _('Graphs'),
 		$data['allowed_ui_hosts']
 			? new CLink(_('Dashboards'), (new CUrl('zabbix.php'))
@@ -175,10 +175,8 @@ $overviewFormList->addRow(_('Monitoring'),
 
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
-	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
-		->setArgument('form', 'update')
-		->setArgument('hostid', $data['host']['hostid'])
-	);
+	$hostLink = (new CLink(_('Host')))
+		->onClick('view.editHost({hostid:\''.$data['host']['hostid'].'\'})');
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')

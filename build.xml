@@ -57,7 +57,8 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
-                <chmod file="ui/conf/zabbix.conf.php" perm="go+w"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{SERVER_PORT}" value="${phpunit_port_prefix}51"/>	<!-- 51 - CIntegrationTest::SERVER_PORT_SUFFIX -->
+		<chmod file="ui/conf/zabbix.conf.php" perm="go+rw"/>
 	</target>
 
 	<target name="create-saml-configs">
@@ -78,6 +79,7 @@
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{ASSERTION_CONSUMER_SERVICE}" value="${url}index_sso.php?acs"/>
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{SINGLE_LOGOUT_SERVICE}" value="${url}index_sso.php?sls"/>
+		<chmod file="${SIMPLESAMLPHP_CFG_FILE}" perm="go+r"/>
 	</target>
 
 	<target name="init-integration">
@@ -171,7 +173,6 @@
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
-			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
@@ -284,7 +285,7 @@
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='create database ${dbname} character set utf8 collate utf8_bin'"/>
+			<arg line="--execute='create database ${dbname} character set utf8mb4 collate utf8mb4_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -328,7 +329,7 @@
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='create database ${dbname}_proxy character set utf8 collate utf8_bin'"/>
+			<arg line="--execute='create database ${dbname}_proxy character set utf8mb4 collate utf8mb4_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -368,6 +369,7 @@
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="ui/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--do-not-cache-result"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="include/"/>
 		</exec>
@@ -377,6 +379,8 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
+			<arg line="--dont-report-useless-tests"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="frontend.php"/>
 		</exec>
@@ -386,6 +390,7 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="api_json/ApiJsonTests.php"/>
 		</exec>
@@ -395,6 +400,7 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
 		</exec>

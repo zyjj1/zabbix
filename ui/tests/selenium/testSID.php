@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,9 +24,14 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
+ *
+ * @dataSource ScheduledReports
+ *
  * @onBefore prepareTokenData
  */
 class testSID extends CWebTest {
+
+	const UPDATE_TOKEN = 'api_update';
 
 	/**
 	 * Token ID used for update.
@@ -37,7 +42,7 @@ class testSID extends CWebTest {
 
 	public function prepareTokenData() {
 		$response = CDataHelper::call('token.create', [
-			'name' => 'api_update',
+			'name' => self::UPDATE_TOKEN,
 			'userid' => '1'
 		]);
 		$this->assertArrayHasKey('tokenids', $response);
@@ -328,7 +333,7 @@ class testSID extends CWebTest {
 			// User role creation.
 			[['link' => 'zabbix.php?form_refresh=1&name=sadasda&type=1&ui_monitoring_dashboard=1&ui_monitoring_problems='.
 					'1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1&ui_monitoring_screens=1'.
-					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_services=1&ui_inventory_overview=1&'.
+					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_services_services=1&ui_inventory_overview=1&'.
 					'ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_availability_report=1&ui_reports_top_triggers'.
 					'=1&ui_reports_audit=0&ui_reports_action_log=0&ui_reports_notifications=0&ui_configuration_host_groups=0'.
 					'&ui_configuration_templates=0&ui_configuration_hosts=0&ui_configuration_maintenance=0&'.
@@ -345,7 +350,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&ui_monitoring_dashboard=1&'.
 					'ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1'.
 					'&ui_monitoring_screens=1&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_discovery=1&'.
-					'ui_monitoring_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
+					'ui_services_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
 					'ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
 					'&ui_reports_notifications=0&ui_reports_notifications=1&ui_configuration_host_groups=0&'.
 					'ui_configuration_host_groups=1&ui_configuration_templates=0&ui_configuration_templates=1&'.
@@ -387,8 +392,10 @@ class testSID extends CWebTest {
 
 			// Authentication update.
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
-					'authentication_type=0&http_auth_enabled=1&http_login_form=0&http_strip_domains=&'.
-					'http_case_sensitive=1&ldap_configured=0&change_bind_password=1&saml_auth_enabled=0&update=Update']],
+					'authentication_type=0&passwd_min_length=8&passwd_check_rules%5B%5D=1&passwd_check_rules%5B%5D=2&'.
+					'passwd_check_rules%5B%5D=4&passwd_check_rules%5B%5D=8&http_auth_enabled=1&http_login_form=0&'.
+					'http_strip_domains=&http_case_sensitive=1&ldap_configured=0&change_bind_password=1&'.
+					'saml_auth_enabled=0&update=Update']],
 
 			// Media type create.
 			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=0&status=1&name=1111&type=0&'.
@@ -472,60 +479,47 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
 
 			// Host creation.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => 'hosts.php?form_refresh=1&form=create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
-					'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
-					'interfaces%5B1%5D%5BisNew%5D=true&interfaces%5B1%5D%5Binterfaceid%5D=1&interfaces%5B1%5D%5Btype%5D=1&'.
-					'interfaces%5B1%5D%5Bip%5D=127.0.0.1&interfaces%5B1%5D%5Bdns%5D=&interfaces%5B1%5D%5Buseip%5D=1&'.
-					'interfaces%5B1%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=1&description=&proxy_hostid=0&status=0&'.
-					'ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&tags%5B0%5D%5Btag%5D=&'.
-					'tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&'.
-					'macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&tls_connect=1&'.
-					'tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&add=Add'
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=host.create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
+						'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
+						'interfaces%5B1%5D%5BisNew%5D=true&interfaces%5B1%5D%5Binterfaceid%5D=1&interfaces%5B1%5D%5Btype%5D=1&'.
+						'interfaces%5B1%5D%5Bip%5D=127.0.0.1&interfaces%5B1%5D%5Bdns%5D=&interfaces%5B1%5D%5Buseip%5D=1&'.
+						'interfaces%5B1%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=1&description=&proxy_hostid=0&status=0&'.
+						'ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&tags%5B0%5D%5Btag%5D=&'.
+						'tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&'.
+						'macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&tls_connect=1&'.
+						'tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject='
+			]],
 
 			// Host update.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => 'hosts.php?form_refresh=1&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
-					'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
-					'interfaces%5B55079%5D%5BisNew%5D=&interfaces%5B55079%5D%5Binterfaceid%5D=55079&interfaces'.
-					'%5B55079%5D%5Btype%5D=1&interfaces%5B55079%5D%5Bip%5D=127.0.0.1&interfaces%5B55079%5D%5Bdns%5D=&'.
-					'interfaces%5B55079%5D%5Buseip%5D=1&interfaces%5B55079%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=55079&'.
-					'description=&proxy_hostid=0&status=0&ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&'.
-					'tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&'.
-					'macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&'.
-					'tls_connect=1&tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&update=Update'
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=host.update&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
+						'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
+						'interfaces%5B55079%5D%5BisNew%5D=&interfaces%5B55079%5D%5Binterfaceid%5D=55079&interfaces'.
+						'%5B55079%5D%5Btype%5D=1&interfaces%5B55079%5D%5Bip%5D=127.0.0.1&interfaces%5B55079%5D%5Bdns%5D=&'.
+						'interfaces%5B55079%5D%5Buseip%5D=1&interfaces%5B55079%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=55079&'.
+						'description=&proxy_hostid=0&status=0&ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&'.
+						'tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&'.
+						'macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&'.
+						'tls_connect=1&tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject='
+			]],
 
 			// Host delete.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => 'hosts.php?delete=1&form=update&hostid=99452'
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=host.massdelete&hostids%5B0%5D=99452'
+			]],
 
 			// Host disable.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => 'hosts.php?action=host.massdisable&hosts[0]=50011'
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=popup.massupdate.host&visible%5Bstatus%5D=1&update=1&backurl='.
+					'zabbix.php%3Faction%3Dhost.list&status=1'
+			]],
 
 			// Host enable.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => 'hosts.php?action=host.massenable&hosts[0]=50011'
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=popup.massupdate.host&visible%5Bstatus%5D=1&update=1&backurl='.
+					'zabbix.php%3Faction%3Dhost.list&status=0'
+			]],
 
 			// Notifications get.
 			[['link' => 'zabbix.php?action=notifications.get&known_eventids%5B%5D=126']],
@@ -631,7 +625,38 @@ class testSID extends CWebTest {
 					'refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.update']],
 
 			// User unblock.
-			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']]
+			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']],
+
+			// Scheduled report creation.
+			[['link' => 'zabbix.php?form_refresh=1&userid=1&name=testsid&dashboardid=1&period=0&cycle=0&hours=00&'.
+				'minutes=00&weekdays%5B1%5D=1&weekdays%5B8%5D=8&weekdays%5B32%5D=32&weekdays%5B2%5D=2&'.
+				'weekdays%5B16%5D=16&weekdays%5B64%5D=64&weekdays%5B4%5D=4&active_since=&active_till='.
+				'&subject=&message=&subscriptions%5B0%5D%5Brecipientid%5D=1&subscriptions%5B0%5D%5Brecipient_type%5D=0&'.
+				'subscriptions%5B0%5D%5Brecipient_name%5D=Admin+%28Zabbix+Administrator%29&'.
+				'subscriptions%5B0%5D%5Brecipient_inaccessible%5D=0&subscriptions%5B0%5D%5Bcreatorid%5D=1&'.
+				'subscriptions%5B0%5D%5Bcreator_type%5D=0&subscriptions%5B0%5D%5Bcreator_name%5D=Admin+%28Zabbix+Administrator%29&'.
+				'subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0&description=&'.
+				'status=0&action=scheduledreport.create']],
+
+			// Scheduled report delete.
+			[['link' => 'zabbix.php?action=scheduledreport.delete&reportids[]=1']],
+
+			// Scheduled report update.
+			[['link' => 'zabbix.php?form_refresh=1&reportid=8&old_dashboardid=2&userid=1&'.
+				'name=Report+for+filter+-+enabled+sid&dashboardid=2&period=3&cycle=2&hours=00&'.
+				'minutes=00&weekdays%5B1%5D=1&weekdays%5B8%5D=8&weekdays%5B32%5D=32&weekdays%5B2%5D=2&'.
+				'weekdays%5B16%5D=16&weekdays%5B64%5D=64&weekdays%5B4%5D=4&active_since=&active_till=&'.
+				'subject=&message=&subscriptions%5B0%5D%5Brecipientid%5D=1&subscriptions%5B0%5D%5Brecipient_type%5D=0&'.
+				'subscriptions%5B0%5D%5Brecipient_name%5D=Admin+%28Zabbix+Administrator%29&'.
+				'subscriptions%5B0%5D%5Brecipient_inaccessible%5D=0&subscriptions%5B0%5D%5Bcreatorid%5D=0&'.
+				'subscriptions%5B0%5D%5Bcreator_type%5D=1&subscriptions%5B0%5D%5Bcreator_name%5D=Recipient&'.
+				'subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0&description=&'.
+				'status=0&action=scheduledreport.update']],
+
+			// Scheduled report test.
+			[['link' => 'zabbix.php?action=popup.scheduledreport.test&period=2&now=1627543595&dashboardid=1'.
+				'&name=Report+for+testFormScheduledReport&subject=Report+subject+for+testFormScheduledReport&'.
+				'message=Report+message+text']]
 		];
 	}
 
@@ -641,16 +666,11 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
-			if (array_key_exists('incorrect_request', $data)) {
-				$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
-						' performed due to unauthorized request.');
-			}
-			else {
-				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions '.
-						'to access this page.');
-				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
-			}
+
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+
+			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 	}
 
@@ -708,7 +728,8 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'hosts.php?form=create'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=host.edit'
 				]
 			],
 
@@ -716,7 +737,8 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'hosts.php?form=update&hostid=10084'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=host.edit&hostid=99062'
 				]
 			],
 
@@ -971,8 +993,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=token.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=token.list',
+					'case' => 'token create'
 				]
 			],
 
@@ -980,8 +1003,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=token.edit&tokenid='
+					'server_error' => true,
+					'link' => 'zabbix.php?action=token.list',
+					'case' => 'token update'
 				]
 			],
 
@@ -1124,8 +1148,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=user.token.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=user.token.list',
+					'case' => 'token create'
 				]
 			],
 
@@ -1133,8 +1158,26 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
+					'server_error' => true,
+					'link' => 'zabbix.php?action=user.token.list',
+					'case' => 'token update'
+				]
+			],
+
+			// Scheduled report creation.
+			[
+				[
+					'db' => 'SELECT * FROM report',
 					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=user.token.edit&tokenid='
+					'link' => 'zabbix.php?action=scheduledreport.edit'
+				]
+			],
+			// Scheduled report update.
+			[
+				[
+					'db' => 'SELECT * FROM report',
+					'incorrect_request' => true,
+					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3'
 				]
 			]
 		];
@@ -1145,24 +1188,59 @@ class testSID extends CWebTest {
 	 */
 	public function testSID_ElementRemove($data) {
 		$hash_before = CDBHelper::getHash($data['db']);
-		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id)
-				->waitUntilReady();
-		$this->query('xpath://input[@name="sid"]')->one()->delete();
-		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
-				' @type="submit"]')->waitUntilClickable()->one()->click();
+		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
+		$this->page->login()->open($url)->waitUntilReady();
 
-		if(array_key_exists('incorrect_request', $data)) {
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to '.
-					'access this page.');
-			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
-			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+		if (CTestArrayHelper::get($data, 'case') === 'token create') {
+			$this->query('button:Create API token')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$fill_data = ['Name' => 'test', 'User' => 'admin-zabbix', 'Expires at' => '2037-12-31 00:00:00'];
+
+			if (strpos($data['link'], 'user') ) {
+				unset($fill_data['User']);
+			}
+
+			$dialog->asForm()->fill($fill_data);
+		}
+		elseif ((CTestArrayHelper::get($data, 'case') === 'token update')) {
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
+					self::UPDATE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		}
+
+		foreach ($this->query('xpath://input[@name="sid"]')->all() as $input) {
+			$input->delete();
+		}
+
+		$query = ($this->query('button:Update')->exists())
+			? 'button:Update'
+			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
+		$this->query($query)->waitUntilClickable()->one()->click();
+
+		if (CTestArrayHelper::get($data, 'incorrect_request')) {
+			$message = 'Access denied';
+			$details = 'You are logged in as "Admin". You have no permissions to access this page.';
+		}
+		elseif (CTestArrayHelper::get($data, 'server_error')) {
+			$message = 'Unexpected server error.';
+			$details = null;
 		}
 		else {
-			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
-					' performed due to unauthorized request.');
+			$message = 'Zabbix has received an incorrect request.';
+			$details = 'Operation cannot be performed due to unauthorized request.';
+		}
+		$this->assertMessage(TEST_BAD, $message, $details);
+
+		if (CTestArrayHelper::get($data, 'incorrect_request'))  {
+			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+		}
 
 		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
+
+		if (CTestArrayHelper::get($data, 'case')) {
+			$dialog->close();
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -315,7 +315,7 @@ static void	dump_token(const zbx_eval_context_t *ctx, const zbx_eval_token_t *to
 			printf("\t'%s'", zbx_variant_value_desc(&token->value));
 	}
 
-	printf(" : %s (%d)\n", mock_token_type2str(token->type), token->opt);
+	printf(" : %s (%u)\n", mock_token_type2str(token->type), (unsigned int)token->opt);
 }
 
 void	mock_dump_stack(const zbx_eval_context_t *ctx)

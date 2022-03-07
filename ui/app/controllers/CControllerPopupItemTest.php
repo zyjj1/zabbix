@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -376,7 +376,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * Function returns array of item specific properties used for item testing.
 	 *
 	 * @param array $input       Stored user input used to overwrite values retrieved from database.
-	 * @param bool  $for_server  Whether need to add to result an additional properties used only for connection with
+	 * @param bool  $for_server  Whether need to add to result additional properties used only for connection with
 	 *                           Zabbix server.
 	 *
 	 * @return array
@@ -1218,6 +1218,17 @@ abstract class CControllerPopupItemTest extends CController {
 					$macro_value = array_key_exists($macro, $macros_posted)
 						? $macros_posted[$macro]
 						: '';
+
+					if ($inputs['type'] == ITEM_TYPE_HTTPAGENT && $field === 'posts') {
+						if ($inputs['post_type'] == ZBX_POSTTYPE_JSON && !is_numeric($macro_value)) {
+							$macro_value = json_encode($macro_value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+							// Remove " wrapping.
+							$macro_value = substr($macro_value, 1, -1);
+						}
+						elseif ($inputs['post_type'] == ZBX_POSTTYPE_XML) {
+							$macro_value = htmlentities($macro_value);
+						}
+					}
 
 					$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
 				}

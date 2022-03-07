@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,19 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-function init_mbstrings() {
-	$res = true;
-	$res &= extension_loaded('mbstring');
-
-	ini_set('default_charset', 'UTF-8');
-	$res &= (ini_get('default_charset') === 'UTF-8');
-
-	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
-	$res &= (ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS');
-
-	return $res;
-}
 
 /**
  * Returns a list of all used locales.
@@ -82,18 +69,41 @@ function getLocales() {
 /**
  * Get support URL for specified language.
  *
- * @param string $language  ISO639-1 code or null for English support URL.
+ * @param string|null $language  ISO639-1 code or null for English support URL.
  *
  * @return string
  */
-function getSupportUrl($language = null) {
+function getSupportUrl(string $language = null): string {
 	$urls = [
+		'cs' => 'https://www.zabbix.com/cz/support',
+		'fr' => 'https://www.zabbix.com/fr/support',
 		'ja' => 'https://www.zabbix.com/jp/support',
+		'pt' => 'https://www.zabbix.com/br/support',
 		'ru' => 'https://www.zabbix.com/ru/support',
 		'zh' => 'https://www.zabbix.com/cn/support'
 	];
 
 	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
+}
+
+/**
+ * Get integrations URL for specified language.
+ *
+ * @param string|null $language  ISO639-1 code or null for English integrations URL.
+ *
+ * @return string
+ */
+function getIntegrationsUrl(string $language = null): string {
+	$urls = [
+		'cs' => 'https://www.zabbix.com/cz/integrations',
+		'fr' => 'https://www.zabbix.com/fr/integrations',
+		'ja' => 'https://www.zabbix.com/jp/integrations',
+		'pt' => 'https://www.zabbix.com/br/integrations',
+		'ru' => 'https://www.zabbix.com/ru/integrations',
+		'zh' => 'https://www.zabbix.com/cn/integrations'
+	];
+
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/integrations';
 }
 
 /**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,11 +67,20 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		if (!CSessionHelper::has('serverCheckResult')
 				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
-			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
-			);
-			CSessionHelper::set('serverCheckResult', $zabbixServer->isRunning(CSessionHelper::getId()));
+
+			if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
+				$is_running = false;
+			}
+			else {
+				$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
+				);
+
+				$is_running = $zabbix_server->isRunning(CSessionHelper::getId());
+			}
+
+			CSessionHelper::set('serverCheckResult', $is_running);
 			CSessionHelper::set('serverCheckTime', time());
 		}
 
@@ -113,7 +122,7 @@ switch ($data['method']) {
 			]);
 
 			foreach ($triggers as $trigger) {
-				$trigger['class_name'] = getSeverityStyle($trigger['priority']);
+				$trigger['class_name'] = CSeverityHelper::getStyle((int) $trigger['priority']);
 				$result[] = $trigger;
 			}
 		}
@@ -218,7 +227,7 @@ switch ($data['method']) {
 			case 'items':
 			case 'item_prototypes':
 				$options = [
-					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'output' => ['itemid', 'name'],
 					'selectHosts' => ['name'],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
@@ -239,8 +248,7 @@ switch ($data['method']) {
 				}
 
 				if ($records) {
-					$records = CMacrosResolverHelper::resolveItemNames($records);
-					CArrayHelper::sort($records, ['name_expanded']);
+					CArrayHelper::sort($records, ['name']);
 
 					if (array_key_exists('limit', $data)) {
 						$records = array_slice($records, 0, $data['limit']);
@@ -249,7 +257,7 @@ switch ($data['method']) {
 					foreach ($records as $record) {
 						$result[] = [
 							'id' => $record['itemid'],
-							'name' => $record['name_expanded'],
+							'name' => $record['name'],
 							'prefix' => $record['hosts'][0]['name'].NAME_DELIMITER
 						];
 					}
@@ -581,6 +589,27 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($services, ['serviceid' => 'id']);
+				}
+				break;
+
+			case 'sla':
+				$slas = API::Sla()->get([
+					'output' => ['slaid', 'name'],
+					'filter' => [
+						'status' => array_key_exists('enabled_only', $data) ? ZBX_SLA_STATUS_ENABLED : null
+					],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($slas) {
+					CArrayHelper::sort($slas, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+					if (array_key_exists('limit', $data)) {
+						$slas = array_slice($slas, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($slas, ['slaid' => 'id']);
 				}
 				break;
 		}

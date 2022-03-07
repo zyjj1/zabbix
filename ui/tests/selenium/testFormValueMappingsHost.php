@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	 * Function creates the given value mappings for the specified host.
 	 */
 	public static function prepareHostValueMappings() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('valuemap.create', [
 			[
 				'name' => self::UPDATE_VALUEMAP1,

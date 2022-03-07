@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/CElementCollection.php';
 require_once dirname(__FILE__).'/CElementFilter.php';
 require_once dirname(__FILE__).'/elements/CNullElement.php';
 require_once dirname(__FILE__).'/elements/CFormElement.php';
-require_once dirname(__FILE__).'/elements/CFluidFormElement.php';
+require_once dirname(__FILE__).'/elements/CGridFormElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxFormElement.php';
 require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
@@ -35,6 +35,7 @@ require_once dirname(__FILE__).'/elements/CDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CZDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxElement.php';
 require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
+require_once dirname(__FILE__).'/elements/CMainMenuElement.php';
 require_once dirname(__FILE__).'/elements/CMessageElement.php';
 require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
@@ -551,9 +552,12 @@ class CElementQuery implements IWaitable {
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [
-				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859
+				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859.
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
+			],
+			'CHostInterfaceElement'		=> [
+				'/div/div[contains(@class, "interface-container")]/../..'
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
@@ -564,9 +568,9 @@ class CElementQuery implements IWaitable {
 				'/div[contains(@class, "range-control")]',
 				'/div[contains(@class, "calendar-control")]'
 			],
-			'CColorPickerElement'		=> '/div[contains(@class, "input-color-picker")]',
+			'CColorPickerElement'		=> '/div[contains(@class, "color-picker")]',
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
-			'CInputGroupElement'		=> '/div[contains(@class, "input-group")]'
+			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]'
 		];
 
 		if ($class !== null) {

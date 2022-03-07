@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
-require_once dirname(__FILE__).'/../../include/helpers/CTestArrayHelper.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Preprocessing tests.
@@ -36,6 +35,150 @@ abstract class testFormPreprocessing extends CWebTest {
 	public $success_message;
 	public $button;
 	public $fail_message;
+
+	const CLONE_PREPROCESSING = [
+		[
+			'type' => '1',
+			'params' => '123',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '2',
+			'params' => 'abc',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '3',
+			'params' => 'def',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '4',
+			'params' => '1a2b3c',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '5',
+			'params' => "regular expression pattern \noutput template",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '6',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '7',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '8',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '9',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '11',
+			'params' => '/document/item/value/text()',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '12',
+			'params' => '$.document.item.value parameter.',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '13',
+			'params' => "-5\n3",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '14',
+			'params' => 'regular expression pattern for matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '15',
+			'params' => 'regular expression pattern for not matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '16',
+			'params' => '/json/path',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '17',
+			'params' => '/xml/path',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '18',
+			'params' => "regular expression pattern for error matching \ntest output",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '20',
+			'params' => '7',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+						[
+			'type' => '21',
+			'params' => 'test script',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '23',
+			'params' => 'metric',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '24',
+			'params' => ".\n/\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '25',
+			'params' => "1\n2",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		]
+	];
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	/*
 	 * Preprocessing validation data for Item and Item prototype.
@@ -699,7 +842,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name']
 					]
 				]
 			],
@@ -1420,7 +1564,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-space'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label name']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => 'label name'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1433,8 +1582,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-quotes'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '"label_name"']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '"label_name"'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1447,8 +1600,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-triangle-quotes'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '<label_name>']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '<label_name>'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1461,8 +1618,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-slash'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '\0']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '\0'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1475,8 +1636,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-digits'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '123']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '123'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1509,6 +1674,34 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus wrong first parameter =!',
+						'Key' => 'wrong-second-parameter-equals-exlamation'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']
+
+					],
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus wrong first parameter ~!',
+						'Key' => 'wrong-second-parameter-tilda-exclamation'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name~!"name"}']
+
+					],
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
 			// Successful Prometheus pattern creation.
 			[
 				[
@@ -1530,7 +1723,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-both-parameters-present'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => 'label_name'
+						]
 					]
 				]
 			],
@@ -1658,6 +1856,30 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'Item Prometeus label operator !=',
+						'Key' => 'prometeus-label-operator-exclamation-equals'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus label operator !~',
+						'Key' => 'prometeus-label-operator-exclamation-tilda'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Item Prometeus slashes in pattern',
 						'Key' => 'prometeus-slashes-pattern'
 					],
@@ -1674,7 +1896,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-macros-1'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{$METRIC_NAME}==1', 'parameter_2' => '{$LABEL_NAME}']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{$METRIC_NAME}==1',
+							'parameter_2' => 'label',
+							'parameter_3' => '{$LABEL_NAME}']
 					]
 				]
 			],
@@ -1737,21 +1963,116 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"<regex>"}']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function sum',
+						'Key' => 'prometeus-function-sum'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{$METRIC_NAME}==1',
+							'parameter_2' => 'sum'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function min',
+						'Key' => 'prometeus-function-min'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label_name!~"<regex>"}',
+							'parameter_2' => 'min'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function max',
+						'Key' => 'prometeus-function-max'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{{$LABEL_NAME}="<label value>"}',
+							'parameter_2' => 'max'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function avg',
+						'Key' => 'prometeus-function-avg'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label="value\\\\"}',
+							'parameter_2' => 'avg'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function count',
+						'Key' => 'prometeus-function-count'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label_name!~"name"}',
+							'parameter_2' => 'count'
+						]
+					]
+				]
 			]
 		]);
 	}
 
 	/**
 	 * Add item and preprocessing steps.
+	 *
+	 * @param array   $data    data provider
+	 * @param boolean $lld     true if item is lld, false if item or item prototype
+	 *
+	 * @return CFormElement|CGridFormElement
+	 *
 	 */
-	protected function addItemWithPreprocessing($data) {
+	protected function addItemWithPreprocessing($data, $lld = false) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
+
+		// Check that 'Type of information' field is not visible before first step is added.
+		$this->assertFalse($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible()
+		);
 		$this->addPreprocessingSteps($data['preprocessing']);
+
+		// Check that 'Type of information' field is visible after steps are added, but not for LLD.
+		$this->assertTrue($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible(!$lld)
+		);
 
 		return $form;
 	}
@@ -1759,22 +2080,19 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check creating items, item prototypes or LLD rules with preprocessing steps.
 	 */
-	protected function checkCreate($data) {
+	protected function checkCreate($data, $lld = false) {
 		if ($data['expected'] === TEST_BAD) {
 			$sql_items = 'SELECT * FROM items ORDER BY itemid';
 			$old_hash = CDBHelper::getHash($sql_items);
 		}
 
-		$form = $this->addItemWithPreprocessing($data);
-
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->assertTrue($message->isGood());
-				$this->assertEquals($this->success_message, $message->getTitle());
+				$this->assertMessage(TEST_GOOD, $this->success_message);
 
 				// Check result in frontend form.
 				$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
@@ -1784,9 +2102,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->assertTrue($message->isBad());
-				$this->assertEquals($this->fail_message, $message->getTitle());
-				$this->assertTrue($message->hasLine($data['error']));
+				$this->assertMessage(TEST_BAD, $this->fail_message, $data['error']);
+
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
 				break;
@@ -1824,7 +2141,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-space-in-parameters'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '  metric  ', 'parameter_2' => '  output  ']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '  metric  ',
+							'parameter_2' => 'label',
+							'parameter_3' => '  output  '
+						]
 					]
 				]
 			],
@@ -1856,18 +2178,20 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check spaces in preprocessing steps.
 	 */
-	protected function checkTrailingSpaces($data) {
-		$form = $this->addItemWithPreprocessing($data);
-
+	protected function checkTrailingSpaces($data, $lld = false) {
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals($this->success_message, $message->getTitle());
+		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Remove spaces.
 		foreach ($data['preprocessing'] as $i => &$options) {
-			foreach (['parameter_1', 'parameter_2'] as $parameter) {
+
+		$parameters = CTestArrayHelper::get($options, 'type') === 'Prometheus pattern'
+			? ['parameter_1', 'parameter_3']
+			: ['parameter_1', 'parameter_2'];
+
+			foreach ($parameters as $parameter) {
 				if (array_key_exists($parameter, $options)) {
 					$options[$parameter] = trim($options[$parameter]);
 				}
@@ -2067,7 +2391,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
 	public function checkCustomOnFail($data, $lld = null) {
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
@@ -2083,11 +2407,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-
-		// Check successful message.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals($this->success_message, $message->getTitle());
+		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Check saved preprocessing.
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
@@ -2378,7 +2698,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Prometheus pattern',
 						'parameter_1' => 'cpu_usage_system',
-						'parameter_2' => 'label_name',
+						'parameter_2' => 'label',
+						'parameter_3' => 'label_name',
 						'on_fail' => true,
 						'error_handler' => 'Set error to',
 						'error_handler_params' => 'Custom_text'
@@ -2390,21 +2711,20 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/**
 	 * Check inheritance of preprocessing steps in items or LLD rules.
+	 *
+	 * @param array		$data		data provider
+	 * @param string	$host_link	URL of host configuration
 	 */
-	protected function checkPreprocessingInheritance($data, $host_link) {
+	protected function checkPreprocessingInheritance($data, $host_link, $lld = false) {
 		// Create item on template.
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
-
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals($this->success_message, $message->getTitle());
+		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Check preprocessing steps on host.
 		$this->page->open($host_link);
 		$this->query('link', $data['fields']['Name'])->waitUntilPresent()->one()->click();
-
 		$form->selectTab('Preprocessing');
 		$steps = $this->assertPreprocessingSteps($data['preprocessing']);
 
@@ -2443,6 +2763,69 @@ abstract class testFormPreprocessing extends CWebTest {
 					$this->assertFalse($step['on_fail']->isSelected());
 					break;
 			}
+		}
+	}
+
+	/**
+	 * Check cloning of inherited preprocessing steps in items, prototypes or LLD rules.
+	 *
+	 * @param string    $link         cloned item, prototype or LLD URL
+	 * @param string    $item         what is being cloned: item, prototype or LLD rule
+	 * @param string    $templated    is it templated item or not
+	 */
+	protected function checkCloneItem($link, $item, $templated = false) {
+		$cloned_values = [
+			'Name'	=> 'Cloned_testInheritancePreprocessingSteps'.time(),
+			'Key' => 'cloned-preprocessing'.time()
+		];
+
+		// Open original item on host and get its' preprocessing steps.
+		$this->page->login()->open($link);
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+
+		if ($templated) {
+			// Check that right templated item is opened.
+			$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
+			$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
+		}
+
+		$form->selectTab('Preprocessing');
+		$original_steps = $this->listPreprocessingSteps();
+		$form->selectTab($item);
+
+		// Clone item.
+		$form->query('button:Clone')->waitUntilPresent()->one()->click();
+		$form->invalidate();
+		$form->fill($cloned_values);
+
+		$this->checkPreprocessingSteps($form, $original_steps);
+		$form->submit();
+		$message = ($item === 'Discovery rule') ? $item.' created' : $item.' added';
+		$this->assertMessage(TEST_GOOD, $message);
+
+		// Open cloned item and check preprocessing steps in saved form.
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($cloned_values['Key']));
+		$this->page->open($this->ready_link.$id);
+		$form->invalidate();
+		$this->assertEquals($cloned_values['Name'], $form->getField('Name')->getValue());
+		$this->checkPreprocessingSteps($form, $original_steps);
+	}
+
+	/**
+	 * Select Preprocessing tab in cloned item, prototype or LLD form and assert
+	 * that steps are the same as in original item.
+	 *
+	 * @param CFormElement	$form				item, prototype or LLD configuration form
+	 * @param array			$original_steps		preprocessing steps of original item
+	 */
+	private function checkPreprocessingSteps($form, $original_steps) {
+		$form->selectTab('Preprocessing');
+		$this->assertEquals($original_steps, $this->listPreprocessingSteps());
+
+		// Check that preprocessing steps in cloned form are editable.
+		foreach (array_keys($this->listPreprocessingSteps()) as $i) {
+			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
+			$this->assertNull($step->getAttribute('readonly'));
 		}
 	}
 }

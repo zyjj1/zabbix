@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	public $config_link = 'zabbix.php?action=miscconfig.edit';
 	public $form_selector = 'name:otherForm';
 
-	public $default = [
+	public $default_values = [
+		'Frontend URL' => '',
 		'Group for discovered hosts' => 'Empty group',
 		'Default host inventory mode' => 'Disabled',
 		'User group for database down message' => 'Zabbix administrators',
@@ -50,7 +51,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Network timeout for item test' => '60s'
 	];
 
-	public $db_default = [
+	public $db_default_values = [
+		'url' => '',
 		'discovery_groupid' => 50006,
 		'default_inventory_mode' => -1,
 		'alert_usrgrpid' => 7,
@@ -72,7 +74,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'item_test_timeout' => '60s'
 	];
 
-	public $custom = [
+	public $custom_values = [
+		'Frontend URL' => 'http://zabbix.com',
 		'Group for discovered hosts' => 'Hypervisors',
 		'Default host inventory mode' => 'Automatic',
 		'User group for database down message' => 'Test timezone',
@@ -108,6 +111,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		}
 
 		$limits = [
+			'url' => 255,
 			'login_attempts' => 2,
 			'login_block' => 32,
 			'uri_valid_schemes' => 255,
@@ -167,6 +171,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
+						'Frontend URL' => 'a',
 						'Group for discovered hosts' => 'Hypervisors',
 						'Default host inventory mode' => 'Manual',
 						'User group for database down message' => 'Test timezone',
@@ -186,6 +191,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1s'
 					],
 					'db' => [
+						'url' => 'a',
 						'discovery_groupid' => 7,
 						'default_inventory_mode' => 0,
 						'alert_usrgrpid' => 92,
@@ -211,6 +217,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
+						'Frontend URL' => 'zabbix.php',
 						'Default host inventory mode' => 'Automatic',
 						'Log unmatched SNMP traps' => true,
 						// Authorization.
@@ -228,6 +235,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1'
 					],
 					'db' => [
+						'url' => 'zabbix.php',
 						'default_inventory_mode' => 1,
 						'snmptrap_logging' => 1,
 						// Authorization.
@@ -429,7 +437,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid sting values.
+			// Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,

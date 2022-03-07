@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,29 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
 		],
+		'bucket_percentile' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
+				['type' => 'number', 'min' => 0, 'max' => 100]
+			]]
+		],
+		'bucket_rate_foreach' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^\d+$/'],
+				['type' => 'number', 'min' => 1]
+			], 'required' => false]
+		],
 		'change' => [
 			['rules' => [['type' => 'query']]]
+		],
+		'changecount' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(inc|dec|all)$/']], 'required' => false]
 		],
 		'count' => [
 			['rules' => [['type' => 'query']]],
@@ -144,6 +165,16 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
 		],
+		'monodec' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(weak|strict)$/']], 'required' => false]
+		],
+		'monoinc' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(weak|strict)$/']], 'required' => false]
+		],
 		'nodata' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'time', 'min' => 1]]],
@@ -156,6 +187,10 @@ final class CHistFunctionData {
 				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
 				['type' => 'number', 'min' => 0, 'max' => 100]
 			]]
+		],
+		'rate' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'skewness' => [
 			['rules' => [['type' => 'query']]],
@@ -193,6 +228,28 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
+		'baselinedev' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [[
+				'type' => 'period',
+				'mode' => self::PERIOD_MODE_TREND,
+				'min' => SEC_PER_HOUR,
+				'aligned_shift' => true
+			]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^[hdwMy]$/']]],
+			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1, 'with_float' => false]]]
+		],
+		'baselinewma' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [[
+				'type' => 'period',
+				'mode' => self::PERIOD_MODE_TREND,
+				'min' => SEC_PER_HOUR,
+				'aligned_shift' => true
+			]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^[hdwMy]$/']]],
+			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1, 'with_float' => false]]]
+		],
 		'trendcount' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
@@ -204,6 +261,23 @@ final class CHistFunctionData {
 		'trendmin' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
+		],
+		'trendstl' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR * 2]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
+				['type' => 'number', 'min' => 1, 'max' => ZBX_MAX_INT32]
+			], 'required' => false],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
+			], 'required' => false],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^\d+$/'],
+				['type' => 'number', 'min' => 7, 'max' => ZBX_MAX_INT32]
+			], 'required' => false]
 		],
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],
@@ -220,12 +294,70 @@ final class CHistFunctionData {
 	];
 
 	/**
-	 * A subset of history functions for use in calculated item formulas only.
+	 * Additional requirements for history function usage in expressions.
 	 *
 	 * @var array
 	 */
-	private const CALCULATED_ONLY = [
+	private const EXPRESSION_RULES = [
+		'avg_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'bucket_rate_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['histogram_quantile'],
+			'parameters' => ['count' => 2],
+			'position' => 1
+		]],
+		'count_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'exists_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'last_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'max_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'min_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'sum_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]]
+	];
+
+	/**
+	 * A subset of aggregating history functions for use in calculated item formulas.
+	 *
+	 * @var array
+	 */
+	private const AGGREGATING = [
 		'avg_foreach',
+		'bucket_percentile',
+		'bucket_rate_foreach',
 		'count_foreach',
 		'exists_foreach',
 		'item_count',
@@ -249,7 +381,10 @@ final class CHistFunctionData {
 	private const VALUE_TYPES = [
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'bucket_percentile' => self::ITEM_VALUE_TYPES_NUM,
+		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
+		'changecount' => self::ITEM_VALUE_TYPES_ALL,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'countunique' => self::ITEM_VALUE_TYPES_ALL,
@@ -270,8 +405,11 @@ final class CHistFunctionData {
 		'max_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'min' => self::ITEM_VALUE_TYPES_NUM,
 		'min_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'monodec' =>  self::ITEM_VALUE_TYPES_NUM,
+		'monoinc' =>  self::ITEM_VALUE_TYPES_NUM,
 		'nodata' => self::ITEM_VALUE_TYPES_ALL,
 		'percentile' => self::ITEM_VALUE_TYPES_NUM,
+		'rate' => self::ITEM_VALUE_TYPES_NUM,
 		'skewness' => self::ITEM_VALUE_TYPES_NUM,
 		'stddevpop' => self::ITEM_VALUE_TYPES_NUM,
 		'stddevsamp' => self::ITEM_VALUE_TYPES_NUM,
@@ -280,9 +418,12 @@ final class CHistFunctionData {
 		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinedev' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinewma' => self::ITEM_VALUE_TYPES_NUM,
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
+		'trendstl' => self::ITEM_VALUE_TYPES_NUM,
 		'trendsum' => self::ITEM_VALUE_TYPES_NUM,
 		'varpop' => self::ITEM_VALUE_TYPES_NUM,
 		'varsamp' => self::ITEM_VALUE_TYPES_NUM
@@ -319,7 +460,7 @@ final class CHistFunctionData {
 			return false;
 		}
 
-		if (!$this->options['calculated'] && in_array($function, self::CALCULATED_ONLY, true)) {
+		if (!$this->options['calculated'] && in_array($function, self::AGGREGATING, true)) {
 			return false;
 		}
 
@@ -336,7 +477,33 @@ final class CHistFunctionData {
 			return self::PARAMETERS;
 		}
 
-		return array_diff_key(self::PARAMETERS, array_flip(self::CALCULATED_ONLY));
+		return array_diff_key(self::PARAMETERS, array_flip(self::AGGREGATING));
+	}
+
+	/**
+	 * Get additional requirements for history function usage in expressions.
+	 *
+	 * @return array
+	 */
+	public function getExpressionRules(): array {
+		if ($this->options['calculated']) {
+			return self::EXPRESSION_RULES;
+		}
+
+		return array_diff_key(self::EXPRESSION_RULES, array_flip(self::AGGREGATING));
+	}
+
+	/**
+	 * Check if function is aggregating wildcarded host/item queries and is exclusive to calculated item formulas.
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public function isAggregating(string $function): bool {
+		return in_array($function, self::AGGREGATING);
 	}
 
 	/**
@@ -349,31 +516,6 @@ final class CHistFunctionData {
 			return self::VALUE_TYPES;
 		}
 
-		return array_diff_key(self::VALUE_TYPES, array_flip(self::CALCULATED_ONLY));
-	}
-
-	/**
-	 * Check if function is aggregating wildcarded host/item queries and is exclusive to calculated item formulas.
-	 *
-	 * @static
-	 *
-	 * @param string $function
-	 *
-	 * @return bool
-	 */
-	public static function isAggregating(string $function): bool {
-		switch ($function) {
-			case 'avg_foreach':
-			case 'count_foreach':
-			case 'exists_foreach':
-			case 'last_foreach':
-			case 'max_foreach':
-			case 'min_foreach':
-			case 'sum_foreach':
-				return true;
-
-			default:
-				return false;
-		}
+		return array_diff_key(self::VALUE_TYPES, array_flip(self::AGGREGATING));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,24 +174,40 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Return 'Never' if 0.
-function zbx_date2str($format, $value = null) {
+/**
+ * Convert time to a string representation. Return 'Never' if timestamp is 0.
+ *
+ * @param             $format
+ * @param null        $time
+ * @param string|null $timezone
+ *
+ * @throws Exception
+ *
+ * @return string
+ */
+function zbx_date2str($format, $time = null, string $timezone = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
-	$prefix = '';
+	if ($time === null) {
+		$time = time();
+	}
 
-	if ($value === null) {
-		$value = time();
-	}
-	elseif ($value > ZBX_MAX_DATE) {
-		$prefix = '> ';
-		$value = ZBX_MAX_DATE;
-	}
-	elseif (!$value) {
+	if ($time == 0) {
 		return _('Never');
 	}
 
-	if (!is_array($weekdaynames)) {
+	if ($time > ZBX_MAX_DATE) {
+		$prefix = '> ';
+		$datetime = new DateTime('@'.ZBX_MAX_DATE);
+	}
+	else {
+		$prefix = '';
+		$datetime = new DateTime('@'.$time);
+	}
+
+	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));
+
+	if ($weekdaynames === null) {
 		$weekdaynames = [
 			0 => _('Sun'),
 			1 => _('Mon'),
@@ -203,7 +219,7 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	if (!is_array($weekdaynameslong)) {
+	if ($weekdaynameslong === null) {
 		$weekdaynameslong = [
 			0 => _('Sunday'),
 			1 => _('Monday'),
@@ -215,7 +231,7 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	if (!is_array($months)) {
+	if ($months === null) {
 		$months = [
 			1 => _('Jan'),
 			2 => _('Feb'),
@@ -232,7 +248,7 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	if (!is_array($monthslong)) {
+	if ($monthslong === null) {
 		$monthslong = [
 			1 => _('January'),
 			2 => _('February'),
@@ -249,30 +265,28 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	$rplcs = [
-		'l' => $weekdaynameslong[date('w', $value)],
-		'F' => $monthslong[date('n', $value)],
-		'D' => $weekdaynames[date('w', $value)],
-		'M' => $months[date('n', $value)]
+	$replacements = [
+		'l' => $weekdaynameslong[$datetime->format('w')],
+		'F' => $monthslong[$datetime->format('n')],
+		'D' => $weekdaynames[$datetime->format('w')],
+		'M' => $months[$datetime->format('n')]
 	];
 
-	$output = $part = '';
+	$output = '';
+
 	$length = strlen($format);
 
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? substr($format, $i - 1, 1) : '';
-		$char = substr($format, $i, 1);
+		$char = $format[$i];
+		$char_escaped = $i > 0 && $format[$i - 1] === '\\';
 
-		if ($pchar != '\\' && isset($rplcs[$char])) {
-			$output .= (strlen($part) ? date($part, $value) : '').$rplcs[$char];
-			$part = '';
+		if (!$char_escaped && array_key_exists($char, $replacements)) {
+			$output .= $replacements[$char];
 		}
 		else {
-			$part .= $char;
+			$output .= $datetime->format($char);
 		}
 	}
-
-	$output .= (strlen($part) > 0) ? date($part, $value) : '';
 
 	return $prefix.$output;
 }
@@ -593,7 +607,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 }
 
 /**
- * Converts value to actual value.
+ * Converts a raw value to a user-friendly representation based on unit and other parameters.
  * Example:
  * 	6442450944 B convert to 6 GB
  *
@@ -611,6 +625,39 @@ function convertUnitsS($value, $ignore_millisec = false) {
  * @return string
  */
 function convertUnits(array $options) {
+	[
+		'value' => $value,
+		'units' => $units
+	] = convertUnitsRaw($options);
+
+	$result = $value;
+
+	if ($units !== '') {
+		$result .= ' '.$units;
+	}
+
+	return $result;
+}
+
+/**
+ * Converts a raw value to a user-friendly representation based on unit and other parameters.
+ * Example:
+ * 	6442450944 B convert to 6 GB
+ *
+ * @param array  $options
+ * @param string $options['value']
+ * @param string $options['units']
+ * @param int    $options['convert']
+ * @param int    $options['power']
+ * @param string $options['unit_base']
+ * @param bool   $options['ignore_milliseconds']
+ * @param int    $options['precision']
+ * @param int    $options['decimals']
+ * @param bool   $options['decimals_exact']
+ *
+ * @return array
+ */
+function convertUnitsRaw(array $options) {
 	static $power_table = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
 
 	$options += [
@@ -628,21 +675,37 @@ function convertUnits(array $options) {
 	$value = $options['value'] !== null ? $options['value'] : '';
 
 	if (!is_numeric($value)) {
-		return $value;
+		return [
+			'value' => $value,
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	$units = $options['units'] !== null ? $options['units'] : '';
 
 	if ($units === 'unixtime') {
-		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value);
+		return [
+			'value' => zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value),
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	if ($units === 'uptime') {
-		return convertUnitsUptime($value);
+		return [
+			'value' => convertUnitsUptime($value),
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	if ($units === 's') {
-		return convertUnitsS($value, $options['ignore_milliseconds']);
+		return [
+			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	$blacklist = ['%', 'ms', 'rpm', 'RPM'];
@@ -658,16 +721,17 @@ function convertUnits(array $options) {
 	$do_convert = $units !== '' || $options['convert'] == ITEM_CONVERT_NO_UNITS;
 
 	if (in_array($units, $blacklist) || !$do_convert || $value_abs < 1) {
-		$result = formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
-			$options['decimals_exact']
-		);
-
-		$result .= ($units === '' ? '' : ' '.$units);
-
-		return $result;
+		return [
+			'value' => formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
+				$options['decimals_exact']
+			),
+			'units' => $units,
+			'is_numeric' => true
+		];
 	}
 
 	$unit_base = $options['unit_base'];
+
 	if ($unit_base != 1000 && $unit_base != ZBX_KIBIBYTE) {
 		$unit_base = ($units === 'B' || $units === 'Bps') ? ZBX_KIBIBYTE : 1000;
 	}
@@ -694,20 +758,23 @@ function convertUnits(array $options) {
 			$unit_prefix = $power_table[$unit_power];
 		}
 		else {
-			$unit_power = count($power_table);
+			$unit_power = count($power_table) - 1;
 			$unit_prefix = $power_table[$unit_power];
 		}
 
-		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'], $options['decimals'] ??
-			($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
+		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'],
+			$options['decimals'] ?? ($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
+			$options['decimals_exact']
 		);
 	}
 
 	$result_units = ($result == 0 ? '' : $unit_prefix).$units;
 
-	$result .= ($result_units === '' ? '' : ' '.$result_units);
-
-	return $result;
+	return [
+		'value' => $result,
+		'units' => $result_units,
+		'is_numeric' => true
+	];
 }
 
 /**
@@ -717,7 +784,7 @@ function convertUnits(array $options) {
  * @param string $time       Decimal integer with optional time suffix.
  * @param bool   $with_year  Additionally parse year suffixes.
  *
- * @return string|null  Decimal integer seconds or null on error.
+ * @return int|null  Decimal integer seconds or null on error.
  */
 function timeUnitToSeconds($time, $with_year = false) {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
@@ -1577,8 +1644,21 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
-function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false) {
-	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+/**
+ * Create a message box.
+ *
+ * @param string      $class                  CSS class of the message box. Possible values:
+ *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
+ * @param array       $messages               An array of messages.
+ * @param string      $messages[]['message']  Message text.
+ * @param string|null $title                  (optional) Message box title.
+ * @param bool        $show_close_box         (optional) Show or hide close button in error message box.
+ * @param bool        $show_details           (optional) Show or hide message details.
+ *
+ * @return CTag
+ */
+function makeMessageBox(string $class, array $messages, string $title = null, bool $show_close_box = true,
+		bool $show_details = false): CTag {
 	$msg_details = null;
 	$link_details = null;
 
@@ -1624,11 +1704,17 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$title = new CSpan($title);
 	}
 
+	$aria_labels = [
+		ZBX_STYLE_MSG_GOOD => _('Success message'),
+		ZBX_STYLE_MSG_BAD => _('Error message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message')
+	];
+
 	// Details link should be in front of title.
 	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
 		->addClass($class)
 		->setAttribute('role', 'contentinfo')
-		->setAttribute('aria-label', $good ? _('Success message') : _('Error message'));
+		->setAttribute('aria-label', $aria_labels[$class]);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1661,7 +1747,7 @@ function filter_messages(): array {
 				}
 			}
 			else {
-				CMessageHelper::addSuccess($message['message']);
+				CMessageHelper::addMessage($message);
 			}
 		}
 	}
@@ -1670,7 +1756,7 @@ function filter_messages(): array {
 }
 
 /**
- * Returns the message box when messages are present; null otherwise
+ * Returns a message box if there are messages. Otherwise, null.
  *
  * @param  bool    $good            Parameter passed to makeMessageBox to specify message box style.
  * @param  string  $title           Message box title.
@@ -1682,21 +1768,48 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title, $show_close_box, !$good)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;
 }
 
-function show_messages($good = false, $okmsg = null, $errmsg = null) {
+function show_messages($good = null, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES_PREPARED;
 
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
 	}
 
-	$title = $good ? $okmsg : $errmsg;
 	$messages = get_and_clear_messages();
+
+	if ($good === null) {
+		$has_errors = false;
+		$has_warnings = false;
+
+		foreach ($messages as $message) {
+			$has_errors = ($has_errors || ($message['type'] === 'error'));
+			$has_warnings = ($has_warnings || ($message['type'] === 'warning'));
+		}
+
+		if ($has_errors) {
+			$class = ZBX_STYLE_MSG_BAD;
+			$good = false;
+		}
+		elseif ($has_warnings) {
+			$class = ZBX_STYLE_MSG_WARNING;
+			$good = true;
+		}
+		else {
+			$class = ZBX_STYLE_MSG_GOOD;
+			$good = true;
+		}
+	}
+	else {
+		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+	}
+
+	$title = $good ? $okmsg : $errmsg;
 
 	if ($title === null && !$messages) {
 		return;
@@ -1718,7 +1831,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 			foreach ($messages as $message) {
 				$image_messages[] = [
 					'text' => $message['message'],
-					'color' => $message['type'] == 'error'
+					'color' => ($message['type'] === 'error')
 						? ['R' => 255, 'G' => 55, 'B' => 55]
 						: ['R' => 155, 'G' => 155, 'B' => 55]
 				];
@@ -1770,11 +1883,11 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 
 			// Prepare messages for inclusion within the layout engine.
 			$ZBX_MESSAGES_PREPARED[] = [
-				'is_good' => $good,
+				'class' => $class,
 				'messages' => $messages,
 				'title' => $title,
 				'show_close_box' => true,
-				'show_details' => !$good
+				'show_details' => ($class === ZBX_STYLE_MSG_BAD)
 			];
 
 			break;
@@ -1807,7 +1920,7 @@ function get_prepared_messages(array $options = []): ?string {
 
 	if ($options['with_current_messages']) {
 		show_messages(
-			CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+			null,
 			CMessageHelper::getTitle(),
 			CMessageHelper::getTitle()
 		);
@@ -1870,7 +1983,7 @@ function get_prepared_messages(array $options = []): ?string {
 
 	$html = '';
 	foreach (array_merge($messages_authentication, $messages_session, $messages_current) as $box) {
-		$html .= makeMessageBox($box['is_good'], $box['messages'], $box['title'], $box['show_close_box'],
+		$html .= makeMessageBox($box['class'], $box['messages'], $box['title'], $box['show_close_box'],
 			$box['show_details']
 		)->toString();
 	}
@@ -1897,6 +2010,19 @@ function info($msgs): void {
 
 	foreach ($msgs as $msg) {
 		CMessageHelper::addSuccess($msg);
+	}
+}
+
+/**
+ * Add warning messages to the global message array.
+ *
+ * @param array|string $messages
+ */
+function warning($messages): void {
+	zbx_value2array($messages);
+
+	foreach ($messages as $message) {
+		CMessageHelper::addWarning($message);
 	}
 }
 
@@ -1954,149 +2080,6 @@ function parse_period($str) {
 	}
 
 	return $out;
-}
-
-function get_status() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-	$status = [
-		'is_running' => false,
-		'has_status' => false
-	];
-
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-	);
-	$status['is_running'] = $server->isRunning(CSessionHelper::getId());
-
-	if ($status['is_running'] === false) {
-		return $status;
-	}
-
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)), 15, ZBX_SOCKET_BYTES_LIMIT
-	);
-	$server_status = $server->getStatus(CSessionHelper::getId());
-	$status['has_status'] = (bool) $server_status;
-
-	if ($server_status === false) {
-		error($server->getError());
-		return $status;
-	}
-
-	$status += [
-		'triggers_count_disabled' => 0,
-		'triggers_count_off' => 0,
-		'triggers_count_on' => 0,
-		'items_count_monitored' => 0,
-		'items_count_disabled' => 0,
-		'items_count_not_supported' => 0,
-		'hosts_count_monitored' => 0,
-		'hosts_count_not_monitored' => 0,
-		'hosts_count_template' => 0,
-		'users_count' => 0,
-		'users_online' => 0
-	];
-
-	// hosts
-	foreach ($server_status['template stats'] as $stats) {
-		$status['hosts_count_template'] += $stats['count'];
-	}
-
-	foreach ($server_status['host stats'] as $stats) {
-		if ($stats['attributes']['proxyid'] == 0) {
-			switch ($stats['attributes']['status']) {
-				case HOST_STATUS_MONITORED:
-					$status['hosts_count_monitored'] += $stats['count'];
-					break;
-
-				case HOST_STATUS_NOT_MONITORED:
-					$status['hosts_count_not_monitored'] += $stats['count'];
-					break;
-			}
-		}
-	}
-	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored'];
-
-	// items
-	foreach ($server_status['item stats'] as $stats) {
-		if ($stats['attributes']['proxyid'] == 0) {
-			switch ($stats['attributes']['status']) {
-				case ITEM_STATUS_ACTIVE:
-					if (array_key_exists('state', $stats['attributes'])) {
-						switch ($stats['attributes']['state']) {
-							case ITEM_STATE_NORMAL:
-								$status['items_count_monitored'] += $stats['count'];
-								break;
-
-							case ITEM_STATE_NOTSUPPORTED:
-								$status['items_count_not_supported'] += $stats['count'];
-								break;
-						}
-					}
-					break;
-
-				case ITEM_STATUS_DISABLED:
-					$status['items_count_disabled'] += $stats['count'];
-					break;
-			}
-		}
-	}
-	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
-			+ $status['items_count_not_supported'];
-
-	// triggers
-	foreach ($server_status['trigger stats'] as $stats) {
-		switch ($stats['attributes']['status']) {
-			case TRIGGER_STATUS_ENABLED:
-				if (array_key_exists('value', $stats['attributes'])) {
-					switch ($stats['attributes']['value']) {
-						case TRIGGER_VALUE_FALSE:
-							$status['triggers_count_off'] += $stats['count'];
-							break;
-
-						case TRIGGER_VALUE_TRUE:
-							$status['triggers_count_on'] += $stats['count'];
-							break;
-					}
-				}
-				break;
-
-			case TRIGGER_STATUS_DISABLED:
-				$status['triggers_count_disabled'] += $stats['count'];
-				break;
-		}
-	}
-	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on'];
-	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
-
-	// users
-	foreach ($server_status['user stats'] as $stats) {
-		switch ($stats['attributes']['status']) {
-			case ZBX_SESSION_ACTIVE:
-				$status['users_online'] += $stats['count'];
-				break;
-
-			case ZBX_SESSION_PASSIVE:
-				$status['users_count'] += $stats['count'];
-				break;
-		}
-	}
-	$status['users_count'] += $status['users_online'];
-
-	// performance
-	if (array_key_exists('required performance', $server_status)) {
-		$status['vps_total'] = 0;
-
-		foreach ($server_status['required performance'] as $stats) {
-			if ($stats['attributes']['proxyid'] == 0) {
-				$status['vps_total'] += $stats['count'];
-			}
-		}
-	}
-
-	return $status;
 }
 
 /**
@@ -2169,7 +2152,7 @@ function imageOut(&$image, $format = null) {
  *
  * @return bool
  */
-function hasErrorMesssages() {
+function hasErrorMessages() {
 	return CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_ERROR;
 }
 
@@ -2186,10 +2169,10 @@ function uncheckTableRows($parentid = null, $keepids = []) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		$keepids = array_combine($keepids, $keepids);
 
-		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.json_encode($keepids).'))');
+		insert_js('sessionStorage.setItem('.json_encode($key).', JSON.stringify('.json_encode($keepids).'));');
 	}
 	else {
-		insert_js('sessionStorage.removeItem("'.$key.'")');
+		insert_js('sessionStorage.removeItem('.json_encode($key).');');
 	}
 }
 
@@ -2599,4 +2582,50 @@ function generateUuidV4($seed = '') {
 	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
 	return bin2hex($data);
+}
+
+/**
+ * Function returns predefined Leaflet Tile providers with parameters.
+ *
+ * @return array
+ */
+function getTileProviders(): array {
+	return [
+		'OpenStreetMap.Mapnik' => [
+			'name' => 'OpenStreetMap Mapnik',
+			'geomaps_tile_url' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			'geomaps_max_zoom' => '19',
+			'geomaps_attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		],
+		'OpenTopoMap' => [
+			'name' => 'OpenTopoMap',
+			'geomaps_tile_url' => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			'geomaps_max_zoom' => '17',
+			'geomaps_attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+		],
+		'Stamen.TonerLite' => [
+			'name' => 'Stamen Toner Lite',
+			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
+			'geomaps_max_zoom' => '20',
+			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		],
+		'Stamen.Terrain' => [
+			'name' => 'Stamen Terrain',
+			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
+			'geomaps_max_zoom' => '18',
+			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		],
+		'USGS.USTopo' => [
+			'name' => 'USGS US Topo',
+			'geomaps_tile_url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
+			'geomaps_max_zoom' => '20',
+			'geomaps_attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
+		],
+		'USGS.USImagery' => [
+			'name' => 'USGS US Imagery',
+			'geomaps_tile_url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
+			'geomaps_max_zoom' => '20',
+			'geomaps_attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
+		]
+	];
 }

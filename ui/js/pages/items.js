@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 
 /**
- * @param {object} interface_ids_by_types  Iterface ids grouped by interface type.
+ * @param {object} interface_ids_by_types  Interface ids grouped by interface type.
  * @param {object} item_interface_types    Item type to interface type map.
  * @param {number|null} item_type          Current item type.
  */
