@@ -18,8 +18,10 @@
 **/
 
 #include "control.h"
+#include "zbxnix.h"
 
-#include "common.h"
+#include "zbxnum.h"
+#include "zbx_rtc_constants.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {
@@ -41,7 +43,7 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
 	else if (0 != isdigit(*(++rtc_options)))
 	{
 		/* convert PID */
-		if (FAIL == is_ushort(rtc_options, &num) || 0 == num)
+		if (FAIL == zbx_is_ushort(rtc_options, &num) || 0 == num)
 		{
 			zbx_error("invalid log level control target: invalid or unsupported process identifier");
 			return FAIL;
@@ -90,7 +92,7 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
 			}
 
 			/* convert Zabbix process number (e.g. "2" in "poller,2") */
-			if (FAIL == is_ushort(proc_num, &num) || 0 == num)
+			if (FAIL == zbx_is_ushort(proc_num, &num) || 0 == num)
 			{
 				zbx_error("invalid log level control target: invalid or unsupported process number"
 						" \"%s\"", proc_num);
@@ -121,7 +123,7 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_rtc_options(const char *opt, int *message)
+int	zbx_parse_rtc_options(const char *opt, int *message)
 {
 	unsigned int	scope, data, command;
 

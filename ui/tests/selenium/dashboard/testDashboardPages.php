@@ -18,9 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * @backup dashboard
@@ -351,6 +354,9 @@ class testDashboardPages extends CWebTest {
 			CPopupMenuElement::find()->waitUntilVisible()->one()->select('Paste page');
 			$dashboard->waitUntilReady();
 
+			// Wait until the second page appears.
+			$this->query('xpath://li[@class="sortable-item"][2]')->waitUntilVisible()->one();
+
 			// Copied page added.
 			$titles_before[] = 'first_page_copy';
 
@@ -450,6 +456,7 @@ class testDashboardPages extends CWebTest {
 		$dashboard->addPage();
 		$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->fill($data['fields'])->submit();
+		$page_dialog->ensureNotPresent();
 		$dashboard->waitUntilReady();
 
 		$title = $data['fields']['Name'];
@@ -551,6 +558,11 @@ class testDashboardPages extends CWebTest {
 		// Check that Delete option is disabled when one page left.
 		$page_menu = $this->getPageMenu('Page 1');
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
+
+		// Press Escape key to close page menu before saving the dashboard.
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
+		$page_menu->waitUntilNotVisible();
+
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
 	}
@@ -584,6 +596,7 @@ class testDashboardPages extends CWebTest {
 			}
 
 			$page_dialog->query('button:Apply')->one()->click();
+			COverlayDialogElement::ensureNotPresent();
 			$dashboard->waitUntilReady();
 			$allpage_name = ($page_name === 'not_page_number') ? ['Page 1', 'not_page_number'] : ['Page 1', 'not_page_number', 'Page 3'];
 			$this->assertEquals($allpage_name, $this->getPagesTitles());
@@ -675,25 +688,11 @@ class testDashboardPages extends CWebTest {
 
 		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->waitUntilVisible()->one()->getAttribute('class');
 		if ($value !== 'selected-tab') {
-			$this->selectPage($page_name, $index);
+			CDashboardElement::find()->one()->selectPage($page_name, $index);
 		}
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->click();
 
 		return CPopupMenuElement::find()->waitUntilVisible()->one();
-	}
-
-	/**
-	 * Select page by name.
-	 *
-	 * @param string $page_name		page name where to open menu
-	 * @param integer $index		number of page that has duplicated name
-	 */
-	private function selectPage($page_name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
-		$this->query('xpath:('.$selection.'])['.$index.']')
-				->one()->click()->waitUntilReady();
-		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')
-				->one()->waitUntilPresent();
 	}
 
 	/**
@@ -728,7 +727,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
 		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
 		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',
-				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asDropdown()->one()->getOptions()->asText()
 		);
 		$page_dialog->query('button:Cancel')->one()->click();
 	}

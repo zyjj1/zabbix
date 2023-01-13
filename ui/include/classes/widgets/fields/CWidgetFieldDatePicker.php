@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,50 +19,42 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use CAbsoluteTimeParser,
+	CParser,
+	CRelativeTimeParser,
+	DB;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldDatePicker extends CWidgetField {
 
-	/**
-	 * @var array
-	 */
-	private $date_time_formats;
+	public const DEFAULT_VALUE = '';
 
-	/**
-	 * @var bool
-	 */
-	private $is_date_only;
+	private bool $is_date_only;
 
-	/**
-	 * @param string $name
-	 * @param string $label
-	 * @param array  $date_time_formats
-	 * @param bool   $is_date_only
-	 */
-	public function __construct(string $name, string $label, array $date_time_formats, bool $is_date_only) {
+	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
 		parent::__construct($name, $label);
 
-		$this->date_time_formats = $date_time_formats;
 		$this->is_date_only = $is_date_only;
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules([
-			'type' => API_STRING_UTF8,
-			'length' => DB::getFieldLength('widget_field', 'value_str')
-		]);
-		$this->setDefault('');
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules([
+				'type' => API_STRING_UTF8,
+				'length' => DB::getFieldLength('widget_field', 'value_str')
+			]);
 	}
 
-	/**
-	 * @param $flags
-	 *
-	 * @return CWidgetFieldDatePicker
-	 */
-	public function setFlags($flags): self {
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
 		$validation_rules = $this->getValidationRules();
 		$validation_rules['flags'] = $validation_rules['flags'] ?? 0x00;
 
-		if (($flags & self::FLAG_NOT_EMPTY) != 0) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$validation_rules['flags'] |= API_NOT_EMPTY;
 		}
 		else {
@@ -74,25 +66,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		return $this;
 	}
 
-	/**
-	 * @return array
-	 */
-	public function getDateTimeFormats(): array {
-		return $this->date_time_formats;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isDateOnly(): bool {
-		return $this->is_date_only;
-	}
-
-	/**
-	 * @param bool $strict
-	 *
-	 * @return array
-	 */
 	public function validate(bool $strict = false): array {
 		if ($errors = parent::validate($strict)) {
 			return $errors;
@@ -101,17 +74,22 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		$label = $this->full_name ?? $this->label ?? $this->name;
 		$value = $this->value ?? $this->default;
 
-		if ($value === '' && ($this->getFlags() & self::FLAG_NOT_EMPTY) == 0) {
+		if ($value === '' && ($this->getFlags() & self::FLAG_NOT_EMPTY) === 0) {
 			$this->setValue('');
 
 			return [];
 		}
 
-		foreach ($this->getDateTimeFormats() as $datetime_format) {
-			$datetime = DateTime::createFromFormat('!'.$datetime_format, $value);
-			$last_errors = DateTime::getLastErrors();
+		$absolute_time_parser = new CAbsoluteTimeParser();
 
-			if ($datetime !== false && $last_errors['warning_count'] == 0 && $last_errors['error_count'] == 0) {
+		if ($absolute_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$has_errors = false;
+
+			if ($this->is_date_only) {
+				$has_errors = $absolute_time_parser->getDateTime(true)->format('H:i:s') !== '00:00:00';
+			}
+
+			if (!$has_errors) {
 				$this->setValue($value);
 
 				return [];
@@ -123,7 +101,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		if ($relative_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
 			$has_errors = false;
 
-			if ($this->isDateOnly()) {
+			if ($this->is_date_only) {
 				foreach ($relative_time_parser->getTokens() as $token) {
 					if ($token['suffix'] === 'h' || $token['suffix'] === 'm' || $token['suffix'] === 's') {
 						$has_errors = true;
@@ -143,7 +121,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 
 		return [
 			_s('Invalid parameter "%1$s": %2$s.', $label,
-				$this->isDateOnly() ? _('a date is expected') : _('a time is expected')
+				$this->is_date_only ? _('a date is expected') : _('a time is expected')
 			)
 		];
 	}

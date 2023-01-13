@@ -17,17 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxeval.h"
-#include "log.h"
-#include "db.h"
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
+
+#include "zbxeval.h"
+#include "log.h"
+#include "zbxdbhigh.h"
 #include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "../zbxalgo/vectorimpl.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "zbxcrypto.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
+#include "zbx_trigger_constants.h"
 
 /*
  * 5.4 development database patches
@@ -35,11 +39,9 @@
 
 #ifndef HAVE_SQLITE3
 
-extern unsigned char	program_type;
-
 static int	DBpatch_5030000(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
@@ -123,7 +125,7 @@ static int	DBpatch_5030001(void)
 		"web.host_prototypes.php.sortorder"
 	};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; SUCCEED == ret && i < (int)ARRSIZE(keys); i++)
@@ -191,7 +193,7 @@ static int	DBpatch_5030001(void)
 
 static int	DBpatch_5030002(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where "
@@ -218,7 +220,7 @@ static int	DBpatch_5030003(void)
 	DB_RESULT		result;
 	zbx_dbpatch_profile_t	profile = {0};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
@@ -367,7 +369,7 @@ static int	DBpatch_5030024(void)
 
 static int	DBpatch_5030025(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.overview.type' or idx='web.actionconf.eventsource'"))
@@ -798,7 +800,7 @@ static int	DBpatch_5030046(void)
 	zbx_db_insert_execute(&db_insert_valuemap_mapping);
 	zbx_db_insert_clean(&db_insert_valuemap_mapping);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
@@ -837,7 +839,7 @@ static int	DBpatch_5030046(void)
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -886,7 +888,7 @@ static int	DBpatch_5030049(void)
 
 static int	DBpatch_5030050(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where"
@@ -922,7 +924,7 @@ static int	DBpatch_5030054(void)
 
 static int	DBpatch_5030055(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter_username' where idx='web.user.filter_alias'"))
@@ -933,7 +935,7 @@ static int	DBpatch_5030055(void)
 
 static int	DBpatch_5030056(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set value_str='username' where idx='web.user.sort' and value_str like 'alias'"))
@@ -949,7 +951,7 @@ static int	is_valid_opcommand_type(const char *type_str, const char *scriptid)
 #define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4	/* not used after upgrade */
 	unsigned int	type;
 
-	if (SUCCEED != is_uint31(type_str, &type))
+	if (SUCCEED != zbx_is_uint31(type_str, &type))
 		return FAIL;
 
 	switch (type)
@@ -979,7 +981,7 @@ static int	validate_types_in_opcommand(void)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	if (NULL == (result = DBselect("select operationid,type,scriptid from opcommand")))
@@ -1080,7 +1082,7 @@ static int	DBpatch_5030065(void)
  ******************************************************************************/
 static int	DBpatch_5030066(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update scripts set scope=%d"
@@ -1099,13 +1101,13 @@ static char	*zbx_rename_host_macros(const char *command)
 {
 	char	*p1, *p2, *p3, *p4, *p5, *p6, *p7;
 
-	p1 = string_replace(command, "{HOST.CONN}", "{HOST.TARGET.CONN}");
-	p2 = string_replace(p1, "{HOST.DNS}", "{HOST.TARGET.DNS}");
-	p3 = string_replace(p2, "{HOST.HOST}", "{HOST.TARGET.HOST}");
-	p4 = string_replace(p3, "{HOST.IP}", "{HOST.TARGET.IP}");
-	p5 = string_replace(p4, "{HOST.NAME}", "{HOST.TARGET.NAME}");
-	p6 = string_replace(p5, "{HOSTNAME}", "{HOST.TARGET.NAME}");
-	p7 = string_replace(p6, "{IPADDRESS}", "{HOST.TARGET.IP}");
+	p1 = zbx_string_replace(command, "{HOST.CONN}", "{HOST.TARGET.CONN}");
+	p2 = zbx_string_replace(p1, "{HOST.DNS}", "{HOST.TARGET.DNS}");
+	p3 = zbx_string_replace(p2, "{HOST.HOST}", "{HOST.TARGET.HOST}");
+	p4 = zbx_string_replace(p3, "{HOST.IP}", "{HOST.TARGET.IP}");
+	p5 = zbx_string_replace(p4, "{HOST.NAME}", "{HOST.TARGET.NAME}");
+	p6 = zbx_string_replace(p5, "{HOSTNAME}", "{HOST.TARGET.NAME}");
+	p7 = zbx_string_replace(p6, "{IPADDRESS}", "{HOST.TARGET.IP}");
 
 	zbx_free(p1);
 	zbx_free(p2);
@@ -1131,7 +1133,7 @@ static int	DBpatch_5030067(void)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	if (NULL == (result = DBselect("select scriptid,command"
@@ -1269,7 +1271,7 @@ static int	DBpatch_5030068(void)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	if (NULL == (result = DBselect("select scriptid,name"
@@ -1449,7 +1451,7 @@ static int	DBpatch_5030069(void)
 	int			ret = SUCCEED, i, suffix = 1;
 	zbx_vector_opcommands_t	opcommands;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	zbx_vector_opcommands_create(&opcommands);
@@ -1674,7 +1676,7 @@ static int	DBpatch_5030085(void)
 
 static int	DBpatch_5030086(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
@@ -1699,7 +1701,7 @@ static int	DBpatch_5030087(void)
 
 static int	DBpatch_5030088(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update widget set dashboard_pageid=dashboardid"))
@@ -3253,7 +3255,7 @@ static int	DBpatch_delay_routine(const char *screen_delay, int *dashboard_delay)
 	int	delays[] = {10, 30, 60, 120, 600, 1800, 3600};
 	int	i, imax, tmp;
 
-	if (FAIL == is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
 	imax = (int)ARRSIZE(delays);
@@ -3376,7 +3378,7 @@ static int	DBpatch_5030094(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	result = DBselect("select slideshowid,name,delay,userid,private from slideshows");
@@ -3407,7 +3409,7 @@ static int	DBpatch_5030095(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	result = DBselect("select screenid,name,userid,private from screens");
@@ -3600,7 +3602,7 @@ static int	DBpatch_5030108(void)
 			"web.templates.dashbrd.list.sortorder", "web.templates.dashboard.list.sortorder"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -3614,7 +3616,7 @@ static int	DBpatch_5030108(void)
 
 static int	DBpatch_5030109(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx=CONCAT('web.dashboard.widget.navtree.item-', SUBSTR(idx, 21))"
@@ -3730,7 +3732,7 @@ static int	DBpatch_5030120(void)
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
@@ -3763,7 +3765,7 @@ static int	DBpatch_5030121(void)
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
@@ -3798,7 +3800,7 @@ static int	DBpatch_5030122(void)
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
@@ -3830,7 +3832,7 @@ static int	DBpatch_5030123(void)
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
@@ -3855,24 +3857,24 @@ static int	DBpatch_5030123(void)
 
 static int	DBpatch_5030127(void)
 {
-#define CONDITION_TYPE_APPLICATION	15
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+#define ZBX_CONDITION_TYPE_APPLICATION	15 /* deprecated */
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
-			CONDITION_TYPE_EVENT_TAG_VALUE, CONDITION_TYPE_APPLICATION))
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_APPLICATION))
 	{
 		return FAIL;
 	}
 
 	return SUCCEED;
-#undef CONDITION_TYPE_APPLICATION
+#undef ZBX_CONDITION_TYPE_APPLICATION
 }
 
 static int	DBpatch_5030128(void)
 {
 #define AUDIT_RESOURCE_APPLICATION	12
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
@@ -3884,7 +3886,7 @@ static int	DBpatch_5030128(void)
 
 static int	DBpatch_5030129(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
@@ -4079,10 +4081,10 @@ static int	DBpatch_5030130(void)
 	size_t		sql_alloc = 0, sql_offset = 0;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select profileid,value_str from profiles"
 			" where idx='web.monitoring.problem.properties'");
@@ -4122,7 +4124,7 @@ static int	DBpatch_5030130(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -4140,7 +4142,7 @@ static int	DBpatch_5030131(void)
 	zbx_vector_uint64_t	widget_fieldids;
 	int			ret;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
@@ -4200,7 +4202,7 @@ out:
 
 static int	DBpatch_5030132(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from role_rule where name like 'api.method.%%'"
@@ -4536,7 +4538,7 @@ static int	dbpatch_update_expression(char **expression, zbx_uint64_t functionid,
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(*expression + token.data.objectid.name.l,
+				if (SUCCEED == zbx_is_uint64_n(*expression + token.data.objectid.name.l,
 						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
 						functionid == id)
 				{
@@ -4604,7 +4606,7 @@ static int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(expression + token.data.objectid.name.l,
+				if (SUCCEED == zbx_is_uint64_n(expression + token.data.objectid.name.l,
 						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
 						functionid == id)
 				{
@@ -4692,7 +4694,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 		if (SUCCEED == dbpatch_is_time_function(row[2], strlen(row[2])))
 		{
-			char	func_name[FUNCTION_NAME_LEN * 4 + 1];
+			char	func_name[12 /* FUNCTION_NAME_LEN */ * 4 + 1];
 
 			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 			func->hostid = hostid;
@@ -4789,7 +4791,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
 	{
-		if (zbx_strlen_utf8(trigger->expression) > TRIGGER_EXPRESSION_LEN)
+		if (zbx_strlen_utf8(trigger->expression) > 2048 /* TRIGGER_EXPRESSION_LEN */ )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" expression is too long: %s",
 					trigger->triggerid, trigger->expression);
@@ -4799,7 +4801,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
 	{
-		if (zbx_strlen_utf8(trigger->recovery_expression) > TRIGGER_EXPRESSION_LEN)
+		if (zbx_strlen_utf8(trigger->recovery_expression) > 2048 /* TRIGGER_EXPRESSION_LEN */)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" recovery expression is too long: %s",
 					trigger->triggerid, trigger->recovery_expression);
@@ -4820,7 +4822,7 @@ static int	DBpatch_5030165(void)
 	zbx_db_insert_t		db_insert_functions;
 	zbx_vector_ptr_t	functions;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_vector_ptr_create(&functions);
@@ -4829,7 +4831,7 @@ static int	DBpatch_5030165(void)
 
 	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", NULL);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select triggerid,recovery_mode,expression,recovery_expression from triggers"
 			" order by triggerid");
@@ -4935,7 +4937,7 @@ static int	DBpatch_5030165(void)
 
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -4956,7 +4958,13 @@ static int	DBpatch_5030165(void)
 
 static int	DBpatch_5030166(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* When upgrading from version 5.0 or less trigger_queue will be created later. */
+	/* Only when upgrading from version 5.2 there will be trigger queue table which */
+	/* must be updated.                                                             */
+	if (SUCCEED != DBtable_exists("trigger_queue"))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update trigger_queue set type=4 where type=3"))
@@ -5027,12 +5035,12 @@ static int	DBpatch_5030167(void)
 	size_t		sql_alloc = 4096, sql_offset = 0;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select triggerid,event_name from triggers order by triggerid");
 
@@ -5085,7 +5093,7 @@ static int	DBpatch_5030167(void)
 
 		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, row[1] + last_pos);
 
-		if (TRIGGER_EVENT_NAME_LEN < zbx_strlen_utf8(out))
+		if (2048 /*TRIGGER_EVENT_NAME_LEN */ < zbx_strlen_utf8(out))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert trigger \"%s\" event name: too long expression",
 					row[0]);
@@ -5106,7 +5114,7 @@ static int	DBpatch_5030167(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5165,7 +5173,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 						ZBX_FS_UI64 "\" formula host:key parameter at %s", itemid, ptr);
 			}
 
-			ret = parse_host_key(arg0, &host, &key);
+			ret = zbx_parse_host_key(arg0, &host, &key);
 			zbx_free(arg0);
 
 			if (FAIL == ret)
@@ -5225,7 +5233,7 @@ static int	DBpatch_5030168(void)
 
 	zbx_vector_ptr_create(&functions);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select i.itemid,i.params"
 			" from items i,hosts h"
@@ -5268,7 +5276,7 @@ static int	DBpatch_5030168(void)
 			switch (token.type)
 			{
 				case ZBX_TOKEN_OBJECTID:
-					if (SUCCEED == is_uint64_n(expression + token.loc.l + 1,
+					if (SUCCEED == zbx_is_uint64_n(expression + token.loc.l + 1,
 							token.loc.r - token.loc.l - 1, &index) &&
 							(int)index < functions.values_num)
 					{
@@ -5298,8 +5306,11 @@ static int	DBpatch_5030168(void)
 		}
 
 		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos);
-
-		if (ITEM_PARAM_LEN < zbx_strlen_utf8(out))
+#if defined(HAVE_ORACLE)
+		if (2048 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
+#else
+		if (65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
+#endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\" formula:"
 					" too long expression", itemid);
@@ -5324,7 +5335,7 @@ static int	DBpatch_5030168(void)
 	DBfree_result(result);
 	zbx_vector_ptr_destroy(&functions);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5386,11 +5397,11 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 		char				*group;
 		zbx_request_parameter_type_t	type;
 
-		groups_num = num_param(request->params[0]);
+		groups_num = zbx_num_param(request->params[0]);
 
 		for (i = 1; i <= groups_num; i++)
 		{
-			if (NULL == (group = get_param_dyn(request->params[0], i, &type)))
+			if (NULL == (group = zbx_get_param_dyn(request->params[0], i, &type)))
 				continue;
 
 			if ('[' != (*str)[*str_offset - 1])
@@ -5429,8 +5440,11 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	}
 
 	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
-
-	if (ITEM_PARAM_LEN < zbx_strlen_utf8(*str))
+#if defined(HAVE_ORACLE)
+	if (2048 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
+#else
+	if (65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
+#endif
 	{
 		*error = zbx_strdup(NULL, "resulting formula is too long");
 		return FAIL;
@@ -5447,7 +5461,7 @@ static int	DBpatch_5030169(void)
 	char		*sql = NULL, *params = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* ITEM_TYPE_AGGREGATE = 8 */
 	result = DBselect("select itemid,key_ from items where type=8");
@@ -5460,9 +5474,9 @@ static int	DBpatch_5030169(void)
 
 		params_offset = 0;
 
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(row[1], &request))
+		if (SUCCEED != zbx_parse_item_key(row[1], &request))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[1]);
 			continue;
@@ -5470,7 +5484,7 @@ static int	DBpatch_5030169(void)
 
 		ret_formula = dbpatch_aggregate2formula(row[0], &request, &params, &params_alloc, &params_offset,
 				&error);
-		free_request(&request);
+		zbx_free_agent_request(&request);
 
 		if (FAIL == ret_formula)
 		{
@@ -5489,7 +5503,7 @@ static int	DBpatch_5030169(void)
 
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5514,6 +5528,17 @@ static int	DBpatch_5030170(void)
 
 static int	DBpatch_5030171(void)
 {
+	/* When upgrading from version 5.0 or less the trigger_queue table will be created */
+	/* later (DBpatch_5030172).                                                        */
+	/* Only when upgrading from version 5.2 there will be existing trigger_queue table */
+	/* to which primary key must be added. This is done by following steps:            */
+	/*   1) rename existing table (DBpatch_5030171)                                    */
+	/*   2) create new table with the primary key (DBpatch_5030172)                    */
+	/*   2) copy data from old table into new table (DBpatch_5030173)                  */
+	/*   2) delete the old (renamed) table (DBpatch_5030174)                           */
+	if (SUCCEED != DBtable_exists("trigger_queue"))
+		return SUCCEED;
+
 	return DBrename_table("trigger_queue", "trigger_queue_tmp");
 }
 
@@ -5543,6 +5568,9 @@ static int	DBpatch_5030173(void)
 	zbx_uint64_t	objectid, type, clock, ns;
 	int		ret;
 
+	if (SUCCEED != DBtable_exists("trigger_queue_tmp"))
+		return SUCCEED;
+
 	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
 
 	result = DBselect("select objectid,type,clock,ns from trigger_queue_tmp");
@@ -5567,6 +5595,9 @@ static int	DBpatch_5030173(void)
 
 static int	DBpatch_5030174(void)
 {
+	if (SUCCEED != DBtable_exists("trigger_queue_tmp"))
+		return SUCCEED;
+
 	return DBdrop_table("trigger_queue_tmp");
 }
 
@@ -5612,7 +5643,7 @@ static int	DBpatch_5030181(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	result = DBselect("select valuemapid from valuemap order by valuemapid asc");
@@ -5628,7 +5659,7 @@ static int	DBpatch_5030181(void)
 
 		ZBX_DBROW2UINT64(valuemapid, row[0]);
 
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		in_result = DBselect("select valuemap_mappingid"
 				" from valuemap_mapping"
@@ -5646,7 +5677,7 @@ static int	DBpatch_5030181(void)
 				goto out;
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -5745,7 +5776,7 @@ static char	*update_template_name(char *old)
 		ptr = zbx_strdup(ptr, new);
 	}
 
-	ptr_snmp = string_replace(ptr, "SNMPv2", "SNMP");
+	ptr_snmp = zbx_string_replace(ptr, "SNMPv2", "SNMP");
 	zbx_free(ptr);
 
 	return ptr_snmp;
@@ -5782,10 +5813,10 @@ static int	DBpatch_5030190(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select h.hostid,h.host"
@@ -5807,7 +5838,7 @@ static int	DBpatch_5030190(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -5826,10 +5857,10 @@ static int	DBpatch_5030191(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select i.itemid,i.key_,h.host"
@@ -5854,7 +5885,7 @@ static int	DBpatch_5030191(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -5873,10 +5904,10 @@ static int	DBpatch_5030192(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
@@ -5932,11 +5963,11 @@ static int	DBpatch_5030192(void)
 				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 					continue;
 
-				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
-							" is_uint64_n error", __func__, row[0]);
+							" zbx_is_uint64_n error", __func__, row[0]);
 					DBfree_result(result);
 					return FAIL;
 				}
@@ -5983,7 +6014,7 @@ static int	DBpatch_5030192(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6002,10 +6033,10 @@ static int	DBpatch_5030193(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
 			"select distinct g.graphid,g.name"
 			" from graphs g"
@@ -6052,7 +6083,7 @@ static int	DBpatch_5030193(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6071,10 +6102,10 @@ static int	DBpatch_5030194(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select d.dashboardid,d.name,h.host"
@@ -6099,7 +6130,7 @@ static int	DBpatch_5030194(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6118,10 +6149,10 @@ static int	DBpatch_5030195(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select ht.httptestid,ht.name,h.host"
@@ -6146,7 +6177,7 @@ static int	DBpatch_5030195(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6165,10 +6196,10 @@ static int	DBpatch_5030196(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select v.valuemapid,v.name,h.host"
@@ -6193,7 +6224,7 @@ static int	DBpatch_5030196(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6212,10 +6243,10 @@ static int	DBpatch_5030197(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select groupid,name from hstgrp");
 
@@ -6230,7 +6261,7 @@ static int	DBpatch_5030197(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6249,10 +6280,10 @@ static int	DBpatch_5030198(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select i.itemid,i.key_,h.host,i2.key_"
@@ -6279,7 +6310,7 @@ static int	DBpatch_5030198(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6298,10 +6329,10 @@ static int	DBpatch_5030199(void)
 	DB_ROW			row;
 	DB_RESULT		result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
@@ -6376,11 +6407,11 @@ static int	DBpatch_5030199(void)
 				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 					continue;
 
-				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
-							" is_uint64_n error", __func__, row[0]);
+							" zbx_is_uint64_n error", __func__, row[0]);
 					DBfree_result(result);
 					return FAIL;
 				}
@@ -6427,7 +6458,7 @@ static int	DBpatch_5030199(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6446,10 +6477,10 @@ static int	DBpatch_5030200(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
 			"select distinct g.graphid,g.name,h.host,i2.key_"
 			" from graphs g"
@@ -6478,7 +6509,7 @@ static int	DBpatch_5030200(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6497,10 +6528,10 @@ static int	DBpatch_5030201(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select h.hostid,h.host,h2.host,i.key_"
@@ -6527,7 +6558,7 @@ static int	DBpatch_5030201(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;

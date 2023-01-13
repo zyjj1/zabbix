@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -26,16 +26,14 @@ class CControllerModuleEdit extends CController {
 
 	/**
 	 * Current module data.
-	 *
-	 * @var array
 	 */
-	private $module = [];
+	private array $module = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'moduleid' =>		'required|db module.moduleid',
 
@@ -53,7 +51,7 @@ class CControllerModuleEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -72,13 +70,14 @@ class CControllerModuleEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
+	protected function doAction(): void {
+		$module_manager = new CModuleManager(APP::getRootDir());
 
 		$manifest = $module_manager->addModule($this->module['relative_path']);
 
-		if ($manifest) {
+		if ($manifest !== null) {
 			$data = [
+				'form_refresh' => $this->getInput('form_refresh', 0),
 				'moduleid' => $this->getInput('moduleid'),
 				'name' => $manifest['name'],
 				'version' => $manifest['version'],
@@ -88,15 +87,12 @@ class CControllerModuleEdit extends CController {
 				'namespace' => $manifest['namespace'],
 				'url' => array_key_exists('url', $manifest) ? $manifest['url'] : null,
 				'status' => $this->hasInput('form_refresh')
-					? $this->hasInput('status')
-						? MODULE_STATUS_ENABLED
-						: MODULE_STATUS_DISABLED
+					? ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED)
 					: $this->module['status']
 			];
 
 			$response = new CControllerResponseData($data);
 			$response->setTitle(_('Modules'));
-			$this->setResponse($response);
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -104,7 +100,8 @@ class CControllerModuleEdit extends CController {
 				->setArgument('page', CPagerHelper::loadPage('module.list', null))
 			);
 			CMessageHelper::setErrorTitle(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
-			$this->setResponse($response);
 		}
+
+		$this->setResponse($response);
 	}
 }

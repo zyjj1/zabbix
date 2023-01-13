@@ -17,30 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxserver.h"
+#include "../../src/libs/zbxserver/evalfunc.h"
+
+#include "zbxnum.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
+		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen);
 
 int __wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
+		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen)
 {
 	ZBX_UNUSED(actionid);
@@ -80,8 +81,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec_t		ts;
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
+	DC_EVALUATE_ITEM	evaluate_item;
 
-	ZBX_DOUBLE_EPSILON = 0.000001;
+	zbx_update_epsilon_to_float_precision();
 
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
@@ -103,7 +105,13 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
 
-	if (SUCCEED != (returned_ret = evaluate_function2(&returned_value, &item, function, params, &ts, &error)))
+	evaluate_item.itemid = item.itemid;
+	evaluate_item.value_type = item.value_type;
+	evaluate_item.proxy_hostid = item.host.proxy_hostid;
+	evaluate_item.host = item.host.host;
+	evaluate_item.key_orig = item.key_orig;
+
+	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &evaluate_item, function, params, &ts, &error)))
 	{
 		printf("evaluate_function returned error: %s\n", error);
 		zbx_free(error);
@@ -131,7 +139,7 @@ void	zbx_mock_test_entry(void **state)
 						returned_value.data.dbl);
 				break;
 			case ZBX_VARIANT_UI64:
-				if (SUCCEED != is_uint64(expected_value, &expected_ui64))
+				if (SUCCEED != zbx_is_uint64(expected_value, &expected_ui64))
 				{
 					fail_msg("function result '" ZBX_FS_UI64
 							"' does not match expected result '%s'",

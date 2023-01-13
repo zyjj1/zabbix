@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -46,7 +46,7 @@ class CSettings extends CApiService {
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
 		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled', 'ha_failover_delay',
-		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution'
+		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider'
 	];
 
 	/**
@@ -98,7 +98,7 @@ class CSettings extends CApiService {
 		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
 			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
 			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'x_frame_options', 'default_timezone', 'session_key', 'dbversion_status'
+			'x_frame_options', 'default_timezone', 'session_key', 'dbversion_status', 'server_status'
 		];
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
@@ -115,6 +115,7 @@ class CSettings extends CApiService {
 		$db_settings = [];
 
 		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+
 		while ($row = DBfetch($result)) {
 			$db_settings[] = $row;
 		}
@@ -146,12 +147,6 @@ class CSettings extends CApiService {
 				'values' => $upd_config,
 				'where' => ['configid' => $db_settings['configid']]
 			]);
-
-			if (array_key_exists('discovery_groupid', $upd_config)
-					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
-				$this->setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-				$this->setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
-			}
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,
@@ -169,7 +164,7 @@ class CSettings extends CApiService {
 	 * @return array
 	 */
 	protected function validateUpdate(array &$settings): array {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'default_theme' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
@@ -204,7 +199,7 @@ class CSettings extends CApiService {
 			'ok_ack_style' =>					['type' => API_INT32, 'in' => '0,1'],
 			'discovery_groupid' =>				['type' => API_ID],
 			'default_inventory_mode' =>			['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
-			'alert_usrgrpid' =>					['type' => API_ID, 'flags' => API_ALLOW_NULL],
+			'alert_usrgrpid' =>					['type' => API_ID],
 			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
 			'default_lang' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(getLocales()))],
 			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', array_keys(CTimezoneHelper::getList()))],
@@ -227,7 +222,8 @@ class CSettings extends CApiService {
 			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders()))],
 			'geomaps_tile_url' =>				['type' => API_URL, 'length' => DB::getFieldLength('config', 'geomaps_tile_url')],
 			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
-			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')]
+			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')],
+			'vault_provider' =>					['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
@@ -249,7 +245,7 @@ class CSettings extends CApiService {
 			}
 		}
 
-		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] !== null) {
+		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] != 0) {
 			$db_usrgrp_exists = API::UserGroup()->get([
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']
@@ -298,18 +294,5 @@ class CSettings extends CApiService {
 		$output_fields[] = 'configid';
 
 		return DB::select('config', ['output' => $output_fields])[0];
-	}
-
-	/**
-	 * Set or unset the host group as internal
-	 *
-	 * @param string $groupid   Host group ID
-	 * @param int    $internal  Value of internal option
-	 */
-	private function setHostGroupInternal(string $groupid, int $internal): void {
-		DB::update('hstgrp', [
-			'values' => ['internal' =>  $internal],
-			'where' => ['groupid' => $groupid]
-		]);
 	}
 }

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -77,7 +77,7 @@
 				return;
 			}
 
-			const access = <?= json_encode([
+			const access_min = <?= json_encode([
 				CRoleHelper::UI_MONITORING_DASHBOARD => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_PROBLEMS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_HOSTS => USER_TYPE_ZABBIX_USER,
@@ -85,7 +85,6 @@
 				CRoleHelper::UI_MONITORING_MAPS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_SERVICES_SERVICES => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_SERVICES_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_SERVICES_SLA => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_SERVICES_SLA_REPORT => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_INVENTORY_OVERVIEW => USER_TYPE_ZABBIX_USER,
@@ -98,18 +97,27 @@
 				CRoleHelper::UI_REPORTS_NOTIFICATIONS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_HOST_GROUPS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_TEMPLATES => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_HOSTS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_GENERAL => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_HOUSEKEEPING => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_PROXIES => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_MACROS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_USER_GROUPS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_USER_ROLES => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_USERS => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_API_TOKENS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_SCRIPTS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_QUEUE => USER_TYPE_SUPER_ADMIN,
@@ -126,17 +134,31 @@
 				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
 
-			for (const [id, value] of Object.entries(access)) {
+			for (const [id, value] of Object.entries(access_min)) {
 				const checkbox = document.getElementById(id);
 
 				if (user_type < value) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
-				} else {
+				}
+				else {
 					if (checkbox.readOnly) {
 						checkbox.checked = true;
 					}
 					checkbox.readOnly = false;
+				}
+			}
+
+			const access_max = <?= json_encode([
+					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
+			], JSON_FORCE_OBJECT) ?>;
+
+			for (const [id, value] of Object.entries(access_max)) {
+				const checkbox = document.getElementById(id);
+				checkbox.readOnly = (user_type > value);
+
+				if (checkbox.readOnly) {
+					checkbox.checked = true;
 				}
 			}
 		},

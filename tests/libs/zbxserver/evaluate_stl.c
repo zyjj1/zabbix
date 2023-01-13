@@ -17,32 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
 #include "zbxserver.h"
-
+#include "zbxcachevalue.h"
 #include "mocks/valuecache/valuecache_mock.h"
-
 #include "../../../src/libs/zbxserver/anomalystl.h"
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
+		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen);
 
 int	__wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
+		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen)
 {
 	ZBX_UNUSED(actionid);
@@ -148,7 +144,7 @@ void	zbx_mock_test_entry(void **state)
 					remainder_values_expected;
 
 	/*ZBX_DOUBLE_EPSILON = 0.000001; results into output that is different from python test case output */
-	ZBX_DOUBLE_EPSILON = 0.0001;
+	zbx_update_epsilon_to_python_compatible_precision();
 
 	zbx_history_record_vector_create(&values_in);
 	zbx_history_record_vector_create(&trend_values_received);

@@ -17,18 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <procfs.h>
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+
+#include <procfs.h>
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>
 #endif
-
-extern int	CONFIG_TIMEOUT;
 
 typedef struct
 {
@@ -104,7 +107,6 @@ static int	zbx_detect_zone_support(void)
 #define ZBX_ZONE_SUPPORT_UNKNOWN	0
 #define ZBX_ZONE_SUPPORT_YES		1
 #define ZBX_ZONE_SUPPORT_NO		2
-
 	static int	zone_support = ZBX_ZONE_SUPPORT_UNKNOWN;
 	unsigned int	major, minor;
 
@@ -129,6 +131,9 @@ static int	zbx_detect_zone_support(void)
 				return FAIL;
 			}
 	}
+#undef ZBX_ZONE_SUPPORT_UNKNOWN
+#undef ZBX_ZONE_SUPPORT_YES
+#undef ZBX_ZONE_SUPPORT_NO
 }
 #endif
 
@@ -225,7 +230,7 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 	/* skip entries not containing pids */
 	memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
-	if (FAIL == is_uint32(pid, &proc->pid))
+	if (FAIL == zbx_is_uint32(pid, &proc->pid))
 		return FAIL;
 
 	zbx_snprintf(path, sizeof(path), "/proc/%s/psinfo", pid);
@@ -381,7 +386,7 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 	return SUCCEED;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *memtype = NULL;
 	DIR			*dir;
@@ -504,8 +509,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
-				/* % of system memory used by process, measured in 16-bit binary fractions in the range */
-				/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
+				/* % of system memory used by process, measured in 16-bit binary fractions in */
+				/* the range 0.0 - 1.0 with the binary point to the right of the most         */
+				/* significant bit. 1.0 == 0x8000                                             */
 				pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
 
 				if (0 != proccount++)
@@ -545,13 +551,12 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *zone_parameter;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
@@ -659,6 +664,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (NULL != (entries = readdir(dir)))
 	{
 		zbx_sysinfo_proc_t	proc;
+		psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
@@ -673,13 +679,20 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 #endif
+			if (SUCCEED != check_procstate(&psinfo, zbx_proc_stat))
+			{
+				zbx_sysinfo_proc_clear(&proc);
+				continue;
+			}
+
 			proccount++;
 		}
 
 		zbx_sysinfo_proc_clear(&proc);
 	}
 
-	closedir(dir);
+	if (0 != closedir(dir))
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
 
@@ -785,7 +798,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
 	DIR			*dir;
 	struct dirent		*entries;
-	int			ret = FAIL, fd = -1;
+	int			ret = FAIL;
 	zbx_sysinfo_proc_t	*proc = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -854,8 +867,9 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	zoneid_t		zoneid;
 #endif
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __func__,
-			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%llu", __func__,
+			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline),
+			(long long unsigned)flags);
 
 	if (NULL != username)
 	{
@@ -888,7 +902,7 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp, *flags;
 	char		*errmsg = NULL;
@@ -990,7 +1004,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	zbx_timespec(&ts_timeout);
-	ts_timeout.sec += CONFIG_TIMEOUT;
+	ts_timeout.sec += sysinfo_get_config_timeout();
 
 	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, zoneflag, period, type, &value, &errmsg))
 	{

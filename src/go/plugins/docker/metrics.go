@@ -20,8 +20,8 @@
 package docker
 
 import (
-	"zabbix.com/pkg/metric"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/metric"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 type metricMeta struct {
@@ -61,8 +61,15 @@ var (
 )
 
 var metrics = metric.MetricSet{
-	keyContainerInfo: metric.New("Return low-level information about a container.",
-		[]*metric.Param{paramContainer}, false),
+	keyContainerInfo: metric.New(
+		"Return low-level information about a container.",
+		[]*metric.Param{
+			paramContainer,
+			metric.NewParam("Info", "Return all JSON fields (full) or partial JSON fields (short).").
+				WithDefault("short").
+				WithValidator(metric.SetValidator{Set: []string{"full", "short"}, CaseInsensitive: true}),
+		},
+		false),
 	keyContainerStats: metric.New("Returns near realtime stats for a given container.",
 		[]*metric.Param{paramContainer}, false),
 	keyContainers: metric.New("Returns a list of containers.", nil, false),

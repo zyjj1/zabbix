@@ -19,8 +19,16 @@
 
 #include "zabbix_users.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
+
+/* group statuses */
+typedef enum
+{
+	GROUP_STATUS_ACTIVE = 0,
+	GROUP_STATUS_DISABLED
+}
+zbx_group_status_type_t;
 
 /******************************************************************************
  *                                                                            *
@@ -70,6 +78,14 @@ char	*get_user_timezone(zbx_uint64_t userid)
 
 	return user_timezone;
 }
+
+/* user role permissions */
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
 
 /******************************************************************************
  *                                                                            *

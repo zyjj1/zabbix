@@ -20,12 +20,10 @@
 #ifndef ZABBIX_TRAPPER_ACTIVE_H
 #define ZABBIX_TRAPPER_ACTIVE_H
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 
-extern int	CONFIG_TIMEOUT;
-
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request);
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp);
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request, int config_timeout);
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout);
 
 #endif

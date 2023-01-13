@@ -23,10 +23,10 @@
 #include "zbxmockutil.h"
 
 #include "zbxserver.h"
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
-#include "mutexs.h"
+#include "zbxcacheconfig.h"
+#include "zbxmutexs.h"
 #include "dbconfig.h"
 #include "configcache.h"
 #include "configcache_mock.h"

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -31,7 +31,6 @@ $url = (new CUrl('zabbix.php'))
 $token_form = (new CForm('post', $url))
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('admin_mode', $data['admin_mode'])
 	->addVar('tokenid', $data['tokenid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
@@ -99,7 +98,7 @@ $token_from_grid->addItem([
 		)
 	])
 	->addItem([
-		(new CLabel(_('Expires at')))->setAsteriskMark(),
+		(new CLabel(_('Expires at'), 'expires_at'))->setAsteriskMark(),
 		new CFormField(
 			(new CDateSelector('expires_at', $data['expires_at']))
 				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
@@ -160,6 +159,7 @@ else {
 
 $output = [
 	'header' =>($data['tokenid'] == 0) ? _('New API token') : ('API token'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TOKEN_EDIT),
 	'body' => $token_form->toString(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
@@ -173,4 +173,3 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
-

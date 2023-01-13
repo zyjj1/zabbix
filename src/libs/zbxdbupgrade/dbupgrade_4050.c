@@ -17,20 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
 #include "dbupgrade.h"
+
+#include "zbxnum.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "../zbxalgo/vectorimpl.h"
 
 /*
  * 5.0 development database patches
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char	program_type;
 
 static int	DBpatch_4050001(void)
 {
@@ -118,10 +116,10 @@ static int	DBpatch_4050014(void)
 	char		*sql = NULL, *name = NULL, *name_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select wf.widget_fieldid,wf.name"
@@ -153,7 +151,7 @@ static int	DBpatch_4050014(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -251,7 +249,7 @@ static int	DBpatch_4050020(void)
 	int		ret = SUCCEED, res, col;
 	char		*subject, *message;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect(
@@ -417,7 +415,7 @@ static int	DBpatch_4050021(void)
 	int		content_type, i, k;
 	char		*msg_esc = NULL, *subj_esc = NULL;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("select mediatypeid,type,content_type from media_type");
@@ -619,7 +617,7 @@ static int	DBpatch_4050039(void)
 			"web.auditlogs.filter.to", "web.auditlog.filter.to"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -647,7 +645,7 @@ static int	DBpatch_4050041(void)
 
 static int	DBpatch_4050042(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update auditlog set resourceid=null where resourceid=0"))
@@ -658,7 +656,7 @@ static int	DBpatch_4050042(void)
 
 static int	DBpatch_4050043(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.screens.graphid'"))
@@ -1037,7 +1035,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	size_t	sql_alloc = snmp_ifs->values_num * ZBX_KIBIBYTE / 3 , sql_offset = 0;
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < snmp_ifs->values_num && SUCCEED == ret; i++)
 	{
@@ -1108,7 +1106,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	if (SUCCEED == ret)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -1523,7 +1521,7 @@ static int	DBpatch_4050063(void)
 	int		ret = SUCCEED, value_int, i;
 	const char	*profile = "web.problem.filter.severities";
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect(
@@ -1584,7 +1582,7 @@ static int	DBpatch_4050065(void)
 {
 	const ZBX_FIELD	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("history", &field, &field);
@@ -1594,7 +1592,7 @@ static int	DBpatch_4050066(void)
 {
 	const ZBX_FIELD	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("trends", &field, &field);
@@ -1604,7 +1602,7 @@ static int	DBpatch_4050067(void)
 {
 	const ZBX_FIELD	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("trends", &field, &field);
@@ -1614,7 +1612,7 @@ static int	DBpatch_4050068(void)
 {
 	const ZBX_FIELD	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("trends", &field, &field);
@@ -1666,7 +1664,7 @@ static int	DBpatch_4050074(void)
 			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i++)

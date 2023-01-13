@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -23,15 +23,11 @@
  * @var CView $this
  */
 
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-
 // create form
 $form = (new CForm())
 	->setId('massupdate-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.host')
-	->addVar('ids', $data['ids'])
+	->addVar('hostids', $data['hostids'], 'ids')
 	->addVar('tls_accept', HOST_ENCRYPTION_NONE)
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
@@ -120,8 +116,8 @@ $proxy_select = (new CSelect('proxy_hostid'))
 	->setValue(0)
 	->addOption(new CSelectOption(0, _('(no proxy)')));
 
-foreach ($data['proxies'] as $proxie) {
-	$proxy_select->addOption(new CSelectOption($proxie['proxyid'], $proxie['host']));
+foreach ($data['proxies'] as $proxy) {
+	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
 }
 
 $host_tab->addRow(
@@ -200,7 +196,7 @@ $tags_tab->addRow(
 			->addStyle('margin-bottom: 10px;'),
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), _('Action')])
-			->setId('tags-table')
+			->addClass('tags-table')
 	]))->setId('tags-div')
 );
 
@@ -298,7 +294,7 @@ $tabs = (new CTabView())
 if (!$data['discovered_host']) {
 	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
 		'visible' => [],
-		'hostids' => $data['ids'],
+		'hostids' => $data['hostids'],
 		'context' => 'host'
 	]));
 }
@@ -310,6 +306,7 @@ $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.macros.js.php')
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_HOST),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

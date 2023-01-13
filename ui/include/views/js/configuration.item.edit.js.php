@@ -96,18 +96,13 @@ include __DIR__.'/itemtest.js.php';
 
 		typeChangeHandler() {
 			// Selected item type.
-			const type = parseInt($('#type').val());
+			const type = parseInt($('#type').val(), 10);
+			const has_key_button = [ <?= ITEM_TYPE_ZABBIX ?>, <?= ITEM_TYPE_ZABBIX_ACTIVE ?>, <?= ITEM_TYPE_SIMPLE ?>,
+				<?= ITEM_TYPE_INTERNAL ?>, <?= ITEM_TYPE_DB_MONITOR ?>, <?= ITEM_TYPE_SNMPTRAP ?>, <?= ITEM_TYPE_JMX ?>,
+				<?= ITEM_TYPE_IPMI ?>
+			];
 
-			$('#keyButton').prop('disabled',
-				type != <?= ITEM_TYPE_ZABBIX ?>
-					&& type != <?= ITEM_TYPE_ZABBIX_ACTIVE ?>
-					&& type != <?= ITEM_TYPE_SIMPLE ?>
-					&& type != <?= ITEM_TYPE_INTERNAL ?>
-					&& type != <?= ITEM_TYPE_DB_MONITOR ?>
-					&& type != <?= ITEM_TYPE_SNMPTRAP ?>
-					&& type != <?= ITEM_TYPE_JMX ?>
-					&& type != <?= ITEM_TYPE_IPMI ?>
-			)
+			$('#keyButton').prop('disabled', !has_key_button.includes(type));
 
 			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
 				$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
@@ -117,6 +112,49 @@ include __DIR__.'/itemtest.js.php';
 				$('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				$('input[name=username]').removeAttr('aria-required');
 			}
+		},
+
+		checkNow(button) {
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: [document.getElementById('itemid').value]})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					/*
+					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
+					 * messages and that would mean to reload the page and show them. Also postMessageError would be
+					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
+					 * in postMessageOk case. Instead show message directly that comes from controller.
+					 */
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+
+					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
+					button.blur();
+				});
 		},
 
 		editHost(e, hostid) {
@@ -130,7 +168,8 @@ include __DIR__.'/itemtest.js.php';
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});

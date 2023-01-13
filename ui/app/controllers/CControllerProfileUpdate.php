@@ -33,7 +33,8 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
-				case 'web.actionconf.filter.active':
+				case 'web.action.list.filter.active':
+				case 'web.actionlog.filter.active':
 				case 'web.auditacts.filter.active':
 				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
@@ -41,9 +42,10 @@ class CControllerProfileUpdate extends CController {
 				case 'web.correlation.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':
+				case 'web.dashboard.last_widget_type':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
-				case 'web.groups.filter.active':
+				case 'web.hostgroups.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
@@ -63,15 +65,16 @@ class CControllerProfileUpdate extends CController {
 				case 'web.proxies.filter.active':
 				case 'web.scheduledreport.filter.active':
 				case 'web.scripts.filter.active':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
-				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_HOSTS.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state':
 				case 'web.service.filter.active':
 				case 'web.service_actions.filter.active':
 				case 'web.sidebar.mode':
 				case 'web.sla.list.filter.active':
 				case 'web.slareport.list.filter.active':
 				case 'web.sysmapconf.filter.active':
+				case 'web.templategroups.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.templates.graphs.filter.active':
 				case 'web.templates.host_discovery.filter.active':
@@ -80,8 +83,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.triggers.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
-				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
-				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
+				case 'web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state':
+				case 'web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state':
 				case 'web.user.filter.active':
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
@@ -91,7 +94,7 @@ class CControllerProfileUpdate extends CController {
 
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
-				case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+				case (bool) preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashboard.widget.navtree.item.selected':
 					$ret = $this->hasInput('idx2');
 					break;
@@ -103,6 +106,7 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
+				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
 					$ret = $this->hasInput('value_str');
@@ -131,6 +135,15 @@ class CControllerProfileUpdate extends CController {
 		DBstart();
 		switch ($idx) {
 			// PROFILE_TYPE_STR
+			case 'web.dashboard.last_widget_type':
+				$value_str = $this->getInput('value_str');
+				if ($value_str === '') {
+					CProfile::delete($idx);
+				}
+				else {
+					CProfile::update($idx, $value_str, PROFILE_TYPE_STR);
+				}
+				break;
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
 				$value_str = $this->getInput('value_str');
@@ -145,7 +158,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			// PROFILE_TYPE_INT
-			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+			case (bool) preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				$value_int = $this->getInput('value_int');
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));

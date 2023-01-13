@@ -21,6 +21,7 @@
 
 #include "log.h"
 #include "zbxexec.h"
+#include "zbxsysinfo.h"
 
 extern char	*CONFIG_EXTERNALSCRIPTS;
 
@@ -28,25 +29,27 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *                                                                            *
  * Purpose: retrieve data from script executed on Zabbix server               *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item           - [IN] item we are interested in                *
+ *             config_timeout - [IN]                                          *
+ *             result         - [OUT]                                         *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_external(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result)
 {
-	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
+	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -73,21 +76,25 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
+	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), config_timeout,
+			ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
 		zbx_free(buf);
-
-		ret = SUCCEED;
 	}
 	else
+	{
+		if (SIG_ERROR != ret)
+			ret = NOTSUPPORTED;
+
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+	}
 out:
 	zbx_free(cmd);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

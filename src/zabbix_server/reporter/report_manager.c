@@ -18,17 +18,22 @@
 **/
 
 #include "report_manager.h"
-
-#include "zbxself.h"
-#include "daemon.h"
-#include "base64.h"
-#include "zbxreport.h"
-#include "../../libs/zbxcrypto/hmac_sha256.h"
-#include "sha256crypt.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
-#include "zbxalert.h"
 #include "zbxserver.h"
+#include "../server.h"
+
+#include "../db_lengths.h"
+#include "zbxself.h"
+#include "zbxnix.h"
+#include "base64.h"
+#include "../zbxreport.h"
+#include "zbxcrypto.h"
+#include "../alerter/alerter.h"
 #include "report_protocol.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+
+#define ZBX_REPORT_STATUS_ENABLED	0
+#define ZBX_REPORT_STATUS_DISABLED	1
 
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1
@@ -42,10 +47,7 @@
 #define ZBX_REPORT_STATE_ERROR		2
 #define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-extern int				CONFIG_REPORTWRITER_FORKS;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* report manager data */
 typedef struct
@@ -247,7 +249,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	int		i, ret;
 	zbx_rm_writer_t	*writer;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_REPORTWRITER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]);
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_REPORTER, error)))
 		goto out;
@@ -268,7 +270,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	manager->zabbix_url = NULL;
 	manager->last_batchid = 0;
 
-	for (i = 0; i < CONFIG_REPORTWRITER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]; i++)
 	{
 		writer = (zbx_rm_writer_t *)zbx_malloc(NULL, sizeof(zbx_rm_writer_t));
 		writer->client = NULL;
@@ -392,26 +394,28 @@ static char	*rm_time_to_urlfield(const struct tm *tm)
 static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 {
 	struct zbx_json	j;
-	char		*cookie = NULL, *out_str_raw = NULL;
-	size_t		i;
-	char		out_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	uint8_t		out[ZBX_SHA256_DIGEST_SIZE];
+	char		*cookie = NULL, *out_str = NULL, *out;
 
 	zbx_json_init(&j, 512);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSIONID, sessionid, ZBX_JSON_TYPE_STRING);
 
-	hmac_sha256(manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out, sizeof(out));
-	memset(&out_str, 0, sizeof(out_str));
+	if (SUCCEED != zbx_hmac(ZBX_HASH_SHA256, manager->session_key, strlen(manager->session_key), j.buffer,
+			j.buffer_size, &out))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		out_str = zbx_strdup(NULL, "");
+	}
+	else
+	{
+		out_str = zbx_dsprintf(NULL, "\"%s\"", out);
+		zbx_free(out);
+	}
 
-	for (i = 0; i < sizeof(out); i++)
-		zbx_snprintf(&out_str[i*2], 3, "%02x", out[i]);
-
-	out_str_raw = zbx_dsprintf(NULL, "\"%s\"", out_str);
-	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str_raw);
+	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
 	zbx_json_clean(&j);
-	zbx_free(out_str_raw);
+	zbx_free(out_str);
 
 	return cookie;
 }
@@ -492,7 +496,7 @@ static void	rm_db_flush_sessions(zbx_rm_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_hashset_iter_reset(&manager->sessions, &iter);
 	while (NULL != (session = (zbx_rm_session_t *)zbx_hashset_iter_next(&iter)))
@@ -506,7 +510,7 @@ static void	rm_db_flush_sessions(zbx_rm_t *manager)
 		session->db_lastaccess = session->lastaccess;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -539,7 +543,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 	zbx_vector_uint64_uniq(&manager->flush_queue, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < manager->flush_queue.values_num; i++)
 	{
@@ -590,7 +594,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 		report->flags = 0;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -1055,20 +1059,29 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
 		{
 			report_local.reportid = reportid;
+			ZBX_STR2UINT64(report_local.userid, row[1]);
+			ZBX_STR2UINT64(report_local.dashboardid, row[3]);
+			report_local.name = zbx_strdup(NULL, row[2]);
+			report_local.timezone = zbx_strdup(NULL, tz);
+			report_local.error = zbx_strdup(NULL, row[12]);
+			ZBX_STR2UCHAR(report_local.period, row[4]);
+			ZBX_STR2UCHAR(report_local.cycle, row[5]);
+			ZBX_STR2UCHAR(report_local.weekdays, row[6]);
+			ZBX_STR2UCHAR(report_local.status, row[14]);
+			report_local.start_time = atoi(row[7]);
+			ZBX_STR2UCHAR(report_local.state, row[11]);
+			report_local.flags = 0;
+			report_local.nextcheck = 0;
+			report_local.active_since = atoi(row[8]);
+			report_local.active_till = atoi(row[9]);
+			report_local.lastsent = atoi(row[13]);
+			zbx_vector_ptr_pair_create(&report_local.params);
+			zbx_vector_recipient_create(&report_local.usergroups);
+			zbx_vector_recipient_create(&report_local.users);
+			zbx_vector_uint64_create(&report_local.users_excl);
+
 			report = (zbx_rm_report_t *)zbx_hashset_insert(&manager->reports, &report_local,
 					sizeof(report_local));
-
-			zbx_vector_ptr_pair_create(&report->params);
-			zbx_vector_recipient_create(&report->usergroups);
-			zbx_vector_recipient_create(&report->users);
-			zbx_vector_uint64_create(&report->users_excl);
-			report->name = zbx_strdup(NULL, row[2]);
-			report->timezone = zbx_strdup(NULL, tz);
-			report->nextcheck = 0;
-			ZBX_STR2UCHAR(report->state, row[11]);
-			report->error = zbx_strdup(NULL, row[12]);
-			report->lastsent = atoi(row[13]);
-			report->flags = 0;
 
 			reschedule = 1;
 		}
@@ -1089,17 +1102,17 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 				report->timezone = zbx_strdup(report->timezone, tz);
 				reschedule = 1;
 			}
-		}
 
-		ZBX_STR2UINT64(report->userid, row[1]);
-		ZBX_STR2UINT64(report->dashboardid, row[3]);
-		ZBX_STR2UCHAR(report->period, row[4]);
-		ZBX_STR2UCHAR(report->cycle, row[5]);
-		ZBX_STR2UCHAR(report->weekdays, row[6]);
-		report->start_time = atoi(row[7]);
-		report->active_since = atoi(row[8]);
-		report->active_till = atoi(row[9]);
-		ZBX_STR2UCHAR(report->status, row[14]);
+			ZBX_STR2UINT64(report->userid, row[1]);
+			ZBX_STR2UINT64(report->dashboardid, row[3]);
+			ZBX_STR2UCHAR(report->period, row[4]);
+			ZBX_STR2UCHAR(report->cycle, row[5]);
+			ZBX_STR2UCHAR(report->weekdays, row[6]);
+			report->start_time = atoi(row[7]);
+			report->active_since = atoi(row[8]);
+			report->active_till = atoi(row[9]);
+			ZBX_STR2UCHAR(report->status, row[14]);
+		}
 
 		if (ZBX_REPORT_STATUS_DISABLED == report->status)
 		{
@@ -1352,6 +1365,9 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+#undef ZBX_REPORT_STATUS_ENABLED
+#undef ZBX_REPORT_STATUS_DISABLED
 
 /******************************************************************************
  *                                                                            *
@@ -1623,7 +1639,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
 		{
-			DB_MEDIATYPE	mt;
+			ZBX_DB_MEDIATYPE	mt;
 
 			ZBX_STR2UINT64(mt.mediatypeid, row[0]);
 
@@ -1837,6 +1853,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 	zbx_uint64_t		access_userid;
 	zbx_rm_batch_t		*batch, batch_local;
 	zbx_vector_ptr_pair_t	params;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 , __func__, report->reportid);
 
@@ -1844,6 +1861,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 	zbx_vector_ptr_create(&jobs);
 	zbx_vector_ptr_pair_create(&params);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < report->params.values_num; i++)
 	{
@@ -1854,12 +1873,14 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		if (0 == strcmp(pair.first, ZBX_REPORT_PARAM_BODY) || 0 == strcmp(pair.first, ZBX_REPORT_PARAM_SUBJECT))
 		{
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 					(char **)&pair.second, MACRO_TYPE_REPORT, NULL, 0);
 		}
 
 		zbx_vector_ptr_pair_append(&params, pair);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	DBbegin();
 
@@ -2227,18 +2248,18 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	}
 	else
 	{
-		zbx_vector_ptr_t		results;
-		int				status, i, total_num = 0, sent_num = 0;
-		zbx_alerter_dispatch_result_t	*result;
-		char				*error;
+		zbx_vector_alerter_dispatch_result_t	results;
+		int					status, i, total_num = 0, sent_num = 0;
+		zbx_alerter_dispatch_result_t		*result;
+		char					*error;
 
-		zbx_vector_ptr_create(&results);
+		zbx_vector_alerter_dispatch_result_create(&results);
 
 		report_deserialize_response(message->data, &status, &error, &results);
 
 		for (i = 0; i < results.values_num; i++)
 		{
-			result = (zbx_alerter_dispatch_result_t *)results.values[i];
+			result = results.values[i];
 
 			if (SUCCEED == result->status)
 			{
@@ -2256,8 +2277,8 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 		rm_finish_job(manager, writer->job, status, error, sent_num, total_num);
 		zbx_free(error);
 
-		zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
-		zbx_vector_ptr_destroy(&results);
+		zbx_vector_alerter_dispatch_result_clear_ext(&results, zbx_alerter_dispatch_result_free);
+		zbx_vector_alerter_dispatch_result_destroy(&results);
 	}
 
 	writer->job = NULL;
@@ -2278,17 +2299,17 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	int			ret, processed_num = 0, created_num = 0;
 	zbx_rm_t		manager;
 	zbx_timespec_t		timeout;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == rm_init(&manager, &error))
 	{
@@ -2361,12 +2382,12 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 
 		time_now = sec;
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&manager.ipc, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

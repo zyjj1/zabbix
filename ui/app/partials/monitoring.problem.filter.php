@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -43,7 +43,7 @@ $left_column = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'groupids_',
-					'real_hosts' => true,
+					'with_hosts' => true,
 					'enrich_parent_groups' => true
 				]
 			]
@@ -57,8 +57,9 @@ $left_column = (new CFormList())
 			'object_name' => 'hosts',
 			'data' => array_key_exists('hosts', $data) ? $data['hosts'] : [],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hostgroups' => 'groupids_'
+				'filter_preselect' => [
+					'id' => 'groupids_',
+					'submit_as' => 'groupid'
 				],
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -77,8 +78,9 @@ $left_column = (new CFormList())
 			'object_name' => 'triggers',
 			'data' => array_key_exists('triggers', $data) ? $data['triggers'] : [],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hosts' => 'hostids_'
+				'filter_preselect' => [
+					'id' => 'hostids_',
+					'submit_as' => 'hostid'
 				],
 				'parameters' => [
 					'srctbl' => 'triggers',
@@ -86,8 +88,7 @@ $left_column = (new CFormList())
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'triggerids_',
 					'monitored_hosts' => true,
-					'with_monitored_triggers' => true,
-					'noempty' => true
+					'with_monitored_triggers' => true
 				]
 			]
 		]))
@@ -100,9 +101,12 @@ $left_column = (new CFormList())
 			->setId('name_#{uniqid}')
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('severities'))
-			->setChecked($data['severities'])
+		(new CCheckBoxList('severities'))
 			->setUniqid('#{uniqid}')
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
@@ -118,10 +122,27 @@ $left_column
 			->setChecked($data['age_state'] == 1)
 			->setUncheckedValue(0)
 			->setId('age_state_#{uniqid}'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		_('days')
+	])
+	->addRow(_('Show symptoms'), [
+		(new CCheckBox('show_symptoms'))
+			->setChecked($data['show_symptoms'] == 1)
+			->setUncheckedValue(0)
+			->setId('show_symptoms_#{uniqid}')
+	])
+	->addRow(_('Show suppressed problems'), [
+		(new CCheckBox('show_suppressed'))
+			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+			->setUncheckedValue(0)
+			->setId('show_suppressed_#{uniqid}')
+	])
+	->addRow(_('Show unacknowledged only'), [
+		(new CCheckBox('unacknowledged'))
+			->setChecked($data['unacknowledged'] == 1)
+			->setUncheckedValue(0)
+			->setId('unacknowledged_#{uniqid}')
 	]);
 
 $filter_inventory_table = new CTable();
@@ -246,20 +267,7 @@ $right_column = (new CFormList())
 			->setEnabled($data['compact_view'] == 0)
 			->removeId()
 	])
-	->addRow(_('Show suppressed problems'), [
-		(new CCheckBox('show_suppressed'))
-			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-			->setUncheckedValue(0)
-			->setId('show_suppressed_#{uniqid}'),
-		(new CDiv([
-			(new CLabel(_('Show unacknowledged only'), 'unacknowledged_#{uniqid}'))
-				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('unacknowledged'))
-				->setChecked($data['unacknowledged'] == 1)
-				->setUncheckedValue(0)
-				->setId('unacknowledged_#{uniqid}')
-		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-	])
+
 	->addRow(_('Compact view'), [
 		(new CCheckBox('compact_view'))
 			->setChecked($data['compact_view'] == 1)
@@ -268,7 +276,7 @@ $right_column = (new CFormList())
 		(new CDiv([
 			(new CLabel(_('Show timeline'), 'show_timeline_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('show_timeline'))
-				->setChecked($data['show_timeline'] == 1)
+				->setChecked($data['show_timeline'] == ZBX_TIMELINE_ON)
 				->setEnabled($data['compact_view'] == 0)
 				->setUncheckedValue(0)
 				->setId('show_timeline_#{uniqid}')
@@ -281,7 +289,7 @@ $right_column = (new CFormList())
 			->setUncheckedValue(0)
 			->setId('details_#{uniqid}'),
 		(new CDiv([
-			(new CLabel(_('Highlight whole row'), 'highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+			(new CLabel(_('Highlight whole row'), 'highlight_row_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('highlight_row'))
 				->setChecked($data['highlight_row'] == 1)
 				->setEnabled($data['compact_view'] == 1)
@@ -323,12 +331,12 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-monitoring-problem'))
+(new CTemplateTag('filter-monitoring-problem'))
 	->setAttribute('data-template', 'monitoring.problem.filter')
 	->addItem($template)
 	->show();
 
-(new CScriptTemplate('filter-inventory-row'))
+(new CTemplateTag('filter-inventory-row'))
 	->addItem(
 		(new CRow([
 			(new CSelect('inventory[#{rowNum}][field]'))
@@ -346,7 +354,7 @@ if (array_key_exists('render_html', $data)) {
 	)
 	->show();
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
+(new CTemplateTag('filter-tag-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
@@ -389,9 +397,9 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
-		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags', 'unacknowledged',
-				'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age', 'tag_name_format',
-				'evaltype'
+		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_suppressed', 'show_tags',
+				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age',
+				'tag_name_format', 'evaltype'
 			],
 			eventHandler = {
 				show: () => {
@@ -501,7 +509,7 @@ if (array_key_exists('render_html', $data)) {
 			name: 'groupids[]',
 			data: data.filter_view_data.groups || [],
 			objectOptions: {
-				real_hosts: 1,
+				with_hosts: 1,
 				enrich_parent_groups: 1
 			},
 			popup: {
@@ -511,7 +519,6 @@ if (array_key_exists('render_html', $data)) {
 					dstfrm: 'zbx_filter',
 					dstfld1: 'groupids_' + data.uniqid,
 					multiselect: 1,
-					noempty: 1,
 					real_hosts: 1,
 					enrich_parent_groups: 1
 				}
@@ -525,8 +532,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'hostids[]',
 			data: data.filter_view_data.hosts || [],
 			popup: {
-				filter_preselect_fields: {
-					hostgroups: 'groupids_' + data.uniqid
+				filter_preselect: {
+					id: 'groupids_' + data.uniqid,
+					submit_as: 'groupid'
 				},
 				parameters: {
 					multiselect: 1,
@@ -545,8 +553,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'triggerids[]',
 			data: data.filter_view_data.triggers || [],
 			popup: {
-				filter_preselect_fields: {
-					hosts: 'hostids_' + data.uniqid
+				filter_preselect: {
+					id: 'hostids_' + data.uniqid,
+					submit_as: 'hostid'
 				},
 				parameters: {
 					srctbl: 'triggers',
@@ -554,7 +563,6 @@ if (array_key_exists('render_html', $data)) {
 					dstfrm: 'zbx_filter',
 					dstfld1: 'triggerids_' + data.uniqid,
 					multiselect: 1,
-					noempty: 1,
 					monitored_hosts: 1,
 					with_monitored_triggers: 1
 				}

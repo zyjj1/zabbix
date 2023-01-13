@@ -35,7 +35,7 @@ abstract class CHostGeneral extends CHostBase {
 	];
 
 	/**
-	 * Check for valid host groups.
+	 * Check for valid host groups and template groups.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -71,7 +71,8 @@ abstract class CHostGeneral extends CHostBase {
 			return;
 		}
 
-		$count = API::HostGroup()->get([
+		$entity = $this instanceof CTemplate ? API::TemplateGroup() : API::HostGroup();
+		$count = $entity->get([
 			'countOutput' => true,
 			'groupids' => array_keys($edit_groupids),
 			'editable' => true
@@ -158,11 +159,13 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array  $templateids
 	 * @param array  $db_hosts
 	 */
-	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts): void {
+	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts,
+			array $templateids_clear = []): void {
 		$ins_templates = [];
 		$del_links = [];
 		$check_double_linkage = false;
 		$del_templates = [];
+		$del_links_clear  = [];
 
 		foreach ($db_hosts as $hostid => $db_host) {
 			$db_templateids = array_column($db_host['templates'], 'templateid');
@@ -211,12 +214,19 @@ abstract class CHostGeneral extends CHostBase {
 				if ($upd_templateids) {
 					$del_templates[$db_templateid][$hostid] = $upd_templateids;
 				}
+
+				if (array_key_exists($db_templateid, $templateids_clear)) {
+					$del_links_clear[$db_templateid][$hostid] = true;
+				}
 			}
 		}
 
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 
 		if ($ins_templates) {
@@ -405,7 +415,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $hostids
 	 * @param bool       $clear
 	 */
-	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null, bool $clear = false): void {
+	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null,
+			bool $clear = false): void {
 		$flags = ($clear)
 			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
 			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
@@ -574,154 +585,15 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// items, discovery rules
-		$upd_items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-
-		$sqlFrom = ' items i1,items i2,hosts h';
-		$sqlWhere = ' i2.itemid=i1.templateid'.
-			' AND '.dbConditionInt('i2.hostid', $templateids).
-			' AND '.dbConditionInt('i1.flags', $flags).
-			' AND h.hostid=i1.hostid';
-
-		if (!is_null($hostids)) {
-			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $hostids);
+		if ($clear) {
+			CDiscoveryRule::clearTemplateObjects($templateids, $hostids);
+			CItem::clearTemplateObjects($templateids, $hostids);
+			CHttpTest::clearTemplateObjects($templateids, $hostids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-
-		$dbItems = DBSelect($sql);
-
-		while ($item = DBfetch($dbItems)) {
-			if ($clear) {
-				$upd_items[$item['flags']][$item['itemid']] = true;
-			}
-			else {
-				$upd_item = ['templateid' => 0];
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
-					$upd_item['uuid'] = generateUuidV4();
-				}
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$upd_item['valuemapid'] = 0;
-				}
-
-				$upd_items[$item['flags']][$item['itemid']] = [
-					'values' => $upd_item,
-					'where' => ['itemid' => $item['itemid']]
-				];
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			if ($clear) {
-				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
-			if ($clear) {
-				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			if ($clear) {
-				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-			}
-		}
-
-		// host prototypes
-		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			$host_prototypes = DBSelect(
-				'SELECT DISTINCT h.hostid,h3.status as host_status'.
-				' FROM hosts h'.
-					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
-					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
-					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
-					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
-					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
-			);
-
-			$upd_host_prototypes = [];
-
-			while ($host_prototype = DBfetch($host_prototypes)) {
-				$upd_host_prototype = ['templateid' => 0];
-				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_host_prototype['uuid'] = generateUuidV4();
-				}
-
-				$upd_host_prototypes[$host_prototype['hostid']] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
-
-			if ($upd_host_prototypes) {
-				DB::update('hosts', $upd_host_prototypes);
-				DB::update('group_prototype', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($upd_host_prototypes)]
-				]);
-			}
-		}
-
-		// http tests
-		$upd_httptests = [];
-
-		$sqlWhere = '';
-		if ($hostids !== null) {
-			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $hostids);
-		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
-				' FROM httptest ht1,httptest ht2,hosts h'.
-				' WHERE ht1.templateid=ht2.httptestid'.
-					' AND ht1.hostid=h.hostid'.
-					' AND '.dbConditionInt('ht2.hostid', $templateids).
-				$sqlWhere;
-
-		$httptests = DBSelect($sql);
-
-		while ($httptest = DBfetch($httptests)) {
-			if ($clear) {
-				$upd_httptests[$httptest['httptestid']] = true;
-			}
-			else {
-				$upd_httptest = ['templateid' => 0];
-				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_httptest['uuid'] = generateUuidV4();
-				}
-
-				$upd_httptests[$httptest['httptestid']] = [
-					'values' => $upd_httptest,
-					'where' => ['httptestid' => $httptest['httptestid']]
-				];
-			}
-		}
-
-		if ($upd_httptests) {
-			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
-				}
-			}
-			else {
-				DB::update('httptest', $upd_httptests);
-			}
+		else {
+			CDiscoveryRule::unlinkTemplateObjects($templateids, $hostids);
+			CItem::unlinkTemplateObjects($templateids, $hostids);
+			CHttpTest::unlinkTemplateObjects($templateids, $hostids);
 		}
 	}
 
@@ -743,11 +615,11 @@ abstract class CHostGeneral extends CHostBase {
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
 
-		API::Item()->syncTemplates($link_request);
+		CItem::linkTemplateObjects($templateids, $hostids);
 		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
 
 		if ($ruleids) {
-			API::ItemPrototype()->syncTemplates($link_request);
+			CItemPrototype::linkTemplateObjects($templateids, $hostids);
 			API::HostPrototype()->syncTemplates($ruleids, $hostids);
 		}
 
@@ -760,11 +632,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		API::Graph()->syncTemplates($link_request);
 
-		API::Trigger()->syncTemplateDependencies($link_request);
-
-		if ($ruleids) {
-			API::TriggerPrototype()->syncTemplateDependencies($link_request);
-		}
+		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 	}
 
 	/**
@@ -980,11 +848,11 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($link_requests as $link_request) {
-			API::Item()->syncTemplates($link_request);
+			CItem::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
 
 			if ($ruleids) {
-				API::ItemPrototype()->syncTemplates($link_request);
+				CItemPrototype::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
 			}
 		}
@@ -998,8 +866,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($link_requests as $link_request){
-			API::Trigger()->syncTemplateDependencies($link_request);
-			API::TriggerPrototype()->syncTemplateDependencies($link_request);
+			CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 		}
 
 		return $hosts_linkage_inserts;
@@ -1209,156 +1076,15 @@ abstract class CHostGeneral extends CHostBase {
 		}
 		/* }}} GRAPHS */
 
-		/* ITEMS, DISCOVERY RULES {{{ */
-		$upd_items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-
-		$sqlFrom = ' items i1,items i2,hosts h';
-		$sqlWhere = ' i2.itemid=i1.templateid'.
-			' AND '.dbConditionInt('i2.hostid', $templateids).
-			' AND '.dbConditionInt('i1.flags', $flags).
-			' AND h.hostid=i1.hostid';
-
-		if (!is_null($targetids)) {
-			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
+		if ($clear) {
+			CDiscoveryRule::clearTemplateObjects($templateids, $targetids);
+			CItem::clearTemplateObjects($templateids, $targetids);
+			CHttpTest::clearTemplateObjects($templateids, $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-
-		$dbItems = DBSelect($sql);
-
-		while ($item = DBfetch($dbItems)) {
-			if ($clear) {
-				$upd_items[$item['flags']][$item['itemid']] = true;
-			}
-			else {
-				$upd_item = ['templateid' => 0];
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
-					$upd_item['uuid'] = generateUuidV4();
-				}
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$upd_item['valuemapid'] = 0;
-				}
-
-				$upd_items[$item['flags']][$item['itemid']] = [
-					'values' => $upd_item,
-					'where' => ['itemid' => $item['itemid']]
-				];
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			if ($clear) {
-				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
-			if ($clear) {
-				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			if ($clear) {
-				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-			}
-		}
-		/* }}} ITEMS, DISCOVERY RULES */
-
-		// host prototypes
-		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
-		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			$host_prototypes = DBSelect(
-				'SELECT DISTINCT h.hostid,h3.status as host_status'.
-				' FROM hosts h'.
-					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
-					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
-					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
-					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
-					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
-			);
-
-			$upd_host_prototypes = [];
-
-			while ($host_prototype = DBfetch($host_prototypes)) {
-				$upd_host_prototype = ['templateid' => 0];
-				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_host_prototype['uuid'] = generateUuidV4();
-				}
-
-				$upd_host_prototypes[$host_prototype['hostid']] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
-
-			if ($upd_host_prototypes) {
-				DB::update('hosts', $upd_host_prototypes);
-				DB::update('group_prototype', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($upd_host_prototypes)]
-				]);
-			}
-		}
-
-		// http tests
-		$upd_httptests = [];
-
-		$sqlWhere = '';
-		if (!is_null($targetids)) {
-			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $targetids);
-		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
-				' FROM httptest ht1,httptest ht2,hosts h'.
-				' WHERE ht1.templateid=ht2.httptestid'.
-					' AND ht1.hostid=h.hostid'.
-					' AND '.dbConditionInt('ht2.hostid', $templateids).
-				$sqlWhere;
-
-		$httptests = DBSelect($sql);
-
-		while ($httptest = DBfetch($httptests)) {
-			if ($clear) {
-				$upd_httptests[$httptest['httptestid']] = true;
-			}
-			else {
-				$upd_httptest = ['templateid' => 0];
-				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_httptest['uuid'] = generateUuidV4();
-				}
-
-				$upd_httptests[$httptest['httptestid']] = [
-					'values' => $upd_httptest,
-					'where' => ['httptestid' => $httptest['httptestid']]
-				];
-			}
-		}
-
-		if ($upd_httptests) {
-			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
-				}
-			}
-			else {
-				DB::update('httptest', $upd_httptests);
-			}
+		else {
+			CDiscoveryRule::unlinkTemplateObjects($templateids, $targetids);
+			CItem::unlinkTemplateObjects($templateids, $targetids);
+			CHttpTest::unlinkTemplateObjects($templateids, $targetids);
 		}
 
 		parent::unlink($templateids, $targetids);
@@ -1369,37 +1095,103 @@ abstract class CHostGeneral extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		// adding groups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'groupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
-
-		// adding templates
+		// Add templates.
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
-				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$related_ids = $relationMap->getRelatedIds();
 
-				if ($related_ids) {
+				// Get template IDs for each host and additional field from relation table if necessary.
+				$hosts_templates = DBfetchArray(DBselect(
+					'SELECT ht.hostid,ht.templateid'.
+						($this->outputIsRequested('link_type', $options['selectParentTemplates'])
+							? ',ht.link_type'
+							: ''
+						).
+					' FROM hosts_templates ht'.
+					' WHERE '.dbConditionId('ht.hostid', array_keys($result))
+				));
+
+				if ($hosts_templates) {
+					// Select also template ID if not selected. It can be removed from results if not requested.
+					$template_options = $this->outputIsRequested('templateid', $options['selectParentTemplates'])
+						? $options['selectParentTemplates']
+						: array_merge($options['selectParentTemplates'], ['templateid']);
+
+					/*
+					 * Since templates API does not have "link_type" field, remove it from request, so that template.get
+					 * validation may pass successfully.
+					 */
+					if ($this->outputIsRequested('link_type', $template_options) && is_array($template_options)
+							&& ($key = array_search('link_type', $template_options)) !== false) {
+						unset($template_options[$key]);
+					}
+
 					$templates = API::Template()->get([
-						'output' => $options['selectParentTemplates'],
-						'templateids' => $related_ids,
+						'output' => $template_options,
+						'templateids' => array_column($hosts_templates, 'templateid'),
 						'nopermissions' => $options['nopermissions'],
 						'preservekeys' => true
 					]);
-					if (!is_null($options['limitSelects'])) {
+
+					if ($options['limitSelects'] !== null) {
 						order_result($templates, 'host');
 					}
 				}
 
-				$result = $relationMap->mapMany($result, $templates, 'parentTemplates', $options['limitSelects']);
+				/*
+				 * In order to correctly slice the ordered templates in case of "limitSelects", first they must be
+				 * mapped for each host. Otherwise incorrect results may appear. $relation_map key is the host ID, and
+				 * values are template ID and, if selected, "link_type".
+				 */
+				$relation_map = [];
+				foreach ($hosts_templates as $host_template) {
+					if (!array_key_exists($host_template['hostid'], $relation_map)) {
+						$relation_map[$host_template['hostid']] = [];
+					}
+
+					$related_fields = ['templateid' => $host_template['templateid']];
+
+					if ($this->outputIsRequested('link_type', $options['selectParentTemplates'])) {
+						$related_fields['link_type'] = $host_template['link_type'];
+					}
+
+					$relation_map[$host_template['hostid']][] = $related_fields;
+				}
+
+				foreach ($result as $hostid => &$host) {
+					$host['parentTemplates'] = [];
+
+					if (array_key_exists($hostid, $relation_map)) {
+						$templateids = array_column($relation_map[$hostid], 'templateid');
+						$templateids = array_combine($templateids, $templateids);
+
+						// Find the matching templates and limit the results if necessary.
+						$host['parentTemplates'] = array_values(array_intersect_key($templates, $templateids));
+
+						if ($options['limitSelects'] !== null && $options['limitSelects'] != 0) {
+							$host['parentTemplates'] = array_slice($host['parentTemplates'], 0,
+								$options['limitSelects']
+							);
+						}
+
+						// Append the additional field from relation table.
+						if ($this->outputIsRequested('link_type', $options['selectParentTemplates'])) {
+							foreach ($host['parentTemplates'] as &$template) {
+								foreach ($relation_map[$hostid] as $rel_template) {
+									if (bccomp($template['templateid'], $rel_template['templateid']) == 0) {
+										$template['link_type'] = $rel_template['link_type'];
+									}
+								}
+							}
+						}
+
+						// Unset fields if they were not requested.
+						$host['parentTemplates'] = $this->unsetExtraFields($host['parentTemplates'], ['templateid'],
+							$options['selectParentTemplates']
+						);
+					}
+				}
+				unset($host);
 			}
 			else {
 				$templates = API::Template()->get([
@@ -1416,7 +1208,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding items
 		if ($options['selectItems'] !== null) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
 				$items = API::Item()->get([
@@ -1449,7 +1240,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding discoveries
 		if ($options['selectDiscoveries'] !== null) {
 			if ($options['selectDiscoveries'] != API_OUTPUT_COUNT) {
 				$items = API::DiscoveryRule()->get([
@@ -1484,7 +1274,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding triggers
 		if ($options['selectTriggers'] !== null) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
 				$triggers = [];
@@ -1531,7 +1320,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding graphs
 		if ($options['selectGraphs'] !== null) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
 				$graphs = [];
@@ -1577,7 +1365,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding http tests
 		if ($options['selectHttpTests'] !== null) {
 			if ($options['selectHttpTests'] != API_OUTPUT_COUNT) {
 				$httpTests = API::HttpTest()->get([
@@ -1612,32 +1399,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding tags
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$options['selectTags'] = ['tag', 'value'];
-			}
-
-			$tags_options = [
-				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
-				'filter' => ['hostid' => $hostids]
-			];
-
-			foreach ($result as &$host) {
-				$host['tags'] = [];
-			}
-			unset($host);
-
-			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
-
-			while ($tag = DBfetch($tags)) {
-				$hostid = $tag['hostid'];
-				unset($tag['hosttagid'], $tag['hostid']);
-				$result[$hostid]['tags'][] = $tag;
-			}
-		}
-
-		// Add value mapping.
 		if ($options['selectValueMaps'] !== null) {
 			if ($options['selectValueMaps'] === API_OUTPUT_EXTEND) {
 				$options['selectValueMaps'] = ['valuemapid', 'name', 'mappings'];
@@ -1684,35 +1445,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Validates tags.
-	 *
-	 * @param array  $host
-	 * @param int    $host['evaltype']
-	 * @param array  $host['tags']
-	 * @param string $host['tags'][]['tag']
-	 * @param string $host['tags'][]['value']
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function validateTags(array $host) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'tags'		=> ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
-				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]]
-		]];
-
-		// Keep values only for fields with defined validation rules.
-		$host = array_intersect_key($host, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-	}
-
-	/**
-	 * Add the existing host groups, templates, tags, macros.
+	 * Add the existing host or template groups, templates, tags, macros.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts
@@ -1745,11 +1478,20 @@ abstract class CHostGeneral extends CHostBase {
 		$filter = ['hostid' => $hostids];
 
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-			$db_groups = API::HostGroup()->get([
-				'output' => [],
-				$id_field_name.'s' => $hostids,
-				'preservekeys' => true
-			]);
+			if ($this instanceof CTemplate) {
+				$db_groups = API::TemplateGroup()->get([
+					'output' => [],
+					'templateids' => $hostids,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					'hostids' => $hostids,
+					'preservekeys' => true
+				]);
+			}
 
 			$filter += ['groupid' => array_keys($db_groups)];
 		}
@@ -1788,11 +1530,20 @@ abstract class CHostGeneral extends CHostBase {
 				$filter += ['groupid' => $objectids];
 			}
 			elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$db_groups = API::HostGroup()->get([
-					'output' => [],
-					$id_field_name.'s' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
+				if ($this instanceof CTemplate) {
+					$db_groups = API::TemplateGroup()->get([
+						'output' => [],
+						'templateids' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$db_groups = API::HostGroup()->get([
+						'output' => [],
+						'hostids' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
 
 				$filter += ['groupid' => array_keys($db_groups)];
 			}

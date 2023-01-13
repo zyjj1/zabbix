@@ -122,8 +122,9 @@ class TabIndicators {
 
 			if (indicator_item instanceof TabIndicatorItem) {
 				indicator_item
-					.addAttributes(element)
-					.initObserver(element);
+					.setElement(element)
+					.addAttributes()
+					.initObserver();
 			}
 		}
 	}
@@ -184,12 +185,14 @@ class TabIndicatorFactory {
 				return new FiltersTabIndicatorItem;
 			case 'FrontendMessage':
 				return new FrontendMessageTabIndicatorItem;
+			case 'GraphAxes':
+				return new GraphAxesTabIndicatorItem;
 			case 'GraphDataset':
 				return new GraphDatasetTabIndicatorItem;
 			case 'GraphLegend':
 				return new GraphLegendTabIndicatorItem;
-			case 'GraphOptions':
-				return new GraphOptionsTabIndicatorItem;
+			case 'GraphDisplayOptions':
+				return new GraphDisplayOptionsTabIndicatorItem;
 			case 'GraphOverrides':
 				return new GraphOverridesTabIndicatorItem;
 			case 'GraphProblems':
@@ -200,12 +203,16 @@ class TabIndicatorFactory {
 				return new HttpAuthTabIndicatorItem;
 			case 'Media':
 				return new MediaTabIndicatorItem;
+			case 'MediatypeOptions':
+				return new MediatypeOptionsTabIndicatorItem;
 			case 'MessageTemplate':
 				return new MessageTemplateTabIndicatorItem;
 			case 'Http':
 				return new HttpTabIndicatorItem;
 			case 'Inventory':
 				return new InventoryTabIndicatorItem;
+			case 'Ipmi':
+				return new IpmiTabIndicatorItem;
 			case 'Ldap':
 				return new LdapTabIndicatorItem;
 			case 'LldMacros':
@@ -216,10 +223,14 @@ class TabIndicatorFactory {
 				return new OverridesTabIndicatorItem;
 			case 'Operations':
 				return new OperationsTabIndicatorItem;
-			case 'Permissions':
-				return new PermissionsTabIndicatorItem;
+			case 'TemplatePermissions':
+				return new TemplatePermissionsTabIndicatorItem;
+			case 'HostPermissions':
+				return new HostPermissionsTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
+			case 'ProxyEncryption':
+				return new ProxyEncryptionTabIndicatorItem;
 			case 'Saml':
 				return new SamlTabIndicatorItem;
 			case 'Sharing':
@@ -249,6 +260,29 @@ class TabIndicatorItem {
 
 	constructor(type) {
 		this._type = type;
+		this._element = null;
+	}
+
+	/**
+	 * Get element
+	 *
+	 * @returns {HTMLElement} element  tab element
+	 */
+	getElement() {
+		return this._element;
+	}
+
+	/**
+	 * Set element
+	 *
+	 * @param {HTMLElement} element  tab element
+	 *
+	 * @return {TabIndicatorItem}
+	 */
+	setElement(element) {
+		this._element = element;
+
+		return this;
 	}
 
 	/**
@@ -271,29 +305,25 @@ class TabIndicatorItem {
 
 	/**
 	 * Init observer for html changes.
-	 *
-	 * @param {HTMLElement} element
 	 */
-	initObserver(element) {
+	initObserver() {
 		throw 'Fatal error: cannot call abstract method.';
 	}
 
 	/**
 	 * Add tab indicator attribute to tab element.
 	 *
-	 * @param {HTMLElement} element  tab element
-	 *
 	 * @return {TabIndicatorItem}
 	 */
-	addAttributes(element) {
-		element.setAttribute(TAB_INDICATOR_ATTR_TYPE, this.getType());
+	addAttributes() {
+		this._element.setAttribute(TAB_INDICATOR_ATTR_TYPE, this.getType());
 
 		switch (this.getType()) {
 			case TAB_INDICATOR_TYPE_COUNT:
-				element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
+				this._element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
 				break;
 			case TAB_INDICATOR_TYPE_MARK:
-				element.setAttribute(TAB_INDICATOR_ATTR_VALUE, !!this.getValue() ? '1' : '0');
+				this._element.setAttribute(TAB_INDICATOR_ATTR_VALUE, !!this.getValue() ? '1' : '0');
 				break;
 		}
 
@@ -325,18 +355,12 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	/**
-	 * @inheritdoc
-	 * This observer yet init in include\views\js\common.template.edit.js.php.
-	 *
-	 * @param {HTMLElement} element
-	 */
-	initObserver(element) {
-		const target_node = document.querySelector('#tbl_macros');
+	initObserver() {
+		const target_node = document.getElementById('macros_container');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -351,22 +375,33 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 
 class TagsTabIndicatorItem extends TabIndicatorItem {
 
+	static ZBX_PROPERTY_INHERITED = 1;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#tags-table tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
+		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' .tags-table .form_row')]
+			.filter((row) => {
+				const tag = row.querySelector('textarea[name$="[tag]"]');
+				const type = row.querySelector('input[name$="[type]"]');
+
+				if (type !== null && type.value == TagsTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+					return false;
+				}
+
+				return tag !== null && tag.value !== '';
+			})
 			.length;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#tags-table');
+	initObserver() {
+		const target_node = document.querySelector(this.getElement().getAttribute('href') + ' .tags-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -395,12 +430,12 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#http_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -413,7 +448,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const element = document.querySelector('#ldap_configured');
+		const element = document.querySelector('#ldap_auth_enabled');
 
 		if (element !== null) {
 			return element.checked;
@@ -422,12 +457,12 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#ldap_configured');
+	initObserver() {
+		const target_node = document.querySelector('#ldap_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -449,12 +484,12 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#saml_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -476,10 +511,53 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		for (const input of document.querySelectorAll('[name=inventory_mode]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
+			});
+		}
+	}
+}
+
+class IpmiTabIndicatorItem extends TabIndicatorItem {
+
+	static IPMI_AUTHTYPE_DEFAULT = -1;
+	static IPMI_PRIVILEGE_USER = 2;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const ipmi_authtype = document.getElementById('ipmi_authtype');
+
+		if (ipmi_authtype !== null
+				&& ipmi_authtype.value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
+			return true;
+		}
+
+		const ipmi_privilege = document.getElementById('ipmi_privilege');
+
+		if (ipmi_privilege !== null
+				&& ipmi_privilege.value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
+			return true;
+		}
+
+		for (const input of document.querySelectorAll('#ipmi_username, #ipmi_password')) {
+			if (input.value !== '') {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll(
+				'#ipmi_authtype, #ipmi_privilege, #ipmi_username, #ipmi_password')) {
+			input.addEventListener('change', () => {
+				this.addAttributes();
 			});
 		}
 	}
@@ -504,12 +582,12 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 		return tls_in_psk || tls_in_cert;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
 
 		if (tls_in_psk_node !== null) {
 			['click', 'change'].forEach(event =>
-				tls_in_psk_node.addEventListener(event, () => this.addAttributes(element))
+				tls_in_psk_node.addEventListener(event, () => this.addAttributes())
 			);
 		}
 
@@ -517,13 +595,13 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 		if (tls_in_cert_node !== null) {
 			['click', 'change'].forEach(event =>
-				tls_in_cert_node.addEventListener(event, () => this.addAttributes(element))
+				tls_in_cert_node.addEventListener(event, () => this.addAttributes())
 			);
 		}
 
 		for (const input of document.querySelectorAll('[name=tls_connect]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -537,22 +615,49 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#preprocessing .preprocessing-list-item')
+			.querySelectorAll('#preprocessing .preprocessing-list-item:not(.ui-sortable-placeholder)')
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#preprocessing');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
 				childList: true,
 				subtree: true
 			});
+		}
+	}
+}
+
+class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const tls_connect = document.querySelector('[name="tls_connect"]:checked');
+
+		if (tls_connect !== null && (tls_connect.value === '2' || tls_connect.value === '4')) {
+			return true;
+		}
+
+		const tls_accept_psk = document.querySelector('[name="tls_accept_psk"]').checked;
+		const tls_accept_certificate = document.querySelector('[name="tls_accept_certificate"]').checked;
+
+		return tls_accept_psk || tls_accept_certificate;
+	}
+
+	initObserver(element) {
+		for (const _element of document.querySelectorAll(
+				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
+			_element.addEventListener('change', () => this.addAttributes(element));
 		}
 	}
 }
@@ -569,12 +674,12 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#dependency-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -593,16 +698,16 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#lld_macro_paths tbody tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
+			.querySelectorAll('#lld_macro_paths tbody tr.form_row > td:first-child > textarea:not(:placeholder-shown)')
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#lld_macro_paths');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -627,12 +732,12 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#conditions');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -657,12 +762,12 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('.lld-overrides-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -685,12 +790,12 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -721,24 +826,24 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 			|| document.querySelector('#ssl_key_password').value !== '';
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const auth_node = document.querySelector('#authentication');
 
 		if (auth_node !== null) {
 			auth_node.addEventListener('change', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 
 		for (const input of document.querySelectorAll('#verify_peer, #verify_host')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 
 		for (const input of document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')) {
 			input.addEventListener('change', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -754,26 +859,26 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		let count = 0;
 
 		count += document
-			.querySelectorAll('#op-table tbody tr:not(:last-child)')
+			.querySelectorAll('#op-table tbody tr')
 			.length;
 
 		count += document
-			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
+			.querySelectorAll('#rec-table tbody tr')
 			.length;
 
 		count += document
-			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
+			.querySelectorAll('#upd-table tbody tr')
 			.length;
 
 		return count;
 	}
 
-	initObserver(element) {
-		const target_node_op = document.querySelector('#op-table tbody');
+	initObserver() {
+		const target_node_op = document.querySelector('#operations-container');
 
 		if (target_node_op !== null) {
 			const observer_op = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_op.observe(target_node_op, {
@@ -782,11 +887,11 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			});
 		}
 
-		const target_node_rec = document.querySelector('#rec-table tbody');
+		const target_node_rec = document.querySelector('#recovery-operations-container');
 
 		if (target_node_rec !== null) {
 			const observer_rec = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_rec.observe(target_node_rec, {
@@ -795,11 +900,11 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			});
 		}
 
-		const target_node_upd = document.querySelector('#upd-table tbody');
+		const target_node_upd = document.querySelector('#update-operations-container');
 
 		if (target_node_upd !== null) {
 			const observer_upd = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_upd.observe(target_node_upd, {
@@ -822,12 +927,12 @@ class ExcludedDowntimesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#excluded-downtimes tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -851,12 +956,12 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 			.tabIndicator;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#children');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -879,12 +984,12 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#time-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -907,9 +1012,9 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 			.length > 0;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -924,17 +1029,61 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 		return document.querySelectorAll('#media-table tbody tr').length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#media-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
 				childList: true,
 				subtree: true
+			});
+		}
+	}
+}
+
+class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
+
+	static DEFAULT_MAXSESSIONS_TYPE = 'one';
+	static DEFAULT_MAXATTEMPTS = 3;
+	static DEFAULT_ATTEMPT_INTERVAL = '10s';
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const maxsessions_type = document.querySelector('[name="maxsessions_type"]:checked');
+
+		if (maxsessions_type !== null
+				&& maxsessions_type.value !== MediatypeOptionsTabIndicatorItem.DEFAULT_MAXSESSIONS_TYPE) {
+			return true;
+		}
+
+		const maxattempts = document.getElementById('maxattempts');
+
+		if (maxattempts !== null
+				&& maxattempts.value != MediatypeOptionsTabIndicatorItem.DEFAULT_MAXATTEMPTS) {
+			return true;
+		}
+
+		const attempt_interval = document.getElementById('attempt_interval');
+
+		if (attempt_interval !== null
+				&& attempt_interval.value !== MediatypeOptionsTabIndicatorItem.DEFAULT_ATTEMPT_INTERVAL) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll('#maxsessions_type, #maxattempts, #attempt_interval')) {
+			input.addEventListener('change', () => {
+				this.addAttributes();
 			});
 		}
 	}
@@ -952,12 +1101,12 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#message-templates tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -984,12 +1133,12 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#messages_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -1004,7 +1153,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector("[name='private']:checked");
 
-		if (element !== null && element.value > 0) {
+		if (element !== null && element.value == 0) {
 			return true;
 		}
 
@@ -1012,10 +1161,10 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 			|| document.querySelectorAll('#user-share-table tbody tr:not(:last-child)').length > 0;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		for (const input of document.querySelectorAll('[name=private]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 
@@ -1023,7 +1172,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 
 		if (target_node_group !== null) {
 			const observer_group = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_group.observe(target_node_group, {
@@ -1036,7 +1185,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 
 		if (target_node_user !== null) {
 			const observer_user = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_user.observe(target_node_user, {
@@ -1044,6 +1193,43 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 				subtree: true
 			});
 		}
+	}
+}
+
+class GraphAxesTabIndicatorItem extends TabIndicatorItem {
+
+	static SVG_GRAPH_AXIS_UNITS_AUTO = 0;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		for (const checkbox of document.querySelectorAll('#lefty, #righty, #axisx')) {
+			if (!checkbox.checked) {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('#lefty_min, #lefty_max, #righty_min, #righty_max')) {
+			if (!input.disabled && input.value !== '') {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('#lefty_units, #righty_units')) {
+			if (!input.disabled && input.value != GraphAxesTabIndicatorItem.SVG_GRAPH_AXIS_UNITS_AUTO) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }
 
@@ -1055,16 +1241,16 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#data_sets .list-accordion-item')
+			.querySelectorAll('#data_set .list-accordion-item')
 			.length;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#data_sets');
+	initObserver() {
+		const target_node = document.querySelector('#data_set');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -1075,28 +1261,29 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
+class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector("[name='source']:checked");
+		const names = ['source', 'simple_triggers', 'working_time', 'percentile_left', 'percentile_right'];
 
-		if (element !== null) {
-			return element.value > 0;
+		for (const name of names) {
+			const elem = document.querySelector("[name='" + name + "']:checked");
+			if (elem !== null && elem.value > 0) {
+				return true;
+			}
 		}
 
 		return false;
 	}
 
-	initObserver(element) {
-		for (const input of document.querySelectorAll("[name='source']")) {
-			input.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }
 
@@ -1116,41 +1303,55 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#graph_time');
-
-		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }
 
 class GraphLegendTabIndicatorItem extends TabIndicatorItem {
+
+	static SVG_GRAPH_LEGEND_LINES_MIN = 1;
+	static SVG_GRAPH_LEGEND_COLUMNS_MAX = 4;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector('#legend');
+		const legend = document.getElementById('legend');
 
-		if (element !== null) {
-			return element.checked;
+		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_statistic = document.getElementById('legend_statistic');
+
+		if (legend_statistic !== null && legend_statistic.checked) {
+			return true;
+		}
+
+		const legend_lines = document.getElementById('legend_lines');
+
+		if (legend_lines !== null && legend_lines.value != GraphLegendTabIndicatorItem.SVG_GRAPH_LEGEND_LINES_MIN) {
+			return true;
+		}
+
+		const legend_columns = document.getElementById('legend_columns');
+
+		if (legend_columns !== null
+				&& legend_columns.value != GraphLegendTabIndicatorItem.SVG_GRAPH_LEGEND_COLUMNS_MAX) {
+			return true;
 		}
 
 		return false;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#legend');
-
-		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }
 
@@ -1170,14 +1371,10 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#show_problems');
-
-		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }
 
@@ -1193,12 +1390,12 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('.overrides-list');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -1209,7 +1406,26 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class PermissionsTabIndicatorItem extends TabIndicatorItem {
+class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#templategroup-right-table tbody tr')
+			.length > 1;
+	}
+
+	initObserver(element) {
+		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
+	}
+}
+
+class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1221,9 +1437,9 @@ class PermissionsTabIndicatorItem extends TabIndicatorItem {
 			.length > 1;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1240,12 +1456,12 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#valuemap-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {

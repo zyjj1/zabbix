@@ -79,6 +79,7 @@ abstract class CController {
 
 	public function __construct() {
 		$this->init();
+		$this->populateRawInput();
 	}
 
 	/**
@@ -188,29 +189,33 @@ abstract class CController {
 	/**
 	 * @return array
 	 */
-	private function getFormInput(): array {
-		$input = $_REQUEST;
+	private static function getFormInput(): array {
+		static $input;
 
-		if (hasRequest('formdata')) {
-			$data = base64_decode(getRequest('data'));
-			$sign = base64_decode(getRequest('sign'));
-			$request_sign = CEncryptHelper::sign($data);
+		if ($input === null) {
+			$input = $_REQUEST;
 
-			if (CEncryptHelper::checkSign($sign, $request_sign)) {
-				$data = json_decode($data, true);
+			if (hasRequest('formdata')) {
+				$data = base64_decode(getRequest('data'));
+				$sign = base64_decode(getRequest('sign'));
+				$request_sign = CEncryptHelper::sign($data);
 
-				if ($data['messages']) {
-					CMessageHelper::setScheduleMessages($data['messages']);
+				if (CEncryptHelper::checkSign($sign, $request_sign)) {
+					$data = json_decode($data, true);
+
+					if ($data['messages']) {
+						CMessageHelper::setScheduleMessages($data['messages']);
+					}
+
+					$input = array_replace($input, $data['form']);
+				}
+				else {
+					info(_('Operation cannot be performed due to unauthorized request.'));
 				}
 
-				$input = array_replace($input, $data['form']);
+				// Replace window.history to avoid resubmission warning dialog.
+				zbx_add_post_js("history.replaceState({}, '');");
 			}
-			else {
-				info(_('Operation cannot be performed due to unauthorized request.'));
-			}
-
-			// Replace window.history to avoid resubmission warning dialog.
-			zbx_add_post_js("history.replaceState({}, '');");
 		}
 
 		return $input;
@@ -219,16 +224,20 @@ abstract class CController {
 	/**
 	 * @return array
 	 */
-	private function getJsonInput(): array {
-		$input = $_REQUEST;
+	private static function getJsonInput(): array {
+		static $input;
 
-		$json_input = json_decode(file_get_contents('php://input'), true);
+		if ($input === null) {
+			$input = $_REQUEST;
 
-		if (is_array($json_input)) {
-			$input += $json_input;
-		}
-		else {
-			info(_('JSON array input is expected.'));
+			$json_input = json_decode(file_get_contents('php://input'), true);
+
+			if (is_array($json_input)) {
+				$input += $json_input;
+			}
+			else {
+				info(_('JSON array input is expected.'));
+			}
 		}
 
 		return $input;
@@ -433,35 +442,35 @@ abstract class CController {
 	private function populateRawInput(): void {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
-				$this->raw_input = $this->getFormInput();
+				$this->raw_input = self::getFormInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
-				$this->raw_input = $this->getJsonInput();
+				$this->raw_input = self::getJsonInput();
 				break;
 
 			default:
 				$this->raw_input = null;
-				break;
 		}
 	}
 
 	/**
 	 * Main controller processing routine. Returns response object: data, redirect or fatal redirect.
 	 *
-	 * @return CControllerResponse
+	 * @throws CAccessDeniedException
+	 *
+	 * @return CControllerResponse|null
 	 */
-	final public function run() {
-		$this->populateRawInput();
-
+	final public function run(): ?CControllerResponse {
 		if ($this->validate_sid && !$this->checkSID()) {
-			access_deny(ACCESS_DENY_PAGE);
+			throw new CAccessDeniedException();
 		}
 
 		if ($this->checkInput()) {
 			if ($this->checkPermissions() !== true) {
-				access_deny(ACCESS_DENY_PAGE);
+				throw new CAccessDeniedException();
 			}
+
 			$this->doAction();
 		}
 

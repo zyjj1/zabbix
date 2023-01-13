@@ -1,11 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	heart \
+	diag \
 	housekeeper \
 	proxyconfig \
 	datasender \
-	taskmanager
+	rtc \
+	stats \
+	taskmanager \
+	proxyconfigwrite
 
 sbin_PROGRAMS = zabbix_proxy
 
@@ -16,12 +19,13 @@ libzbxproxy_a_SOURCES = \
 	proxy_lld.c
 
 libzbxproxy_a_CFLAGS = \
-	-DZABBIX_DAEMON
+	-DZABBIX_DAEMON \
+	$(TLS_CFLAGS)
 
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
-	heart/libzbxheart.a \
+	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
@@ -35,11 +39,14 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
+	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
+	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
+	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	taskmanager/libzbxtaskmanager.a \
-	$(top_builddir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_builddir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_builddir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_builddir)/src/zabbix_server/availability/libavailability.a \
@@ -49,22 +56,28 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_builddir)/src/libs/zbxserver/libzbxserver_proxy.a \
+	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	stats/libzbxserver_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
-	$(top_builddir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \
+	$(top_builddir)/src/libs/zbxstats/libzbxstats.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
-	$(top_builddir)/src/libs/zbxself/libzbxself_proxy.a \
-	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
-	$(top_builddir)/src/libs/zbxsys/libzbxsys.a \
+	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_builddir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
-	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
+	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
@@ -74,19 +87,30 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
+	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
-	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_proxy.a \
+	rtc/libzbxrtc_proxy.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
-	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_proxy.a \
+	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_builddir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
+	$(top_builddir)/src/libs/zbxip/libzbxip.a \
+	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
 	libzbxproxy.a
 
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
@@ -104,7 +128,8 @@ zabbix_proxy_CFLAGS = \
 	-DDEFAULT_SSL_KEY_LOCATION="\"$(URL_SSL_KEY_LOCATION)\"" \
 	-DDEFAULT_CONFIG_FILE="\"$(PROXY_CONFIG_FILE)\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\""
+	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
+	$(TLS_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(PROXY_CONFIG_FILE).d"

@@ -24,10 +24,12 @@
  * @var array $data
  */
 
-$widget = (new CWidget())->setTitle(_('Item prototypes'));
+$html_page = (new CHtmlPage())
+	->setTitle(_('Item prototypes'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 }
 
 $url = (new CUrl('disc_prototypes.php'))
@@ -36,9 +38,10 @@ $url = (new CUrl('disc_prototypes.php'))
 	->getUrl();
 
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('item-prototype-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -546,36 +549,40 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick(
-			'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'only_hostid' => $data['hostid'],
-				'excludeids' => [$data['itemid']],
-				'with_webitems' => 1,
-				'normal_only' => 1
-			]).', {dialogue_class: "modal-popup-generic"});'
-		);
+		->setAttribute('data-hostid', $data['hostid'])
+		->setAttribute('data-itemid', $data['itemid'])
+		->onClick('
+			PopUp("popup.generic", {
+				srctbl: "items",
+				srcfld1: "itemid",
+				srcfld2: "name",
+				dstfrm: "'.$form->getName().'",
+				dstfld1: "master_itemid",
+				dstfld2: "master_itemname",
+				only_hostid: this.dataset.hostid,
+				excludeids: [this.dataset.itemid],
+				normal_only: 1
+			}, {dialogue_class: "modal-popup-generic"});
+		');
+
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick(
-			'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'item_prototypes',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'parent_discoveryid' => $data['parent_discoveryid'],
-				'excludeids' => [$data['itemid']]
-			]).', {dialogue_class: "modal-popup-generic"});'
-		);
+		->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+		->setAttribute('data-itemid', $data['itemid'])
+		->onClick('
+			PopUp("popup.generic", {
+				srctbl: "item_prototypes",
+				srcfld1: "itemid",
+				srcfld2: "name",
+				dstfrm: "'.$form->getName().'",
+				dstfld1: "master_itemid",
+				dstfld2: "master_itemname",
+				parent_discoveryid: this.dataset.discoveryid,
+				excludeids: [this.dataset.itemid]
+			}, {dialogue_class: "modal-popup-generic"});
+		');
 }
 
 $item_tab->addItem([
@@ -585,15 +592,14 @@ $item_tab->addItem([
 	(new CFormField($master_item))->setId('js-item-master-item-field')
 ]);
 
-// Append interfaces to form list.
-$select_interface = getInterfaceSelect($data['interfaces'])
-	->setId('interface-select')
-	->setValue($data['interfaceid'])
-	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-	->setFocusableElementId('interfaceid')
-	->setAriaRequired();
-
 if ($data['display_interfaces']) {
+	$select_interface = getInterfaceSelect($data['interfaces'])
+		->setId('interface-select')
+		->setValue($data['interfaceid'])
+		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+		->setFocusableElementId('interfaceid')
+		->setAriaRequired();
+
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 			->setAsteriskMark()
@@ -623,9 +629,12 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))
+			->setAsteriskMark()
+			->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 		))->setId('js-item-impi-sensor-field')
 	])
 	->addItem([
@@ -816,15 +825,16 @@ $item_tab
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$item_tab->addItem([
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
-		(new CFormField((new CMultiSelect([
+		(new CFormField(
+			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'disabled' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -833,8 +843,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	]);
 }
@@ -882,7 +891,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => false,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -892,7 +902,7 @@ $item_tabs = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 				)
 			])
 			->addItem([
@@ -908,7 +918,7 @@ $item_tabs = (new CTabView())
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$item_tabs->setSelected(0);
 }
 
@@ -933,16 +943,17 @@ else {
 }
 
 $form->addItem($item_tabs);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.item.prototype.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([
 		'interfaces' => $data['interfaces'],
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'value_type_by_keys' => CItemData::getValueTypeByKey(),
+		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()

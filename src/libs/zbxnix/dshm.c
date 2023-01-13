@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "ipc.h"
-#include "log.h"
+#include "zbxnix.h"
 
-extern char	*CONFIG_FILE;
+#include "zbxcommon.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *

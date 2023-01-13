@@ -17,10 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "dbupgrade.h"
-
-extern unsigned char	program_type;
 
 /*
  * 5.4 maintenance database patches

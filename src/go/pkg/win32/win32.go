@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 /*
@@ -32,6 +33,10 @@ func mustLoadLibrary(name string) Hlib {
 	} else {
 		return Hlib(handle)
 	}
+}
+
+func (h Hlib) getProcAddress(name string) (uintptr, error) {
+	return syscall.GetProcAddress(syscall.Handle(h), name)
 }
 
 func (h Hlib) mustGetProcAddress(name string) uintptr {

@@ -79,10 +79,8 @@ function eventObject($object = null) {
 
 /**
  * Returns all supported event source-object pairs.
- *
- * @return array
  */
-function eventSourceObjects() {
+function eventSourceObjects(): array {
 	return [
 		['source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST],
@@ -155,24 +153,13 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
  * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
  * @param bool   $allowed['close']                   Whether user is allowed to close problems.
+ * @param bool   $allowed['suppress_problems']       Whether user is allowed to manually suppress/unsuppress problems.
+ * @param bool   $allowed['rank_change']             Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
 function make_event_details(array $event, array $allowed) {
-	$can_be_closed = $allowed['close'];
-
-	if ($event['r_eventid'] != 0) {
-		$can_be_closed = false;
-	}
-	else {
-		foreach ($event['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$can_be_closed = false;
-				break;
-			}
-		}
-	}
-
+	$can_be_closed = $allowed['close'] && !isEventClosed($event);
 	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
@@ -182,7 +169,7 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Operational data'),
-			$event['opdata']
+			$event['opdata']->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			_('Severity'),
@@ -194,11 +181,13 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed)
+			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed
+					|| $allowed['suppress_problems'] || $allowed['rank_change'])
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
+					->setAttribute('data-eventid', $event['eventid'])
+					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 				)
@@ -261,21 +250,115 @@ function make_event_details(array $event, array $allowed) {
 
 	$table
 		->addRow([_('Tags'), $tags[$event['eventid']]])
-		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))]);
+		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
+
+	if ($event['cause_eventid'] == 0) {
+		$table->addRow([_('Rank'), _('Cause')]);
+	}
+	else {
+		$cause_event = API::Event()->get([
+			'output' => ['name', 'objectid'],
+			'eventids' => $event['cause_eventid']
+		]);
+
+		if ($cause_event) {
+			$cause_event = reset($cause_event);
+
+			$has_trigger = (bool) API::Trigger()->get([
+				'output' => [],
+				'triggerids' => [$cause_event['objectid']]
+			]);
+
+			$table->addRow([_('Rank'),
+				[
+					_('Symptom'),
+					' (',
+					$has_trigger
+						? new CLink(
+							$cause_event['name'],
+							(new CUrl('tr_events.php'))
+								->setArgument('triggerid', $cause_event['objectid'])
+								->setArgument('eventid', $event['cause_eventid'])
+						)
+						: $cause_event['name'],
+					')'
+				]
+			]);
+		}
+	}
 
 	return $table;
 }
 
 /**
+ * Check if event status is UPDATING depending on acknowledges task ID.
  *
- * @param array  $startEvent                  An array of event data.
- * @param string $startEvent['eventid']       Event ID.
- * @param string $startEvent['objectid']      Object ID.
- * @param array  $allowed                     An array of user role rules.
- * @param bool   $allowed['add_comments']     Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']  Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']      Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']            Whether user is allowed to close problems.
+ * @param bool   $in_closing                         True if problem is in CLOSING state.
+ * @param array  $event                              Event data.
+ * @param array  $event['acknowledges']              List of event acknowledges.
+ * @param int    $event['acknowledges'][]['action']  Event action type.
+ * @param string $event['acknowledges'][]['taskid']  Task ID.
+ *
+ * @return bool
+ */
+function isEventUpdating(bool $in_closing, array $event): bool {
+	$in_updating = false;
+
+	if (!$in_closing) {
+		foreach ($event['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) ==
+					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+					|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
+					ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+
+				// If currently is symptom and there is an active task.
+				if ($acknowledge['taskid'] != 0) {
+					$in_updating = true;
+					break;
+				}
+			}
+		}
+	}
+
+	return $in_updating;
+}
+
+/**
+ * Calculate and return event status string: PROBLEM, RESOLVED, CLOSING or UPDATING depending on acknowledges task ID.
+ *
+ * @param bool   $in_closing                         True if problem is in CLOSING state.
+ * @param array  $event                              Event data.
+ *
+ * @return string
+ */
+function getEventStatusString(bool $in_closing, array $event): string {
+	if ($event['r_eventid'] != 0) {
+		$value_str = isEventUpdating($in_closing, $event) ? _('UPDATING') : _('RESOLVED');
+	}
+	else {
+		if ($in_closing) {
+			$value_str = _('CLOSING');
+		}
+		else {
+			$value_str = isEventUpdating($in_closing, $event) ? _('UPDATING') : _('PROBLEM');
+		}
+	}
+
+	return $value_str;
+}
+
+/**
+ *
+ * @param array  $startEvent                    An array of event data.
+ * @param string $startEvent['eventid']         Event ID.
+ * @param string $startEvent['objectid']        Object ID.
+ * @param array  $allowed                       An array of user role rules.
+ * @param bool   $allowed['add_comments']       Whether user is allowed to add problems comments.
+ * @param bool   $allowed['change_severity']    Whether user is allowed to change problems severity.
+ * @param bool   $allowed['acknowledge']        Whether user is allowed to acknowledge problems.
+ * @param bool   $allowed['close']              Whether user is allowed to close problems.
+ * @param bool   $allowed['suppress_problems']  Whether user is allowed to suppress/unsuppress problems.
+ * @param bool   $allowed['rank_change']        Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
@@ -292,8 +375,12 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		]);
 
 	$events = API::Event()->get([
-		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid'],
-		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
+		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid',
+			'cause_eventid'
+		],
+		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'suppress_until', 'taskid'
+		],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
@@ -335,7 +422,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 	// Get trigger severities.
 	$triggers = $triggerids
 		? API::Trigger()->get([
-			'output' => ['priority'],
+			'output' => ['priority', 'manual_close'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		])
@@ -354,6 +441,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			: zbx_date2age($event['clock']);
 
 		$can_be_closed = $allowed['close'];
+		$in_closing = false;
 
 		if ($event['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
@@ -362,23 +450,22 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			$can_be_closed = false;
 		}
 		else {
-			$in_closing = false;
-
-			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					$in_closing = true;
-					$can_be_closed = false;
-					break;
-				}
+			if (hasEventCloseAction($event['acknowledges'])) {
+				$in_closing = true;
+				$can_be_closed = false;
 			}
 
 			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-			$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 			$value_clock = $in_closing ? time() : $event['clock'];
 		}
 
+		$value_str = getEventStatusString($in_closing, $event);
 		$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
+
+		if (isEventUpdating($in_closing, $event)) {
+			$cell_status->addClass('blink');
+		}
 
 		/*
 		 * Add colors to span depending on configuration and trigger parameters. No blinking added to status,
@@ -388,11 +475,12 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		// Create acknowledge link.
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| $can_be_closed)
+				|| $can_be_closed || $allowed['suppress_problems'] || $allowed['rank_change'])
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
+				->setAttribute('data-eventid', $event['eventid'])
+				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 			);
@@ -415,6 +503,103 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 	}
 
 	return $table;
+}
+
+/**
+ * Checks if event is closed.
+ *
+ * @param array $event                              Event object.
+ * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
+ * @param array $event['acknowledges']              List of problem updates.
+ * @param int   $event['acknowledges'][]['action']  Action performed in update.
+ *
+ * @return bool
+ */
+function isEventClosed(array $event): bool {
+	if ($event['r_eventid'] != 0) {
+		return true;
+	}
+	else {
+		return hasEventCloseAction($event['acknowledges']);
+	}
+}
+
+/**
+ * Checks if event has manual close action.
+ *
+ * @param array $event                              Event object.
+ * @param array $event['acknowledges']              List of problem updates.
+ * @param int   $event['acknowledges'][]['action']  Action performed in update.
+ *
+ * @return bool
+ */
+function hasEventCloseAction(array $acknowledges): bool {
+	foreach ($acknowledges as $acknowledge) {
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+			// If at least one manual close update was found, event is closing.
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Returns true if event is suppressed and not unsuppressed after that.
+ *
+ * @param array $acknowledges
+ * @param int   $acknowledges['action']
+ * @param ?array $unsuppression_action   [OUT] Variable to store suppression action data.
+ *
+ * @return bool
+ */
+function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = null): bool {
+	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+	foreach ($acknowledges as $ack) {
+		if (!array_key_exists('suppress_until', $ack)) {
+			continue;
+		}
+
+		if (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+			return false;
+		}
+		elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+			if ($ack['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE || $ack['suppress_until'] > time()) {
+				$suppression_action = $ack;
+
+				return true;
+			}
+			break;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Returns true if event is unsuppressed and not suppressed after that.
+ *
+ * @param array  $acknowledges
+ * @param int    $acknowledges['action']
+ * @param ?array $unsuppression_action   [OUT] Variable to store unsuppression action data.
+ *
+ * @return bool
+ */
+function isEventRecentlyUnsuppressed(array $acknowledges, &$unsuppression_action = null): bool {
+	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+	foreach ($acknowledges as $ack) {
+		if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+			return false;
+		}
+		elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+			$unsuppression_action = $ack;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -487,7 +672,8 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *                                            - 'eventid' - for events and problems (default);
  *                                            - 'hostid' - for hosts and host prototypes;
  *                                            - 'templateid' - for templates;
- *                                            - 'triggerid' - for triggers.
+ *                                            - 'triggerid' - for triggers;
+ *                                            - 'httptestid' - for web scenarios.
  * @param int    $list_tag_count             Maximum number of tags to display.
  * @param array  $filter_tags                An array of tag filtering data.
  * @param ?array $subfilter_tags             Array of selected sub-filter tags. Null when tags are not clickable.
@@ -556,14 +742,22 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					if ($subfilter_tags !== null
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
-						$value = (new CLinkAction($value))->onClick(CHtml::encode(
-							'view.setSubfilter('.json_encode(['subfilter_tags['.$tag['tag'].'][]', $tag['value']]).')'
-						));
+						$tags[$element[$key]][] = (new CSimpleButton($value))
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
+							->addClass(ZBX_STYLE_BTN_TAG)
+							->setHint(getTagString($tag), '', false);
 					}
-
-					$tags[$element[$key]][] = (new CSpan($value))
-						->addClass(ZBX_STYLE_TAG)
-						->setHint(getTagString($tag));
+					else {
+						$tags[$element[$key]][] = (new CSpan($value))
+							->addClass(ZBX_STYLE_TAG)
+							->setHint(getTagString($tag));
+					}
 
 					$tags_shown++;
 
@@ -584,18 +778,26 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					if ($subfilter_tags !== null
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
-						$value = (new CLinkAction($value))->onClick(CHtml::encode(
-							'view.setSubfilter('.json_encode(['subfilter_tags['.$tag['tag'].'][]', $tag['value']]).')'
-						));
+						$hint_content[$element[$key]][] = (new CSimpleButton($value))
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
+							->addClass(ZBX_STYLE_BTN_TAG)
+							->setHint(getTagString($tag), '', false);
 					}
-
-					$hint_content[$element[$key]][] = (new CSpan($value))
-						->addClass(ZBX_STYLE_TAG)
-						->setHint($value);
+					else {
+						$hint_content[$element[$key]][] = (new CSpan($value))
+							->addClass(ZBX_STYLE_TAG)
+							->setHint($value);
+					}
 				}
 
 				$tags[$element[$key]][] = (new CButton(null))
-					->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+					->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP, true);
 			}
 		}
@@ -627,9 +829,82 @@ function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
 			return $tag['value'];
 
 		case TAG_NAME_SHORTENED:
-			return substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
+			return mb_substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
 
 		default:
 			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
 	}
+}
+
+/**
+ * Validate if the given events can change the rank by moving to a new cause. Linking a cause event with its symptoms
+ * (or only cause or only symptoms) to another different cause or symptom is allowed and will switch to the new cause as
+ * a result. Linking a cause to one of its own symptoms is also allowed and will simply switch the cause and symptom as
+ * a result. Linking a symptom to same cause is not allowed and that event ID is skipped. Linking a symptom to symptom
+ * of same cause is also not allowed and is skipped.
+ *
+ * @param array  $eventids        Array of event IDs that should be converted to symptom events.
+ * @param string $cause_eventid   Event ID that will be the new cause ID for given $eventids.
+ *
+ * @return array                  Returns event IDs that are allowed to change rank.
+ */
+function validateEventRankChangeToSymptom(array $eventids, string $cause_eventid): array {
+	$eventids = array_fill_keys($eventids, true);
+	$all_eventids = $eventids;
+	$all_eventids[$cause_eventid] = true;
+
+	// Get all the events that were given in the request to check permissions.
+	$events = API::Event()->get([
+		'output' => ['eventid', 'cause_eventid'],
+		'eventids' => array_keys($all_eventids),
+		'preservekeys' => true
+	]);
+
+	// Early return. In case one of the events are missing, no rank change can occur.
+	if (count($events) != count($all_eventids)) {
+		return [];
+	}
+
+	// Early return. No matter if cause or symptom, source and destination cannot be the same.
+	if (count($eventids) == 1 && bccomp(key($eventids), $cause_eventid) == 0) {
+		return [];
+	}
+
+	$dst_event = $events[$cause_eventid];
+
+	foreach (array_keys($eventids) as $eventid) {
+		$event = $events[$eventid];
+
+		// Given cause is being moved.
+		if ($event['cause_eventid'] == 0) {
+			// Destination is cause. Cause is moved to same cause. Skip this event ID.
+			if ($dst_event['cause_eventid'] == 0 && bccomp($eventid, $dst_event['eventid']) == 0) {
+				unset($eventids[$eventid]);
+			}
+		}
+		// Given symptom is moved.
+		else {
+			// Destination is cause.
+			if ($dst_event['cause_eventid'] == 0) {
+				// Symptom current cause is the same as new cause. Skip this event ID.
+				if (bccomp($event['cause_eventid'], $dst_event['eventid']) == 0) {
+					unset($eventids[$eventid]);
+				}
+			}
+			// Destination is symptom.
+			else {
+				// Symptom destination is self. Skip this Event ID.
+				if (bccomp($eventid, $dst_event['eventid']) == 0) {
+					unset($eventids[$eventid]);
+				}
+
+				// If given symptom cause is not also in the list, skip this Event ID.
+				if (!array_key_exists($event['cause_eventid'], $eventids)) {
+					unset($eventids[$eventid]);
+				}
+			}
+		}
+	}
+
+	return array_keys($eventids);
 }

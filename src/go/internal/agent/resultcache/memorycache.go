@@ -25,11 +25,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/version"
 )
 
@@ -51,7 +51,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	request := AgentDataRequest{
 		Request: "agent data",
 		Data:    c.results,
-		Session: c.token,
+		Session: u.Session(),
 		Host:    u.Hostname(),
 		Version: version.Short(),
 	}

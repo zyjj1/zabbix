@@ -53,7 +53,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 						['type' => 'Prometheus pattern', 'parameter_1' => '{#METRICNAME}==1']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -71,7 +71,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 							'parameter_3' => '{#LABELNAME}'
 						]
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
 				]
 			],
 			[
@@ -85,7 +85,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			]
 		]);
@@ -224,7 +224,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->assertEquals('', $form->getField($fields['value'])->getValue());
 
 		// Fill value with text.
-		$form->getField($fields['dropdown'])->asZDropdown()->fill('label');
+		$form->getField($fields['dropdown'])->fill('label');
 		$form->getField($fields['value'])->fill('test');
 
 		$values = [
@@ -239,7 +239,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 
 		// Change dropdown values and check label field value and editability.
 		foreach ($values as $value => $enabled) {
-			$form->getField($fields['dropdown'])->asZDropdown()->fill($value);
+			$form->getField($fields['dropdown'])->fill($value);
 			$this->assertTrue($form->getField($fields['value'])->isEnabled($enabled));
 
 			// Check that entered value did not disappear.

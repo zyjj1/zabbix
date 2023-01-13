@@ -17,32 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "daemon.h"
-
-#include "common.h"
-#include "pid.h"
-#include "cfg.h"
-#include "log.h"
-#include "control.h"
+#include "zbxnix.h"
 
 #include "fatal.h"
-#include "sighandler.h"
 #include "sigcommon.h"
 
-char		*CONFIG_PID_FILE = NULL;
+#include "zbxcommon.h"
+#include "log.h"
+#include "pid.h"
+#include "zbx_rtc_constants.h"
+
+#if defined(__linux__)
+#define ZBX_PID_FILE_TIMEOUT 20
+#define ZBX_PID_FILE_SLEEP_TIME 100000000
+#endif
+
 static int	parent_pid = -1;
+
+/* pointer to function for getting caller's PID file location */
+static zbx_get_pid_file_pathname_f	get_pid_file_pathname_cb = NULL;
 
 extern pid_t	*threads;
 extern int	threads_num;
 
-#ifdef HAVE_SIGQUEUE
-extern unsigned char	program_type;
-#endif
-
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num);
 
-static void	(*zbx_sigusr_handler)(int flags);
+static zbx_signal_handler_f	sigusr_handler;
+static zbx_signal_redirect_f	signal_redirect_handler;
 
 #ifdef HAVE_SIGQUEUE
 /******************************************************************************
@@ -66,6 +68,12 @@ static void	common_sigusr_handler(int flags)
 						zabbix_get_log_level_string());
 			}
 			break;
+		case ZBX_RTC_PROF_ENABLE:
+			zbx_prof_enable(ZBX_RTC_GET_SCOPE(flags));
+			break;
+		case ZBX_RTC_PROF_DISABLE:
+			zbx_prof_disable();
+			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if (SUCCEED != zabbix_decrease_log_level())
 			{
@@ -79,8 +87,8 @@ static void	common_sigusr_handler(int flags)
 			}
 			break;
 		default:
-			if (NULL != zbx_sigusr_handler)
-				zbx_sigusr_handler(flags);
+			if (NULL != sigusr_handler)
+				sigusr_handler(flags);
 			break;
 	}
 }
@@ -166,7 +174,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",	threads[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d", threads[i]);
 		}
 		else
 		{
@@ -189,9 +197,9 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 #endif
 
-void	zbx_set_sigusr_handler(void (*handler)(int flags))
+void	zbx_set_sigusr_handler(zbx_signal_handler_f handler)
 {
-	zbx_sigusr_handler = handler;
+	sigusr_handler = handler;
 }
 
 /******************************************************************************
@@ -203,7 +211,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
 	int	flags;
-	int	scope;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -229,44 +236,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		return;
 	}
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_AGENTD))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: runtime control signals are supported only by agent");
-		return;
-	}
-
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_LOG_LEVEL_INCREASE:
-		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			scope = ZBX_RTC_GET_SCOPE(flags);
-
-			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
-			{
-				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags, NULL);
-			}
-			else
-			{
-				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
-				{
-					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
-							flags, NULL);
-				}
-			}
-
-			/* call custom sigusr handler to handle log level changes for non worker processes */
-			if (NULL != zbx_sigusr_handler)
-				zbx_sigusr_handler(flags);
-
-			break;
-		case ZBX_RTC_USER_PARAMETERS_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			break;
-		default:
-			if (NULL != zbx_sigusr_handler)
-				zbx_sigusr_handler(flags);
-	}
+	if(signal_redirect_handler != NULL)
+		signal_redirect_handler(flags, sigusr_handler);
 #endif
 }
 
@@ -289,10 +260,11 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
  ******************************************************************************/
-static void	set_daemon_signal_handlers(void)
+static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 {
 	struct sigaction	phan;
 
+	signal_redirect_handler = signal_redirect_cb;
 	sig_parent_pid = (int)getpid();
 
 	sigemptyset(&phan.sa_mask);
@@ -309,17 +281,29 @@ static void	set_daemon_signal_handlers(void)
  *                                                                            *
  * Purpose: init process as daemon                                            *
  *                                                                            *
- * Parameters: allow_root - allow root permission for application             *
- *             user       - user on the system to which to drop the           *
- *                          privileges                                        *
- *             flags      - daemon startup flags                              *
+ * Parameters: allow_root         - [IN] allow root permission for            *
+ *                     application                                            *
+ *             user               - [IN] user on the system to which to drop  *
+ *                     the privileges                                         *
+ *             flags              - [IN] daemon startup flags                 *
+ *             get_pid_file_cb    - [IN] callback function for getting        *
+ *                     absolute path and name of PID file                     *
+ *             zbx_on_exit_cb_arg - [IN] callback function called when        *
+ *                     terminating signal handler                             *
+ *             config_log_type    - [IN]                                      *
+ *             config_log_file    - [IN]                                      *
+ *             signal_redirect_cb - [IN] USR1 handling callback               *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root, const char *user, unsigned int flags)
+int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
+		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb)
 {
 	struct passwd	*pwd;
+
+	get_pid_file_pathname_cb = get_pid_file_cb;
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
@@ -375,8 +359,29 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		if (0 != zbx_fork())
+		pid_t	child_pid;
+
+		if(0 != (child_pid = zbx_fork()))
+		{
+#if defined(__linux__)
+			if (0 < child_pid)
+			{
+				int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
+				zbx_stat_t	stat_buff;
+				struct timespec	ts = {0, ZBX_PID_FILE_SLEEP_TIME};
+
+				/* wait for the forked child to create pid file */
+				while (0 < pid_file_timeout && 0 != zbx_stat(get_pid_file_cb(), &stat_buff))
+				{
+					pid_file_timeout--;
+					nanosleep(&ts, NULL);
+				}
+			}
+#else
+			ZBX_UNUSED(child_pid);
+#endif
 			exit(EXIT_SUCCESS);
+		}
 
 		setsid();
 
@@ -388,19 +393,19 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
 
-		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == CONFIG_LOG_TYPE ? CONFIG_LOG_FILE : NULL))
+		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
 			exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == create_pid_file(CONFIG_PID_FILE))
+	if (FAIL == create_pid_file(get_pid_file_cb()))
 		exit(EXIT_FAILURE);
 
-	atexit(daemon_stop);
+	atexit(zbx_daemon_stop);
 
 	parent_pid = (int)getpid();
 
-	zbx_set_common_signal_handlers();
-	set_daemon_signal_handlers();
+	zbx_set_common_signal_handlers(zbx_on_exit_cb_arg);
+	set_daemon_signal_handlers(signal_redirect_cb);
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
 	/* sigaction() is called. To avoid problems when scripts exit in zbx_execute() and */
@@ -410,7 +415,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 	return MAIN_ZABBIX_ENTRY(flags);
 }
 
-void	daemon_stop(void)
+void	zbx_daemon_stop(void)
 {
 	/* this function is registered using atexit() to be called when we terminate */
 	/* there should be nothing like logging or calls to exit() beyond this point */
@@ -418,17 +423,17 @@ void	daemon_stop(void)
 	if (parent_pid != (int)getpid())
 		return;
 
-	drop_pid_file(CONFIG_PID_FILE);
+	drop_pid_file(get_pid_file_pathname_cb());
 }
 
-int	zbx_sigusr_send(int flags)
+int	zbx_sigusr_send(int flags, const char *pid_file_pathname)
 {
 	int	ret = FAIL;
 	char	error[256];
 #ifdef HAVE_SIGQUEUE
 	pid_t	pid;
 
-	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
+	if (SUCCEED == read_pid_file(pid_file_pathname, &pid, error, sizeof(error)))
 	{
 		union sigval	s;
 

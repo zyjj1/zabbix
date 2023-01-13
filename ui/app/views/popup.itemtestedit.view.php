@@ -151,6 +151,19 @@ if ($data['is_item_testable']) {
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmp-community'),
 
+			(new CLabel(_('Max repetition count'), 'interface[details][max_repetitions]'))
+				->addClass('js-popup-row-snmp-max-repetition'),
+			(new CFormField(
+					(new CTextBox('interface[details][max_repetitions]',
+						$data['inputs']['interface']['details']['max_repetitions'], false,
+						CControllerPopupItemTest::INPUT_MAX_LENGTH
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired()
+				))
+					->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+					->addClass('js-popup-row-snmp-max-repetition'),
+
 			(new CLabel(_('Context name'), 'interface[details][contextname]'))
 				->addClass('js-popup-row-snmpv3-contextname'),
 			(new CFormField(
@@ -274,7 +287,7 @@ $form_grid->addItem([
 			->setId('time')
 	),
 
-	($data['preproc_item'] instanceof CDiscoveryRule)
+	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
 		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
@@ -424,6 +437,7 @@ $warning_box = $data['show_warning']
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TEST_EDIT),
 	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
 	'body' => (new CDiv([$warning_box, $form, $templates]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',

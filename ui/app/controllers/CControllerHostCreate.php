@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -106,17 +106,18 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 				$host = $this->extendHostCloneEncryption($host, $src_hostid);
 			}
 
-			$hostids = API::Host()->create($host);
+			$result = API::Host()->create($host);
 
-			if ($hostids === false
-					|| !$this->createValueMaps($hostids['hostids'][0])
-					|| ($full_clone && !$this->copyFromCloneSourceHost($src_hostid, $hostids['hostids'][0]))) {
+			if ($result === false
+					|| !$this->createValueMaps($result['hostids'][0])
+					|| ($full_clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
 				throw new Exception();
 			}
 
 			$result = DBend(true);
 		}
 		catch (Exception $e) {
+			$result = false;
 			DBend(false);
 		}
 
@@ -205,19 +206,12 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if (!copyItems($src_hostid, $hostid)) {
+		if (!copyItemsToHosts('hostids', [$src_hostid], false, [$hostid])) {
 			return false;
 		}
 
 		// Copy triggers.
-		$db_triggers = API::Trigger()->get([
-			'output' => ['triggerid'],
-			'hostids' => $src_hostid,
-			'inherited' => false,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		]);
-
-		if ($db_triggers && !copyTriggersToHosts(array_column($db_triggers, 'triggerid'), $hostid, $src_hostid)) {
+		if (!copyTriggersToHosts([$hostid], $src_hostid)) {
 			return false;
 		}
 

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 
 /*
 ** Zabbix
@@ -56,7 +56,7 @@ class CControllerSlaReportList extends CController {
 	}
 
 	/**
-	 * @throws APIException
+	 * @throws Exception
 	 */
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
@@ -130,47 +130,48 @@ class CControllerSlaReportList extends CController {
 		CProfile::update('web.slareport.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.slareport.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
+		$timezone = new DateTimeZone($sla !== null && $sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
+			? $sla['timezone']
+			: CTimezoneHelper::getSystemTimezone()
+		);
+
+		$absolute_time_parser = new CAbsoluteTimeParser();
+
 		$period_from = null;
 
 		if ($filter['date_from'] !== '') {
-			$date_from = DateTime::createFromFormat('!'.DATE_FORMAT, $filter['date_from'], new DateTimeZone('UTC'));
-			$last_errors = DateTime::getLastErrors();
-
-			if ($date_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('From'), _('a date is expected')));
-			}
-			else {
-				$period_from = $date_from->getTimestamp();
+			if ($absolute_time_parser->parse($filter['date_from']) == CParser::PARSE_SUCCESS) {
+				$period_from = $absolute_time_parser
+					->getDateTime(true, $timezone)
+					->getTimestamp();
 
 				if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
 					$period_from = null;
 
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('From'),
-						_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE))
-					));
+					error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
 				}
+			}
+			else {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
 			}
 		}
 
 		$period_to = null;
 
 		if ($filter['date_to'] !== '') {
-			$date_to = DateTime::createFromFormat('!'.DATE_FORMAT, $filter['date_to'], new DateTimeZone('UTC'));
-			$last_errors = DateTime::getLastErrors();
-
-			if ($date_to === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('To'), _('a date is expected')));
-			}
-			else {
-				$period_to = $date_to->getTimestamp();
+			if ($absolute_time_parser->parse($filter['date_to']) == CParser::PARSE_SUCCESS) {
+				$period_to = $absolute_time_parser
+					->getDateTime(false, $timezone)
+					->getTimestamp();
 
 				if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
 					$period_to = null;
 
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('To'),
-						_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE))
-					));
+					error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
 				}
+			}
+			else {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
 			}
 		}
 
@@ -226,7 +227,7 @@ class CControllerSlaReportList extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('SLA Report'));
+		$response->setTitle(_('SLA report'));
 		$this->setResponse($response);
 	}
 }

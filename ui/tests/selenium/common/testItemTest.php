@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
@@ -29,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testItemTest extends CWebTest {
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
+	const HOST_ID = 99136;		// 'Test item host' monitored by 'Proxy for Discovery rule'
 	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	use PreprocessingTrait;
@@ -57,10 +56,10 @@ class testItemTest extends CWebTest {
 				['Type' => 'Database monitor', 'SQL query' => 'query'],
 				['Type' => 'HTTP agent', 'URL' => 'https://www.zabbix.com'],
 				['Type' => 'IPMI agent', 'IPMI sensor' => 'Sensor'],
-				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50]', 'User name' => 'Name', 'Executed script' => 'Script'],
-				['Type' => 'TELNET agent', 'Key' => 'telnet'],
-				['Type' => 'JMX agent', 'Key' => 'jmx','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
-				['Type' => 'Dependent item', 'Key'=>'dependent', 'Master item' => 'Master item']
+				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50,[{#KEY}]]', 'User name' => 'Name', 'Executed script' => 'Script'],
+				['Type' => 'TELNET agent', 'Key' => 'telnet[{#KEY}]'],
+				['Type' => 'JMX agent', 'Key' => 'jmx[{#KEY}]','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
+				['Type' => 'Dependent item', 'Key'=>'dependent[{#KEY}]', 'Master item' => 'Master item']
 		];
 	}
 
@@ -69,7 +68,7 @@ class testItemTest extends CWebTest {
 	 */
 	public function getItemTestButtonStateData() {
 		return array_merge($this->getCommonTestButtonStateData(), [
-				['Type' => 'SNMP trap', 'Key' => 'snmptrap.fallback'],
+				['Type' => 'SNMP trap', 'Key' => 'snmptrap.fallback[{#KEY}]'],
 				['Type' => 'Calculated', 'Formula' => '"formula"']
 		]);
 	}
@@ -102,7 +101,7 @@ class testItemTest extends CWebTest {
 		$item_form->fill([
 			'Name' => $item_name,
 			'Type' => 'Zabbix agent',
-			'Key' => 'key'
+			'Key' => 'key[{#KEY}]'
 		]);
 		// Check Test item button.
 		$this->checkTestButtonInPreprocessing($item_type);
@@ -128,7 +127,10 @@ class testItemTest extends CWebTest {
 				// Check "Execute now" button only in host case item saved form and then change type.
 				if ($i === 0) {
 					if ($check_now) {
-						$execute_button = $this->query('id:check_now')->waitUntilVisible()->one();
+						if ($type === 'Dependent item') {
+							$enabled = true;
+						}
+						$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
@@ -268,7 +270,8 @@ class testItemTest extends CWebTest {
 					'snmp_fields' => [
 						'version' => 'SNMPv1',
 						'community' => 'public'
-					]
+					],
+					'interface_text_part' => 'SNMPv1, Community: {$SNMP_COMMUNITY}'
 				]
 			],
 			[
@@ -288,7 +291,8 @@ class testItemTest extends CWebTest {
 						'authentication_passphrase' => '{$TEST}',
 						'privacy_protocol' => 'AES128',
 						'privacy_passphrase' => 'test_privpassphrase'
-					]
+					],
+					'interface_text_part' => 'SNMPv3, Context name: test_context, (priv: AES128, auth: SHA1)'
 				]
 			],
 			[
@@ -381,7 +385,8 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => ''
 					],
-					'error' => 'Incorrect value for field "key_": key is empty.'
+					'error' => 'Incorrect value for field "key_": key is empty.',
+					'lld_error' => 'Incorrect value for field "key_": key is empty.'
 				]
 			],
 			[
@@ -391,7 +396,8 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'key space'
 					],
-					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
+					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".',
+					'lld_error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
 				]
 			],
 			[
@@ -404,7 +410,8 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '2']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": first parameter is expected.'
 				]
 			],
 			[
@@ -417,7 +424,8 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1', 'parameter_2' => '']
 					],
-					'error' => 'Incorrect value for field "params": second parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/2": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": second parameter is expected.'
 				]
 			],
 			[
@@ -430,7 +438,8 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'XML XPath', 'parameter_1' => '']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			[
@@ -448,7 +457,8 @@ class testItemTest extends CWebTest {
 						'error_handler' => 'Set error to',
 						'error_handler_params' => '']
 					],
-					'error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
 				]
 			],
 			[
@@ -660,7 +670,13 @@ class testItemTest extends CWebTest {
 		if ($is_host) {
 			// If host fill interface.
 			if (CTestArrayHelper::get($data, 'host_interface')) {
-				$item_form->getField('Host interface')->fill($data['host_interface']);
+				/**
+				 * The value of an SNMP interface option element contains not only the IP and port, but also the
+				 * interface type and context name or community. In this case the address and details must be merged.
+				 */
+				$interface = $data['host_interface'].CTestArrayHelper::get($data, 'interface_text_part', '');
+
+				$item_form->getField('Host interface')->fill($interface);
 			}
 			// Get ip and port separately.
 			$host_interface = explode(':', $item_form->getField('Host interface')->getText(), 2);
@@ -728,6 +744,7 @@ class testItemTest extends CWebTest {
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
+
 				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
 						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
 
@@ -878,7 +895,7 @@ class testItemTest extends CWebTest {
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
 						'Calculated'])) {
-					$details = 'Connection to Zabbix server "localhost" refused. Possible reasons:';
+					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
 				}
 				else {
 					$details = ($data['fields']['Type'] === 'SNMP agent')
@@ -1009,7 +1026,8 @@ class testItemTest extends CWebTest {
 				}
 				break;
 			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, null, $data['error']);
+				$error_message = ($lld) ? $data['lld_error'] : $data['error'];
+				$this->assertMessage(TEST_BAD, null, $error_message);
 				$overlay->close();
 				break;
 		}

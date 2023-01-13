@@ -20,7 +20,16 @@
 #ifndef ZABBIX_REPORT_WRITER_H
 #define ZABBIX_REPORT_WRITER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
+
+typedef struct
+{
+	char	*config_tls_ca_file;
+	char	*config_tls_cert_file;
+	char	*config_tls_key_file;
+	char	*config_source_ip;
+}
+zbx_thread_report_writer_args;
 
 ZBX_THREAD_ENTRY(report_writer_thread, args);
 

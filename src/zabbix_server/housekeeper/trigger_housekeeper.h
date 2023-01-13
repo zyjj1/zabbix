@@ -20,7 +20,13 @@
 #ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
 #define ZABBIX_TRIGGER_HOUSEKEEPER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
+
+typedef struct
+{
+	int			config_timeout;
+}
+zbx_thread_server_trigger_housekeeper_args;
 
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args);
 

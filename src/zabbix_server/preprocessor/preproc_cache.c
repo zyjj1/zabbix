@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxprometheus.h"
-
+#include "preproc_snmp.h"
 #include "item_preproc.h"
 
 ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t)
@@ -96,6 +95,15 @@ void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache)
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				zbx_prometheus_clear((zbx_prometheus_t *)cache->refs.values[i].impl);
 				zbx_free(cache->refs.values[i].impl);
+				break;
+			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+				zbx_snmp_value_cache_clear((zbx_snmp_value_cache_t *)cache->refs.values[i].impl);
+				zbx_free(cache->refs.values[i].impl);
+				break;
+			case ZBX_PREPROC_JSONPATH:
+				zbx_jsonobj_clear((zbx_jsonobj_t *)cache->refs.values[i].impl);
+				zbx_free(cache->refs.values[i].impl);
+				break;
 		}
 	}
 

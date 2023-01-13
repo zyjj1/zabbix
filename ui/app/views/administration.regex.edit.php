@@ -25,9 +25,10 @@
 
 $this->includeJsFile('administration.regex.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Regular expressions'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT));
 
 $action = (new CUrl('zabbix.php'))->setArgument('action', ($data['regexid'] == 0) ? 'regex.create' : 'regex.update');
 
@@ -36,9 +37,10 @@ if ($data['regexid'] != 0) {
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('regex')
 	->setAction($action->getUrl())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $table = (new CTable())
 	->setId('tbl_expr')
@@ -132,7 +134,7 @@ $test_tab = (new CFormList())
 	);
 
 $reg_exp_view = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$reg_exp_view->setSelected(0);
 }
 
@@ -171,6 +173,6 @@ else {
 
 $form->addItem($reg_exp_view);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -109,10 +109,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
-
-		$errors = [];
 
 		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
@@ -125,16 +122,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 			$this->page->removeFocus();
 			sleep(1);
-			// Collect all screenshot errors.
-			try {
-				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
-			} catch (Exception $ex) {
-				$errors[] = $ex->getMessage();
-			}
-		}
-
-		if ($errors) {
-			$this->fail(implode("\n", $errors));
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
 		}
 	}
 
@@ -174,19 +162,11 @@ class testDashboardGraphWidget extends CWebTest {
 		}
 
 		sleep(2);
-		if (array_key_exists('color_error', $data)) {
-			// Check colorpick error message.
-			$this->assertMessage(TEST_BAD, null, $data['color_error']);
-		}
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
 				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
 		if (array_key_exists('error', $data)) {
-			if (!is_array($data['error'])) {
-				$data['error'] = [$data['error']];
-			}
-			// Check error message.
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 
@@ -206,36 +186,30 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Data set' => [
 						[
-							'color' => [
-								'id:lbl_ds_0_color' => ''
-							]
+							'xpath://button[@id="lbl_ds_0_color"]/..' => ''
 						]
 					],
-					'color_error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
+					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
 				]
 			],
 			[
 				[
 					'Data set' => [
 						[
-							'color' => [
-								'id:lbl_ds_0_color' => '00000!'
-							]
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000!'
 						]
 					],
-					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
 				[
 					'Data set' => [
 						[
-							'color' => [
-								'id:lbl_ds_0_color' => '00000 '
-							]
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000 '
 						]
 					],
-					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -378,12 +352,10 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Zabbix*',
 							'item' => 'Agent ping',
-							'color' => [
-								'id:lbl_ds_1_color' => '00000 '
-							]
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 '
 						]
 					],
-					'color_error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -654,7 +626,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 12:53:00',
+						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'
@@ -946,31 +918,26 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Overrides' => [
 						[
-
+							'color' => '00000!',
 							'options' => [
 								'Base color'
-							],
-							'color' => [
-								'id:lbl_or_0__color_' => '00000!'
 							]
 						]
 					],
-					'color_error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
 				[
 					'Overrides' => [
 						[
+							'color' => '00000 ',
 							'options' => [
 								'Base color'
-							],
-							'color' => [
-								'id:lbl_or_0__color_' => '00000 '
 							]
 						]
 					],
-					'color_error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -1307,13 +1274,15 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Zabbix,Server',
 							'item' => 'Agent, Ping',
 							'Aggregation function' => 'min',
-							'Aggregate' => 'Data set'
+							'Aggregate' => 'Data set',
+							'Data set label' => '祝你今天過得愉快'
 						],
 						[
 							'host' => ',Zabbix Server',
 							'item' => ',Agentp ping',
 							'Draw' => 'Bar',
-							'Aggregation function' => 'max'
+							'Aggregation function' => 'max',
+							'Data set label' => 'Bar ping'
 						],
 						[
 							'host' => ',Zabbix, Server,',
@@ -1473,9 +1442,8 @@ class testDashboardGraphWidget extends CWebTest {
 							'Aggregation function' => 'last',
 							'Aggregation interval' => '1',
 							'Aggregate' => 'Data set',
-							'color' => [
-								'id:lbl_ds_0_color' => '009688'
-							]
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
+							'Data set label' => 'Staircase graph'
 						],
 						[
 							'host' => 'Two host',
@@ -1485,9 +1453,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Point size' => '1',
 							'Transparency' => '0',
 							'Time shift' => '-1s',
-							'color' => [
-								'id:lbl_ds_1_color' => '000000'
-							]
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000'
 						]
 					],
 					'Displaying options' => [
@@ -1529,6 +1495,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'time_shift' => '-5s',
+							'color' => '000000',
 							'options' => [
 								'Base color',
 								['Width', '0'],
@@ -1539,15 +1506,13 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'None'],
 								['Y-axis', 'Right'],
 								'Time shift'
-							],
-							'color' => [
-								'id:lbl_or_0__color_' => '000000'
 							]
 						],
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'time_shift' => '5s',
+							'color' => 'FFFFFF',
 							'options' => [
 								'Base color',
 								['Width', '1'],
@@ -1558,9 +1523,6 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'Connected'],
 								['Y-axis', 'Left'],
 								'Time shift'
-							],
-							'color' => [
-								'id:lbl_or_1__color_' => 'FFFFFF'
 							]
 						]
 					],
@@ -1766,9 +1728,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Fill' => '10',
 							'Missing data' => 'Connected',
 							'Time shift' => '0',
-							'color' => [
-								'id:lbl_ds_0_color' => '009688'
-							]
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688'
 						],
 						[
 							'host' => 'Two host',
@@ -1781,9 +1741,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Aggregation function' => 'avg',
 							'Aggregation interval' => '5h',
 							'Aggregate' => 'Data set',
-							'color' => [
-								'id:lbl_ds_1_color' => '000000'
-							]
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000'
 						]
 					],
 					'Displaying options' => [
@@ -1829,6 +1787,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'time_shift' => '-5s',
+							'color' => '000000',
 							'options' => [
 								'Base color',
 								['Width', '0'],
@@ -1839,15 +1798,13 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'None'],
 								['Y-axis', 'Right'],
 								'Time shift'
-							],
-							'color' => [
-								'id:lbl_or_0__color_' => '000000'
 							]
 						],
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'time_shift' => '5s',
+							'color' => 'FFFFFF',
 							'options' => [
 								'Base color',
 								['Width', '1'],
@@ -1858,9 +1815,6 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'Connected'],
 								['Y-axis', 'Left'],
 								'Time shift'
-							],
-							'color' => [
-								'id:lbl_or_1__color_' => 'FFFFFF'
 							]
 						]
 					],
@@ -1917,7 +1871,6 @@ class testDashboardGraphWidget extends CWebTest {
 	 */
 	private function fillForm($data, $form) {
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
-
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set', []));
 
 		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
@@ -1931,7 +1884,7 @@ class testDashboardGraphWidget extends CWebTest {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setFilterSelector('id:tags_table_tags');
+						$this->setTagSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);
 					}
 					break;
@@ -1962,15 +1915,6 @@ class testDashboardGraphWidget extends CWebTest {
 			$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all()->count();
 
 			foreach ($data_sets as $i => $data_set) {
-				if (array_key_exists('color', $data_set)) {
-					foreach ($data_set['color'] as $selector => $color) {
-						$form->query($selector)->one()->click()->waitUntilReady();
-						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-					}
-
-					unset($data_set['color']);
-				}
-
 				$mapping = [
 					'host' => 'xpath://div[@id="ds_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="ds_'.$i.'_items_"]/..'
@@ -2036,7 +1980,11 @@ class testDashboardGraphWidget extends CWebTest {
 						'selector' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
 						'class' => CMultiselectElement::class
 					],
-					'time_shift' => 'name:or['.$i.'][timeshift]'
+					'time_shift' => 'name:or['.$i.'][timeshift]',
+					'color' => [
+						'selector' => 'xpath://button[@id="lbl_or_'.$i.'__color_"]/..',
+						'class' => CColorPickerElement::class
+					]
 				];
 
 				foreach ($mapping as $field => $item) {
@@ -2049,13 +1997,6 @@ class testDashboardGraphWidget extends CWebTest {
 					}
 
 					$form->query($item['selector'])->cast($item['class'])->one()->fill($override[$field]);
-				}
-
-				if (array_key_exists('color', $override)) {
-					foreach ($override['color'] as $selector => $color) {
-						$form->query($selector)->one()->click()->waitUntilReady();
-						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-					}
 				}
 
 				// Press "Add new override" button, except for last override set and if in data provider exist only one set.
@@ -2088,15 +2029,6 @@ class testDashboardGraphWidget extends CWebTest {
 			foreach ($mapping as $field => $selector) {
 				$data_set = [$selector => $data_set[$field]] + $data_set;
 				unset($data_set[$field]);
-			}
-
-			// Check color value.
-			if (array_key_exists('color', $data_set)) {
-				foreach($data_set['color'] as $selector => $value) {
-					$this->assertEquals('#'.$value, $this->query($selector)->one()->getAttribute('title'));
-				}
-
-				unset($data_set['color']);
 			}
 
 			// Check fields value.
@@ -2137,20 +2069,12 @@ class testDashboardGraphWidget extends CWebTest {
 			}
 
 			foreach ($data['Overrides'] as $i => $override) {
-				// Check color value.
-				if (array_key_exists('color', $override)) {
-					foreach($override['color'] as $selector => $value) {
-						$this->assertEquals('#'.$value, $this->query($selector)->one()->getAttribute('title'));
-					}
-
-					unset($override['color']);
-				}
-
 				// Prepare input fields.
 				$mapping = [
 					'host' => 'xpath://div[@id="or_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
-					'time_shift' => 'name:or['.$i.'][timeshift]'
+					'time_shift' => 'name:or['.$i.'][timeshift]',
+					'color' => 'xpath://button[@id="lbl_or_'.$i.'__color_"]/..'
 				];
 				$inputs = [];
 				foreach ($mapping as $field => $selector) {
@@ -2493,6 +2417,73 @@ class testDashboardGraphWidget extends CWebTest {
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 		}
+	}
+
+	/**
+	 * Check data set naming in legend and in configuration form.
+	 */
+	public function testDashboardGraphWidget_CheckDataSetNaming() {
+		$input_data = [
+			'main_fields' => [
+				'Name' => 'Graph widget for Data set naming check'
+			],
+			'Data set' => [
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'item' => 'Available memory*',
+					'Aggregation function' => 'avg',
+					'Aggregate' => 'Data set',
+					'Data set label' => '祝你今天過得愉快'
+				],
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'item' => 'CPU guest*',
+					'Aggregation function' => 'max',
+					'Data set label' => 'Data set only'
+				],
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'item' => 'CPU utilization',
+					'Aggregation function' => 'count',
+					'Aggregation interval' => '24h',
+					'Aggregate' => 'Data set'
+				]
+			]
+		];
+		$displayed_data = [
+			'Data sets' => [
+				'祝你今天過得愉快',
+				'Data set only',
+				'Data set #3'
+			],
+			'Legend labels' => [
+				'avg(祝你今天過得愉快)', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
+				'count(Data set #3)'
+			]
+		];
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$form = $this->openGraphWidgetConfiguration();
+
+		// Check hint next to the "Data set label" field.
+		$form->query('xpath:.//label[text()="Data set label"]/a')->one()->click();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
+		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
+
+		$this->fillForm($input_data, $form);
+		$form->submit();
+		$this->saveGraphWidget($input_data['main_fields']['Name']);
+
+		// Check labels in legend.
+		$widget = CDashboardElement::find()->one()->getWidget($input_data['main_fields']['Name']);
+		$legend_labels = $widget->query('class:svg-graph-legend')->one()->getText();
+		$this->assertEquals($displayed_data['Legend labels'], explode("\n", $legend_labels));
+
+		$form = $widget->edit();
+
+		// Check Data set names in created widget configuration form.
+		$data_set_labels = $form->query('xpath:.//label[@class="sortable-drag-handle js-dataset-label"]')->all()->asText();
+		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
 	}
 
 	/**

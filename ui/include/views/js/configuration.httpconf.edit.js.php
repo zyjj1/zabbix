@@ -42,7 +42,10 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addStyle('top: 0px;')
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
@@ -104,7 +107,8 @@
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
@@ -208,7 +212,7 @@
 	});
 
 	/**
-	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
+	 * Implementation of jQuery.val for radio buttons. Use this method within scoped jQuery object;
 	 * Use with jQuery collection of input nodes.
 	 *
 	 * @param {string} value  Check button by value. Read value if no param is given.
@@ -1161,8 +1165,12 @@
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore(this.$form);
+
+				return;
 			}
 
 			if (!httpconf.steps.data[ret.params.no]) {

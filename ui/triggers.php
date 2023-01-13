@@ -35,8 +35,8 @@ $fields = [
 	'hostid' =>									[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
 	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
-													IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-														COPY_TYPE_TO_TEMPLATE
+													IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP,
+														COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
 													]),
 													'isset({copy})'
 												],
@@ -50,6 +50,7 @@ $fields = [
 	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'url_name' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	null],
 	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -60,12 +61,12 @@ $fields = [
 	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Target')],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
 	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Target')],
-	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
-	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
-	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
+	'dependencies' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'new_dependency' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID.'{}>0',	'isset({add_dependency})'],
+	'g_triggerid' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'copy_targetids' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,			null],
+	'tags' =>									[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -77,7 +78,7 @@ $fields = [
 	// Filter related fields.
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'filter_priority' =>						[T_ZBX_INT, O_OPT, null,
+	'filter_priority' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,
 													IN([
 														TRIGGER_SEVERITY_NOT_CLASSIFIED,
 														TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
@@ -85,8 +86,8 @@ $fields = [
 														TRIGGER_SEVERITY_DISASTER
 													]), null
 												],
-	'filter_groupids' =>						[T_ZBX_INT, O_OPT, null, DB_ID, null],
-	'filter_hostids' =>							[T_ZBX_INT, O_OPT, null, DB_ID, null],
+	'filter_groupids' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY, DB_ID, null],
+	'filter_hostids' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY, DB_ID, null],
 	'filter_inherited' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_discovered' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_dependent' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
@@ -103,7 +104,7 @@ $fields = [
 	'filter_evaltype' =>						[T_ZBX_INT, O_OPT, null,
 													IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null
 												],
-	'filter_tags' =>							[T_ZBX_STR, O_OPT, null,	null,			null],
+	'filter_tags' =>							[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -135,7 +136,7 @@ $fields = [
 	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>							[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'checkbox_hash' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
 	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// Sort and sortorder.
@@ -258,6 +259,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
 	$recovery_expression = getRequest('recovery_expression', '');
 	$type = getRequest('type', 0);
+	$url_name = getRequest('url_name', '');
 	$url = getRequest('url', '');
 	$priority = getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 	$comments = getRequest('comments', '');
@@ -274,6 +276,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'expression' => $expression,
 			'recovery_mode' => $recovery_mode,
 			'type' => $type,
+			'url_name' => $url_name,
 			'url' => $url,
 			'priority' => $priority,
 			'comments' => $comments,
@@ -308,9 +311,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	else {
 		$db_triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
-				'opdata', 'event_name'
+			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'templateid',
+				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'manual_close', 'opdata', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -364,6 +367,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_trigger['type'] != $type) {
 				$trigger['type'] = $type;
+			}
+			if ($db_trigger['url_name'] !== $url_name) {
+				$trigger['url_name'] = $url_name;
 			}
 			if ($db_trigger['url'] !== $url) {
 				$trigger['url'] = $url;
@@ -498,32 +504,30 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
 		&& hasRequest('g_triggerid')) {
-
 	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-
-		// Hosts or templates.
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetids');
+			$hostids = getRequest('copy_targetids');
 		}
-		// Host groups.
+		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
+			$hostids = array_keys(API::Template()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
+		}
 		else {
-			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetids');
-			$db_hosts = DBselect(
-				'SELECT DISTINCT h.hostid'.
-				' FROM hosts h,hosts_groups hg'.
-				' WHERE h.hostid=hg.hostid'.
-					' AND '.dbConditionInt('hg.groupid', $group_ids)
-			);
-
-			while ($db_host = DBfetch($db_hosts)) {
-				$hosts_ids[] = $db_host['hostid'];
-			}
+			$hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
 		}
 
 		DBstart();
 
-		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
+		$result = copyTriggersToHosts($hostids, getRequest('hostid'), getRequest('g_triggerid'));
 		$result = DBend($result);
 
 		$triggers_count = count(getRequest('g_triggerid'));
@@ -558,7 +562,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'parent_discoveryid' => null,
 		'dependencies' => getRequest('dependencies', []),
 		'db_dependencies' => [],
@@ -575,6 +579,7 @@ if (isset($_REQUEST['form'])) {
 		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
 		'comments' => getRequest('comments', ''),
+		'url_name' => getRequest('url_name', ''),
 		'url' => getRequest('url', ''),
 		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
@@ -610,7 +615,6 @@ else {
 
 	$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';
 
-	$filter_groupids_ms = [];
 	$filter_hostids_ms = [];
 
 	if (getRequest('filter_set')) {
@@ -668,18 +672,8 @@ else {
 		}
 	}
 
-	$filter_groupids_enriched =  [];
-	if ($filter_groupids) {
-		$filter_groupids = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
-		$filter_groupids = array_keys($filter_groupids);
-		$filter_groupids_enriched = getSubGroups($filter_groupids);
-	}
+	$ms_groups = [];
+	$filter_groupids_enriched = getSubGroups($filter_groupids, $ms_groups, ['editable' => true], $data['context']);
 
 	if ($filter_hostids) {
 		if ($data['context'] === 'host') {
@@ -969,7 +963,7 @@ else {
 		'active_tab' => $active_tab,
 		'sort' => $sort,
 		'sortorder' => $sortorder,
-		'filter_groupids_ms' => $filter_groupids_ms,
+		'filter_groupids_ms' => $ms_groups,
 		'filter_hostids_ms' => $filter_hostids_ms,
 		'filter_name' => $filter_name,
 		'filter_priority' => $filter_priority,

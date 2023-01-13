@@ -48,24 +48,14 @@ class CHostPrototype extends CHostBase {
 			// filter
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'discoveryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
-				'templateid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'inventory_mode' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $output_fields), 'default' => $output_fields],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => $output_fields],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
@@ -234,8 +224,7 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		// adding discovery rule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+		if ($options['selectDiscoveryRule'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
 			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
@@ -249,8 +238,7 @@ class CHostPrototype extends CHostBase {
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
 
-		// adding host
-		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
+		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
@@ -278,7 +266,6 @@ class CHostPrototype extends CHostBase {
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
-		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
@@ -310,20 +297,35 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		// adding tags
-		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('host_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
-				'filter' => ['hostid' => $hostids],
-				'preservekeys' => true
-			]);
+		if ($options['selectTags'] !== null) {
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
 
-			$relation_map = $this->createRelationMap($tags, 'hostid', 'hosttagid');
-			$tags = $this->unsetExtraFields($tags, ['hostid', 'hosttagid'], []);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['hosttagid', 'hostid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
+			}
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => $hostids]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
+
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
+
+				$result[$hostid]['tags'][] = $db_tag;
+			}
 		}
 
-		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+		if ($options['selectInterfaces'] !== null) {
 			$interfaces = API::HostInterface()->get([
 				'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
 				'hostids' => $hostids,
@@ -376,7 +378,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionId('gp.groupid', [0], true)
+				' AND gp.groupid IS NOT NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -418,7 +420,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionString('gp.name', [''], true)
+				' AND gp.groupid IS NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -439,7 +441,7 @@ class CHostPrototype extends CHostBase {
 		$this->validateCreate($host_prototypes);
 
 		$this->createForce($host_prototypes);
-		[$tpl_host_prototypes] = $this->getTemplatedObjects($host_prototypes);
+		[$tpl_host_prototypes] = self::getTemplatedObjects($host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes);
@@ -480,7 +482,7 @@ class CHostPrototype extends CHostBase {
 				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
 											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
@@ -527,7 +529,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupLinks($host_prototypes);
 		self::updateGroupPrototypes($host_prototypes);
 		$this->updateTemplates($host_prototypes);
-		$this->updateTagsNew($host_prototypes);
+		$this->updateTags($host_prototypes);
 		$this->updateMacros($host_prototypes);
 		self::updateHostInventories($host_prototypes);
 
@@ -545,7 +547,7 @@ class CHostPrototype extends CHostBase {
 		$this->updateForce($host_prototypes, $db_host_prototypes);
 
 		[$tpl_host_prototypes, $tpl_db_host_prototypes] =
-			$this->getTemplatedObjects($host_prototypes, $db_host_prototypes);
+			self::getTemplatedObjects($host_prototypes, $db_host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
@@ -728,28 +730,28 @@ class CHostPrototype extends CHostBase {
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& in_array($data['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 												}, 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& in_array($data['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 												}, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& $data['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
 												}, 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& $data['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
 												}, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
@@ -767,7 +769,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
-	protected function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
+	public function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
 		$upd_host_prototypes = [];
 
 		// save the host prototypes
@@ -792,7 +794,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
 		$this->updateTemplates($host_prototypes, $db_host_prototypes);
-		$this->updateTagsNew($host_prototypes, $db_host_prototypes);
+		$this->updateTags($host_prototypes, $db_host_prototypes);
 		$this->updateMacros($host_prototypes, $db_host_prototypes);
 		self::updateHostInventories($host_prototypes, $db_host_prototypes);
 
@@ -885,11 +887,12 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'name' => '']
-		];
-		$db_links = DBselect(DB::makeSql('group_prototype', $options));
+		$db_links = DBselect(
+			'SELECT gp.group_prototypeid,gp.hostid,gp.groupid,gp.templateid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
+				' AND gp.groupid IS NOT NULL'
+		);
 
 		while ($db_link = DBfetch($db_links)) {
 			$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']] =
@@ -915,13 +918,14 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'groupid' => '0']
-		];
-		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
+		$db_links = DBselect(
+			'SELECT gp.group_prototypeid,gp.hostid,gp.name,gp.templateid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
+				' AND gp.groupid IS NULL'
+		);
 
-		while ($db_link = DBfetch($db_groups)) {
+		while ($db_link = DBfetch($db_links)) {
 			$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']] =
 				array_diff_key($db_link, array_flip(['hostid']));
 		}
@@ -1645,6 +1649,46 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
+	 * @param array $ruleids
+	 */
+	public static function unlinkTemplateObjects(array $ruleids): void {
+		$result = DBselect(
+			'SELECT hd.hostid,h.status AS host_status'.
+			' FROM host_discovery hd,items i,hosts h'.
+			' WHERE hd.parent_itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
+		);
+
+		$upd_host_prototypes = [];
+		$hostids = [];
+
+		while ($row = DBfetch($result)) {
+			$upd_host_prototype = ['templateid' => 0];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$upd_host_prototype += ['uuid' => generateUuidV4()];
+			}
+
+			$upd_host_prototypes[$row['hostid']] = [
+				'values' => $upd_host_prototype,
+				'where' => ['hostid' => $row['hostid']]
+			];
+
+			$hostids[] = $row['hostid'];
+		}
+
+		if ($upd_host_prototypes) {
+			DB::update('hosts', $upd_host_prototypes);
+
+			DB::update('group_prototype', [
+				'values' => ['templateid' => 0],
+				'where' => ['hostid' => $hostids]
+			]);
+		}
+	}
+
+	/**
 	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $host_prototypes
@@ -1695,7 +1739,7 @@ class CHostPrototype extends CHostBase {
 			$this->createForce($ins_host_prototypes, true);
 		}
 
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] = $this->getTemplatedObjects(
+		[$tpl_host_prototypes, $tpl_db_host_prototypes] = self::getTemplatedObjects(
 			array_merge($upd_host_prototypes, $ins_host_prototypes), $upd_db_host_prototypes
 		);
 
@@ -2237,7 +2281,10 @@ class CHostPrototype extends CHostBase {
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hostmacro', ['hostid' => $hostids]);
 		DB::delete('host_inventory', ['hostid' => $hostids]);
-
+		DB::update('hosts', [
+			'values' => ['templateid' => 0],
+			'where' => ['hostid' => $hostids]
+		]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);

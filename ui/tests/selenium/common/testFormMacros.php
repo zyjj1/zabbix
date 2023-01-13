@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -33,17 +32,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
-	public $macro_resolve;
-	public $macro_resolve_hostid;
-
-	public $vault_object;
-	public $vault_error_field;
-	public $vault_macro_index;
-	public $update_vault_macro;
-
-	public $revert_macro_1;
-	public $revert_macro_2;
-	public $revert_macro_object;
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -240,13 +228,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
 				]
 			]
 		];
 	}
 
-	public static function getUpdateMacrosData() {
+	public static function getUpdateMacrosNormalData() {
 		return [
 			[
 				[
@@ -268,7 +256,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 						]
 					]
 				]
-			],
+			]
+		];
+	}
+
+	public static function getUpdateMacrosCommonData() {
+		return [
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -378,7 +371,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
 				]
 			],
 			[
@@ -420,7 +413,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
 				]
 			],
 			[
@@ -443,7 +436,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
 				]
 			],
 			[
@@ -466,7 +459,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
 				]
 			],
 			[
@@ -489,7 +482,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
 				]
 			]
 		];
@@ -509,13 +502,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
-
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
-				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+				$column->query('link', $name)->asPopupButton()->one()->select('Host');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
@@ -531,7 +523,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
@@ -545,11 +537,25 @@ abstract class testFormMacros extends CLegacyWebTest {
 			}
 
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
-			$form->fill([(($host_type === 'template') ? 'Template name' : 'Host name') => $name]);
-			$form->fill(['Groups' => 'Zabbix servers']);
+			$group_name = ($host_type === 'template') ? 'Templates' : 'Zabbix servers';
+			$group_field = ($host_type === 'template') ? 'Template groups' : 'Host groups';
+			$form->fill([
+					(($host_type === 'template') ? 'Template name' : 'Host name') => $name,
+					$group_field => $group_name
+			]);
 		}
 
 		$form->selectTab('Macros');
+
+		// Click "Change" button for every macros row in first case for discovered host form.
+		$macros_count = count($this->getMacros());
+		if (CTestArrayHelper::get($data, 'expected_macros')) {
+			for ($i = 0; $i < $macros_count; $i++) {
+				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
+				$this->assertFalse($form->query('id:macros_'.$i.'_macro')->one()->isEnabled());
+			}
+		}
+
 		$this->fillMacros($data['macros']);
 		$form->submit();
 
@@ -559,14 +565,17 @@ abstract class testFormMacros extends CLegacyWebTest {
 				if ($host_type === 'host') {
 					COverlayDialogElement::ensureNotPresent();
 				}
+
 				$this->assertMessage(TEST_GOOD, $update ? ucfirst($object).' updated' : ucfirst($object).' added');
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
+
 				// Check the results in form.
 				$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data);
 				break;
 
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, ($update ? 'Cannot update '.$object : 'Cannot add '.$object), $data['error']);
+
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
 
@@ -592,7 +601,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -610,12 +619,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form->selectTab('Macros');
 		$this->removeAllMacros();
 		$form->submit();
+
 		if ($host_type === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
 
 		$this->assertMessage(TEST_GOOD, ($is_prototype ? 'Host prototype' : ucfirst($host_type)).' updated');
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
+
 		// Check the results in form.
 		$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, null);
 	}
@@ -696,7 +707,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill(['Host name' => $name]);
-			$form->fill(['Groups' => 'Zabbix servers']);
+			$form->fill(['Host groups' => 'Zabbix servers']);
 		}
 		else {
 			if ($host_type === 'host') {
@@ -710,11 +721,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 			}
 
 			$name = $host_type.' with edited global macro '.time();
+			$group_name = ($host_type === 'template') ? 'Templates' : 'Zabbix servers';
+			$group_field = ($host_type === 'template') ? 'Template groups' : 'Host groups';
 			$form->fill([
-				($host_type === 'template') ? 'Template name' : 'Host name' => $name,
-				'Groups' => 'Zabbix servers'
+					($host_type === 'template') ? 'Template name' : 'Host name' => $name,
+					$group_field => $group_name
 			]);
 		}
+
 		$form->selectTab('Macros');
 		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 
@@ -841,10 +855,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$form->submit();
+
 		if ($host_type === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
+
 		$this->assertMessage(TEST_GOOD);
+
 		// Check saved edited macros in host/template form.
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
@@ -852,7 +869,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -911,10 +928,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 				// Compare new macros table with db.
 				$this->assertEquals($this->getMacros(true),
 						$this->sortMacros(CDBHelper::getAll('SELECT macro, value, description, type'.
-							' FROM hostmacro'.
-							' WHERE hostid ='.$id)
+								' FROM hostmacro'.
+								' WHERE hostid ='.$id)
 						)
 				);
+
 				// Compare new macros table from global and inherited macros page with expected result.
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->assertEquals($new_global_macros, $this->getGlobalMacrosFrotendTable());
@@ -986,7 +1004,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -1131,16 +1149,18 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$form->submit();
+
 		if ($host_type === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
+
 		$this->assertMessage(TEST_GOOD);
 
 		if ($host_type === 'host') {
 			$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 		}
 		else {
 			$this->page->open($link);
@@ -1198,7 +1218,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -1213,6 +1233,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form->selectTab('Macros');
 
 		if ($data !== null) {
+			// Write expected macros to data for discovered host for first case in discovered host.
+			if (CTestArrayHelper::get($data, 'expected_macros')) {
+				foreach (array_keys($data['expected_macros']) as $i ) {
+					$data['macros'][$i]['macro'] = $data['expected_macros'][$i]['macro'];
+				}
+			}
+
 			foreach ($data['macros'] as &$macro) {
 				if ($macro['macro'] === '{$lowercase}') {
 					$macro['macro'] = '{$LOWERCASE}';
@@ -1223,6 +1250,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+
 		// Get all macros defined for this host.
 		$hostmacros = CDBHelper::getAll('SELECT macro, value, description, type FROM hostmacro where hostid ='.$id);
 
@@ -1267,6 +1295,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$macros_frontend = [];
 		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
 		$count = $table->getRows()->count() - 1;
+
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
 			$row = $table->getRow($i);
@@ -1282,14 +1311,54 @@ abstract class testFormMacros extends CLegacyWebTest {
 		return $this->sortMacros($macros_frontend);
 	}
 
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text'
+				]
+			],
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$TEXT_HOST_MACRO}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check content of macro value InputGroup element for macros.
 	 *
-	 * @param array		$data		given data provider
-	 * @param string	$url		url of configuration form of the corresponding entity
-	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param array		$data		   given data provider
+	 * @param string	$url		   url of configuration form of the corresponding entity
+	 * @param string	$source		   type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string    $name          name of a host where macros to be checked
+	 * @param string    $discovered    true if discovered host being checked, false if normal host or template
 	 */
-	public function checkSecretMacrosLayout($data, $url, $source, $name = null) {
+	public function checkSecretMacrosLayout($data, $url, $source, $name = null, $discovered = false) {
 		$this->openMacrosTab($url, $source, true, $name);
 
 		// Check that value field is disabled for global macros in "Inherited and host macros" tab.
@@ -1315,6 +1384,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else {
 			$value_field = $this->getValueField($data['macro']);
+
+			$macros_count = count($this->getMacros());
+			if ($discovered) {
+				for ($i = 0; $i < $macros_count; $i++) {
+					$this->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
+				}
+			}
+
 			$change_button = $value_field->getNewValueButton();
 			$revert_button = $value_field->getRevertButton();
 			$textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
@@ -1325,6 +1402,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				$this->assertTrue($change_button->isValid());
 				$this->assertFalse($revert_button->isClickable());
+
 				// Change value text or type and check that New value button is not displayed and Revert button appeared.
 				if (CTestArrayHelper::get($data, 'change_type', false)) {
 					$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
@@ -1332,6 +1410,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				else {
 					$change_button->click();
 				}
+
 				$value_field->invalidate();
 
 				$this->assertFalse($change_button->isEnabled());
@@ -1358,12 +1437,58 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 	}
 
+	public function getCreateSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'macro' => '{$SECRET_MACRO}',
+						'value' => [
+							'text' => 'host secret value',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret description'
+					],
+					'check_default_type' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$TEXT_MACRO}',
+						'value' => [
+							'text' => 'host plain text value',
+							'type' => 'Secret text'
+						],
+						'description' => 'plain text description'
+					],
+					'back_to_text' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_EMPTY_MACRO}',
+						'value' => [
+							'text' => '',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret empty value'
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check adding and saving secret macros for host, host prototype and template entities.
 	 *
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string	$name		name of the host where macros are removed
 	 */
 	public function createSecretMacros($data, $url, $source, $name = null) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
@@ -1397,9 +1522,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$form->invalidate();
 		$form->submit();
+
 		if ($source === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
+
 		$this->assertMessage(TEST_GOOD);
 
 		// Check value field for guest account.
@@ -1408,11 +1535,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$this->assertEquals($data['macro_fields']['value']['text'], $guest_value_field->getValue());
+
 			// Switch to tab with inherited and instance macros and verify that the value is plain text.
 			$this->checkInheritedTab($data['macro_fields'], false);
 		}
 		else {
 			$this->assertEquals('******', $guest_value_field->getValue());
+
 			// Switch to tab with inherited and instance macros and verify that the value is secret and is not accessible.
 			$this->checkInheritedTab($data['macro_fields'], true, false);
 		}
@@ -1436,10 +1565,25 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string	$name		name of the host where macros to be updated
+	 * @param boolean	$discovered true if object is discovered host, false - if normal
 	 */
-	public function updateSecretMacros($data, $url, $source, $name = null) {
+	public function updateSecretMacros($data, $url, $source, $name = null, $discovered = false) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
+
+		if ($discovered) {
+			$expected = $data['expected'];
+			$data = $data['fields'];
+
+			// Click "Change" button for every macros row in first case for discovered host form.
+			$form->query('id:macros_'.$data['index'].'_change_state')->one()->waitUntilClickable()->click();
+		}
+
 		$this->fillMacros([$data]);
+
+		if ($discovered) {
+			$data = $expected;
+		}
 
 		// Check that new values are correct in Inherited and host prototype macros tab before saving the values.
 		$secret = (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) ===
@@ -1448,14 +1592,15 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$form->invalidate();
 		$form->submit();
+
 		if ($source === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
+
 		$this->assertMessage(TEST_GOOD);
-
 		$this->openMacrosTab($url, $source, false, $name);
-
 		$value_field = $this->getValueField($data['macro']);
+
 		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
 			$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 			$this->assertEquals('******', $value_field->getValue());
@@ -1466,8 +1611,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertEquals($data['value']['text'], $value_field->getValue());
 			$this->checkInheritedTab($data, false);
 		}
+
 		// Check in DB that values of the updated macros are correct.
-		$sql = 'SELECT value FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
+		$sql = 'SELECT value FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']).' ORDER BY hostmacroid DESC';
 		$this->assertEquals($data['value']['text'], CDBHelper::getValue($sql));
 
 		if ($source === 'hosts') {
@@ -1501,11 +1647,15 @@ abstract class testFormMacros extends CLegacyWebTest {
 	/**
 	 *  Check that it is possible to revert secret macro changes for host, host prototype and template entities.
 	 *
-	 * @param array		$data		given data provider
+	 * @param array	$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string	$name		name of the host where macros to be updated
+	 * @param boolean	$discovered true if object is discovered host, false - if normal
 	 */
-	public function revertSecretMacroChanges($data, $url, $source, $name = null) {
+	public function revertSecretMacroChanges($data, $url, $source, $name = null, $discovered = false) {
+		static $first_case = true;
+
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		$sql = 'SELECT * FROM hostmacro WHERE macro='.CDBHelper::escape($data['macro_fields']['macro']);
@@ -1515,6 +1665,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		// Check that the existing macro value is hidden.
 		$this->assertEquals('******', $value_field->getValue());
+
+		// Click "Change" button for every macros row in first case for discovered host form.
+		$macros_count = count($this->getMacros());
+		if ($discovered && $first_case) {
+			$first_case = false;
+
+			for ($i = 0; $i < $macros_count; $i++) {
+				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
+			}
+		}
 
 		// Change the value of the secret macro
 		$value_field->getNewValueButton()->click();
@@ -1570,6 +1730,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
 			$this->assertEquals($data['value']['text'], $value_field->getValue());
 		}
+
 		// Switch back to the list of instance macros.
 		$this->query('xpath://label[@for="show_inherited_macros_0"]')->waitUntilPresent()->one()->click();
 		$this->query('class:is-loading')->waitUntilNotPresent();
@@ -1593,7 +1754,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($source === 'hosts') {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
 					->findRow('Name', $name, true)->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
 		else {
@@ -1651,6 +1812,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					[COverlayDialogElement::find()->one()->getContent()]
 			);
 		}
+
 		$radio_switcher->fill(ucfirst($host_type).' macros');
 		$this->page->waitUntilReady();
 
@@ -1670,7 +1832,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description'
 					],
-					'title' => ucfirst($this->vault_object).' updated'
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1682,9 +1845,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'text' => 'one/two/three/four/five/six:key',
 							'type' => 'Vault secret'
 						],
-						'description' => 'vault description7'
+						'description' => 'vault description1'
 					],
-					'title' => ucfirst($this->vault_object).' updated'
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1699,7 +1863,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path:".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1714,7 +1879,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/path:key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/path:key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1729,7 +1895,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description4'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path:key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1744,7 +1911,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near ":key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1759,7 +1927,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1774,7 +1943,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description8'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/secret/path:key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/secret/path:key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1789,13 +1959,164 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description9'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": cannot be empty.'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": cannot be empty.',
+					'vault' => 'Hashicorp'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO10}',
+						'value' => [
+							'text' => 'AppID=zabbix:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'cyberark description10'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO11}',
+						'value' => [
+							'text' => 'AppID=zabbix;SomethingElse=value;AndMoreValue=values:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'cyberark description11'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO12}',
+						'value' => [
+							'text' => 'AppID=:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'cyberark description12'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO13}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description13'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": cannot be empty.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO14}',
+						'value' => [
+							'text' => 'AppID=zabbix:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description14'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory key is missing.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO15}',
+						'value' => [
+							'text' => 'AppID:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description15'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": incorrect syntax near "AppID:key".',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO16}',
+						'value' => [
+							'text' => 'APPID=something:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description16'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO17}',
+						'value' => [
+							'text' => 'NotApp=something:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description17'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO18}',
+						'value' => [
+							'text' => 'NotApp=something:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description18'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
+					'vault' => 'Cyberark'
 				]
 			]
 		];
 	}
 
+	/**
+	 * Create Hashicorp or Cyberark vault macros.
+	 *
+	 * @param string $data		data provider
+	 * @param string $url		link to page where source exists
+	 * @param string $source	source type - host/template/host prototype
+	 * @param string $name		source name
+	 */
 	public function createVaultMacros($data, $url, $source, $name = null) {
+		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
 		$form->submit();
@@ -1811,7 +2132,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertMessage($data['expected'], $data['title']);
 			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
 			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
-					array_values(CDBHelper::getRow($sql)));
+					array_values(CDBHelper::getRow($sql))
+			);
 			$this->openMacrosTab($url, $source, false, $name);
 			$value_field = $this->getValueField($data['macro_fields']['macro']);
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
@@ -1823,66 +2145,253 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 	}
 
-	public function getUpdateVaultMacrosData() {
+	public function getUpdateVaultMacrosNormalData() {
 		return [
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => $this->vault_macro_index,
-					'macro' => $this->update_vault_macro,
-					'value' => [
-						'text' => 'secret/path:key'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'secret/path:key'
+						],
+						'description' => ''
 					],
-					'description' => ''
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => $this->vault_macro_index,
-					'macro' => $this->update_vault_macro,
-					'value' => [
-						'text' => 'new/path/to/secret:key'
-					],
-					'description' => ''
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => $this->vault_macro_index,
-					'macro' => $this->update_vault_macro,
-					'value' => [
-						'text' => 'new/path/to/secret:key'
-					],
-					'description' => 'Changing description'
+					'vault' => 'Hashicorp'
 				]
 			]
 		];
 	}
 
+	public function getUpdateVaultMacrosCommonData() {
+		return [
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'new/path/to/secret:key'
+						],
+						'description' => ''
+					],
+					'vault' => 'Hashicorp'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'new/path/to/secret:key'
+						],
+						'description' => 'Changing description'
+					],
+					'vault' => 'Hashicorp'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'AppID=zabbix:key'
+						],
+						'description' => ''
+					],
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'AppID=zabbix;Object=something:key'
+						],
+						'description' => ''
+					],
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'AppID=zabbix;Object=something:key'
+						],
+						'description' => 'Changing description'
+					],
+					'vault' => 'Cyberark'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Update Hashicorp and Cyberark vault macros.
+	 *
+	 * @param string $data		data provider
+	 * @param string $url		link to page where source exists
+	 * @param string $source	source type - host/template/host prototype
+	 * @param string $name		source name
+	 */
 	public function updateVaultMacros($data, $url, $source, $name = null) {
+		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
-		$this->fillMacros([$data]);
+
+		// Click "Change" button for every macros row in first case for discovered host form.
+		if (CTestArrayHelper::get($data, 'expected_macros')) {
+			$form->query('id:macros_'.$data['fields']['index'].'_change_state')->one()->waitUntilClickable()->click();
+		}
+
+		$this->fillMacros([$data['fields']]);
 		$form->submit();
+
 		if ($source === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
-		$this->assertMessage(TEST_GOOD);
 
+		$this->assertMessage(TEST_GOOD);
 		$this->openMacrosTab($url, $source, false, $name);
+
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
-			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
+			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
 		}
-		$this->assertEquals([$data['macro'], $data['value']['text'], $data['description']], $result);
+
+		$data = CTestArrayHelper::get($data, 'expected_macros', $data);
+
+		$this->assertEquals([$data['fields']['macro'], $data['fields']['value']['text'], $data['fields']['description']], $result);
 		array_push($result, ZBX_MACRO_TYPE_VAULT);
-		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
+		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']).' ORDER BY hostmacroid DESC';
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 
 		if ($source === 'hosts') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
+		}
+	}
+
+	/**
+	 * Select vault provider.
+	 *
+	 * @param string $vault		vault provider Hashicorp or Cyberark
+	 */
+	public function selectVault($vault) {
+		$vaultid = ($vault === 'Hashicorp') ? 0 : 1;
+
+		if ($vaultid !== CDBHelper::getValue('SELECT vault_provider FROM config')) {
+			DBexecute('UPDATE config SET vault_provider='.zbx_dbstr($vaultid));
+		}
+	}
+
+	/**
+	 * Check vault macros validation after changing vault type.
+	 *
+	 * @param string $url		URL that leads to the configuration form of corresponding entity
+	 * @param string $source    type of entity that is being checked (host, hostPrototype, template)
+	 * @param type $name		name of a host where macros are updated
+	 */
+	public function checkVaultValidation($url, $source, $name = null, $discovered = false) {
+		$cyberark = [
+			'fields' =>
+				[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$VAULT}',
+				'value' => [
+					'text' => 'AppID=zabbix:key',
+					'type' => 'Vault secret'
+				],
+				'description' => 'CyberArk vault description'
+			],
+			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "AppID=zabbix:key".'
+		];
+
+		$hashicorp = [
+			'fields' =>
+				[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$VAULT}',
+				'value' => [
+					'text' => 'secret/path:key',
+					'type' => 'Vault secret'
+				],
+				'description' => 'HashiCorp vault description'
+			],
+			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "secret/path:key".'
+		];
+
+		$this->page->login();
+
+		for ($i = 0; $i <= 1; $i++) {
+			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+
+			// Check in setting what Vault is enabled.
+			$setting_form = $this->query('name:otherForm')->asForm()->one();
+			$vault = $setting_form->getField('Vault provider')->getText();
+
+			// Try to create macros with Vault type different from settings.
+			$form = $this->openMacrosTab($url, $source, false, $name);
+			$vault_values = ($vault === 'CyberArk Vault') ? $hashicorp : $cyberark;
+
+			// Click "Change" button for discovered host form in the first case.
+			if ($discovered && $i === 0) {
+				$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
+			}
+
+			$this->fillMacros([$vault_values['fields']]);
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $vault_values['error']);
+
+			// Hosts in edit view opens in overlay and need to be closed manually.
+			if ($source === 'hosts') {
+				COverlayDialogElement::find()->one()->close();
+				COverlayDialogElement::ensureNotPresent();
+			}
+
+			// Change Vault in settings to correct one.
+			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+			$vault_settings = ($vault === 'CyberArk Vault') ? 'HashiCorp Vault' : 'CyberArk Vault';
+			$setting_form->fill(['Vault provider' => $vault_settings])->submit();
+
+			// Check simple update.
+			$this->openMacrosTab($url, $source, false, $name);
+
+			if ($discovered && $i === 0) {
+				$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
+			}
+
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
+
+			// Create macros with correct value.
+			$this->fillMacros([$vault_values['fields']]);
+
+			// For discovered host macro becomes editable only after marco is redefined first.
+			if ($discovered && $i === 0) {
+				$form->submit();
+				$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
+				$this->openMacrosTab($url, $source, false, $name);
+				$form->invalidate();
+				$this->fillMacros([$vault_values['fields']]);
+			}
+
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
 		}
 	}
 

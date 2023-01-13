@@ -17,41 +17,50 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "taskmanager.h"
+#include "zbxdbhigh.h"
+#include "zbxnum.h"
 #include "zbxtasks.h"
-
-#include "db.h"
+#include "zbxversion.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
- * Parameters: tasks        - [OUT] the tasks to execute                      *
- *             proxy_hostid - [IN] (ignored)                                  *
+ * Parameters: tasks         - [OUT] the tasks to execute                     *
+ *             proxy_hostid  - [IN] (ignored)                                 *
+ *             compatibility - [IN] (ignored)                                 *
  *                                                                            *
  * Comments: This function is used by proxy to get tasks to be sent to the    *
  *           server.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	ZBX_UNUSED(proxy_hostid);
+	ZBX_UNUSED(compatibility);
 
 	result = DBselect(
 			"select t.taskid,t.type,t.clock,t.ttl,"
 				"r.status,r.parent_taskid,r.info,"
-				"tr.status,tr.parent_taskid,tr.info"
+				"tr.status,tr.parent_taskid,tr.info,"
+				"d.data,d.parent_taskid,d.type"
 			" from task t"
 			" left join task_remote_command_result r"
 				" on t.taskid=r.taskid"
 			" left join task_result tr"
 				" on t.taskid=tr.taskid"
+			" left join task_data d"
+				" on t.taskid=d.taskid"
 			" where t.status=%d"
-				" and t.type in (%d,%d)"
+				" and t.type in (%d,%d,%d)"
 			" order by t.taskid",
-			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_TASK_DATA_RESULT);
+			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_TASK_DATA_RESULT,
+			ZBX_TM_PROXYDATA);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -85,9 +94,19 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 
 				task->data = zbx_tm_data_result_create(parent_taskid, atoi(row[7]), row[9]);
 				break;
+			case ZBX_TM_PROXYDATA:
+				if (SUCCEED == DBis_null(row[10]))
+				{
+					zbx_free(task);
+					continue;
+				}
+				ZBX_STR2UINT64(parent_taskid, row[11]);
+				task->data = (void *)zbx_tm_data_create(parent_taskid, row[10], strlen(row[10]),
+						atoi(row[12]));
+				break;
 		}
 
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_tm_task_append(tasks, task);
 	}
 
 	DBfree_result(result);

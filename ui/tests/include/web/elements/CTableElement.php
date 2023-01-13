@@ -35,7 +35,7 @@ class CTableElement extends CElement {
 	protected $selectors = [
 		'header' => 'xpath:./thead/tr/th',
 		'row' => 'xpath:./tbody/tr',
-		'column' => 'xpath:./td'
+		'column' => 'xpath:./*'
 	];
 
 	/**
@@ -186,7 +186,7 @@ class CTableElement extends CElement {
 	public function findRows($param, $data = []) {
 		$rows = [];
 
-		if (is_callable($param)) {
+		if ($param instanceof \Closure) {
 			foreach ($this->getRows() as $i => $row) {
 				if (call_user_func($param, $row)) {
 					$rows[$i] = $row;

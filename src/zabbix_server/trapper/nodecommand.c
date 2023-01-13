@@ -24,9 +24,11 @@
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "audit/zbxaudit.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
+#include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -138,7 +140,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ZBX_STR2UCHAR(script->host_access, row[1]);
 
-	if (SUCCEED != is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		zbx_strlcpy(error, "Invalid timeout value in script configuration.", error_len);
 		goto fail;
@@ -220,13 +222,14 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                            *
  * Purpose: executing command                                                 *
  *                                                                            *
- * Parameters:  scriptid - [IN] the id of a script to be executed             *
- *              hostid   - [IN] the host the script will be executed on       *
- *              eventid  - [IN] the id of an event                            *
- *              user     - [IN] the user who executes the command             *
- *              clientip - [IN] the IP of client                              *
- *              result   - [OUT] the result of a script execution             *
- *              debug    - [OUT] the debug data (optional)                    *
+ * Parameters:  scriptid       - [IN] the id of a script to be executed       *
+ *              hostid         - [IN] the host the script will be executed on *
+ *              eventid        - [IN] the id of an event                      *
+ *              user           - [IN] the user who executes the command       *
+ *              clientip       - [IN] the IP of client                        *
+ *              config_timeout - [IN]                                         *
+ *              result         - [OUT] the result of a script execution       *
+ *              debug          - [OUT] the debug data (optional)              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -235,7 +238,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                            *
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, char **result, char **debug)
+		const char *clientip, int config_timeout, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	DC_HOST			host;
@@ -245,7 +248,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
-	DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	ZBX_DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s",
@@ -322,7 +326,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		switch (events.values_num)
 		{
 			case 1:
-				if (eventid == ((DB_EVENT *)(events.values[0]))->eventid)
+				if (eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[0];
 				}
@@ -333,7 +337,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				}
 				break;
 			case 2:
-				if (r_eventid == ((DB_EVENT *)(events.values[0]))->eventid)
+				if (r_eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[1];
 					recovery_event = events.values[0];
@@ -392,16 +396,18 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	else
 		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
 
+	um_handle = zbx_dc_open_user_macros();
+
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
-		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
+		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
 				NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command, macro_type,
 				error, sizeof(error)))
 		{
 			goto fail;
 		}
 
-		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
+		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
 				NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
 				sizeof(error)))
 		{
@@ -416,7 +422,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		for (i = 0; i < webhook_params.values_num; i++)
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
+			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
 					(char **)&webhook_params.values[i].second, macro_type, error,
 					sizeof(error)))
@@ -436,8 +442,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			ret = zbx_script_execute(&script, &host, webhook_params_json, result, error, sizeof(error),
-					debug);
+			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout, result, error,
+					sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
@@ -457,6 +463,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		ZBX_UNUSED(audit_res);
 	}
 fail:
+	if (NULL != um_handle)
+		zbx_dc_close_user_macros(um_handle);
+
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);
 
@@ -488,7 +497,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
+int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
@@ -512,7 +521,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
 		goto finish;
 	}
-
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
@@ -520,11 +530,12 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. No role access.");
 		goto finish;
 	}
-
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS
 	/* extract and validate other JSON elements */
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||
-			FAIL == is_uint64(tmp, &scriptid))
+			FAIL == zbx_is_uint64(tmp, &scriptid))
 	{
 		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_SCRIPTID);
 		goto finish;
@@ -552,7 +563,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 
 	if (1 == got_hostid)
 	{
-		if (SUCCEED != is_uint64(tmp_hostid, &hostid))
+		if (SUCCEED != zbx_is_uint64(tmp_hostid, &hostid))
 		{
 			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
 					ZBX_PROTO_TAG_HOSTID);
@@ -567,7 +578,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	}
 	else
 	{
-		if (SUCCEED != is_uint64(tmp_eventid, &eventid))
+		if (SUCCEED != zbx_is_uint64(tmp_eventid, &eventid))
 		{
 			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
 					ZBX_PROTO_TAG_EVENTID);
@@ -584,7 +595,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, &result, &debug)))
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout, &result,
+			&debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
@@ -603,7 +615,7 @@ finish:
 		send = j.buffer;
 	}
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (SUCCEED != zbx_tcp_send(sock, send))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else

@@ -25,22 +25,25 @@
 
 require_once __DIR__.'/js/common.template.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Templates'));
+$html_page = (new CHtmlPage())
+	->setTitle(_('Templates'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_EDIT));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
-	$widget->setNavigation(getHostNavigation('', $data['templateid']));
+	$html_page->setNavigation(getHostNavigation('', $data['templateid']));
 }
 
 $tabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
@@ -91,28 +94,24 @@ if ($data['linked_templates']) {
 
 		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
 
-		$unlink_parameters = array_map('json_encode', [
-			$form->getName(),
-			'unlink['.$template['templateid'].']',
-			'1'
-		]);
-
-		$unlink_clear_parameters = array_map('json_encode', [
-			$form->getName(),
-			'unlink_and_clear['.$template['templateid'].']',
-			'1'
-		]);
-
 		$linked_templates->addRow([
 			$template_link,
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
-						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
+						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('
+							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
+						')
 						->addClass(ZBX_STYLE_BTN_LINK),
 					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
 						? (new CSimpleButton(_('Unlink and clear')))
-							->onClick('submitFormWithParam('.implode(', ', $unlink_clear_parameters).');')
+							->setAttribute('data-templateid', $template['templateid'])
+							->onClick('
+								submitFormWithParam("'.$form->getName().'",
+									`unlink_and_clear[${this.dataset.templateid}]`, 1
+								);
+							')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])
@@ -142,20 +141,20 @@ $templates_field_items[] = (new CMultiSelect([
 
 $template_tab
 	->addRow(
-		new CLabel(_('Templates')),
+		new CLabel(_('Templates'), 'add_templates__ms'),
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
 	)
-	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Template groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
-			'object_name' => 'hostGroup',
+			'object_name' => 'templateGroup',
 			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'data' => $data['groups_ms'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'host_groups',
+					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',
@@ -180,7 +179,8 @@ $tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'template',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]), TAB_INDICATOR_TAGS
 );
 
@@ -237,6 +237,7 @@ else {
 }
 
 $form->addItem($tabs);
-$widget->addItem($form);
 
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

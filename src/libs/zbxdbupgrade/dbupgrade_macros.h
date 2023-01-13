@@ -20,9 +20,9 @@
 #ifndef ZABBIX_DBUPGRADE_MACROS_H
 #define ZABBIX_DBUPGRADE_MACROS_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
+#include "zbxexpr.h"
 
 #define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
 #define ZBX_DBPATCH_FUNCTION_UPDATE_PARAM		0x02

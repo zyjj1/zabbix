@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -64,11 +64,9 @@ class CColor extends CDiv {
 
 	/**
 	 * Enable default color button.
-
-	 * @return CColor
 	 */
-	public function enableUseDefault(): self {
-		$this->use_default = true;
+	public function enableUseDefault($use_default = true): self {
+		$this->use_default = $use_default;
 
 		return $this;
 	}

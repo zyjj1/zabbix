@@ -20,24 +20,25 @@
 #include "ha.h"
 #include "zbxha.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
-#include "threads.h"
-#include "mutexs.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_ha.h"
-#include "../../libs/zbxaudit/audit_settings.h"
+#include "zbxthreads.h"
+#include "zbxmutexs.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_ha.h"
+#include "audit/zbxaudit_settings.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
+#include "zbxcomms.h"
+#include "../rtc/rtc_server.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
 #define ZBX_HA_NODE_LOCK	1
 
 static pid_t			ha_pid = ZBX_THREAD_ERROR;
-
-extern char	*CONFIG_HA_NODE_NAME;
-extern char	*CONFIG_NODE_ADDRESS;
 
 extern zbx_cuid_t	ha_sessionid;
 
@@ -97,6 +98,16 @@ static void	zbx_ha_node_free(zbx_ha_node_t *node)
 static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
 static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
 static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if server is a part of HA cluster                           *
+ *                                                                            *
+ ******************************************************************************/
+static int is_ha_cluster(const char *ha_node_name)
+{
+	return (NULL != ha_node_name && '\0' != *ha_node_name) ? 1 : 0;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -207,7 +218,7 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
 {
 	if (SUCCEED != zbx_ipc_async_socket_send(rtc_socket, ZBX_IPC_SERVICE_HA_HEARTBEAT, NULL, 0) ||
-		SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
+			SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA heartbeat to main process");
 		exit(EXIT_FAILURE);
@@ -258,6 +269,8 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -279,6 +292,8 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -375,7 +390,7 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED != is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
 			THIS_SHOULD_NEVER_HAPPEN;
 
 		info->auditlog = atoi(row[1]);
@@ -419,7 +434,7 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 		node->lastaccess = atoi(row[3]);
 		node->address = zbx_strdup(NULL, row[4]);
 
-		if (SUCCEED != is_ushort(row[5], &node->port))
+		if (SUCCEED != zbx_is_ushort(row[5], &node->port))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "node \"%s\" has invalid port value \"%s\"", row[1], row[5]);
 			node->port = 0;
@@ -457,9 +472,30 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
  * Purpose: get server external address and port from configuration           *
  *                                                                            *
  ******************************************************************************/
-static void	ha_get_external_address(char **address, unsigned short *port)
+static void	ha_get_external_address(char **address, unsigned short *port, zbx_ha_config_t *ha_config)
 {
-	(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 10051);
+	if (NULL != ha_config->ha_node_address)
+	{
+		(void)zbx_parse_serveractive_element(ha_config->ha_node_address, address, port, 0);
+	}
+	else if (NULL != ha_config->default_node_ip)
+	{
+		char	*tmp;
+
+		zbx_strsplit_first(ha_config->default_node_ip, ',', address, &tmp);
+		zbx_free(tmp);
+	}
+
+	if (NULL == *address || 0 == strcmp(*address, "0.0.0.0") || 0 == strcmp(*address, "::"))
+		*address = zbx_strdup(*address, "localhost");
+
+	if (0 == *port)
+	{
+		if (0 != ha_config->default_node_port)
+			*port = (unsigned short)ha_config->default_node_port;
+		else
+			*port = ZBX_DEFAULT_SERVER_PORT;
+	}
 }
 
 /******************************************************************************
@@ -639,7 +675,7 @@ static void	ha_flush_audit(zbx_ha_info_t *info)
  *               FAIL    - node configuration or database error               *
  *                                                                            *
  ******************************************************************************/
-static void	ha_db_create_node(zbx_ha_info_t *info)
+static void	ha_db_create_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 {
 	zbx_vector_ha_node_t	nodes;
 	int			i, activate, db_time;
@@ -671,7 +707,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
-	if (ZBX_HA_IS_CLUSTER())
+	if (0 != is_ha_cluster(ha_config->ha_node_name))
 	{
 		if (SUCCEED != ha_check_cluster_config(info, &nodes, db_time, &activate))
 			goto out;
@@ -690,7 +726,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 			nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
 	{
 		zbx_audit_init(info->auditlog);
-		zbx_audit_ha_create_entry(AUDIT_ACTION_ADD, nodeid.str, info->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_ADD, nodeid.str, info->name);
 		zbx_audit_ha_add_create_fields(nodeid.str, info->name, ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
 	}
@@ -716,6 +752,62 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check for active and standby node availability and update         *
+ *          unavailable nodes accordingly                                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
+{
+	int	i, ret = SUCCEED;
+
+	zbx_vector_str_t	unavailable_nodes;
+
+	zbx_vector_str_create(&unavailable_nodes);
+
+	for (i = 0; i < nodes->values_num; i++)
+	{
+		if (SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))
+			continue;
+
+		if (ZBX_NODE_STATUS_STANDBY != nodes->values[i]->status &&
+				ZBX_NODE_STATUS_ACTIVE != nodes->values[i]->status)
+		{
+			continue;
+		}
+
+		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
+		{
+			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
+
+			zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
+					nodes->values[i]->name);
+			zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
+					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
+		}
+	}
+
+	if (0 != unavailable_nodes.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set status=%d where",
+				ZBX_NODE_STATUS_UNAVAILABLE);
+
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "ha_nodeid",
+				(const char **)unavailable_nodes.values, unavailable_nodes.values_num);
+
+		ret = ha_db_execute(info, "%s", sql);
+		zbx_free(sql);
+	}
+
+	zbx_vector_str_destroy(&unavailable_nodes);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: register server node                                              *
  *                                                                            *
  * Return value: SUCCEED - node was registered or database was offline        *
@@ -728,7 +820,7 @@ finish:
  *           In the case of critical error the error status will be set.      *
  *                                                                            *
  ******************************************************************************/
-static void	ha_db_register_node(zbx_ha_info_t *info)
+static void	ha_db_register_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 {
 	zbx_vector_ha_node_t	nodes;
 	int			ha_status = ZBX_NODE_STATUS_UNKNOWN, activate = SUCCEED, db_time;
@@ -741,7 +833,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	ha_db_create_node(info);
+	ha_db_create_node(info, ha_config);
 
 	if (SUCCEED == zbx_cuid_empty(info->ha_nodeid))
 		goto finish;
@@ -755,7 +847,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
-	if (ZBX_HA_IS_CLUSTER())
+	if (0 != is_ha_cluster(ha_config->ha_node_name))
 	{
 		if (SUCCEED != ha_check_cluster_config(info, &nodes, db_time, &activate))
 			goto out;
@@ -773,10 +865,10 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 	}
 
 	ha_status = SUCCEED == activate ? ZBX_NODE_STATUS_ACTIVE : ZBX_NODE_STATUS_STANDBY;
-	ha_get_external_address(&address, &port);
+	ha_get_external_address(&address, &port, ha_config);
 
 	zbx_audit_init(info->auditlog);
-	zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
+	zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess="
 				ZBX_DB_TIMESTAMP() ",ha_sessionid='%s'", ha_sessionid.str);
@@ -805,10 +897,16 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 
 	if (SUCCEED == ha_db_execute(info, "%s where ha_nodeid='%s'", sql, info->ha_nodeid.str))
 	{
-		if (ZBX_HA_IS_CLUSTER())
+		if (0 != is_ha_cluster(ha_config->ha_node_name))
 			ha_db_execute(info, "delete from ha_node where name=''");
 		else
 			ha_db_execute(info, "delete from ha_node where name<>''");
+	}
+
+	if (0 != is_ha_cluster(ha_config->ha_node_name) && ZBX_NODE_STATUS_ERROR != info->ha_status &&
+			ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		ha_db_check_unavailable_nodes(info, &nodes, db_time);
 	}
 
 	ha_flush_audit(info);
@@ -842,49 +940,11 @@ finish:
  ******************************************************************************/
 static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
 {
-	int			i, ret = SUCCEED;
-	zbx_vector_str_t	unavailable_nodes;
+	int	ret;
 
 	zbx_audit_init(info->auditlog);
 
-	zbx_vector_str_create(&unavailable_nodes);
-
-	for (i = 0; i < nodes->values_num; i++)
-	{
-		if (nodes->values[i]->status != ZBX_NODE_STATUS_STANDBY)
-			continue;
-
-		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
-		{
-			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
-
-			zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
-					nodes->values[i]->name);
-			zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
-					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
-		}
-	}
-
-	if (0 != unavailable_nodes.values_num)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set status=%d where",
-				ZBX_NODE_STATUS_UNAVAILABLE);
-
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "ha_nodeid",
-				(const char **)unavailable_nodes.values, unavailable_nodes.values_num);
-
-		if (SUCCEED != ha_db_execute(info, "%s", sql))
-			ret = FAIL;
-
-		zbx_free(sql);
-	}
-
-	zbx_vector_str_destroy(&unavailable_nodes);
-
-	if (SUCCEED == ret)
+	if (SUCCEED == (ret = ha_db_check_unavailable_nodes(info, nodes, db_time)))
 		ha_flush_audit(info);
 	else
 		zbx_audit_clean();
@@ -952,7 +1012,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
  * Comments: Sets error status on critical errors forcing manager to exit     *
  *                                                                            *
  ******************************************************************************/
-static void	ha_check_nodes(zbx_ha_info_t *info)
+static void	ha_check_nodes(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 {
 	zbx_vector_ha_node_t	nodes;
 	zbx_ha_node_t		*node;
@@ -981,7 +1041,13 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	if (SUCCEED != zbx_cuid_compare(ha_sessionid, node->ha_sessionid))
 	{
-		ha_set_error(info, "the server HA registry record has changed ownership");
+		if ('\0' == *info->name)
+		{
+			ha_set_error(info, "multiple servers have been started without configuring \"HANodeName\" "
+					"parameter");
+		}
+		else
+			ha_set_error(info, "the server HA registry record has changed ownership");
 		goto out;
 	}
 
@@ -995,7 +1061,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
-	if (ZBX_HA_IS_CLUSTER())
+	if (0 != is_ha_cluster(ha_config->ha_node_name))
 	{
 		if (ZBX_NODE_STATUS_ACTIVE == info->ha_status)
 		{
@@ -1017,7 +1083,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ha_status);
 
-		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, node->ha_nodeid.str, node->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, node->ha_nodeid.str, node->name);
 		zbx_audit_ha_update_field_int(node->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, node->status,
 				ha_status);
 	}
@@ -1031,7 +1097,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 		ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
 				ZBX_NODE_STATUS_UNAVAILABLE, last_active->ha_nodeid.str);
 
-		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, last_active->ha_nodeid.str, last_active->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, last_active->ha_nodeid.str, last_active->name);
 		zbx_audit_ha_update_field_int(last_active->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, last_active->status,
 				ZBX_NODE_STATUS_UNAVAILABLE);
 	}
@@ -1087,7 +1153,7 @@ out:
  * Purpose: get cluster status in lld compatible json format                  *
  *                                                                            *
  ******************************************************************************/
-static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **error)
+static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **error, zbx_ha_config_t *ha_config)
 {
 	zbx_vector_ha_node_t	nodes;
 	int			i, db_time, ret = FAIL;
@@ -1096,6 +1162,14 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 	if (ZBX_DB_OK > info->db_status)
 		goto out;
+
+	if (0 == is_ha_cluster(ha_config->ha_node_name))
+	{
+		/* return empty json array in standalone mode */
+		*nodes_json = zbx_strdup(NULL, "[]");
+		ret = SUCCEED;
+		goto out;
+	}
 
 	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
@@ -1204,7 +1278,7 @@ static int	ha_remove_node_impl(zbx_ha_info_t *info, const char *node, char **res
 	else
 	{
 		zbx_audit_init(info->auditlog);
-		zbx_audit_ha_create_entry(AUDIT_ACTION_DELETE, nodes.values[i]->ha_nodeid.str,
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_DELETE, nodes.values[i]->ha_nodeid.str,
 				nodes.values[i]->name);
 		ha_flush_audit(info);
 	}
@@ -1262,7 +1336,6 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: reply to ha_status request                                        *
@@ -1292,7 +1365,6 @@ static void	ha_send_status(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1328,9 +1400,8 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 
 		ZBX_STR2UINT64(configid, row[0]);
 		zbx_audit_init(info->auditlog);
-		zbx_audit_settings_create_entry(AUDIT_ACTION_UPDATE, configid);
-		zbx_audit_update_json_update_int(configid, AUDIT_CONFIG_ID, "settings.ha_failover_delay", atoi(row[1]),
-				delay);
+		zbx_audit_settings_create_entry(ZBX_AUDIT_ACTION_UPDATE, configid);
+		zbx_audit_settings_update_field_int(configid, "settings.ha_failover_delay", atoi(row[1]), delay);
 		ha_flush_audit(info);
 	}
 	else
@@ -1369,7 +1440,7 @@ static void	ha_get_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client)
  * Purpose: reply to get nodes request                                        *
  *                                                                            *
  ******************************************************************************/
-static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client)
+static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client, zbx_ha_config_t *ha_config)
 {
 	int		ret;
 	char		*error = NULL, *nodes_json = NULL, *str;
@@ -1378,7 +1449,7 @@ static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = ha_db_get_nodes_json(info, &nodes_json, &error)))
+	if (SUCCEED == (ret = ha_db_get_nodes_json(info, &nodes_json, &error, ha_config)))
 		str = nodes_json;
 	else
 		str = error;
@@ -1417,7 +1488,7 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 			ZBX_NODE_STATUS_STOPPED, info->ha_nodeid.str))
 	{
 		zbx_audit_init(info->auditlog);
-		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
 		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status, ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
 	}
@@ -1438,7 +1509,7 @@ out:
  *   active  - for standalone setup                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
+int	zbx_ha_get_status(const char *ha_node_name, int *ha_status, int *ha_failover_delay, char **error)
 {
 	int		ret;
 	unsigned char	*result = NULL;
@@ -1464,7 +1535,7 @@ int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
 		}
 		else
 		{
-			if (ZBX_HA_IS_CLUSTER())
+			if (0 != is_ha_cluster(ha_node_name))
 				*ha_status = ZBX_NODE_STATUS_STANDBY;
 			else
 				*ha_status = ZBX_NODE_STATUS_ACTIVE;
@@ -1486,7 +1557,8 @@ int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
  *           process to switch to standby mode and initiate teardown process  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error)
+int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message, int *ha_status,
+		int *ha_failover_delay, char **error)
 {
 	static time_t	last_hb;
 	int		ret = SUCCEED, ha_status_old;
@@ -1512,7 +1584,6 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				{
-					zbx_ipc_message_free(message);
 					ret = FAIL;
 					goto out;
 				}
@@ -1528,10 +1599,17 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 		}
 	}
 
-	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
+	if (is_ha_cluster(ha_node_name) && 0 != last_hb)
 	{
 		if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
-			*ha_status = ZBX_NODE_STATUS_STANDBY;
+		{
+			last_hb = 0;
+
+			if (ZBX_NODE_STATUS_ACTIVE == *ha_status)
+				*ha_status = ZBX_NODE_STATUS_STANDBY;
+			else
+				*ha_status = ZBX_NODE_STATUS_HATIMEOUT;
+		}
 	}
 out:
 	return ret;
@@ -1542,9 +1620,9 @@ out:
  * Purpose: start HA manager                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
+int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error)
 {
-	int			ret = FAIL;
+	int			ret = FAIL, status;
 	zbx_uint32_t		code = 0;
 	zbx_thread_args_t	args;
 	zbx_ipc_client_t	*client;
@@ -1554,7 +1632,7 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	args.args = (void *)(uintptr_t)ha_status;
+	args.args = (void *)ha_config;
 	zbx_thread_start(ha_manager_thread, &args, &ha_pid);
 
 	if (ZBX_THREAD_ERROR == ha_pid)
@@ -1565,7 +1643,9 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 
 	start = now = time(NULL);
 
-	while (start + ZBX_HA_SERVICE_TIMEOUT > now)
+	/* Add few seconds to allow HA manager to terminate by its own in the case of RTC timeout. */
+	/* Otherwise it will get killed before logging timeout error.                              */
+	while (start + ZBX_HA_SERVICE_TIMEOUT + 5 > now)
 	{
 		(void)zbx_ipc_service_recv(&rtc->service, &rtc_timeout, &client, &message);
 
@@ -1581,6 +1661,13 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 				break;
 		}
 
+		if (0 < waitpid(ha_pid, &status, WNOHANG))
+		{
+			ha_pid = ZBX_THREAD_ERROR;
+			*error = zbx_strdup(NULL, "HA manager has stopped during startup registration");
+			goto out;
+		}
+
 		now = time(NULL);
 	}
 
@@ -1592,13 +1679,15 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 
 	ret = SUCCEED;
 out:
-	if (SUCCEED != ret && ZBX_THREAD_ERROR != ha_pid)
+	if (SUCCEED != ret)
 	{
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
 #endif
 		zbx_ha_kill();
 	}
+
+	zbx_free(ha_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1642,7 +1731,7 @@ int	zbx_ha_stop(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_THREAD_ERROR == ha_pid)
+	if (ZBX_THREAD_ERROR == ha_pid || 0 != kill(ha_pid, 0))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -1662,7 +1751,8 @@ int	zbx_ha_stop(char **error)
 		ret = SUCCEED;
 	}
 out:
-	ha_pid = ZBX_THREAD_ERROR;
+	if (SUCCEED == ret)
+		ha_pid = ZBX_THREAD_ERROR;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1676,9 +1766,12 @@ out:
  ******************************************************************************/
 void	zbx_ha_kill(void)
 {
-	kill(ha_pid, SIGKILL);
-	zbx_thread_wait(ha_pid);
-	ha_pid = ZBX_THREAD_ERROR;
+	if (ZBX_THREAD_ERROR != ha_pid)
+	{
+		kill(ha_pid, SIGKILL);
+		zbx_thread_wait(ha_pid);
+		ha_pid = ZBX_THREAD_ERROR;
+	}
 }
 
 /******************************************************************************
@@ -1705,10 +1798,13 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	double			now, tick;
 	zbx_ha_info_t		info;
 	zbx_timespec_t		timeout;
+	zbx_ha_config_t		ha_config;
 
 	zbx_setproctitle("ha manager");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "starting HA manager");
+
+	ha_config = *(zbx_ha_config_t *)((zbx_thread_args_t *)args)->args;
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_HA, &error))
 	{
@@ -1717,7 +1813,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_rtc_open(&rtc_socket, ZBX_HA_SERVICE_TIMEOUT, &error))
+	if (FAIL == rtc_open(&rtc_socket, ZBX_HA_SERVICE_TIMEOUT, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager service: %s", error);
 		zbx_free(error);
@@ -1732,8 +1828,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	}
 
 	zbx_cuid_clear(info.ha_nodeid);
-	info.name = ZBX_NULL2EMPTY_STR(CONFIG_HA_NODE_NAME);
-	info.ha_status = (int)(uintptr_t)((zbx_thread_args_t *)args)->args;
+	info.name = ZBX_NULL2EMPTY_STR(ha_config.ha_node_name);
+	info.ha_status = ha_config.ha_status;
 	info.error = NULL;
 	info.db_status = ZBX_DB_DOWN;
 	info.offline_ticks_active = 0;
@@ -1745,7 +1841,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
 	{
-		ha_db_register_node(&info);
+		ha_db_register_node(&info, &ha_config);
 
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
@@ -1753,10 +1849,10 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	nextcheck = ZBX_HA_POLL_PERIOD;
 
-	/* double the initial database check delay in standby mode to avoid the same node becoming active */
+	/* triple the initial database check delay in standby mode to avoid the same node becoming active */
 	/* immediately after switching to standby mode or crashing and being restarted                    */
 	if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
-		nextcheck *= 2;
+		nextcheck *= 3;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
@@ -1771,9 +1867,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				int	old_status = info.ha_status, delay;
 
 				if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
-					ha_db_register_node(&info);
+					ha_db_register_node(&info, &ha_config);
 				else
-					ha_check_nodes(&info);
+					ha_check_nodes(&info, &ha_config);
 
 				if (old_status != info.ha_status && ZBX_NODE_STATUS_UNKNOWN != info.ha_status)
 					ha_update_parent(&rtc_socket, &info);
@@ -1790,7 +1886,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					nextcheck += delay;
 			}
 
-			if (ZBX_DB_OK <= info.db_status)
+			if (ZBX_DB_OK <= info.db_status || ZBX_NODE_STATUS_ACTIVE != info.ha_status)
 				ha_send_heartbeat(&rtc_socket);
 
 			while (tick <= now)
@@ -1818,7 +1914,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					pause = SUCCEED;
 					break;
 				case ZBX_IPC_SERVICE_HA_GET_NODES:
-					ha_send_node_list(&info, client);
+					ha_send_node_list(&info, client, &ha_config);
 					break;
 				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
 					ha_remove_node(&info, client, message);

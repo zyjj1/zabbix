@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -52,14 +52,8 @@ class CRegexp extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'regexpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'regexpid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'test_string' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['regexpid', 'name']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'test_string']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -224,10 +218,12 @@ class CRegexp extends CApiService {
 					})
 				);
 
-				if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-					// Set default value for expression delimiter.
-					$expression += ['exp_delimiter' => ','];
-				}
+				/**
+				 * Set default value for expression delimiter.
+				 * Because Zabbix agent 2 cannot work with regular expression when delimiter is empty.
+				 * Bugfix for Zabbix agent 2 5.0.22 and less.
+				 */
+				$expression += ['exp_delimiter' => ','];
 
 				if ($db_expression) {
 					$expression['expressionid'] = $db_expression['expressionid'];
@@ -244,6 +240,13 @@ class CRegexp extends CApiService {
 				}
 				else {
 					$ins_expressions[] = ['regexpid' => $regex['regexpid']] + $expression;
+				}
+
+				/**
+				 * Unset exp_delimiter from array for audit log records.
+				 */
+				if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+					unset($expression['exp_delimiter']);
 				}
 			}
 			unset($expression);

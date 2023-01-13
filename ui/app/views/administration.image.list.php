@@ -26,9 +26,10 @@
 $this->includeJsFile('administration.image.list.js.php');
 
 $page_url = (new CUrl('zabbix.php'))->setArgument('action', 'image.list');
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Images'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
@@ -71,7 +72,7 @@ $widget = (new CWidget())
 	);
 
 if (!$data['images']) {
-	$widget->addItem(new CTableInfo());
+	$html_page->addItem(new CTableInfo());
 }
 else {
 	$image_table = (new CDiv())
@@ -112,14 +113,16 @@ else {
 		$image_table->addItem($image_row);
 	}
 
-	$widget->addItem(
-		(new CForm())->addItem(
-			(new CTabView())->addTab('image', null, $image_table)
-		)
+	$html_page->addItem(
+		(new CForm())
+			->cleanItems()
+			->addItem(
+				(new CTabView())->addTab('image', null, $image_table)
+			)
 	);
 }
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

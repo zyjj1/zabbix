@@ -25,11 +25,13 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Triggers'));
+$html_page = (new CHtmlPage())
+	->setTitle(_('Triggers'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TRIGGERS_EDIT));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('triggers', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('triggers', $data['hostid']));
 }
 
 $url = (new CUrl('triggers.php'))
@@ -38,9 +40,10 @@ $url = (new CUrl('triggers.php'))
 
 // Create form.
 $triggersForm = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setid('triggers-form')
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -127,15 +130,14 @@ if ($data['recovery_expression_field_readonly']) {
 	$triggersForm->addItem((new CVar('recovery_expression', $data['recovery_expression']))->removeId());
 }
 
-$popup_options = [
-	'srctbl' => $data['expression_field_name'],
-	'srcfld1' => $data['expression_field_name'],
+$popup_parameters = [
 	'dstfrm' => $triggersForm->getName(),
-	'dstfld1' => $data['expression_field_name']
+	'dstfld1' => $data['expression_field_name'],
+	'context' => $data['context']
 ];
 
 if ($data['hostid']) {
-	$popup_options['hostid'] = $data['hostid'];
+	$popup_parameters['hostid'] = $data['hostid'];
 }
 
 $expression_row = [
@@ -148,14 +150,15 @@ $expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+	(new CButton('insert', $data['expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick(
-			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
-					{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}
-				), {dialogue_class: "modal-popup-generic"}
-			);'
-		)
+		->setAttribute('data-parameters', json_encode($popup_parameters))
+		->onClick('
+			PopUp("popup.triggerexpr", {
+				...JSON.parse(this.dataset.parameters),
+				expression: document.querySelector("[name='.$data['expression_field_name'].']").value
+			}, {dialogue_class: "modal-popup-generic"});
+		')
 		->setEnabled(!$readonly)
 		->removeId()
 ];
@@ -172,28 +175,28 @@ if ($data['expression_constructor'] == IM_TREE) {
 	if ($data['expression_formula'] === '') {
 		// Append "Add" button.
 		$expression_row[] = (new CSimpleButton(_('Add')))
-			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "add_expression", "1");')
+			->onClick('submitFormWithParam("'.$triggersForm->getName().'", "add_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 	}
 	else {
 		// Append "And" button.
 		$expression_row[] = (new CSimpleButton(_('And')))
-			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "and_expression", "1");')
+			->onClick('submitFormWithParam("'.$triggersForm->getName().'", "and_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 
 		// Append "Or" button.
 		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$expression_row[] = (new CSimpleButton(_('Or')))
-			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "or_expression", "1");')
+			->onClick('submitFormWithParam("'.$triggersForm->getName().'", "or_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 
 		// Append "Replace" button.
 		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$expression_row[] = (new CSimpleButton(_('Replace')))
-			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "replace_expression", "1");')
+			->onClick('submitFormWithParam("'.$triggersForm->getName().'", "replace_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 	}
@@ -201,7 +204,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 elseif ($data['expression_constructor'] != IM_FORCED) {
 	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
+		->onClick(
 			'document.getElementById("toggle_expression_constructor").value=1;'.
 			'document.getElementById("expression_constructor").value='.
 				(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
@@ -270,12 +273,13 @@ if ($data['expression_constructor'] == IM_TREE) {
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick('javascript:'.
-									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
-										' delete_expression("'.$e['id'] .'", '.TRIGGER_EXPRESSION.');'.
-										' document.forms["'.$triggersForm->getName().'"].submit();'.
-									' }'
-								)
+								->setAttribute('data-id', $e['id'])
+								->onClick('
+									if (confirm('.json_encode(_('Delete expression?')).')) {
+										delete_expression(this.dataset.id, '.TRIGGER_EXPRESSION.');
+										document.forms["'.$triggersForm->getName().'"].submit();
+									}
+								')
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
 					makeInformationList($info_icons)
@@ -333,15 +337,14 @@ $triggersFormList->addRow(_('OK event generation'),
 		->setEnabled(!$readonly)
 );
 
-$popup_options = [
-	'srctbl' => $data['recovery_expression_field_name'],
-	'srcfld1' => $data['recovery_expression_field_name'],
+$popup_parameters = [
 	'dstfrm' => $triggersForm->getName(),
-	'dstfld1' => $data['recovery_expression_field_name']
+	'dstfld1' => $data['recovery_expression_field_name'],
+	'context' => $data['context']
 ];
 
 if ($data['hostid']) {
-	$popup_options['hostid'] = $data['hostid'];
+	$popup_parameters['hostid'] = $data['hostid'];
 }
 
 $recovery_expression_row = [
@@ -354,14 +357,15 @@ $recovery_expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+	(new CButton('insert', $data['recovery_expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick(
-			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
-					{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}
-				), {dialogue_class: "modal-popup-generic"}
-			);'
-		)
+		->setAttribute('data-parameters', json_encode($popup_parameters))
+		->onClick('
+			PopUp("popup.triggerexpr", {
+				...JSON.parse(this.dataset.parameters),
+				expression: document.querySelector("[name='.$data['recovery_expression_field_name'].']").value
+			}, {dialogue_class: "modal-popup-generic"});
+		')
 		->setEnabled(!$readonly)
 		->removeId()
 ];
@@ -473,12 +477,13 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick('javascript:'.
-									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
-										' delete_expression("'.$e['id'] .'", '.TRIGGER_RECOVERY_EXPRESSION.');'.
-										' document.forms["'.$triggersForm->getName().'"].submit();'.
-									' }'
-								)
+								->setAttribute('data-id', $e['id'])
+								->onClick('
+									if (confirm('.json_encode(_('Delete expression?')).')) {
+										delete_expression(this.dataset.id, '.TRIGGER_RECOVERY_EXPRESSION.');
+										document.forms["'.$triggersForm->getName().'"].submit();
+									}
+								')
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
 					makeInformationList($info_icons)
@@ -558,7 +563,7 @@ $triggersFormList
 	);
 
 // Append status to form list.
-if (empty($data['triggerid']) && empty($data['form_refresh'])) {
+if (empty($data['triggerid']) && $data['form_refresh'] == 0) {
 	$status = true;
 }
 else {
@@ -566,7 +571,20 @@ else {
 }
 
 $triggersFormList
-	->addRow(_('URL'), (new CTextBox('url', $data['url'], $discovered_trigger))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(
+		new CLabel([
+			_('Menu entry name'),
+			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
+		]),
+		(new CTextBox('url_name', $data['url_name'], $discovered_trigger, DB::getFieldLength('triggers', 'url_name')))
+			->setAttribute('placeholder', _('Trigger URL'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(
+		_('Menu entry URL'),
+		(new CTextBox('url', $data['url'], $discovered_trigger, DB::getFieldLength('triggers', 'url')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -577,7 +595,7 @@ $triggersFormList
 
 // Append tabs to form.
 $triggersTab = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
@@ -588,7 +606,8 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],
 		'readonly' => $discovered_trigger,
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]),
 	TAB_INDICATOR_TAGS
 );
@@ -600,7 +619,7 @@ $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), $readonly ? null : _('Action')]);
+	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
 
 foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -618,10 +637,11 @@ foreach ($data['db_dependencies'] as $dependency) {
 					->setArgument('context', $data['context'])
 			))->setTarget('_blank'),
 			(new CCol(
-				$readonly
+				$discovered_trigger
 					? null
 					: (new CButton('remove', _('Remove')))
-						->onClick('view.removeDependency('.json_encode($dependency['triggerid']).')')
+						->setAttribute('data-triggerid', $dependency['triggerid'])
+						->onClick('view.removeDependency(this.dataset.triggerid)')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -629,32 +649,62 @@ foreach ($data['db_dependencies'] as $dependency) {
 	);
 }
 
+$buttons = null;
+
+if (!$discovered_trigger) {
+	$buttons = $data['context'] === 'host'
+		? (new CButton('add_dep_trigger', _('Add')))
+			->setAttribute('data-hostid', $data['hostid'])
+			->onClick('
+				PopUp("popup.generic", {
+					srctbl: "triggers",
+					srcfld1: "triggerid",
+					reference: "deptrigger",
+					hostid: this.dataset.hostid,
+					multiselect: 1,
+					with_triggers: 1,
+					real_hosts: 1
+				}, {dialogue_class: "modal-popup-generic"});
+			')
+			->addClass(ZBX_STYLE_BTN_LINK)
+		: new CHorList([
+				(new CButton('add_dep_trigger', _('Add')))
+					->setAttribute('data-templateid', $data['hostid'])
+					->onClick('
+						PopUp("popup.generic", {
+							srctbl: "template_triggers",
+							srcfld1: "triggerid",
+							reference: "deptrigger",
+							templateid: this.dataset.templateid,
+							multiselect: 1,
+							with_triggers: 1
+						}, {dialogue_class: "modal-popup-generic"});
+					')
+					->addClass(ZBX_STYLE_BTN_LINK),
+				(new CButton('add_dep_host_trigger', _('Add host trigger')))
+					->onClick('
+						PopUp("popup.generic", {
+							srctbl: "triggers",
+							srcfld1: "triggerid",
+							reference: "deptrigger",
+							multiselect: 1,
+							with_triggers: 1,
+							real_hosts: 1
+						}, {dialogue_class: "modal-popup-generic"});
+					')
+					->addClass(ZBX_STYLE_BTN_LINK)
+		]);
+}
+
 $dependenciesFormList->addRow(_('Dependencies'),
-	(new CDiv([
-		$dependenciesTable,
-		$readonly
-			? null
-			: (new CButton('bnt1', _('Add')))
-				->onClick(
-					'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'triggers',
-						'srcfld1' => 'triggerid',
-						'reference' => 'deptrigger',
-						'hostid' => $data['hostid'],
-						'multiselect' => '1',
-						'with_triggers' => '1',
-						'noempty' => '1'
-					]).', {dialogue_class: "modal-popup-generic"});'
-				)
-				->addClass(ZBX_STYLE_BTN_LINK)
-	]))
+	(new CDiv([$dependenciesTable, $buttons]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
 $cancelButton = $data['backurl'] !== null
-	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 	: new CButtonCancel(url_param('context'));
 
 // Append buttons to form list.
@@ -681,9 +731,9 @@ else {
 // Append tabs to form.
 $triggersForm->addItem($triggersTab);
 
-$widget->addItem($triggersForm);
-
-$widget->show();
+$html_page
+	->addItem($triggersForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

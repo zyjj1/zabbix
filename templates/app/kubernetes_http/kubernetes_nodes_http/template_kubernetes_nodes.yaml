@@ -1,10 +1,14 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-14T14:27:43Z'
-  groups:
+  version: '6.4'
+  date: '2022-11-10T10:19:26Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
+  host_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
   templates:
     -
       uuid: f397be2340734d24bc666102fbe184a5
@@ -18,7 +22,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -279,7 +283,7 @@ zabbix_export:
           parameters:
             -
               name: api_endpoint
-              value: '{$KUBE.API.ENDPOINT}'
+              value: '{$KUBE.API.ENDPOINT.URL}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
@@ -378,9 +382,16 @@ zabbix_export:
                   try {
                       var input = JSON.parse(value),
                           output = [];
+                          api_url = '{$KUBE.API.ENDPOINT.URL}',
+                          hostname = api_url.match(/\/\/(.+):/);
+                  
+                      if (typeof hostname[1] === 'undefined') {
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                          throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                      };
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + value);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -404,7 +415,8 @@ zabbix_export:
                                       '{#IP}': internalIP,
                                       '{#ROLES}': node.status.roles,
                                       '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
-                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || ''
+                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || '',
+                                      '{#CLUSTER_HOSTNAME}': hostname[1]
                                   });
                               }
                               else {
@@ -423,7 +435,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           master_item:
             key: kube.nodes
           tags:
@@ -473,14 +485,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.addresses[?(@.type == "ExternalIP")].address.first()'
+                    - '$.status.addresses[?(@.type == "ExternalIP")].address.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -502,14 +514,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.addresses[?(@.type == "InternalIP")].address.first()'
+                    - '$.status.addresses[?(@.type == "InternalIP")].address.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -533,9 +545,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.allocatable.cpu.first()'
+                    - $.status.allocatable.cpu
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -559,9 +571,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.allocatable.memory.first()'
+                    - $.status.allocatable.memory
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -581,9 +593,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.allocatable.pods.first()'
+                    - $.status.allocatable.pods
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -607,9 +619,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.capacity.cpu.first()'
+                    - $.status.capacity.cpu
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -633,9 +645,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.capacity.memory.first()'
+                    - $.status.capacity.memory
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -655,9 +667,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.capacity.pods.first()'
+                    - $.status.capacity.pods
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -672,21 +684,21 @@ zabbix_export:
               key: 'kube.node.conditions.diskpressure[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'True if pressure exists on the disk size — that is, if the disk capacity is low; otherwise False.'
+              description: 'True if pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
               valuemap:
                 name: 'Node conditions'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "DiskPressure")].status.first()'
+                    - '$.status.conditions[?(@.type == "DiskPressure")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -698,9 +710,10 @@ zabbix_export:
                 -
                   uuid: 4e283f3f104a4239a0b1c24f0313ab95
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.diskpressure[{#NAME}])=1'
-                  name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size (state: {ITEM.VALUE})'
+                  name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — pressure exists on the disk size — that is, if the disk capacity is low; otherwise False.'
+                  description: 'True - pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
                   tags:
                     -
                       tag: scope
@@ -712,21 +725,21 @@ zabbix_export:
               key: 'kube.node.conditions.memorypressure[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'True if pressure exists on the node memory — that is, if the node memory is low; otherwise False.'
+              description: 'True if pressure exists on the node memory - that is, if the node memory is low; otherwise False.'
               valuemap:
                 name: 'Node conditions'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "MemoryPressure")].status.first()'
+                    - '$.status.conditions[?(@.type == "MemoryPressure")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -738,9 +751,10 @@ zabbix_export:
                 -
                   uuid: f580b6534bf54281912515874ca46cdf
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.memorypressure[{#NAME}])=1'
-                  name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory (state: {ITEM.VALUE})'
+                  name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — pressure exists on the node memory — that is, if the node memory is low; otherwise False'
+                  description: 'True - pressure exists on the node memory - that is, if the node memory is low; otherwise False'
                   tags:
                     -
                       tag: scope
@@ -759,14 +773,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "NetworkUnavailable")].status.first()'
+                    - '$.status.conditions[?(@.type == "NetworkUnavailable")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -778,9 +792,10 @@ zabbix_export:
                 -
                   uuid: 0da0db08077a42668efcc886c155bf4e
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.networkunavailable[{#NAME}])=1'
-                  name: 'Node [{#NAME}] Conditions: Network is not correctly configured (state: {ITEM.VALUE})'
+                  name: 'Node [{#NAME}] Conditions: Network is not correctly configured'
+                  event_name: 'Node [{#NAME}] Conditions: Network is not correctly configured (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — the network for the node is not correctly configured, otherwise False'
+                  description: 'True - the network for the node is not correctly configured, otherwise False'
                   tags:
                     -
                       tag: scope
@@ -792,21 +807,21 @@ zabbix_export:
               key: 'kube.node.conditions.pidpressure[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'True if pressure exists on the processes — that is, if there are too many processes on the node; otherwise False.'
+              description: 'True if pressure exists on the processes - that is, if there are too many processes on the node; otherwise False.'
               valuemap:
                 name: 'Node conditions'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "PIDPressure")].status.first()'
+                    - '$.status.conditions[?(@.type == "PIDPressure")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -818,9 +833,10 @@ zabbix_export:
                 -
                   uuid: 5f6a7fce910e4cf79e9fc778519ad00f
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.pidpressure[{#NAME}])=1'
-                  name: 'Node [{#NAME}] Conditions: Pressure exists on the processes (state: {ITEM.VALUE})'
+                  name: 'Node [{#NAME}] Conditions: Pressure exists on the processes'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the processes (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — pressure exists on the processes — that is, if there are too many processes on the node; otherwise False'
+                  description: 'True - pressure exists on the processes - that is, if there are too many processes on the node; otherwise False'
                   tags:
                     -
                       tag: scope
@@ -839,14 +855,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "Ready")].status.first()'
+                    - '$.status.conditions[?(@.type == "Ready")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -858,15 +874,40 @@ zabbix_export:
                 -
                   uuid: 02f873ab69fb4df49578cf5e1cbad1b8
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.ready[{#NAME}])<>1'
-                  name: 'Node [{#NAME}] Conditions: Is not in Ready state (state: {ITEM.VALUE})'
+                  name: 'Node [{#NAME}] Conditions: Is not in Ready state'
+                  event_name: 'Node [{#NAME}] Conditions: Is not in Ready state (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: |
-                    False — if the node is not healthy and is not accepting pods.
-                    Unknown — if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).
+                    False - if the node is not healthy and is not accepting pods.
+                    Unknown - if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).
                   tags:
                     -
                       tag: scope
                       value: availability
+            -
+              uuid: 3d8536659ac44347b36e61f60873fa61
+              name: 'Node [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'kube.node.get[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: CHAR
+              description: 'Collecting and processing cluster by node [{#NAME}] data via Kubernetes API.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 8f9152074e2041d7b5cd2c6215e06832
               name: 'Node [{#NAME}] Info: Architecture'
@@ -881,13 +922,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.architecture.first()'
+                    - $.status.nodeInfo.architecture
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -912,13 +953,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.containerRuntimeVersion.first()'
+                    - $.status.nodeInfo.containerRuntimeVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -940,13 +981,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kernelVersion.first()'
+                    - $.status.nodeInfo.kernelVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -968,13 +1009,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kubeletVersion.first()'
+                    - $.status.nodeInfo.kubeletVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -996,13 +1037,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kubeProxyVersion.first()'
+                    - $.status.nodeInfo.kubeProxyVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1024,13 +1065,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.operatingSystem.first()'
+                    - $.status.nodeInfo.operatingSystem
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1052,13 +1093,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kernelVersion.first()'
+                    - $.status.nodeInfo.kernelVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1080,13 +1121,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.roles.first()'
+                    - $.status.roles
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1110,9 +1151,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.limits.cpu.sum()'
+                    - '$.pods[*].containers.limits.cpu.sum()'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1136,9 +1177,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.limits.memory.sum()'
+                    - '$.pods[*].containers.limits.memory.sum()'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1162,9 +1203,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.requests.cpu.sum()'
+                    - '$.pods[*].containers.requests.cpu.sum()'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1188,9 +1229,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.requests.memory.sum()'
+                    - '$.pods[*].containers.requests.memory.sum()'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1211,14 +1252,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].metadata.creationTimestamp.first()'
+                    - $.metadata.creationTimestamp
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return Math.floor((Date.now() - new Date(value)) / 1000);'
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1230,7 +1271,8 @@ zabbix_export:
                 -
                   uuid: b322a8c9a4404da49c434e78822d6ac5
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10'
-                  name: 'Node [{#NAME}]: Has been restarted (uptime < 10m)'
+                  name: 'Node [{#NAME}]: Has been restarted'
+                  event_name: 'Node [{#NAME}]: Has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   tags:
@@ -1249,9 +1291,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.podsCount.first()'
+                    - $.status.podsCount
               master_item:
-                key: kube.nodes
+                key: 'kube.node.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1263,12 +1305,13 @@ zabbix_export:
             -
               uuid: f64efc13be2c4c53a48de40504cf064d
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.9'
-              name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 90% of allocatable)'
+              name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 90% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
+                  name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
               tags:
                 -
@@ -1277,7 +1320,8 @@ zabbix_export:
             -
               uuid: 4c035b6c85574141832691e7ad264f40
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
-              name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
+              name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1287,12 +1331,13 @@ zabbix_export:
             -
               uuid: 5d0d803cfbbe42edb7d32d731ae5f741
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.9'
-              name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 90% of allocatable)'
+              name: 'Node [{#NAME}] Limits: Total memory limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 90% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
+                  name: 'Node [{#NAME}] Limits: Total memory limits are too high'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
               tags:
                 -
@@ -1301,7 +1346,8 @@ zabbix_export:
             -
               uuid: 4fa15174194c476899a96fcf233a5aea
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
-              name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
+              name: 'Node [{#NAME}] Limits: Total memory limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1311,12 +1357,13 @@ zabbix_export:
             -
               uuid: 256cf876a4674dd09123bb388c1a9d32
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.5'
-              name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 50% of allocatable)'
+              name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 50% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Node [{#NAME}] Requests:  Total CPU requests are too high (more than 80% of allocatable)'
+                  name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
               tags:
                 -
@@ -1325,7 +1372,8 @@ zabbix_export:
             -
               uuid: 7fa6901f620c4b388d550c669089dde2
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
-              name: 'Node [{#NAME}] Requests:  Total CPU requests are too high (more than 80% of allocatable)'
+              name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 80% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1335,12 +1383,13 @@ zabbix_export:
             -
               uuid: d73aa5aa2a9b424789181033630bb432
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5'
-              name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 50% of allocatable)'
+              name: 'Node [{#NAME}] Requests: Total memory requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 50% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
+                  name: 'Node [{#NAME}] Requests: Total memory requests are too high'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
               tags:
                 -
@@ -1349,7 +1398,8 @@ zabbix_export:
             -
               uuid: ad9a65c4786e48b9a4b77c1214fa2e1f
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
-              name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
+              name: 'Node [{#NAME}] Requests: Total memory requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1359,7 +1409,8 @@ zabbix_export:
             -
               uuid: 0126dfbfa9d949499e0f7689b714c855
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9'
-              name: 'Node [{#NAME}] Used: Kubelet too many pods (more than 95% of capacity)'
+              name: 'Node [{#NAME}] Used: Kubelet too many pods'
+              event_name: 'Node [{#NAME}] Used: Kubelet too many pods (more than 95% of capacity)'
               opdata: 'Used: {ITEM.LASTVALUE1}, Capacity: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Kubelet is running at capacity.'
@@ -1430,10 +1481,10 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLES}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Nodes/Role: {#ROLES}'
               templates:
                 -
                   name: 'Linux by Zabbix agent'
@@ -1492,6 +1543,7 @@ zabbix_export:
                 value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+          lifetime: '0'
           item_prototypes:
             -
               uuid: ed4ea3dbbce74404a5039aa9918b8e2b
@@ -1510,14 +1562,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "ContainersReady")].status.first()'
+                    - '$.conditions[?(@.type == "ContainersReady")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1548,14 +1600,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "Initialized")].status.first()'
+                    - '$.conditions[?(@.type == "Initialized")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1586,14 +1638,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "Ready")].status.first()'
+                    - '$.conditions[?(@.type == "Ready")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1624,14 +1676,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "PodScheduled")].status.first()'
+                    - '$.conditions[?(@.type == "PodScheduled")].status.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1657,10 +1709,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].containers.restartCount.first()'
+                    - $.containers.restartCount
                   error_handler: DISCARD_VALUE
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1686,6 +1738,33 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: 34a542538cf449f287a99052870988be
+              name: 'Node [{#NODE}] Pod [{#POD}]: Get data'
+              type: DEPENDENT
+              key: 'kube.pod.get[{#POD}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: CHAR
+              description: 'Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
               uuid: 6862be81e52b4abcb319a8847b022634
               name: 'Node [{#NODE}] Pod [{#POD}] Status: Phase'
               type: DEPENDENT
@@ -1702,14 +1781,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].phase.first()'
+                    - $.phase
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return [''Pending'', ''Running'', ''Succeeded'', ''Failed'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1747,14 +1826,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].startTime.first()'
+                    - $.startTime
                   error_handler: DISCARD_VALUE
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return Math.floor((Date.now() - new Date(value)) / 1000);'
               master_item:
-                key: kube.nodes
+                key: 'kube.pod.get[{#POD}]'
               tags:
                 -
                   tag: component
@@ -1814,7 +1893,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + value);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -1851,7 +1930,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
       tags:
         -
           tag: class
@@ -1861,9 +1940,9 @@ zabbix_export:
           value: 'kubernetes nodes'
       macros:
         -
-          macro: '{$KUBE.API.ENDPOINT}'
-          value: '<PUT YOUR KUBERNETES API ENDPOINT>'
-          description: 'Kubernetes API endpoint in the format <scheme>://<host>:<port>/api'
+          macro: '{$KUBE.API.ENDPOINT.URL}'
+          value: 'https://localhost:6443/api'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api'
         -
           macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token'
@@ -1915,8 +1994,8 @@ zabbix_export:
           description: 'Labels to filter nodes (regex in values are supported)'
         -
           macro: '{$KUBE.NODES.ENDPOINT.NAME}'
-          value: zabbix-agent
-          description: 'Kubenetes nodes endpoint name'
+          value: zabbix-zabbix-helm-chrt-agent
+          description: 'Kubernetes nodes endpoint name. See kubectl -n monitoring get ep'
         -
           macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
           description: 'Annotations to filter pods (regex in values are supported)'

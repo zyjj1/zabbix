@@ -24,12 +24,14 @@
  * @var array $data
  */
 
-$widget = (new CWidget())->setTitle(_('Items'));
+$html_page = (new CHtmlPage())
+	->setTitle(_('Items'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT));
 
 $host = $data['host'];
 
 if (!empty($data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 
 $url = (new CUrl('items.php'))
@@ -38,9 +40,10 @@ $url = (new CUrl('items.php'))
 
 // Create form.
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('item-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -581,7 +584,6 @@ $item_tab
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
 						'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
-						'webitems' => true,
 						'normal_only' => true
 					]
 				]
@@ -601,10 +603,19 @@ if ($data['display_interfaces']) {
 			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$item_tab->addItem([
 				(new CLabel(_('Host interface'), 'interface'))
-					->setAsteriskMark()
+					->setAsteriskMark(itemTypeInterface($data['item']['type']) != INTERFACE_TYPE_OPT)
 					->setId('js-item-interface-label'),
 				(new CFormField((new CTextBox('interface', getHostInterface($interface), true))->setAriaRequired()))
 					->setId('js-item-interface-field')
+			]);
+		}
+		else {
+			$item_tab->addItem([
+				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
+				(new CFormField(
+					(new CTextBox('interface', _('None'), true))
+						->setAttribute('disabled', 'disabled')
+				))->setId('js-item-interface-field')
 			]);
 		}
 	}
@@ -632,7 +643,7 @@ if ($data['display_interfaces']) {
 	}
 }
 
-// Append SNMP common fields fields.
+// Append SNMP common fields.
 $item_tab->addItem([
 	(new CLabel(_('SNMP OID'), 'snmp_oid'))
 		->setAsteriskMark()
@@ -732,7 +743,7 @@ $item_tab
 		(new CLabel(_('Formula'), 'params_f'))
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
-		(new CFormField((new CTextArea('params_f', $data['params'], $discovered_item))
+		(new CFormField((new CTextArea('params_f', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -748,7 +759,7 @@ $item_tab
 		(new CLabel(_('Update interval'), 'delay'))
 			->setAsteriskMark()
 			->setId('js-item-delay-label'),
-		(new CFormField((new CTextBox('delay', $data['delay']))
+		(new CFormField((new CTextBox('delay', $data['delay'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 		))->setId('js-item-delay-field')
@@ -767,7 +778,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
-			->setEnabled(!$discovered_item);
+			->setEnabled(false);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
@@ -906,15 +917,16 @@ $item_tab
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$item_tab->addItem([
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
-		(new CFormField((new CMultiSelect([
+		(new CFormField(
+			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'disabled' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -923,8 +935,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	]);
 }
@@ -1019,7 +1030,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => $discovered_item,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -1029,7 +1041,7 @@ $item_tabs = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 				)
 			])
 			->addItem([
@@ -1045,20 +1057,25 @@ $item_tabs = (new CTabView())
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$item_tabs->setSelected(0);
 }
+
+$cancel_button = $data['backurl'] !== null
+	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
+	: new CButtonCancel(url_params(['hostid', 'context']));
 
 // Append buttons to form.
 if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Execute now')))
+		$buttons[] = (new CSimpleButton(_('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
-			);
+			)
+			->onClick('view.checkNow(this);');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
@@ -1075,28 +1092,29 @@ if ($data['itemid'] != 0) {
 
 	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']), 'context'))
 		->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel(url_params(['hostid', 'context']));
+	$buttons[] = $cancel_button;
 
 	$item_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$item_tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['hostid', 'context']))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), $cancel_button]
 	));
 }
 
 $form->addItem($item_tabs);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.item.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([
 		'interfaces' => $data['interfaces'],
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'value_type_by_keys' => CItemData::getValueTypeByKey(),
+		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()

@@ -24,12 +24,13 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/plugin/comms"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 )
 
 const queSize = 100
@@ -84,7 +85,19 @@ func (b *pluginBroker) handleConnection() {
 	for {
 		t, data, err := comms.Read(b.conn)
 		if err != nil {
-			return
+			if errors.Is(err, net.ErrClosed) {
+				log.Tracef("closed connection to loaded %s plugin", b.pluginName)
+
+				return
+			}
+
+			log.Errf(
+				"failed to read response for plugin %s, %s",
+				b.pluginName,
+				err.Error(),
+			)
+
+			continue
 		}
 
 		var id uint32
@@ -322,7 +335,7 @@ func (b *pluginBroker) register() (*comms.RegisterResponse, error) {
 			Common: comms.Common{
 				Type: comms.RegisterRequestType,
 			},
-			Version: comms.Version,
+			Version: strconv.Itoa(comms.MajorVersion),
 		},
 		out: make(chan interface{}),
 	}

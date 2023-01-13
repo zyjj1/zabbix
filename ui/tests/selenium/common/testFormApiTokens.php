@@ -66,7 +66,7 @@ class testFormApiTokens extends CWebTest {
 
 		// Check the presence of User field and that it is empty by default if it exists.
 		if ($source === 'administration') {
-			$this->assertEquals([], $form->getField('User')->getValue());
+			$this->assertEquals('', $form->getField('User')->getValue());
 		}
 		else {
 			$this->assertFalse($form->query('xpath://label[text()="User"]')->one(false)->isDisplayed());
@@ -355,6 +355,6 @@ class testFormApiTokens extends CWebTest {
 
 		// Check that token string will be copied to clipboard.
 		$clipboard_element = $auth_token->query('xpath:./a[text()="Copy to clipboard"]')->one();
-		$this->assertEquals('writeTextClipboard("'.$token_text.'")', $clipboard_element->getAttribute('onclick'));
+		$this->assertEquals($token_text, $clipboard_element->getAttribute('data-auth_token'));
 	}
 }

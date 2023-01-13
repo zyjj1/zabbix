@@ -20,18 +20,18 @@
 #include "timer.h"
 
 #include "log.h"
-#include "dbcache.h"
-#include "daemon.h"
+#include "zbxcacheconfig.h"
+#include "zbxnix.h"
 #include "zbxself.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbx_host_constants.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 
 #define ZBX_EVENT_BATCH_SIZE	1000
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-extern int				CONFIG_TIMER_FORKS;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
 typedef struct
@@ -97,7 +97,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < updates->values_num; i++)
 	{
@@ -151,7 +151,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 			log_host_maintenance_update(diff);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -167,7 +167,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 static void	db_remove_expired_event_suppress_data(int now)
 {
 	DBbegin();
-	DBexecute("delete from event_suppress where suppress_until<%d", now);
+	DBexecute("delete from event_suppress where suppress_until<%d and suppress_until<>0", now);
 	DBcommit();
 }
 
@@ -229,7 +229,7 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
  *          data from database and prepare event query, event data structures *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
+static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data, int process_num)
 {
 	DB_ROW				row;
 	DB_RESULT			result;
@@ -260,7 +260,8 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 				" and " ZBX_SQL_MOD(p.eventid, %d) "=%d"
 			" order by p.eventid",
 			tag_fields, tag_join,
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_TIMER_FORKS, process_num - 1);
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER],
+			process_num - 1);
 
 	event_queries_fetch(result, event_queries);
 	DBfree_result(result);
@@ -273,7 +274,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			" from event_suppress"
 			" where " ZBX_SQL_MOD(eventid, %d) "=%d"
 			" order by eventid",
-			CONFIG_TIMER_FORKS, process_num - 1);
+			CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER], process_num - 1);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -346,9 +347,10 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
  *          changes in cache                                                  *
  *                                                                            *
  * Parameters: suppressed_num - [OUT] the number of suppressed events         *
+ *             process_num    - [IN] process number                           *
  *                                                                            *
  ******************************************************************************/
-static void	db_update_event_suppress_data(int *suppressed_num)
+static void	db_update_event_suppress_data(int *suppressed_num, int process_num)
 {
 	zbx_vector_ptr_t	event_queries, event_data;
 
@@ -357,7 +359,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
 
-	db_get_query_events(&event_queries, &event_data);
+	db_get_query_events(&event_queries, &event_data, process_num);
 
 	if (0 != event_queries.values_num)
 	{
@@ -383,7 +385,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", NULL);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < event_queries.values_num; i++)
 		{
@@ -480,7 +482,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 				goto cleanup;
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
 		{
@@ -558,19 +560,20 @@ static int	update_host_maintenances(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-	double		sec;
-	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
-	char		*info = NULL;
-	size_t		info_alloc = 0, info_offset = 0;
+	double			sec;
+	int			maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
+	char			*info = NULL;
+	size_t			info_alloc = 0, info_offset = 0;
+	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(thread_info->program_type), server_num,
+			get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
-
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
@@ -580,7 +583,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (1 == process_num)
 		{
@@ -607,7 +610,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				if (SUCCEED == update)
 				{
 					zbx_dc_maintenance_set_update_flags();
-					db_update_event_suppress_data(&events_num);
+					db_update_event_suppress_data(&events_num, process_num);
 					zbx_dc_maintenance_reset_update_flag(process_num);
 				}
 				else
@@ -626,7 +629,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_setproctitle("%s #%d [%s, processing maintenances]", get_process_type_string(process_type),
 					process_num, info);
 
-			db_update_event_suppress_data(&events_num);
+			db_update_event_suppress_data(&events_num, process_num);
 
 			info_offset = 0;
 			zbx_snprintf_alloc(&info, &info_alloc, &info_offset, "suppressed %d events in " ZBX_FS_DBL
@@ -649,7 +652,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		}
 
 		if (0 != idle)
-			zbx_sleep_loop(1);
+			zbx_sleep_loop(thread_info, 1);
 
 		idle = 1;
 	}

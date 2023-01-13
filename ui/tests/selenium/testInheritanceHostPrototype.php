@@ -84,9 +84,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
-		foreach (['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'] as $id) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
-		}
+		$this->zbxTestAssertElementPresentXpath('//z-select[@id="ipmi_authtype"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-select[@id="ipmi_privilege"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_username"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_password"][@readonly]');
 
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
@@ -154,7 +155,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Host name' => 'test Inheritance host prototype',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -212,7 +213,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @param array $data	test case data from data provider
 	 */
 	private function sqlForHostPrototypeCompare($data) {
-		$sql = 'SELECT host, status, name, lastaccess, ipmi_authtype,'.
+		$sql = 'SELECT host, status, name, ipmi_authtype,'.
 				' ipmi_privilege, ipmi_username, ipmi_password,'.
 				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
 				' tls_psk_identity, tls_psk, auto_compress, flags'.
@@ -287,11 +288,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'visible_name' => 'New visible name',
 					'create_enabled' => false,
 					'groups' => [
-						'Templates'
+						'Linux servers'
 					],
 					'group_macro' => '{#GROUP_MACRO}',
 					'templates' => [
-						['name' => 'Inheritance test template', 'group' => 'Templates']
+						['name' => 'Inheritance test template', 'group' => 'Linux servers']
 					],
 					'host_inventory' => 'Automatic'
 				]
@@ -455,7 +456,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find()->one()->setDataContext('Templates');
+			COverlayDialogElement::find()->waitUntilReady()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -574,8 +575,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$sql = 'SELECT macro,type,value,description FROM hostmacro WHERE hostid=%d ORDER BY hostmacroid';
-		$this->assertSame(CDBHelper::getHash(vsprintf($sql, $template_prototype_id)),
-			CDBHelper::getHash(vsprintf($sql, $host_prototype_id))
+		$this->assertSame(CDBHelper::getHash(vsprintf($sql, [$template_prototype_id])),
+			CDBHelper::getHash(vsprintf($sql, [$host_prototype_id]))
 		);
 	}
 

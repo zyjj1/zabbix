@@ -17,23 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-#include "mutexs.h"
-#include "memalloc.h"
-#include "zbxalgo.h"
-#include "zbxhistory.h"
-#include "history.h"
-#include "valuecache.h"
-#include "dbcache.h"
-
-#include <setjmp.h>
-#include <cmocka.h>
-
 #include "zbxmockassert.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "valuecache_mock.h"
+
+#include "zbxcachevalue.h"
+#include "zbxnum.h"
+#include "log.h"
+#include "zbxmutexs.h"
+#include "zbxshmem.h"
+#include "zbxalgo.h"
+#include "zbxhistory.h"
+#include "history.h"
+#include "zbxcacheconfig.h"
+
+#include <setjmp.h>
+#include <cmocka.h>
+
 
 /*
  * data source
@@ -43,13 +44,13 @@ static zbx_timespec_t	vcmock_ts;
 
 int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
-int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+int	__wrap_zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error);
-void	__wrap_zbx_mem_destroy(zbx_mem_info_t *info);
-void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
-void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
-void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
-void	__wrap_zbx_mem_dump_stats(int level, zbx_mem_info_t *info);
+void	__wrap_zbx_shmem_destroy(zbx_shmem_info_t *info);
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size);
+void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size);
+void	__wrap___zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr);
+void	__wrap_zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
@@ -83,7 +84,7 @@ static int	history_compare(const void *d1, const void *d2)
  ******************************************************************************/
 
 static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned char value_type,
-		history_value_t *value, zbx_timespec_t *ts)
+		zbx_history_value_t *value, zbx_timespec_t *ts)
 {
 	const char		*data;
 	zbx_mock_error_t	err;
@@ -102,7 +103,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				value->str = zbx_strdup(NULL, data);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				if (FAIL == is_uint64(data, &value->ui64))
+				if (FAIL == zbx_is_uint64(data, &value->ui64))
 					fail_msg("Invalid uint64 value \"%s\"", data);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
@@ -119,15 +120,15 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 		log->source = zbx_strdup(NULL, zbx_mock_get_object_member_string(hvalue, "source"));
 
 		data = zbx_mock_get_object_member_string(hvalue, "logeventid");
-		if (FAIL == is_uint32(data, &log->logeventid))
+		if (FAIL == zbx_is_uint32(data, &log->logeventid))
 			fail_msg("Invalid log logeventid value \"%s\"", data);
 
 		data = zbx_mock_get_object_member_string(hvalue, "severity");
-		if (FAIL == is_uint32(data, &log->severity))
+		if (FAIL == zbx_is_uint32(data, &log->severity))
 			fail_msg("Invalid log severity value \"%s\"", data);
 
 		data = zbx_mock_get_object_member_string(hvalue, "timestamp");
-		if (FAIL == is_uint32(data, &log->timestamp))
+		if (FAIL == zbx_is_uint32(data, &log->timestamp))
 			fail_msg("Invalid log timestamp value \"%s\"", data);
 
 		value->log = log;
@@ -151,7 +152,7 @@ static void	zbx_vcmock_ds_read_item(zbx_mock_handle_t hitem, zbx_vcmock_ds_item_
 	const char	*itemid;
 
 	itemid = zbx_mock_get_object_member_string(hitem, "itemid");
-	if (SUCCEED != is_uint64(itemid, &item->itemid))
+	if (SUCCEED != zbx_is_uint64(itemid, &item->itemid))
 		fail_msg("Invalid itemid \"%s\"", itemid);
 
 	item->value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(hitem, "value type"));
@@ -438,7 +439,7 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
 		memset(data, 0, sizeof(ZBX_DC_HISTORY));
 
 		itemid = zbx_mock_get_object_member_string(hitem, "itemid");
-		if (SUCCEED != is_uint64(itemid, &data->itemid))
+		if (SUCCEED != zbx_is_uint64(itemid, &data->itemid))
 			fail_msg("Invalid itemid \"%s\"", itemid);
 
 		data->value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(hitem, "value type"));
@@ -479,7 +480,7 @@ void	zbx_vcmock_free_dc_history(void *ptr)
  */
 
 static zbx_mutex_t	*vc_mutex = NULL;
-zbx_mem_info_t		*vc_meminfo = NULL;
+zbx_shmem_info_t		*vc_meminfo = NULL;
 
 static size_t		vcmock_mem = ZBX_MEBIBYTE * 1024;
 
@@ -497,7 +498,7 @@ void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex)
 	zbx_mock_assert_ptr_eq("Attempting to destroy unknown mutex", vc_mutex, mutex);
 }
 
-int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+int	__wrap_zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
 	*info = vc_meminfo;
@@ -510,12 +511,12 @@ int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *
 	return SUCCEED;
 }
 
-void	__wrap_zbx_mem_destroy(zbx_mem_info_t *info)
+void	__wrap_zbx_shmem_destroy(zbx_shmem_info_t *info)
 {
 	zbx_free(info);
 }
 
-void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size)
 {
 	size_t	*psize;
 
@@ -535,7 +536,7 @@ void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, 
 	return (void *)(psize + 1);
 }
 
-void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
+void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size)
 {
 	size_t	*psize;
 
@@ -556,7 +557,7 @@ void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info,
 	return (void *)(psize + 1);
 }
 
-void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
+void	__wrap___zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr)
 {
 	size_t	*psize;
 
@@ -575,7 +576,7 @@ void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, voi
 	zbx_free(psize);
 }
 
-void	__wrap_zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
+void	__wrap_zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info)
 {
 	ZBX_UNUSED(level);
 	ZBX_UNUSED(info);
@@ -712,7 +713,7 @@ void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key)
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hitem, key, &hmem))
 	{
-		if (ZBX_MOCK_SUCCESS != zbx_mock_string(hmem, &data) || SUCCEED != is_uint64(data, &cache_size))
+		if (ZBX_MOCK_SUCCESS != zbx_mock_string(hmem, &data) || SUCCEED != zbx_is_uint64(data, &cache_size))
 			fail_msg("Cannot read \"%s\" parameter", key);
 		else
 			zbx_vcmock_set_available_mem(cache_size);
@@ -731,7 +732,7 @@ void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key)
 void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		int *seconds, int *count, zbx_timespec_t *end)
 {
-	if (FAIL == is_uint64(zbx_mock_get_object_member_string(handle, "itemid"), itemid))
+	if (FAIL == zbx_is_uint64(zbx_mock_get_object_member_string(handle, "itemid"), itemid))
 		fail_msg("Invalid itemid value");
 
 	*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value type"));

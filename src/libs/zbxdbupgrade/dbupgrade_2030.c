@@ -17,18 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
 #include "dbupgrade.h"
+
+#include "zbxdbhigh.h"
 #include "log.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 /*
  * 2.4 development database patches
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char program_type;
 
 static int	DBpatch_2030000(void)
 {
@@ -330,7 +330,7 @@ static int	DBpatch_2030030(void)
 
 static int	DBpatch_2030031(void)
 {
-	/* 16 - CONDITION_TYPE_MAINTENANCE */
+	/* 16 - ZBX_CONDITION_TYPE_MAINTENANCE */
 	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
 		return FAIL;
 
@@ -377,7 +377,7 @@ static int	DBpatch_2030037(void)
 				NULL
 			};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -385,7 +385,7 @@ static int	DBpatch_2030037(void)
 
 static int	DBpatch_2030038(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -429,7 +429,7 @@ static int	DBpatch_2030040(void)
 
 static int	DBpatch_2030041(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -443,7 +443,7 @@ static int	DBpatch_2030041(void)
 
 static int	DBpatch_2030042(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBdrop_table("ids_tmp");
@@ -477,7 +477,7 @@ static int	DBpatch_2030044(void)
 
 static int	DBpatch_2030045(void)
 {
-	/* 17 - CONDITION_TYPE_NODE */
+	/* 17 - ZBX_CONDITION_TYPE_NODE */
 	const char	*sql = "delete from conditions where conditiontype=17";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -716,7 +716,7 @@ static int	DBpatch_2030067(void)
 
 static int	DBpatch_2030068(void)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 	{
 		/* "name" is empty on proxy side, because it is not synchronized between server and proxy */
 		/* in 2.2, and should therefore be filled with unique values to create a unique index.    */
@@ -1001,7 +1001,7 @@ static int	parse_function(char **exp, char **func, char **params)
 
 	for (p = *exp, s = *exp, state_fn = 0; '\0' != *p; p++)	/* check for function */
 	{
-		if (SUCCEED == is_function_char(*p))
+		if (SUCCEED == zbx_is_function_char(*p))
 		{
 			state_fn = 1;
 			continue;
@@ -1175,12 +1175,12 @@ static int	DBpatch_2030095(void)
 
 			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
 		}
-
 #if defined(HAVE_ORACLE)
-		if (0 == params_offset || (2048 < params_offset && 2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
+		if (0 == params_offset || (2048 < params_offset && 2048 /* ZBX_ITEM_PARAM_LEN */ <
+				zbx_strlen_utf8(params)))
 #else
 		if (0 == params_offset ||
-				(65535 < params_offset && 65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
+				(65535 < params_offset && 65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
 #endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\": resulting"

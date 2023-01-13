@@ -20,7 +20,17 @@
 #ifndef ZABBIX_DATASENDER_H
 #define ZABBIX_DATASENDER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
+
+#include "zbxcomms.h"
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	int			config_timeout;
+}
+zbx_thread_datasender_args;
 
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 

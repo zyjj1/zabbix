@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -35,9 +35,11 @@ class CControllerPopupTokenEdit extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -51,7 +53,7 @@ class CControllerPopupTokenEdit extends CController {
 
 		if ($this->getInput('admin_mode') === '1') {
 			return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_API_TOKENS)
 			);
 		}
 
@@ -72,7 +74,7 @@ class CControllerPopupTokenEdit extends CController {
 			$data = $tokens[0];
 
 			if ($data['expires_at'] != 0) {
-				$data['expires_at'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']);
+				$data['expires_at'] = date(ZBX_FULL_DATE_TIME, (int) $data['expires_at']);
 				$data['expires_state'] = '1';
 			}
 			else {

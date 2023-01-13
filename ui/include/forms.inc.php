@@ -143,14 +143,14 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	return $output;
 }
 
-function makeItemSubfilter(array &$filter_data, array $items = [], string $context) {
+function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	// subfilters
 	$table_subfilter = (new CTableInfo())
 		->addRow([
 			new CTag('h4', true, [
 				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
-		]);
+		], ZBX_STYLE_HOVER_NOBG);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
@@ -401,7 +401,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 			if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($trends);
-				$trends = convertUnitsS($value);
+				$trends = convertSecondsToTimeUnits($value);
 			}
 
 			if (!array_key_exists($trends, $item_params['trends'])) {
@@ -436,7 +436,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 			if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($history);
-				$history = convertUnitsS($value);
+				$history = convertSecondsToTimeUnits($value);
 			}
 
 			if (!array_key_exists($history, $item_params['history'])) {
@@ -479,7 +479,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				// "value" is delay represented in seconds and it is used for sorting the subfilter.
 				if ($delay[0] !== '{') {
 					$value = timeUnitToSeconds($delay);
-					$delay = convertUnitsS($value);
+					$delay = convertSecondsToTimeUnits($value);
 				}
 				else {
 					$value = $delay;
@@ -514,9 +514,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 	// output
 	if (count($item_params['tags']) > 1) {
-		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags'],
-			'subfilter_tags'
-		);
+		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags']);
 		$table_subfilter->addRow([$tags_output]);
 	}
 
@@ -728,7 +726,7 @@ function prepareScriptItemFormData(array $item): array {
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
 		'form' => $options['form'],
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
@@ -791,7 +789,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
-		'tags' => getRequest('tags', [])
+		'tags' => getRequest('tags', []),
+		'backurl' => getRequest('backurl')
 	];
 
 	// Unset empty and inherited tags.
@@ -921,7 +920,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 
@@ -1238,7 +1237,6 @@ function getItemFormData(array $item = [], array $options = []) {
 /**
  * Get list of item pre-processing data and return a prepared HTML object.
  *
- * @param CForm  $form                                     Form object to where add pre-processing list.
  * @param array  $preprocessing                            Array of item pre-processing steps.
  * @param string $preprocessing[]['type']                  Pre-processing step type.
  * @param array  $preprocessing[]['params']                Additional parameters used by pre-processing.
@@ -1249,7 +1247,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
@@ -1294,19 +1292,19 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		// Depending on preprocessing type, display corresponding params field and placeholders.
 		$params = '';
 
-		// Create a primary param text box, so it can be hidden if necessary.
-		$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
-		$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
-			->setTitle($step_param_0_value)
-			->setReadonly($readonly);
+		if ($step['type'] != ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+			// Create a primary param text box, so it can be hidden if necessary.
+			$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
+			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
+				->setReadonly($readonly);
 
-		// Create a secondary param text box, so it can be hidden if necessary.
-		$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-			? $step['params'][1]
-			: '';
-		$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
-			->setTitle($step_param_1_value)
-			->setReadonly($readonly);
+			// Create a secondary param text box, so it can be hidden if necessary.
+			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+				? $step['params'][1]
+				: '';
+			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
+				->setReadonly($readonly);
+		}
 
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
@@ -1442,6 +1440,88 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					$step_param_1->setAttribute('placeholder', _('replacement'))
 				];
 				break;
+
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('OID')),
+					(new CSelect('preprocessing['.$i.'][params][1]'))
+						->setValue($step_param_1_value)
+						->setAdaptiveWidth(202)
+						->addOptions([
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+						])
+						->setReadonly($readonly)
+				];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+				$mapping_rows = [];
+				$count = count($step['params']);
+
+				for ($j = 0; $j < $count; $j += 3) {
+					$mapping_rows[] = [
+						(new CRow([
+							new CCol(
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
+									->setReadonly($readonly)
+									->removeId()
+									->setAttribute('placeholder', _('Field name'))
+							),
+							new CCol(
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
+									->setReadonly($readonly)
+									->removeId()
+									->setAttribute('placeholder', _('OID prefix'))
+							),
+							new CCol(
+								(new CSelect('preprocessing['.$i.'][params][]'))
+									->setValue($step['params'][$j + 2])
+									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+									->addOptions([
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+									])
+									->setReadonly($readonly)
+							),
+							(new CCol(
+								(new CSimpleButton(_('Remove')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-group-json-action-delete')
+									->setEnabled($count > 3)
+							))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass('group-json-row')
+					];
+				}
+
+				$params = (new CDiv())
+					->addItem([
+						(new CTable())
+							->addClass('group-json-mapping')
+							->setHeader(
+								(new CRowHeader([
+									new CColHeader(_('Field name')),
+									new CColHeader(_('OID prefix')),
+									new CColHeader(_('Format')),
+									(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+								]))->addClass(ZBX_STYLE_GREY)
+							)
+							->addItem($mapping_rows)
+							->addItem(
+								(new CTag('tfoot', true))
+									->addItem(
+										(new CCol(
+											(new CSimpleButton(_('Add')))
+												->addClass(ZBX_STYLE_BTN_LINK)
+												->addClass('js-group-json-action-add')
+										))->setColSpan(4)
+									)
+							)
+							->setAttribute('data-index', $i)
+					])->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
@@ -1573,10 +1653,17 @@ function getCopyElementsFormData($elements_field, $title = null) {
 		'title' => $title,
 		'elements_field' => $elements_field,
 		'elements' => getRequest($elements_field, []),
-		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
+		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_TEMPLATE_GROUP),
 		'copy_targetids' => getRequest('copy_targetids', []),
-		'hostid' => getRequest('hostid', 0)
+		'hostid' => 0
 	];
+
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
+
+	if (count($filter_hostids) == 1) {
+		$data['hostid'] = reset($filter_hostids);
+	}
 
 	if (!$data['elements'] || !is_array($data['elements'])) {
 		show_error_message(_('Incorrect list of items.'));
@@ -1608,6 +1695,15 @@ function getCopyElementsFormData($elements_field, $title = null) {
 					'templateids' => $data['copy_targetids'],
 					'editable' => true
 				]), ['templateid' => 'id']);
+				break;
+
+			case COPY_TYPE_TO_TEMPLATE_GROUP:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
+					'output' => ['groupid', 'name'],
+					'groupids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['groupid' => 'id']);
+				break;
 		}
 	}
 
@@ -1744,7 +1840,7 @@ function getTriggerFormData(array $data) {
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {
@@ -1811,7 +1907,8 @@ function getTriggerFormData(array $data) {
 			$db_hosts = API::Host()->get([
 				'output' => [],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			if ($db_hosts) {
@@ -1874,6 +1971,7 @@ function getTriggerFormData(array $data) {
 			$data['priority'] = $trigger['priority'];
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
+			$data['url_name'] = $trigger['url_name'];
 			$data['url'] = $trigger['url'];
 
 			if ($data['parent_discoveryid'] !== null) {
@@ -2048,24 +2146,29 @@ function getTriggerFormData(array $data) {
  * Renders tag table row.
  *
  * @param int|string $index
- * @param string     $tag      (optional)
- * @param string     $value    (optional)
- * @param array      $options  (optional)
+ * @param string     $tag        (optional)
+ * @param string     $value      (optional)
+ * @param int        $automatic  (optional)
+ * @param array      $options    (optional)
  *
  * @return CRow
  */
-function renderTagTableRow($index, $tag = '', $value = '', array $options = []) {
-	$options = array_merge([
+function renderTagTableRow($index, $tag = '', $value = '', int $automatic = ZBX_TAG_MANUAL, array $options = []) {
+	$options += [
 		'readonly' => false,
-		'field_name' => 'tags'
-	], $options);
+		'field_name' => 'tags',
+		'with_automatic' => false
+	];
 
 	return (new CRow([
-		(new CCol(
+		(new CCol([
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
 				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-				->setAttribute('placeholder', _('tag'))
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				->setAttribute('placeholder', _('tag')),
+			$options['with_automatic']
+				? new CVar($options['field_name'].'['.$index.'][automatic]', $automatic)
+				: null
+		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
 				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
@@ -2097,14 +2200,21 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 		->addStyle('width: 100%; max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
-	$row_options = ['readonly' => $readonly];
+	$with_automatic = array_key_exists('with_automatic', $options) && $options['with_automatic'];
+
+	$row_options = [
+		'readonly' => $readonly,
+		'with_automatic' => $with_automatic
+	];
 
 	if (array_key_exists('field_name', $options)) {
 		$row_options['field_name'] = $options['field_name'];
 	}
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $row_options));
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'],
+			$with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL, $row_options
+		));
 	}
 
 	return $table->setFooter(new CCol(

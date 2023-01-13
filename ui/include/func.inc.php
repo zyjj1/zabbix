@@ -202,7 +202,7 @@ function zbx_date2str($format, $time = null, string $timezone = null) {
 	}
 	else {
 		$prefix = '';
-		$datetime = new DateTime('@'.$time);
+		$datetime = new DateTime('@'.(int) $time);
 	}
 
 	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));
@@ -589,7 +589,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$units = [
 		'years' => _x('y', 'year short'),
-		'months' => _x('m', 'month short'),
+		'months' => _x('M', 'month short'),
 		'days' => _x('d', 'day short'),
 		'hours' => _x('h', 'hour short'),
 		'minutes' => _x('m', 'minute short'),
@@ -604,6 +604,72 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
+}
+
+/**
+ * Convert time period to a human-readable format.
+ * The following units will be used: weeks, days, hours, minutes and seconds.
+ * Only the 3 most significant units will be displayed: #w #d #h, #d #h #m or #h #m #s, omitting empty ones.
+ *
+ * @param int $value  Time period in seconds.
+ *
+ * @return string
+ */
+function convertSecondsToTimeUnits(int $value): string {
+	$parts = [];
+	$start = null;
+
+	if (($v = floor($value / SEC_PER_WEEK)) > 0) {
+		$parts['weeks'] = $v;
+		$value -= $v * SEC_PER_WEEK;
+		$start = 0;
+	}
+
+	$level = 1;
+
+	foreach ([
+		'days' => SEC_PER_DAY,
+		'hours' => SEC_PER_HOUR,
+		'minutes' => SEC_PER_MIN
+	] as $part => $sec_per_part) {
+		$v = floor($value / $sec_per_part);
+
+		if ($v > 0) {
+			$parts[$part] = $v;
+			$value -= $v * $sec_per_part;
+			$start = $start === null ? $level : $start;
+		}
+
+		if ($start !== null && $level - $start >= 2) {
+			break;
+		}
+
+		$level++;
+	}
+
+	if ($start === null || $start >= 2) {
+		$v = $value + round(fmod($value, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
+
+		if ($v > 0) {
+			$parts['seconds'] = $v;
+		}
+	}
+
+	$units = [
+		'weeks' => _x('w', 'week short'),
+		'days' => _x('d', 'day short'),
+		'hours' => _x('h', 'hour short'),
+		'minutes' => _x('m', 'minute short'),
+		'seconds' => _x('s', 'second short')
+	];
+
+	$result = [];
+
+	foreach ($parts as $part_unit => $part_value) {
+		$result[] = $part_value.$units[$part_unit];
+	}
+
+	return $result ? implode(' ', $result) : '0';
 }
 
 /**
@@ -835,6 +901,10 @@ function zbx_empty($value) {
 }
 
 function zbx_is_int($var) {
+	if (is_array($var)) {
+		return false;
+	}
+
 	if (is_int($var)) {
 		return true;
 	}
@@ -1388,7 +1458,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  *
  * @param string   $number     Valid number in decimal or scientific notation.
  * @param int|null $precision  Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
- * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
+ * @param int|null $decimals   Max number of first non-zero decimals to display. Default: 0.
  * @param bool     $exact      Display exactly this number of decimals instead of first non-zeros.
  *
  * Note: $decimals must be less than $precision.
@@ -1491,6 +1561,10 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 * @return float
 */
 function truncateFloat(float $number): float {
+	if ($number == INF) {
+		return INF;
+	}
+
 	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);
 }
 
@@ -1555,7 +1629,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 
 		require_once dirname(__FILE__).'/page_header.php';
-		(new CWidget())->show();
+		(new CHtmlPage())->show();
 		require_once dirname(__FILE__).'/page_footer.php';
 	}
 	// deny access to a page
@@ -1588,11 +1662,13 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
 				$data['buttons'][] = (new CButton('login', _('Login')))
-					->onClick('javascript: document.location = "index.php?request='.$url.'";');
+					->setAttribute('data-url', $url)
+					->onClick('document.location = "index.php?request=" + this.dataset.url;');
 			}
 
 			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-				->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"');
+				->setAttribute('data-url', CMenuHelper::getFirstUrl())
+				->onClick('document.location = this.dataset.url');
 		}
 		// if the user is not logged in - offer to login
 		else {
@@ -1603,7 +1679,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => [
-					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
+					(new CButton('login', _('Login')))
+						->setAttribute('data-url', $url)
+						->onClick('document.location = "index.php?request=" + this.dataset.url;')
 				]
 			];
 		}
@@ -1690,9 +1768,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		}
 
 		foreach ($messages as $message) {
-			foreach (explode("\n", $message['message']) as $message_part) {
-				$list->addItem($message_part);
-			}
+			$list->addItem($message['message']);
 		}
 
 		$msg_details = (new CDiv())
@@ -1734,13 +1810,24 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 function filter_messages(): array {
 	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+
+		$type = CMessageHelper::getType();
+		$title = CMessageHelper::getTitle();
 		$messages = CMessageHelper::getMessages();
-		CMessageHelper::clear(false);
+		CMessageHelper::clear();
+
+		if ($title !== null) {
+			if ($type === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
+				CMessageHelper::setSuccessTitle($title);
+			}
+			else {
+				CMessageHelper::setErrorTitle($title);
+			}
+		}
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
-			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR
-					&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
+			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR	&& $message['is_technical_error']) {
 				if (!$generic_exists) {
 					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
 					$generic_exists = true;
@@ -2026,17 +2113,17 @@ function warning($messages): void {
 	}
 }
 
-/*
+/**
  * Add an error to global message array.
  *
- * @param string | array $msg	Error message text.
- * @param string		 $src	The source of error message.
+ * @param string|array $msgs                Error message text.
+ * @param bool         $is_technical_error
  */
-function error($msgs, string $src = ''): void {
+function error($msgs, bool $is_technical_error = false): void {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		CMessageHelper::addError($msg, $src);
+		CMessageHelper::addError($msg, $is_technical_error);
 	}
 }
 
@@ -2159,15 +2246,14 @@ function hasErrorMessages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $parentid  parent ID, is used as sessionStorage suffix
- * @param array  $keepids   checked rows ids
+ * @param string $name     entity name, used as sessionStorage suffix
+ * @param array  $keepids  checked rows ids
  */
-function uncheckTableRows($parentid = null, $keepids = []) {
-	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+function uncheckTableRows($name = null, $keepids = []) {
+	$key = 'cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').($name !== null ? '_'.$name : '');
 
 	if ($keepids) {
-		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
-		$keepids = array_combine($keepids, $keepids);
+		$keepids = array_fill_keys($keepids, '');
 
 		insert_js('sessionStorage.setItem('.json_encode($key).', JSON.stringify('.json_encode($keepids).'));');
 	}
@@ -2231,19 +2317,14 @@ function splitPath($path) {
  * @param string   $color  a hexadecimal color identifier like "1F2C33"
  * @param int      $alpha
  *
- * @return int|false
+ * @return int
  */
 function get_color($image, $color, $alpha = 0) {
 	$red = hexdec('0x'.substr($color, 0, 2));
 	$green = hexdec('0x'.substr($color, 2, 2));
 	$blue = hexdec('0x'.substr($color, 4, 2));
 
-	if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-			&& @imagecreatetruecolor(1, 1)) {
-		return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
-	}
-
-	return imagecolorallocate($image, $red, $green, $blue);
+	return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
 }
 
 /**
@@ -2280,21 +2361,22 @@ function getUserGraphTheme() {
 /**
  * Custom error handler for PHP errors.
  *
- * @param int     $errno Level of the error raised.
- * @param string  $errstr Error message.
- * @param string  $errfile Filename that the error was raised in.
- * @param int     $errline Line number the error was raised in.
+ * @param int    $errno    Level of the error raised.
+ * @param string $errstr   Error message.
+ * @param string $errfile  Filename that the error was raised in.
+ * @param int    $errline  Line number the error was raised in.
  *
- * @return bool  False, to continue with the default error handler.
+ * @return bool
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-	// Necessary to suppress errors when calling with error control operator like @function_name().
-	if (error_reporting() === 0) {
+	// Suppress errors when calling with error control operator @function_name().
+	if ((error_reporting()
+			& ~(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)) == 0) {
 		return true;
 	}
 
 	// Don't show the call to this handler function.
-	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', true);
 
 	return false;
 }

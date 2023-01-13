@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -37,7 +37,7 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				new CLabel(_('SLA'), 'filter_slaid'),
+				new CLabel(_('SLA'), 'filter_slaid_ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_slaid',
@@ -57,11 +57,11 @@ $filter = (new CFilter())
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				),
-				new CLabel(_('Service'), 'filter_serviceid'),
+				new CLabel(_('Service'), 'filter_serviceid_ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',
-						'object_name' => 'service',
+						'object_name' => 'services',
 						'data' => $data['service'] !== null
 							? [CArrayHelper::renameKeys($data['service'], ['serviceid' => 'id'])]
 							: [],
@@ -76,25 +76,27 @@ $filter = (new CFilter())
 				new CLabel(_('From'), 'filter_date_from'),
 				new CFormField(
 					(new CDateSelector('filter_date_from', $data['filter']['date_from']))
-						->setDateFormat(DATE_FORMAT)
-						->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+						->setDateFormat(ZBX_DATE)
+						->setPlaceholder(_('YYYY-MM-DD'))
 				),
 				new CLabel(_('To'), 'filter_date_to'),
 				new CFormField(
 					(new CDateSelector('filter_date_to', $data['filter']['date_to']))
-						->setDateFormat(DATE_FORMAT)
-						->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+						->setDateFormat(ZBX_DATE)
+						->setPlaceholder(_('YYYY-MM-DD'))
 				)
 			])
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('SLA report'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLAREPORT_LIST))
 	->addItem($filter);
 
 $report = new CTableInfo();
 
 $form = (new CForm())
+	->cleanItems()
 	->setId('slareport-list')
 	->setName('slareport_list');
 
@@ -195,7 +197,7 @@ else {
 	$form->addItem($report);
 }
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

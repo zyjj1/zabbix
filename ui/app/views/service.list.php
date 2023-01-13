@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -101,9 +101,10 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	]);
 }
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Services'))
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SERVICE_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -41,11 +41,11 @@ class CControllerPopupTokenView extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
+				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				])]))->disableView()
 			);
 		}
 
@@ -62,7 +62,7 @@ class CControllerPopupTokenView extends CController {
 		}
 
 		return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_API_TOKENS)
 		);
 	}
 

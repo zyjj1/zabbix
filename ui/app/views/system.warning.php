@@ -21,18 +21,32 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
-	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
-	->display();
+$page_header = (new CHtmlPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()));
 
-$buttons = [
-	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-		->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"'
-)];
+$page_header
+	->setTheme($data['theme'])
+	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
+	->show();
 
-echo '<body lang="'.CWebUser::getLang().'">';
+if (CWebUser::isLoggedIn()) {
+	$buttons = [
+		(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+			->setAttribute('data-url', CMenuHelper::getFirstUrl())
+			->onClick('document.location = this.dataset.url;')
+	];
+}
+else {
+	$buttons = [
+		(new CButton('login', _s('Go to "%1$s"', _('Login'))))
+			->setAttribute('data-url', 'index.php')
+			->onClick('document.location = this.dataset.url;')
+	];
+}
+
+echo '<body';
 
 (new CDiv((new CTag('main', true,
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)

@@ -19,8 +19,8 @@
 
 #include "preproc_worker.h"
 
-#include "common.h"
-#include "daemon.h"
+#include "../db_lengths.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
@@ -28,10 +28,8 @@
 #include "zbxembed.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
+#include "preproc_snmp.h"
+#include "zbxtime.h"
 
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
 
@@ -116,6 +114,88 @@ static void	worker_format_result(int step, const zbx_preproc_result_t *result, c
 	}
 }
 
+/* mock field to estimate how much data can be stored in characters, bytes or both, */
+/* depending on database backend                                                    */
+
+typedef struct
+{
+	int	bytes_num;
+	int	chars_num;
+}
+zbx_db_mock_field_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes mock field                                            *
+ *                                                                            *
+ * Parameters: field      - [OUT] the field data                              *
+ *             field_type - [IN] the field type in database schema            *
+ *             field_len  - [IN] the field size in database schema            *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
+{
+	switch (field_type)
+	{
+		case ZBX_TYPE_CHAR:
+#if defined(HAVE_ORACLE)
+			field->chars_num = field_len;
+			field->bytes_num = 4000;
+#else
+			field->chars_num = field_len;
+			field->bytes_num = -1;
+#endif
+			return;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	field->chars_num = 0;
+	field->bytes_num = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: 'appends' text to the field, if successful the character/byte     *
+ *           limits are updated                                               *
+ *                                                                            *
+ * Parameters: field - [IN/OUT] the mock field                                *
+ *             text  - [IN] the text to append                                *
+ *                                                                            *
+ * Return value: SUCCEED - the field had enough space to append the text      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
+{
+	int	bytes_num, chars_num;
+
+	if (-1 != field->bytes_num)
+	{
+		bytes_num = strlen(text);
+		if (bytes_num > field->bytes_num)
+			return FAIL;
+	}
+	else
+		bytes_num = 0;
+
+	if (-1 != field->chars_num)
+	{
+		chars_num = zbx_strlen_utf8(text);
+		if (chars_num > field->chars_num)
+			return FAIL;
+	}
+	else
+		chars_num = 0;
+
+	field->bytes_num -= bytes_num;
+	field->chars_num -= chars_num;
+
+	return SUCCEED;
+}
+
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: formats preprocessing error message                               *
@@ -144,7 +224,7 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 	zbx_snprintf_alloc(error, &error_alloc, &error_offset, "Preprocessing failed for: %s\n", value_str);
 	zbx_free(value_str);
 
-	zbx_db_mock_field_init(&field, ZBX_TYPE_CHAR, ITEM_ERROR_LEN);
+	zbx_db_mock_field_init(&field, ZBX_TYPE_CHAR, ZBX_ITEM_ERROR_LEN);
 
 	zbx_db_mock_field_append(&field, *error);
 	zbx_db_mock_field_append(&field, "...\n");
@@ -179,11 +259,11 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 		zbx_strcpy_alloc(error, &error_alloc, &error_offset, results_str.values[i]);
 
 	/* truncate formatted error if necessary */
-	if (ITEM_ERROR_LEN < zbx_strlen_utf8(*error))
+	if (ZBX_ITEM_ERROR_LEN < zbx_strlen_utf8(*error))
 	{
 		char	*ptr;
 
-		ptr = (*error) + zbx_db_strlen_n(*error, ITEM_ERROR_LEN - 3);
+		ptr = (*error) + zbx_db_strlen_n(*error, ZBX_ITEM_ERROR_LEN - 3);
 		for (i = 0; i < 3; i++)
 			*ptr++ = '.';
 		*ptr = '\0';
@@ -582,10 +662,10 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	zbx_ipc_socket_t		socket;
 	zbx_ipc_message_t		message;
 	zbx_preproc_dep_request_t	dep_request;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -603,10 +683,10 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_PREPROCESSOR_WORKER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	memset(&dep_request, 0, sizeof(dep_request));
 	zbx_variant_set_none(&dep_request.value);
@@ -615,7 +695,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
@@ -623,8 +703,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		zbx_update_env(zbx_time());
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		switch (message.code)
 		{
@@ -652,4 +732,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		zbx_sleep(SEC_PER_MIN);
 
 	zbx_es_destroy(&es_engine);
+#ifdef HAVE_NETSNMP
+	zbx_preproc_shutdown_snmp();
+#endif
 }

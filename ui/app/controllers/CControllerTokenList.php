@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -29,6 +29,7 @@ class CControllerTokenList extends CController {
 		$fields = [
 			'sort'                   => 'in name,user,expires_at,creator,lastaccess,status',
 			'sortorder'              => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck'                => 'in 1',
 			'filter_set'             => 'in 1',
 			'filter_rst'             => 'in 1',
 			'filter_name'            => 'string',
@@ -55,7 +56,7 @@ class CControllerTokenList extends CController {
 		}
 
 		return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_API_TOKENS)
 		);
 	}
 
@@ -103,6 +104,7 @@ class CControllerTokenList extends CController {
 			'ms_creators' => [],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
+			'uncheck' => $this->hasInput('uncheck'),
 			'filter' => $filter,
 			'profileIdx' => 'web.token.filter',
 			'active_tab' => CProfile::get('web.token.filter.active', 1)

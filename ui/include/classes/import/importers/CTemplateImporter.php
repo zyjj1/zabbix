@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -68,7 +68,7 @@ class CTemplateImporter extends CImporter {
 				 *  - save linkages to add in case if 'create new' linkages is checked;
 				 *  - calculate missing linkages in case if 'delete missing' is checked.
 				 */
-				if ($template['templates']) {
+				if (array_key_exists('templates', $template) && $template['templates']) {
 					$template_linkage[$template['host']] = $template['templates'];
 				}
 				unset($template['templates']);
@@ -222,7 +222,7 @@ class CTemplateImporter extends CImporter {
 					$this->processed_templateids[$templateid] = $templateid;
 
 					if ($this->options['templateLinkage']['createMissing']
-						&& array_key_exists($template['host'], $template_linkage)) {
+							&& array_key_exists($template['host'], $template_linkage)) {
 						API::Template()->massAdd([
 							'templates' => ['templateid' => $templateid],
 							'templates_link' => $template_linkage[$template['host']]
@@ -393,7 +393,7 @@ class CTemplateImporter extends CImporter {
 		}
 
 		foreach ($template['groups'] as $index => $group) {
-			$groupid = $this->referencer->findGroupidByName($group['name']);
+			$groupid = $this->referencer->findTemplateGroupidByName($group['name']);
 
 			if ($groupid === null) {
 				throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));

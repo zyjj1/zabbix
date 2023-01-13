@@ -51,10 +51,12 @@ class CControllerNotificationsGet extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			return $this->setResponse(
-				new CControllerResponseData([
-					'main_block' => json_encode(['error' => true])
-				])
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 
@@ -67,7 +69,8 @@ class CControllerNotificationsGet extends CController {
 
 	protected function doAction() {
 		if (!$this->settings['enabled']) {
-			return $this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
+			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
+			return;
 		}
 
 		// Server returns only basic details for events already known by client-side.
@@ -85,6 +88,7 @@ class CControllerNotificationsGet extends CController {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'severities' => array_keys($this->settings['triggers.severities']),
 			'suppressed' => $this->settings['show_suppressed'] ? null : false,
+			'symptom' => false,
 			'sortorder' => ZBX_SORT_DOWN,
 			'sortfield' => 'eventid',
 			'limit' => 15,

@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxdbhigh.h"
+
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
-
-#include "db.h"
+#include "zbxnum.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {
@@ -240,8 +242,8 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		override_operation->severity = FAIL == DBis_null(row[10]) ? (unsigned char)atoi(row[10]) :
 				TRIGGER_SEVERITY_COUNT;
 
-		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ?
-				(unsigned char)atoi(row[11]) : HOST_INVENTORY_COUNT;
+		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ? (signed char)atoi(row[11]) :
+				HOST_INVENTORY_COUNT;
 
 		zbx_vector_ptr_append(ops, override_operation);
 

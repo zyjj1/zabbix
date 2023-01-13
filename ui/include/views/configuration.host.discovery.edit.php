@@ -24,8 +24,9 @@
  * @var array $data
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_EDIT))
 	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
@@ -35,9 +36,10 @@ $url = (new CUrl('host_discovery.php'))
 	->getUrl();
 
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('host-discovery-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('backurl', $data['backurl']);
@@ -518,7 +520,6 @@ $item_tab
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
-						'webitems' => true,
 						'normal_only' => true
 					]
 				]
@@ -872,7 +873,7 @@ if (!$lld_macro_paths) {
 		'path' => ''
 	]];
 }
-elseif (!hasRequest('form_refresh')) {
+elseif ($data['form_refresh'] == 0) {
 	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
 }
 
@@ -969,7 +970,7 @@ $tab = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
 				)
 			]),
 		TAB_INDICATOR_PREPROCESSING
@@ -978,7 +979,7 @@ $tab = (new CTabView())
 	->addTab('macroTab', _('Filters'), $condition_tab, TAB_INDICATOR_FILTERS)
 	->addTab('overridesTab', _('Overrides'), $overrides_tab, TAB_INDICATOR_OVERRIDES);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tab->setSelected(0);
 }
 
@@ -987,11 +988,12 @@ if (!empty($data['itemid'])) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Execute now')))
+		$buttons[] = (new CSimpleButton(_('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
-			);
+			)
+			->onClick('view.checkNow(this);');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
@@ -1005,7 +1007,7 @@ if (!empty($data['itemid'])) {
 }
 else {
 	$cancel_button = $data['backurl'] !== null
-		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 		: new CButtonCancel(url_param('context'));
 
 	$form_actions = new CFormActions(
@@ -1020,11 +1022,11 @@ else {
 $tab->setFooter(new CFormGrid($form_actions));
 
 $form->addItem($tab);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.host.discovery.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([

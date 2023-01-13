@@ -218,7 +218,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'auditacts.php',
+				'url' => 'zabbix.php?action=actionlog.list',
 				'title' =>	'Action log',
 				'users' => [
 					'guest' => false,
@@ -238,8 +238,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// Configuration
 			[[
-				'url' => 'hostgroups.php',
-				'title' =>	'Configuration of host groups',
+				'url' => 'zabbix.php?action=hostgroup.list',
+				'title' => 'Configuration of host groups',
 				'header' => 'Host groups',
 				'users' => [
 					'guest' => false,
@@ -248,9 +248,18 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hostgroups.php?form=update&groupid=1',
-				'title' =>	'Configuration of host groups',
-				'no_permissions_to_object' => true,
+				'url' => 'zabbix.php?action=hostgroup.edit&groupid=4',
+				'title' => 'Configuration of host groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => false
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=hostgroup.edit',
+				'title' => 'Configuration of host group',
+				'header' => 'New host group',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -258,9 +267,28 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hostgroups.php?form=Create+host+group',
-				'title' =>	'Configuration of host groups',
-				'header' => 'Host groups',
+				'url' => 'zabbix.php?action=templategroup.list',
+				'title' => 'Configuration of template groups',
+				'header' => 'Template groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => true
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=templategroup.edit&groupid=1',
+				'title' => 'Configuration of template groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => false
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=templategroup.edit',
+				'title' =>	'Configuration of template group',
+				'header' => 'New template group',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -368,7 +396,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'actionconf.php',
+				'url' => 'zabbix.php?action=action.list&eventsource=0',
 				'title' =>	'Configuration of actions',
 				'header' => 'Trigger actions',
 				'users' => [
@@ -378,17 +406,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'actionconf.php?eventsource=0',
-				'title' =>	'Configuration of actions',
-				'header' => 'Trigger actions',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'actionconf.php?eventsource=1',
+				'url' => 'zabbix.php?action=action.list&eventsource=1',
 				'title' =>	'Configuration of actions',
 				'header' => 'Discovery actions',
 				'users' => [
@@ -398,7 +416,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'actionconf.php?eventsource=2',
+				'url' => 'zabbix.php?action=action.list&eventsource=2',
 				'title' =>	'Configuration of actions',
 				'header' => 'Autoregistration actions',
 				'users' => [
@@ -408,9 +426,19 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'actionconf.php?eventsource=3',
+				'url' => 'zabbix.php?action=action.list&eventsource=3',
 				'title' =>	'Configuration of actions',
 				'header' => 'Internal actions',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => true
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=action.list&eventsource=4',
+				'title' =>	'Configuration of actions',
+				'header' => 'Service actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -623,10 +651,10 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		foreach ($data['users'] as $alias => $user) {
 			switch ($alias) {
 				case 'admin-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 40);
 					break;
 				case 'user-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 50);
 					break;
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
@@ -665,17 +693,18 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		$this->zbxTestOpen($data['url']);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'You are not logged in');
 		$this->zbxTestAssertElementText("//ul/li[1]", 'You must login to view this page.');
-		$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+		$this->zbxTestAssertElementText("//ul/li[2]", 'Possibly the session has expired or the password was changed.');
+		$this->zbxTestAssertElementText("//ul/li[3]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 	}
 
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public static function removeGuestFromDisabledGroup() {
+	public function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 
-	public function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
+	public static function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1552, 9, 2)');
 	}
 }

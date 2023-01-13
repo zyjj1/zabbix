@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher.
 Official JMX Template for WildFly server.
 
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 Metrics are collected by JMX.
 This template works with standalone and domain instances.
@@ -86,7 +86,7 @@ There are no template links in this template.
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Cache delete, rate |<p>The number of statements discarded from the cache per second.</p> |JMX |jmx["{#JMXOBJ}",PreparedStatementCacheDeleteCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Cache hit, rate |<p>The number of times that statements from the cache were used per second.</p> |JMX |jmx["{#JMXOBJ}",PreparedStatementCacheHitCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Cache miss, rate |<p>The number of times that a statement request could not be satisfied with a statement from the cache per second.</p> |JMX |jmx["{#JMXOBJ}",PreparedStatementCacheMissCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|WildFly |WildFly {#JMX_DATA_SOURCE}: Statistics enabled |<p>Define whether runtime statistics are enabled or not.</p> |JMX |jmx["{#JMXOBJ}",statisticsEnabled]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|WildFly |WildFly {#JMX_DATA_SOURCE}: Statistics enabled |<p>Define whether runtime statistics are enabled or not.</p> |JMX |jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Connections: Active |<p>The number of open connections.</p> |JMX |jmx["{#JMXOBJ}",ActiveCount] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Connections: Available |<p>The available count.</p> |JMX |jmx["{#JMXOBJ}",AvailableCount] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Blocking time, avg |<p>Average Blocking Time for pool.</p> |JMX |jmx["{#JMXOBJ}",AverageBlockingTime] |
@@ -128,21 +128,21 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |WildFly: Server needs to restart for configuration change. |<p>-</p> |`find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0` |WARNING | |
 |WildFly: Server controller is not in RUNNING state |<p>-</p> |`find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","serverState"],,"like","running")=0` |WARNING |<p>**Depends on**:</p><p>- WildFly: Server needs to restart for configuration change.</p> |
-|WildFly: Version has changed (new version: {ITEM.VALUE}) |<p>WildFly version has changed. Ack to close.</p> |`last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0` |INFO |<p>Manual close: YES</p> |
-|WildFly: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
-|WildFly: Failed to fetch info data (or no data for 15m) |<p>Zabbix has not received data for items for the last 15 minutes</p> |`nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1` |WARNING | |
-|WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE}) |<p>Deployment status has changed. Ack to close.</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0` |WARNING |<p>Manual close: YES</p> |
-|WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0` |INFO | |
+|WildFly: Version has changed |<p>The WildFly version has changed. Perform Ack to close.</p> |`last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0` |INFO |<p>Manual close: YES</p> |
+|WildFly: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
+|WildFly: Failed to fetch info data |<p>Zabbix has not received data for items for the last 15 minutes</p> |`nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1` |WARNING | |
+|WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed |<p>Deployment status has changed. Ack to close.</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0` |WARNING |<p>Manual close: YES</p> |
+|WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"])=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m |<p>-</p> |`max(/WildFly Server by JMX/jmx["{#JMXOBJ}",ActiveCount],5m)=0` |WARNING | |
-|WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m) |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
+|WildFly {#JMX_DATA_SOURCE}: Connection usage is too high |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
 |WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are timeout connections |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",TimedOut])>0` |WARNING | |
-|WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m) |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}` |WARNING | |
+|WildFly {#JMX_DATA_SOURCE}: Too many waiting connections |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}` |WARNING | |
 |WildFly listener {#HTTP_LISTENER}: There are 500 responses by this listener. |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",errorCount])>0` |WARNING | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

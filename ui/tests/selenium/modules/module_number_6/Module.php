@@ -1,8 +1,8 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 
 namespace Modules\Example_F;
 
-use Core\CModule,
+use Zabbix\Core\CModule,
 	APP,
 	CMenu;
 

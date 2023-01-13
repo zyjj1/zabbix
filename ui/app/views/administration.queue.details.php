@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Queue details'))
 	->setTitleSubmenu([
 		'main_section' => [
@@ -39,7 +39,8 @@ $widget = (new CWidget())
 					->getUrl() => _('Queue details')
 			]
 		]
-	]);
+	])
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_DETAILS));
 
 $table = (new CTableInfo())->setHeader([
 	_('Scheduled check'),
@@ -74,7 +75,7 @@ if (CWebUser::getRefresh()) {
 		->show();
 }
 
-$widget
+$html_page
 	->addItem($table)
 	->addItem((new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)

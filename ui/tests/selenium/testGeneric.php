@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
@@ -56,17 +57,18 @@ class testGeneric extends CLegacyWebTest {
 			['toptriggers.php?severities[5]=5&filter_set=Filter',	'100 busiest triggers'],
 
 			// configuration
-			['hostgroups.php',					'Configuration of host groups'],
+			['zabbix.php?action=hostgroup.list',		'Configuration of host groups'],
+			['zabbix.php?action=templategroup.list',	'Configuration of template groups'],
 			['templates.php',					'Configuration of templates'],
 			[self::HOST_LIST_PAGE,				'Configuration of hosts'],
 			['maintenance.php',				'Configuration of maintenance periods'],
 			['httpconf.php',					'Configuration of web monitoring'],
 
-			['actionconf.php',					'Configuration of actions'],
-			['actionconf.php?eventsource=0',	'Configuration of actions'],
-			['actionconf.php?eventsource=1',	'Configuration of actions'],
-			['actionconf.php?eventsource=2',	'Configuration of actions'],
-			['actionconf.php?eventsource=3',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=0',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=1',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=2',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=3',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=4',	'Configuration of actions'],
 
 			['sysmaps.php',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.list',	'Configuration of discovery rules'],
@@ -89,7 +91,7 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],
 			['zabbix.php?action=script.list',						'Configuration of scripts'],
 			['zabbix.php?action=auditlog.list',					'Audit log'],
-			['auditacts.php',					'Action log'],
+			['zabbix.php?action=actionlog.list',					'Action log'],
 
 			['zabbix.php?action=queue.overview',			'Queue [refreshed every 30 sec.]'],
 			['zabbix.php?action=queue.overview.proxy',		'Queue [refreshed every 30 sec.]'],

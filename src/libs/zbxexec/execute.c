@@ -19,8 +19,9 @@
 
 #include "zbxexec.h"
 
-#include "common.h"
-#include "threads.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxthreads.h"
 #include "log.h"
 
 /* the size of temporary buffer used to read from output stream */
@@ -305,7 +306,8 @@ exit:
  *                                  pass NULL to stay in current directory    *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
- *               timeout occurred or FAIL otherwise                           *
+ *               timeout occurred, SIG_ERROR if interrupted by signal or FAIL *
+ *               otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
@@ -326,6 +328,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 #else
 	pid_t			pid;
 	int			fd;
+	sigset_t	mask, orig_mask;
 #endif
 
 	*error = '\0';
@@ -461,6 +464,18 @@ close:
 	zbx_free(wdir);
 
 #else	/* not _WINDOWS */
+	/* block signals to prevent interruption of statements when runtime control command is issued */
+	if (0 > sigemptyset(&mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize signal set: %s", zbx_strerror(errno));
+
+	if (0 > sigaddset(&mask, SIGUSR1))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add SIGUSR1 signal to signal mask: %s", zbx_strerror(errno));
+
+	if (0 > sigaddset(&mask, SIGUSR2))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add SIGUSR2 signal to signal mask: %s", zbx_strerror(errno));
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal: %s", zbx_strerror(errno));
 
 	zbx_alarm_on(timeout);
 
@@ -480,7 +495,16 @@ close:
 		if (-1 == rc || -1 == zbx_waitpid(pid, &status))
 		{
 			if (EINTR == errno)
-				ret = TIMEOUT_ERROR;
+			{
+				if (SUCCEED == zbx_alarm_timed_out())
+					ret = TIMEOUT_ERROR;
+				else
+				{
+					ret = SIG_ERROR;
+					zbx_strlcpy(error, "Signal received while executing a shell script.",
+							max_error_len);
+				}
+			}
 			else
 				zbx_snprintf(error, max_error_len, "zbx_waitpid() failed: %s", zbx_strerror(errno));
 
@@ -508,6 +532,7 @@ close:
 				{
 					zbx_snprintf(error, max_error_len, "Process killed by signal: %d.",
 							WTERMSIG(status));
+					ret = SIG_ERROR;
 				}
 				else
 					zbx_strlcpy(error, "Process terminated unexpectedly.", max_error_len);
@@ -522,6 +547,9 @@ close:
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
 	zbx_alarm_off();
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore sigprocmask: %s", zbx_strerror(errno));
 
 #endif	/* _WINDOWS */
 

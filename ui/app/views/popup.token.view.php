@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -25,9 +25,9 @@
  */
 
 $token_form = (new CForm())
+	->cleanItems()
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(makeMessageBox(ZBX_STYLE_MSG_GOOD, [], $data['message']));
 
 $token_from_grid = (new CFormGrid())
@@ -52,7 +52,8 @@ $token_from_grid = (new CFormGrid())
 			),
 			'&nbsp;',
 			(new CLinkAction(_('Copy to clipboard')))
-				->onClick('writeTextClipboard("' . $data['auth_token'] . '")')
+				->setAttribute('data-auth_token', $data['auth_token'])
+				->onClick('writeTextClipboard(this.dataset.auth_token);')
 				->setAttribute('autofocus', 'autofocus')
 		])
 	])

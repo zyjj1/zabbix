@@ -17,9 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_ipmi.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
+
+#include "zbxtime.h"
+
+#include "checks_ipmi.h"
 
 /* Theoretically it should be enough max 16 bytes for sensor ID and terminating '\0' (see SDR record format in IPMI */
 /* v2 spec). OpenIPMI author Corey Minyard explained at	*/
@@ -1955,7 +1959,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	return SUCCEED;
 }
 
-/* function 'zbx_parse_ipmi_command' requires 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
+/* function 'zbx_parse_ipmi_command' requires 'c_name' with size 'ZBX_ITEM_IPMI_SENSOR_LEN_MAX' */
 int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len)
 {
 	const char	*p;
@@ -1976,7 +1980,7 @@ int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *er
 		goto fail;
 	}
 
-	if (ITEM_IPMI_SENSOR_LEN_MAX <= sz_c_name)
+	if (ZBX_ITEM_IPMI_SENSOR_LEN_MAX <= sz_c_name)
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command is too long [%.*s]", (int)sz_c_name, command);
 		goto fail;
@@ -1992,7 +1996,7 @@ int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *er
 		*val = 1;
 	else if (0 == strcasecmp(p, "off"))
 		*val = 0;
-	else if (SUCCEED != is_uint31(p, val))
+	else if (SUCCEED != zbx_is_uint31(p, val))
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command value is not supported [%s]", p);
 		goto fail;

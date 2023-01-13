@@ -25,17 +25,23 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.prototype.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Host prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create host prototype'),
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'create')
-					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			))
+			(new CList())
+				->addItem(
+					new CRedirectButton(_('Create host prototype'),
+						(new CUrl('host_prototypes.php'))
+							->setArgument('form', 'create')
+							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+							->setArgument('context', $data['context'])
+					)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(
@@ -143,18 +149,19 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$status = (new CLink(
 		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		(new CUrl('host_prototypes.php'))
-			->setArgument('group_hostid', $hostPrototype['hostid'])
+			->setArgument('group_hostid[]', $hostPrototype['hostid'])
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgumentSID()
 			->getUrl()
 	))
+		->addSID()
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']))
-		->addSID();
+		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
 	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
@@ -200,7 +207,6 @@ $itemForm->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($itemForm);
-
-$widget->show();
+$html_page
+	->addItem($itemForm)
+	->show();

@@ -23,8 +23,8 @@
 #include "zbxmockutil.h"
 #include "zbxmockhelper.h"
 
-#include "common.h"
-#include "comms.h"
+#include "zbxcommon.h"
+#include "zbxcomms.h"
 
 static void	mock_accept(zbx_socket_t *s)
 {

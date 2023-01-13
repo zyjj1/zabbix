@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -49,6 +49,8 @@ class CLdapAuthValidatorTest extends CValidatorTest {
 	}
 
 	protected function createValidator(array $params = []) {
-		return new CLdapAuthValidator($params);
+		$ldap = new CLdap($params['conf']);
+
+		return new CLdapAuthValidator(['ldap' => $ldap]);
 	}
 }

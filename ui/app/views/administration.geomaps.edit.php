@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -114,7 +114,7 @@ $form = (new CForm())
 			->setArgument('action', 'geomaps.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('geomaps_tab', _('Geographical maps'), $form_grid)
@@ -123,14 +123,15 @@ $form = (new CForm())
 			))
 	);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Geographical maps'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GEOMAPS_EDIT))
 	->addItem($form)
 	->show();
 
 (new CScriptTag(
-	'view.init('. json_encode([
+	'view.init('.json_encode([
 		'tile_providers' => $data['tile_providers']
 	]).');'
 ))

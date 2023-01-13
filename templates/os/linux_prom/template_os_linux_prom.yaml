@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T14:29:54Z'
-  groups:
+  version: '6.4'
+  date: '2022-11-16T20:12:08Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Operating systems'
@@ -84,7 +84,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -106,11 +106,12 @@ zabbix_export:
             -
               uuid: c0002ad071d7497ab32633c93624e0c2
               expression: 'last(/Linux by Prom/kernel.maxfiles[node_exporter])<{$KERNEL.MAXFILES.MIN}'
-              name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
+              name: 'Configured max number of open filedescriptors is too low'
+              event_name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
               dependencies:
                 -
-                  name: 'Running out of file descriptors (less than < 20% free)'
+                  name: 'Running out of file descriptors'
                   expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
               tags:
                 -
@@ -133,7 +134,8 @@ zabbix_export:
             -
               uuid: e33fafc8476e404aa4150d0d491f4c83
               expression: 'nodata(/Linux by Prom/node_exporter.get,30m)=1'
-              name: 'node_exporter is not available (or no data for 30m)'
+              name: 'node_exporter is not available'
+              event_name: 'node_exporter is not available (or no data for 30m)'
               priority: WARNING
               description: 'Failed to fetch system metrics from node_exporter in time.'
               manual_close: 'YES'
@@ -172,7 +174,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)'
+          description: 'Guest time - the time spent on running a virtual CPU for a guest operating system.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -210,7 +212,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)'
+          description: 'The time spent on running a niced guest (a virtual CPU for guest operating systems under the control of the Linux kernel).'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -349,7 +351,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Amount of time the CPU has been waiting for I/O to complete.'
+          description: 'The amount of time the CPU has been waiting for I/O to complete.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -550,7 +552,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The amount of CPU ''stolen'' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).'
+          description: 'The amount of ''stolen'' CPU from this virtual machine by the hypervisor for other tasks, such as running another virtual machine.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -689,7 +691,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'The CPU utilization expressed in %.'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -707,13 +709,14 @@ zabbix_export:
             -
               uuid: 4c924f8243a7431886a2d69368cb7142
               expression: 'min(/Linux by Prom/system.cpu.util[node_exporter],5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               dependencies:
                 -
-                  name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+                  name: 'Load average is too high'
                   expression: |
                     min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
                     and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
@@ -762,7 +765,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: unixtime
-          description: 'System local time of the host.'
+          description: 'The local system time of the host.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -780,9 +783,10 @@ zabbix_export:
             -
               uuid: e91c10be1c4a4c3fadfe06aec6c1e4e4
               expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              name: 'System time is out of sync'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
-              description: 'The host system time is different from the Zabbix server time.'
+              description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
               tags:
                 -
@@ -800,7 +804,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: CHAR
-          description: 'System host name.'
+          description: 'The host name of the system.'
           inventory_link: NAME
           preprocessing:
             -
@@ -823,9 +827,10 @@ zabbix_export:
             -
               uuid: e827e944568b46e284820630482317bd
               expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Ack to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -843,7 +848,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: CHAR
-          description: 'Operating system architecture of the host.'
+          description: 'The architecture of the host''s operating system.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -888,11 +893,11 @@ zabbix_export:
               expression: 'last(/Linux by Prom/system.sw.os[node_exporter],#1)<>last(/Linux by Prom/system.sw.os[node_exporter],#2) and length(last(/Linux by Prom/system.sw.os[node_exporter]))>0'
               name: 'Operating system description has changed'
               priority: INFO
-              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
               tags:
                 -
@@ -907,7 +912,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The free space of swap volume/file in bytes.'
+          description: 'The free space of the swap volume/file expressed in bytes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -933,7 +938,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//system.swap.free[node_exporter])/last(//system.swap.total[node_exporter])*100'
-          description: 'The free space of swap volume/file in percent.'
+          description: 'The free space of the swap volume/file expressed in %.'
           tags:
             -
               tag: component
@@ -950,7 +955,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The total space of swap volume/file in bytes.'
+          description: 'The total space of the swap volume/file expressed in bytes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -976,7 +981,7 @@ zabbix_export:
           history: 2w
           trends: 0d
           units: uptime
-          description: 'System uptime in ''N days, hh:mm:ss'' format.'
+          description: 'The system uptime expressed in the following format:''N days, hh:mm:ss''.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1000,7 +1005,8 @@ zabbix_export:
             -
               uuid: 83311a7c73c441d39d88fe0fc7b55af9
               expression: 'last(/Linux by Prom/system.uptime[node_exporter])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1017,7 +1023,11 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.'
+          description: |
+            The available memory:
+             - in Linux - available = free + buffers + cache;
+             - on other platforms calculation may vary.
+            See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1040,7 +1050,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Total memory in Bytes'
+          description: 'The total memory expressed in Bytes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1072,12 +1082,13 @@ zabbix_export:
             -
               uuid: 72304b3a167e41ccbcdb75568c65294a
               expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory'
                   expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
               tags:
                 -
@@ -1427,11 +1438,11 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. Can be triggered if operations status is down.
-                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    1. It can be triggered if the operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'ethernal off' interfaces.)
                     
-                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                    WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
                     -
@@ -1489,7 +1500,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge (Ack) to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1516,7 +1527,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge (Ack) to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1537,10 +1548,11 @@ zabbix_export:
               recovery_expression: |
                 avg(/Linux by Prom/net.if.in[node_exporter,"{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"]) and
                 avg(/Linux by Prom/net.if.out[node_exporter,"{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1560,10 +1572,11 @@ zabbix_export:
               recovery_expression: |
                 max(/Linux by Prom/net.if.in.errors[node_exporter,"{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Linux by Prom/net.if.out.errors[node_exporter"{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              description: 'It recovers when it is below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1670,7 +1683,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.'
+              description: 'The current average disk queue; the number of requests outstanding on the disk while the performance data is being collected.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1776,7 +1789,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.'
+              description: 'This item is the percentage of elapsed time during which the selected disk drive was busy while servicing read or write requests.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1881,7 +1894,8 @@ zabbix_export:
             -
               uuid: 412381f71bba441b955898839f81d51c
               expression: 'min(/Linux by Prom/vfs.dev.read.await[node_exporter,"{#DEVNAME}"],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or min(/Linux by Prom/vfs.dev.write.await[node_exporter,"{#DEVNAME}"],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
-              name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
+              name: '{#DEVNAME}: Disk read/write request responses are too high'
+              event_name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
               priority: WARNING
               description: 'This trigger might indicate disk {#DEVNAME} saturation.'
               manual_close: 'YES'
@@ -2058,12 +2072,15 @@ zabbix_export:
                 -
                   uuid: 27cabcc9d9644ba6b7bd8c92a740e3cc
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                    It may become impossible to write to a disk if there are no index nodes left.
+                    Following error messages may be returned as symptoms, even though the free space is available:
+                     - 'No space left on device';
+                     - 'Disk is full'.
                   tags:
                     -
                       tag: scope
@@ -2074,15 +2091,18 @@ zabbix_export:
                 -
                   uuid: c639215f6dd94c71aebf97265a282a0d
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                    It may become impossible to write to a disk if there are no index nodes left.
+                    Following error messages may be returned as symptoms, even though the free space is available:
+                     - 'No space left on device';
+                     - 'Disk is full'.
                   dependencies:
                     -
-                      name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                      name: '{#FSNAME}: Running out of free inodes'
                       expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     -
@@ -2100,7 +2120,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: '(last(//vfs.fs.used[node_exporter,"{#FSNAME}"])/last(//vfs.fs.total[node_exporter,"{#FSNAME}"]))*100'
-              description: 'Space utilization in % for {#FSNAME}'
+              description: 'The space utilization expressed in % for {#FSNAME}.'
               tags:
                 -
                   tag: component
@@ -2117,7 +2137,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Total space in Bytes'
+              description: 'The total space expressed in Bytes.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2143,7 +2163,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               params: '(last(//vfs.fs.total[node_exporter,"{#FSNAME}"])-last(//vfs.fs.free[node_exporter,"{#FSNAME}"]))'
-              description: 'Used storage in Bytes'
+              description: 'Used storage expressed in Bytes'
               tags:
                 -
                   tag: component
@@ -2156,15 +2176,17 @@ zabbix_export:
               uuid: d5687d7aa0484b389f0bd168d50ee1e6
               expression: |
                 last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<5G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is critically low'
+              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 5G.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match:
+                 1. The first condition - utilization of space should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
+                 2. The second condition should be one of the following:
+                  - the disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"};
+                  - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
                 -
@@ -2177,22 +2199,24 @@ zabbix_export:
               uuid: 8f765148cfd64d5ebda93f39d0b20e36
               expression: |
                 last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<10G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is low'
+              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 10G.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match:
+                 1. The first condition - utilization of space should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
+                 2. The second condition should be one of the following:
+                  - the disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"};
+                  - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<5G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
+                    ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -2323,6 +2347,14 @@ zabbix_export:
           value: '20'
           description: 'Disk write average response time (in ms) before the trigger would fire.'
         -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
+        -
           macro: '{$VFS.FS.FSDEVICE.MATCHES}'
           value: ^.+$
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
@@ -2386,8 +2418,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Linux by Prom'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 558606056f464970a7c544ba75d544f2
           name: 'System performance'
@@ -2407,8 +2439,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Linux by Prom'
                         name: 'System load'
-                        host: 'Linux by Prom'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2423,8 +2455,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Linux by Prom'
                         name: 'CPU usage'
-                        host: 'Linux by Prom'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2439,8 +2471,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'Linux by Prom'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2456,8 +2488,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'Linux by Prom'
+                        name: 'Swap usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2480,8 +2512,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Linux by Prom'
+                        name: '{#FSNAME}: Disk space usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2504,8 +2536,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk read/write rates'
                         host: 'Linux by Prom'
+                        name: '{#DEVNAME}: Disk read/write rates'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -2528,8 +2560,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk average waiting time'
                         host: 'Linux by Prom'
+                        name: '{#DEVNAME}: Disk average waiting time'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '25'
@@ -2552,8 +2584,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk utilization and queue'
                         host: 'Linux by Prom'
+                        name: '{#DEVNAME}: Disk utilization and queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '30'
@@ -2576,8 +2608,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Linux by Prom'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 4827063819f14d539f509552c84f5f94
@@ -2804,16 +2836,17 @@ zabbix_export:
     -
       uuid: 16e6a4d340164dee9379a3fc0aac0576
       expression: 'max(/Linux by Prom/system.swap.pfree[node_exporter],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Prom/system.swap.total[node_exporter])>0'
-      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
         -
-          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'High memory utilization'
           expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory'
           expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
       tags:
         -
@@ -2822,7 +2855,8 @@ zabbix_export:
     -
       uuid: f78ed17586964a46a9de0c4f183984f6
       expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
-      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       tags:
@@ -2838,10 +2872,11 @@ zabbix_export:
         min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
         and last(/Linux by Prom/system.cpu.load.avg15[node_exporter])>0
-      name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
-      description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      description: 'The load average per CPU is too high. The system may be slow to respond.'
       tags:
         -
           tag: scope
@@ -2852,7 +2887,8 @@ zabbix_export:
     -
       uuid: 7effa63c9c994a6786279802aa7328ad
       expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
-      name: 'Running out of file descriptors (less than < 20% free)'
+      name: 'Running out of file descriptors'
+      event_name: 'Running out of file descriptors (less than < 20% free)'
       opdata: '{ITEM.LASTVALUE1} of {ITEM.LASTVALUE2} file descriptors are in use.'
       priority: WARNING
       tags:

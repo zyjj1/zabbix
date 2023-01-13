@@ -32,27 +32,27 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
-	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'groups'			=> [null,      O_OPT, P_ONLY_ARRAY,	NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,		DB_ID,	null],
+	'templates'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
+	'add_templates'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form}) && {form} == "update"'],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
-	'groupids'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'groupids'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
+	'tags'				=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
-	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'macros'			=> [null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
-	'valuemaps'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'valuemaps'			=> [null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
 								null
 							],
-	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
+	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
@@ -61,18 +61,18 @@ $fields = [
 	'delete_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,		null,	null],
+	'form_refresh'		=> [T_ZBX_INT, O_OPT, P_SYS,		null,	null],
 	// filter
-	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
-	'filter_templates' =>  [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
+	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_name'		=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_templates' =>  [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
 								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 								null
 							],
-	'filter_tags'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
+	'filter_tags'		=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,		null,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -127,10 +127,10 @@ $macros = array_filter($macros, function($macro) {
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	$unlinkTemplates = [];
 
-	if (hasRequest('unlink') && is_array(getRequest('unlink'))) {
+	if (hasRequest('unlink')) {
 		$unlinkTemplates = array_keys(getRequest('unlink'));
 	}
-	elseif (hasRequest('unlink_and_clear') && is_array(getRequest('unlink_and_clear'))) {
+	else {
 		$unlinkTemplates = array_keys(getRequest('unlink_and_clear'));
 		$_REQUEST['clear_templates'] = array_merge($unlinkTemplates, getRequest('clear_templates', []));
 	}
@@ -153,7 +153,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 	}
 
 	if ($groupids) {
-		$groups_allowed = API::HostGroup()->get([
+		$groups_allowed = API::TemplateGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
 			'editable' => true,
@@ -192,6 +192,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	try {
 		DBstart();
 
+		foreach ($macros as &$macro) {
+			unset($macro['discovery_state']);
+		}
+		unset($macro);
+
 		$input_templateid = getRequest('templateid', 0);
 		$cloneTemplateId = 0;
 
@@ -221,7 +226,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($new_groups) {
-			$new_groupid = API::HostGroup()->create($new_groups);
+			$new_groupid = API::TemplateGroup()->create($new_groups);
 
 			if (!$new_groupid) {
 				throw new Exception();
@@ -239,6 +244,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$template_name = getRequest('template_name', '');
 
+		$save_macros = $macros;
+
+		foreach ($save_macros as &$macro) {
+			unset($macro['allow_revert']);
+		}
+		unset($macro);
+
 		// create / update template
 		$template = [
 			'host' => $template_name,
@@ -247,7 +259,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
 			'tags' => $tags,
-			'macros' => $macros
+			'macros' => $save_macros
 		];
 
 		if ($input_templateid == 0) {
@@ -328,22 +340,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $input_templateid)) {
+			if (!copyItemsToHosts('templateids', [$cloneTemplateId], true, [$input_templateid])) {
 				throw new Exception();
 			}
 
 			// copy triggers
-			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			if ($dbTriggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $input_templateid,
-						$cloneTemplateId)) {
-					throw new Exception();
-				}
+			if (!copyTriggersToHosts([$input_templateid], $cloneTemplateId)) {
+				throw new Exception();
 			}
 
 			// copy graphs
@@ -547,6 +550,7 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
  */
 if (hasRequest('form')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),
 		'linked_templates' => [],
@@ -562,7 +566,7 @@ if (hasRequest('form')) {
 	if ($data['templateid'] != 0) {
 		$dbTemplates = API::Template()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectTemplateGroups' => ['groupid'],
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -578,6 +582,14 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
+
+			foreach ($data['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro['allow_revert'] = true;
+				}
+			}
+			unset($macro);
+
 			order_result($data['dbTemplate']['valuemaps'], 'name');
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
@@ -645,9 +657,14 @@ if (hasRequest('form')) {
 		$data['macros'][] = $macro;
 	}
 
+	foreach ($data['macros'] as &$macro) {
+		$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+	}
+	unset($macro);
+
 	if (!hasRequest('form_refresh')) {
 		if ($data['templateid'] != 0) {
-			$groups = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
+			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
 		}
 		else {
 			$groups = getRequest('groupids', []);
@@ -669,7 +686,7 @@ if (hasRequest('form')) {
 
 	// Groups with R and RW permissions.
 	$groups_all = $groupids
-		? API::HostGroup()->get([
+		? API::TemplateGroup()->get([
 			'output' => ['name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -678,7 +695,7 @@ if (hasRequest('form')) {
 
 	// Groups with RW permissions.
 	$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-		? API::HostGroup()->get([
+		? API::TemplateGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
 			'editable' => true,
@@ -802,9 +819,9 @@ else {
 		]), ['templateid' => 'id'])
 		: [];
 
-	// Get host groups.
+	// Get template groups.
 	$filter['groups'] = $filter['groups']
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+		? CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
 			'editable' => true,
@@ -814,7 +831,7 @@ else {
 
 	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
 	if ($filter_groupids) {
-		$filter_groupids = getSubGroups($filter_groupids);
+		$filter_groupids = getTemplateSubGroups($filter_groupids);
 	}
 
 	// Select templates.

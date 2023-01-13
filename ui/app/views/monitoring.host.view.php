@@ -45,9 +45,10 @@ if ($data['can_create_hosts']) {
 
 $nav_items->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Hosts'))
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_VIEW))
 	->setControls((new CTag('nav', true, $nav_items))
 		->setAttribute('aria-label', _('Content controls'))
 	);
@@ -65,18 +66,20 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 
 	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 	$data['filter_options'] = $filter->options;
-	$widget->addItem($filter);
+	$html_page->addItem($filter);
 }
 else {
 	$data['filter_options'] = null;
 }
 
-$widget->addItem((new CForm())
-	->setName('host_view')
-	->addClass('is-loading')
-);
-
-$widget->show();
+$html_page
+	->addItem(
+		(new CForm())
+			->cleanItems()
+			->setName('host_view')
+			->addClass('is-loading')
+	)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

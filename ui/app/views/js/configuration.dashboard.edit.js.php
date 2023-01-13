@@ -26,12 +26,10 @@
 
 <script>
 	const view = {
-		dashboard: null,
-		page: null,
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, widget_defaults, time_period, page}) {
+		init({dashboard, widget_defaults, widget_last_type, time_period, page}) {
 			this.dashboard = dashboard;
 			this.page = page;
 
@@ -60,19 +58,19 @@
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
+				widget_last_type,
 				is_editable: true,
 				is_edit_mode: true,
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
-				time_period: time_period,
+				time_period,
 				dynamic_hostid: null
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
 					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
-					widget.configuration = (typeof widget.configuration === 'object') ? widget.configuration : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
@@ -115,14 +113,10 @@
 		},
 
 		save() {
-			clearMessages();
-
 			this.is_busy_saving = true;
 			this.updateBusy();
 
 			const request_data = ZABBIX.Dashboard.save();
-
-			request_data.sharing = this.dashboard.sharing;
 
 			const curl = new Curl('zabbix.php');
 
@@ -135,28 +129,38 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					if ('errors' in response) {
-						throw {html_string: response.errors};
+					if ('error' in response) {
+						throw {error: response.error};
 					}
 
-					if ('system-message-ok' in response) {
-						postMessageOk(response['system-message-ok']);
+					postMessageOk(response.success.title);
+
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
 					}
 
 					this.disableNavigationWarning();
 					this.cancelEditing();
 				})
-				.catch((error) => {
-					if (typeof error === 'object' && 'html_string' in error) {
-						addMessage(error.html_string);
+				.catch((exception) => {
+					clearMessages();
+
+					let title;
+					let messages = [];
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
 					}
 					else {
-						const message = this.dashboard.dashboardid === null
+						title = this.dashboard.dashboardid === null
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
-
-						addMessage(makeMessageBox('bad', [], message, true, false));
 					}
+
+					const message_box = makeMessageBox('bad', messages, title);
+
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this.is_busy_saving = false;

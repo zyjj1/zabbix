@@ -29,7 +29,7 @@ type AgentOptions struct {
 	DebugLevel               int      `conf:"optional,range=0:5,default=3"`
 	PidFile                  string   `conf:"optional"`
 	ServerActive             string   `conf:"optional"`
-	RefreshActiveChecks      int      `conf:"optional,range=30:3600,default=120"`
+	RefreshActiveChecks      int      `conf:"optional,range=1:86400,default=5"`
 	Timeout                  int      `conf:"optional,range=1:30,default=3"`
 	Hostname                 string   `conf:"optional"`
 	HostnameItem             string   `conf:"optional"`
@@ -66,6 +66,7 @@ type AgentOptions struct {
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
 	ExternalPluginsSocket    string   `conf:"optional,name=PluginSocket,default=/tmp/agent.plugin.sock"`
 	ForceActiveChecksOnStart int      `conf:"optional,range=0:1,default=0"`
+	HeartbeatFrequency       int      `conf:"optional,range=0:3600,default=60"`
 
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`

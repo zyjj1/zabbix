@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -137,7 +137,7 @@ class CServiceHelper {
 		$status_names = [];
 
 		foreach (CSeverityHelper::getSeverities() as $severity) {
-			$status_names[$severity['value']] = $severity['name'];
+			$status_names[$severity['value']] = $severity['label'];
 		}
 
 		return $status_names;

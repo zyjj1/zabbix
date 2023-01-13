@@ -25,16 +25,19 @@
 
 require_once dirname(__FILE__).'/js/monitoring.sysmap.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Network maps'));
+$html_page = (new CHtmlPage())
+	->setTitle(_('Network maps'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_EDIT));
 
 $tabs = new CTabView();
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 // Create sysmap form.
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('sysmap-form')
 	->setName('map.edit.php')
 	->addVar('form', getRequest('form', 1))
@@ -344,7 +347,7 @@ $user_groups = [];
 
 foreach ($data['sysmap']['userGroups'] as $user_group) {
 	$user_groupid = $user_group['usrgrpid'];
-	$user_groups[$user_groupid] = [
+	$user_groups[] = [
 		'usrgrpid' => $user_groupid,
 		'name' => $data['user_groups'][$user_groupid]['name'],
 		'permission' => $user_group['permission']
@@ -381,14 +384,14 @@ $users = [];
 
 foreach ($data['sysmap']['users'] as $user) {
 	$userid = $user['userid'];
-	$users[$userid] = [
+	$users[] = [
 		'id' => $userid,
 		'name' => getUserFullname($data['users'][$userid]),
 		'permission' => $user['permission']
 	];
 }
 
-$js_insert .= 'window.addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+$js_insert .= 'window.addPopupValues('.json_encode(['object' => 'userid', 'values' => $users]).');';
 
 zbx_add_post_js($js_insert);
 
@@ -434,7 +437,6 @@ else {
 
 $form->addItem($tabs);
 
-// Append form to widget.
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

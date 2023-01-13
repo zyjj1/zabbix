@@ -23,14 +23,16 @@
  * @var CView $this
  */
 
-(new CWidget())->show();
+$this->addJsFile('class.calendar.js');
+
+(new CHtmlPage())->show();
 
 (new CScriptTag(
 	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).');'.
 
 	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
 		'clearMessages();'.
-		'addMessage(makeMessageBox("good", [], response.message, true, false));'.
+		'addMessage(makeMessageBox("good", [], response.success.title, true, false));'.
 	'});'
 ))
 	->setOnDocumentReady()

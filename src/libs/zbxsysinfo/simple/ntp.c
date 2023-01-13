@@ -19,9 +19,9 @@
 
 #include "ntp.h"
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
-#include "common.h"
+#include "zbxtime.h"
 
 #define NTP_SCALE		4294967296.0	/* 2^32, of course! */
 

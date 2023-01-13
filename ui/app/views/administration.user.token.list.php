@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -23,6 +23,10 @@
  * @var CView $this
  * @var array $data
  */
+
+if ($data['uncheck']) {
+	uncheckTableRows('user.token');
+}
 
 $this->includeJsFile('administration.user.token.list.js.php');
 $this->addJsFile('class.calendar.js');
@@ -62,9 +66,10 @@ $filter = (new CFilter())
 			)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getUserSettingsSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_TOKEN_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(
@@ -158,7 +163,7 @@ $token_form->addItem([
 	], 'user.token')
 ]);
 
-$widget
+$html_page
 	->addItem($token_form)
 	->show();
 

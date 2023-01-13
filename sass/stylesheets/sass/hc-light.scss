@@ -40,6 +40,7 @@ $font-selected-color: #ffffff;
 $font-alt-color: #333333;
 $body-bg-color: #ffffff;
 $overlay-bg-color: #000000;
+$overlay-border-color: #383838;
 
 // Main menu
 $menu-main-color: #ffffff;
@@ -91,13 +92,17 @@ $menu-user-selected-arrow-bg-position: -579px -434px;
 $sidebar-server-name-color: #9f9f9f;
 
 $menu-main-icons: (
+	dashboards: -570px -856px,
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
 	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
+	data-collection: -570px -784px,
+	alerts: -570px -879px,
 	configuration: -570px -784px,
+	users: -570px -904px,
 	administration: -570px -808px
 );
 
@@ -133,6 +138,7 @@ $form-font-color: #000000;
 $form-bg-color: #ffffff;
 $form-border-color: #888888;
 $form-border-focus-color: #000000;
+$form-fields-group-border-color: #888888;
 
 $form-disabled-font-color: #9f9f9f;
 $form-disabled-bg-color: #f0f0f0;
@@ -395,18 +401,18 @@ $var-icons: (
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -201px -834px,
-	wzrd-action: url($sprite-path) no-repeat -168px -617px
+	wizard-action: url($sprite-path) no-repeat -168px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
 		@extend %form-icon-btn;
 
-		@if $form-icon-btn == 'wzrd-action' {
+		@if $form-icon-btn == 'wizard-action' {
 			margin-top: -16px;
 		}
 	}
@@ -784,6 +790,21 @@ a.link-action {
 		border-color: lighten($table-border-color, 3%);
 	}
 
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: $ui-bg-color;
+
+		td {
+			border-bottom-color: $table-border-color !important;
+		}
+
+		.timeline-axis,
+		.timeline-td,
+		.timeline-date,
+		.problem-expand-td {
+			border-bottom-color: transparent !important;
+		}
+	}
+
 	&.compact-view {
 		.flh-na-bg,
 		.flh-info-bg,
@@ -825,13 +846,25 @@ a.link-action {
 				background-position: -208px -767px;
 			}
 
-			.icon-wzrd-action {
+			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -318px -624px;
 			}
 
-			.icon-wzrd-action {
+			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -165px -624px;
 			}
+		}
+	}
+}
+
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
 		}
 	}
 }
@@ -1198,6 +1231,22 @@ td.inactive-bg {
 	background-position: -173px -285px;
 }
 
+.icon-action-suppress::before {
+	background-position: -249px -803px;
+}
+
+.icon-action-unsuppress::before {
+	background-position: -249px -836px;
+}
+
+.icon-action-cause::before {
+	background-position: -283px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -282px -656px;
+}
+
 .icon-invisible::before {
 	background-position: -249px -803px;
 }
@@ -1288,18 +1337,6 @@ td.inactive-bg {
 	}
 }
 
-// Overrides.
-.overrides-options-list {
-	> li > div {
-		background-color: $ui-bg-selected-color !important;
-
-		> .subfilter-disable-btn {
-			border: none !important;
-			top: 0;
-		}
-	}
-}
-
 .totals-list {
 	> div {
 		border-top: 1px solid $ui-border-color;
@@ -1318,6 +1355,7 @@ td.inactive-bg {
 }
 
 // Widget "Host availability".
+
 .host-avail-widget {
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
@@ -1331,7 +1369,8 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Navigation tree"
+// Widget "Navigation tree".
+
 .navtree {
 	.tree .tree-item > .tree-row {
 		min-width: 410px;
@@ -1339,6 +1378,7 @@ td.inactive-bg {
 }
 
 // Widget "Problems by severity".
+
 .by-severity-widget {
 	> div {
 		min-width: 65px;
@@ -1351,7 +1391,7 @@ td.inactive-bg {
 	}
 }
 
-// InputSecret and ButtonDropdown
+// InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
@@ -1374,5 +1414,37 @@ td.inactive-bg {
 
 	&>:last-child::after {
 		content: "";
+	}
+}
+
+// Host interfaces.
+
+.interfaces {
+	.interface-row {
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				background-position: -165px -690px;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background-position: -165px -655px;
+				}
+			}
+		}
+	}
+}
+
+// Section (components/_section.scss).
+
+section {
+	.section-toggle {
+		background-position: -165px -654px;
+	}
+
+	&.section-collapsed {
+		.section-toggle {
+			background-position: -165px -690px;
+		}
 	}
 }

@@ -99,7 +99,8 @@ class CPage {
 			$options->addArguments([
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
-				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
+				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
+				'--disable-dev-shm-usage'
 			]);
 
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
@@ -218,7 +219,6 @@ class CPage {
 			self::$cookie = [
 				'name' => 'zbx_session',
 				'value' => base64_encode(json_encode($data)),
-				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
@@ -494,7 +494,7 @@ class CPage {
 	 *
 	 * @param array|string $keys   keys to be pressed
 	 */
-	public function keyPress($keys) {
+	public function pressKey($keys) {
 		if (!is_array($keys)) {
 			$keys = [$keys];
 		}
@@ -587,14 +587,15 @@ class CPage {
 	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
+	 * @param string $url		Direct link to certain Zabbix page
 	 */
-	public function userLogin($alias, $password) {
+	public function userLogin($alias, $password, $url = 'index.php') {
 		if (self::$cookie === null) {
 			$this->driver->get(PHPUNIT_URL);
 		}
 
 		$this->logout();
-		$this->open('index.php');
+		$this->open($url);
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();

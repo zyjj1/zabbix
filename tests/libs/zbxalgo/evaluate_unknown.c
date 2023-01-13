@@ -21,7 +21,9 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
+#include "zbxserver.h"
 #include "zbxalgo.h"
+#include "zbxnum.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -36,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	tmp = zbx_mock_get_parameter_string("out.value");
 
-	if (SUCCEED != is_double(tmp, &expected_value))
+	if (SUCCEED != zbx_is_double(tmp, &expected_value))
 	{
 		if (0 == strcmp(tmp, ZBX_UNKNOWN_STR))
 			expected_value = ZBX_UNKNOWN;
@@ -44,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("out.value parameter \"%s\" is not double or is out of range.", tmp);
 	}
 
-	if (expected_result != (actual_result = evaluate_unknown(expression, &actual_value, actual_error,
+	if (expected_result != (actual_result = zbx_evaluate_unknown(expression, &actual_value, actual_error,
 			sizeof(actual_error))))
 	{
 		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_sysinfo_ret_string(actual_result),

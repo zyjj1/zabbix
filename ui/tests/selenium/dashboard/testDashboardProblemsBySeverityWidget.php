@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 
 	/**
 	 * Id of the dashboard that is created within this test specifically for the update scenario.
@@ -264,7 +264,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only unaknowledged problems.
+			// Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -455,7 +455,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only unaknowledged problems.
+			// Totals: Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -657,7 +657,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unaknowledged problems and to show latest values.
+			// Update widget to display only unacknowledged problems and to show latest values.
 			[
 				[
 					'widget to update' => 'Reference widget 4',
@@ -1174,7 +1174,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unaknowledged problems and to show latest values without timeline.
+			// Update widget to display only unacknowledged problems and to show latest values without timeline.
 			[
 				[
 					'widget to update' => 'Totals reference widget 2',
@@ -1498,7 +1498,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		if (CTestArrayHelper::get($data,'tags',false)) {
-			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 		$form->submit();

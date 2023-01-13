@@ -26,18 +26,25 @@
 
 <script>
 	const view = {
-		dashboard: null,
-		time_period: null,
-		dynamic: null,
-		has_time_selector: null,
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, time_period, dynamic, has_time_selector, widget_defaults, web_layout_mode}) {
+		init({
+			dashboard,
+			widget_defaults,
+			widget_last_type,
+			configuration_hash,
+			has_time_selector,
+			time_period,
+			dynamic,
+			web_layout_mode,
+			clone
+		}) {
 			this.dashboard = dashboard;
+			this.has_time_selector = has_time_selector;
 			this.time_period = time_period;
 			this.dynamic = dynamic;
-			this.has_time_selector = has_time_selector;
+			this.clone = clone;
 
 			timeControl.refreshPage = false;
 
@@ -73,20 +80,21 @@
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
+				widget_last_type,
+				configuration_hash,
 				is_editable: dashboard.can_edit_dashboards && dashboard.editable
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				is_edit_mode: dashboard.dashboardid === null,
+				is_edit_mode: dashboard.dashboardid === null || clone,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				time_period: time_period,
+				time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
 					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
-					widget.configuration = (typeof widget.configuration === 'object') ? widget.configuration : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
@@ -102,7 +110,7 @@
 					jQuery('#dynamic_hostid').on('change', this.events.dynamicHostChange);
 				}
 
-				if (dashboard.dashboardid === null) {
+				if (dashboard.dashboardid === null || clone) {
 					this.edit();
 					ZABBIX.Dashboard.editProperties();
 				}
@@ -115,6 +123,8 @@
 						});
 				}
 			}
+
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
 			if (dynamic.has_dynamic_widgets) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
@@ -176,14 +186,16 @@
 		},
 
 		save() {
-			clearMessages();
-
 			this.is_busy_saving = true;
 			this.updateBusy();
 
 			const request_data = ZABBIX.Dashboard.save();
 
 			request_data.sharing = this.dashboard.sharing;
+
+			if (this.clone) {
+				request_data.clone = '1';
+			}
 
 			const curl = new Curl('zabbix.php');
 
@@ -196,31 +208,44 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					if ('errors' in response) {
-						throw {html_string: response.errors};
+					if ('error' in response) {
+						throw {error: response.error};
 					}
 
-					if ('redirect' in response) {
-						if ('system-message-ok' in response) {
-							postMessageOk(response['system-message-ok']);
-						}
+					postMessageOk(response.success.title);
 
-						this.disableNavigationWarning();
-
-						location.replace(response.redirect);
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
 					}
+
+					this.disableNavigationWarning();
+
+					const curl = new Curl('zabbix.php', false);
+
+					curl.setArgument('action', 'dashboard.view');
+					curl.setArgument('dashboardid', response.dashboardid);
+
+					location.replace(curl.getUrl());
 				})
-				.catch((error) => {
-					if (typeof error === 'object' && 'html_string' in error) {
-						addMessage(error.html_string);
+				.catch((exception) => {
+					clearMessages();
+
+					let title;
+					let messages = [];
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
 					}
 					else {
-						const message = this.dashboard.dashboardid === null
+						title = this.dashboard.dashboardid === null || this.clone
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
-
-						addMessage(makeMessageBox('bad', [], message, true, false));
 					}
+
+					const message_box = makeMessageBox('bad', messages, title);
+
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this.is_busy_saving = false;
@@ -266,7 +291,8 @@
 
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
@@ -299,14 +325,14 @@
 								clickCallback: () => ZABBIX.Dashboard.pasteWidget(
 									ZABBIX.Dashboard.getStoredWidgetDataCopy()
 								),
-								disabled: (ZABBIX.Dashboard.getStoredWidgetDataCopy() === null)
+								disabled: ZABBIX.Dashboard.getStoredWidgetDataCopy() === null
 							},
 							{
 								label: <?= json_encode(_('Paste page')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
 									ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
 								),
-								disabled: (ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null)
+								disabled: ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null
 							}
 						]
 					}
@@ -368,8 +394,12 @@
 			applyProperties() {
 				const dashboard_data = ZABBIX.Dashboard.getData();
 
-				document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = dashboard_data.name;
+				document.getElementById('<?= CHtmlPage::PAGE_TITLE_ID ?>').textContent = dashboard_data.name;
 				document.getElementById('dashboard-direct-link').textContent = dashboard_data.name;
+			},
+
+			configurationOutdated() {
+				location.href = location.href;
 			},
 
 			busy() {

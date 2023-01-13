@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
 #include "dbupgrade.h"
 
-extern unsigned char	program_type;
+#include "zbxnum.h"
+#include "zbxdbhigh.h"
 
 /*
  * 4.2 development database patches
@@ -38,7 +37,7 @@ static int	DBpatch_4010001(void)
 
 static int	DBpatch_4010002(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update media_type set content_type=0"))
@@ -135,7 +134,7 @@ static int	DBpatch_4010012(void)
 
 static int	DBpatch_4010013(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_groupids'"
@@ -147,7 +146,7 @@ static int	DBpatch_4010013(void)
 
 static int	DBpatch_4010014(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_hostids'"
@@ -159,7 +158,7 @@ static int	DBpatch_4010014(void)
 
 static int	DBpatch_4010015(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_inherited'"
@@ -171,7 +170,7 @@ static int	DBpatch_4010015(void)
 
 static int	DBpatch_4010016(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.triggers.filter_priority' and value_int='-1'"))
@@ -234,7 +233,7 @@ static int	DBpatch_4010025(void)
 	DB_RESULT	result;
 	zbx_uint64_t	nextid;
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='proxy_history'"))
@@ -260,7 +259,7 @@ static int	DBpatch_4010025(void)
 
 static int	DBpatch_4010026(void)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update hosts set status=1"))

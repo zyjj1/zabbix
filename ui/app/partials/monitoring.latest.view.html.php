@@ -98,13 +98,39 @@ else {
 
 // Latest data rows.
 foreach ($data['items'] as $itemid => $item) {
+	$host = $data['hosts'][$item['hostid']];
+
+	$data_actions = [];
 	$is_graph = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64);
-	$checkbox = (new CCheckBox('itemids['.$itemid.']', $itemid))->setEnabled($is_graph);
+	if ($is_graph) {
+		$data_actions['graph'] = true;
+	}
+
+	if (in_array($item['type'], checkNowAllowedTypes())
+			&& $item['status'] == ITEM_STATUS_ACTIVE && $host['status'] == HOST_STATUS_MONITORED
+			&& array_key_exists($itemid, $data['items_rw'])) {
+		$data_actions['execute'] = true;
+	}
+
+	$checkbox = new CCheckBox('itemids['.$itemid.']', $itemid);
+	if ($data_actions) {
+		$checkbox->setAttribute('data-actions', implode(' ', array_keys($data_actions)));
+	}
+
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
 		(new CLinkAction($item['name']))
-			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
+			->setMenuPopup(
+				CMenuPopupHelper::getItem([
+					'itemid' => $itemid,
+					'context' => 'host',
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'latest.view')
+						->setArgument('context','host')
+						->getUrl()
+				])
+			),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 
@@ -194,8 +220,6 @@ foreach ($data['items'] as $itemid => $item) {
 		$actions = '';
 	}
 
-	$host = $data['hosts'][$item['hostid']];
-
 	$maintenance_icon = '';
 
 	if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -275,13 +299,18 @@ foreach ($data['items'] as $itemid => $item) {
 	$table->addRow($table_row);
 }
 
-$form->addItem([
-	$table,
-	$data['paging'],
-	new CActionButtonList('graphtype', 'itemids', [
-		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
-		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]
-	])
-]);
+$button_list = [
+	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph'), 'attributes' => ['data-required' => 'graph']],
+	GRAPH_TYPE_NORMAL => ['name' => _('Display graph'), 'attributes' => ['data-required' => 'graph']],
+	'item.masscheck_now' => [
+		'content' => (new CSimpleButton(_('Execute now')))
+			->onClick('view.massCheckNow(this);')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('no-chkbxrange')
+			->setAttribute('data-required', 'execute')
+	]
+];
+
+$form->addItem([$table, $data['paging'], new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
 
 echo $form;

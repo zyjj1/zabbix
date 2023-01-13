@@ -21,6 +21,7 @@ package tcpudp
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
@@ -30,10 +31,10 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/go-ldap/ldap"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/web"
 )
 
@@ -81,7 +82,7 @@ func (p *Plugin) exportNetTcpListen(params []string) (result interface{}, err er
 	return exportSystemTcpListen(uint16(port))
 }
 
-func (p *Plugin) exportNetTcpPort(params []string) (result int, err error) {
+func (p *Plugin) exportNetTcpPort(params []string, timeout time.Duration) (result int, err error) {
 	if len(params) > 2 {
 		err = errors.New(errorTooManyParams)
 		return
@@ -106,7 +107,7 @@ func (p *Plugin) exportNetTcpPort(params []string) (result int, err error) {
 		address = net.JoinHostPort(params[0], port)
 	}
 
-	if _, err := net.Dial("tcp", address); err != nil {
+	if _, err := net.DialTimeout("tcp", address, timeout*time.Second); err != nil {
 		return 0, nil
 	}
 	return 1, nil
@@ -146,8 +147,12 @@ func (p *Plugin) validateSmtp(buf []byte) int {
 }
 
 func (p *Plugin) validateFtp(buf []byte) int {
-	if string(buf[:4]) == "220 " {
-		return tcpExpectOk
+	sc := bufio.NewScanner(bytes.NewReader(buf))
+	ok := []byte("220 ")
+	for sc.Scan() {
+		if bytes.Equal(sc.Bytes()[:4], ok) {
+			return tcpExpectOk
+		}
 	}
 	return tcpExpectIgnore
 }
@@ -490,7 +495,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "net.tcp.listen":
 		return p.exportNetTcpListen(params)
 	case "net.tcp.port":
-		return p.exportNetTcpPort(params)
+		return p.exportNetTcpPort(params, p.options.Timeout)
 	case "net.tcp.service", "net.tcp.service.perf":
 		if len(params) > 3 {
 			err = errors.New(errorTooManyParams)

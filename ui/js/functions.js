@@ -160,40 +160,42 @@ function getUniqueId() {
 /**
  * Color palette object used for getting different colors from color palette.
  */
-var colorPalette = (function() {
+let colorPalette = (function() {
 	'use strict';
 
-	var current_color = 0,
-		palette = [];
+	let palette = [];
 
 	return {
-		incrementNextColor: function() {
-			if (++current_color == palette.length) {
-				current_color = 0;
-			}
-		},
-
 		/**
 		 * Gets next color from palette.
 		 *
-		 * @return string	hexadecimal color code
+		 * @param {array} used_colors  Array of already used hexadecimal color codes.
+		 *
+		 * @return string  Hexadecimal color code.
 		 */
-		getNextColor: function() {
-			var color = palette[current_color];
+		getNextColor: function(used_colors) {
+			if (!used_colors.length) {
+				return palette[0] || '';
+			}
 
-			this.incrementNextColor();
+			const palette_usage = {};
 
-			return color;
+			for (const color of palette) {
+				palette_usage[color] = used_colors.filter(used_color => used_color === color).length;
+			}
+
+			const min_used_color_count = Math.min(...Object.values(palette_usage));
+
+			return Object.keys(palette_usage).find(color => palette_usage[color] == min_used_color_count);
 		},
 
 		/**
-		 * Set theme specific color palette.
+		 * Set color palette.
 		 *
-		 * @param array colors  Array of hexadecimal color codes.
+		 * @param {array} colors  Array of hexadecimal color codes.
 		 */
 		setThemeColors: function(colors) {
 			palette = colors;
-			current_color = 0;
 		}
 	}
 }());
@@ -660,52 +662,41 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 })(jQuery);
 
 /**
- * Parse url string to object. Hash starting part of URL will be removed.
- * Return object where 'url' key contain parsed url, 'pairs' key is array of objects with parsed arguments.
+ * Parse URL string to object. Hash starting part of URL will be removed.
+ * Return object where 'url' key contains parsed URL, 'pairs' key is array of objects with parsed arguments.
  * For malformed URL strings will return false.
  *
- * @param {string} url    URL string to parse.
+ * @param {string} url_string  URL string to parse.
  *
  * @return {object|bool}
  */
-function parseUrlString(url) {
-	var url = url.replace(/#.+/, ''),
-		pos = url.indexOf('?'),
-		valid = true,
-		pairs = [],
-		query;
-
-	if (pos != -1) {
-		query = url.substring(pos + 1);
-		url = url.substring(0, pos);
-
-		jQuery.each(query.split('&'), function(i, pair) {
-			if (jQuery.trim(pair)) {
-				pair = pair.replace(/\+/g, ' ').split('=', 2);
-				pair.push('');
-
-				try {
-					if (pair[0].match(/%[01]/) || pair[1].match(/%[01]/)) {
-						// Non-printable characters in URL.
-						throw null;
-					}
-
-					pairs.push({
-						'name': decodeURIComponent(pair[0]),
-						'value': decodeURIComponent(pair[1])
-					});
-				}
-				catch( e ) {
-					valid = false;
-					// Break jQuery.each iteration.
-					return false;
-				}
-			}
-		});
+function parseUrlString(url_string) {
+	try {
+		decodeURI(url_string);
+	}
+	catch {
+		return false;
 	}
 
-	if (!valid) {
-		return false;
+	let url = url_string.replace(/#.+/, '');
+	const pos = url.indexOf('?');
+	const pairs = [];
+
+	if (pos != -1) {
+		const query = url.substring(pos + 1);
+		url = url.substring(0, pos);
+
+		for (const param of new URLSearchParams(query)) {
+			if (encodeURIComponent(param[0]).match(/%[01]/) || encodeURIComponent(param[1]).match(/%[01]/)) {
+				// Non-printable characters in URL.
+				return false;
+			}
+
+			pairs.push({
+				'name': param[0],
+				'value': param[1]
+			});
+		}
 	}
 
 	return {
@@ -718,29 +709,19 @@ function parseUrlString(url) {
  * Message formatting function.
  *
  * @param {string}       type            Message type. ('good'|'bad'|'warning')
- * @param {string|array} messages        Array with details messages or message string with normal font.
- * @param {string}       title           Larger font title.
+ * @param {array}        messages        Error messages.
+ * @param {string|null}  title           Error title.
  * @param {boolean}      show_close_box  Show close button.
- * @param {boolean}      show_details    Show details on opening.
+ * @param {boolean|null} show_details    Show details on opening.
  *
  * @return {jQuery}
  */
-function makeMessageBox(type, messages, title, show_close_box, show_details) {
+function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
 		msg_class = classes[type];
 
-	if (typeof msg_class === 'undefined') {
-		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
-	}
-
-	if (typeof title === 'undefined') {
-		title = null;
-	}
-	if (typeof show_close_box === 'undefined') {
-		show_close_box = true;
-	}
-	if (typeof show_details === 'undefined') {
-		show_details = false;
+	if (show_details === null) {
+		show_details = type === 'bad' || type === 'warning';
 	}
 
 	var	$list = jQuery('<ul>')
@@ -790,24 +771,15 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		}
 	}
 
-	if (messages.length > 0) {
-		if (Array.isArray(messages)) {
-			jQuery.map(messages, function (message) {
-				jQuery('<li>')
-					.text(message)
-					.appendTo($list);
-				return null;
-			});
-
-			$msg_box.append($msg_details);
-		}
-		else {
+	if (Array.isArray(messages) && messages.length > 0) {
+		jQuery.map(messages, function (message) {
 			jQuery('<li>')
-				.text(messages ? messages : ' ')
+				.text(message)
 				.appendTo($list);
+			return null;
+		});
 
-			$msg_box.append($msg_details);
-		}
+		$msg_box.append($msg_details);
 	}
 
 	if (show_close_box) {
@@ -941,15 +913,37 @@ function urlEncodeData(parameters, prefix = '') {
 		else {
 			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
 		}
-	};
+	}
 
 	return result.join('&');
 }
 
 /**
- * Get all input fields from the given form and return them. The order of returned fields is not predictable.
+ * Get form field values as deep object.
  *
- * @param {object}  form    Form object from which fields are retrieved.
+ * Example:
+ *     <form>
+ *         <input name="a" value="1">
+ *         <input name="b[c]" value="2">
+ *         <input name="b[d]" value="3">
+ *         <input name="e[f][]" value="4">
+ *         <input name="e[f][]" value="5">
+ *     </form>
+ *
+ *    ... will result in:
+ *
+ *    {
+ *        a: "1",
+ *        b: {
+ *            c: "2",
+ *            d: "3"
+ *        },
+ *        e: {
+ *            f: ["4", "5"]
+ *        }
+ *    }
+ *
+ * @param {HTMLFormElement} form
  *
  * @return {object}
  */
@@ -957,6 +951,8 @@ function getFormFields(form) {
 	const fields = {};
 
 	for (let [key, value] of new FormData(form)) {
+		value = value.replace(/\r?\n/g, '\r\n');
+
 		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
 
 		let key_fields = fields;

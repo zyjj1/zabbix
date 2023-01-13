@@ -42,19 +42,19 @@ $filter = (new CFilter())
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(
-				(new CLabel(_('Host groups'), 'filter_groups__ms')),
+				(new CLabel(_('Template groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_groups[]',
-					'object_name' => 'hostGroup',
+					'object_name' => 'templateGroup',
 					'data' => $data['filter']['groups'],
 					'popup' => [
 						'parameters' => [
-							'srctbl' => 'host_groups',
+							'srctbl' => 'template_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
-							'templated_hosts' => 1,
-							'editable' => 1,
+							'with_templates' => true,
+							'editable' => true,
 							'enrich_parent_groups' => true
 						]
 					]
@@ -83,15 +83,15 @@ $filter = (new CFilter())
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Templates'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create template'),
 				(new CUrl('templates.php'))
 					->setArgument('groupids', array_keys($data['filter']['groups']))
 					->setArgument('form', 'create')
-					->getUrl()
 				)
 			)
 			->addItem(
@@ -296,6 +296,6 @@ $form->addItem([
 	)
 ]);
 
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

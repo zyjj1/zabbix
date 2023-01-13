@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "ipc.h"
+#include "zbxnix.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 /******************************************************************************

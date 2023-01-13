@@ -46,7 +46,26 @@ window.popup_generic = {
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
-				const parameters = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
+				const parameters = groups.length
+					? {groupid: groups[0]}
+					: {filter_groupid_rst: 1, group: undefined, groupid: undefined};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
+	initTemplategroupsFilter() {
+		const overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
+				const parameters = groups.length
+					? {templategroupid: groups[0]}
+					: {filter_groupid_rst: 1, templategroup: undefined, templategroupid: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
@@ -61,7 +80,26 @@ window.popup_generic = {
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				const hosts = jQuery(this).multiSelect('getData').map((item) => item.id);
-				const parameters = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
+				const parameters = hosts.length
+					? {hostid: hosts[0]}
+					: {filter_hostid_rst: 1, host: undefined, hostid: undefined, host_pattern: undefined};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
+	initTemplatesFilter() {
+		const overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const templates = jQuery(this).multiSelect('getData').map((item) => item.id);
+				const parameters = templates.length
+					? {templateid: templates[0]}
+					: {filter_templateid_rst: 1, templateid: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
@@ -74,13 +112,6 @@ window.popup_generic = {
 		$('#itemtype').on('change', (e) => {
 			reloadPopup(e.target.closest('form'));
 		});
-	},
-
-	setEmpty(e, reset_fields) {
-		e.preventDefault();
-
-		this.setPopupOpenerFieldValues(reset_fields);
-		overlayDialogueDestroy(jQuery(e.target).closest('[data-dialogueid]').attr('data-dialogueid'));
 	},
 
 	closePopup(e) {

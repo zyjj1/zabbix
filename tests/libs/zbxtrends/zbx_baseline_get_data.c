@@ -22,9 +22,11 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxtrends.h"
+#include "zbxdb.h"
 #include "log.h"
+#include "../../../src/libs/zbxtrends/trends.h"
 
 int	__wrap_DBis_null(const char *field);
 DB_ROW	__wrap_DBfetch(DB_RESULT result);

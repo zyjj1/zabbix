@@ -27,18 +27,16 @@ if ($data['uncheck']) {
 	uncheckTableRows('correlation');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation'))
-	->setControls((new CTag('nav', true,
-		(new CForm('get'))
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(new CRedirectButton(_('Create correlation'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'correlation.edit'))
-				)
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create correlation'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'correlation.edit')
+				))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'correlation.list'))
@@ -150,6 +148,6 @@ $form->addItem([
 	], 'correlation')
 ]);
 
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Queue overview'))
 	->setTitleSubmenu([
 		'main_section' => [
@@ -39,7 +39,8 @@ $widget = (new CWidget())
 					->getUrl() => _('Queue details')
 			]
 		]
-	]);
+	])
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_OVERVIEW));
 
 $table = (new CTableInfo())->setHeader([
 	_('Items'),
@@ -86,6 +87,6 @@ if (CWebUser::getRefresh()) {
 		->show();
 }
 
-$widget
+$html_page
 	->addItem($table)
 	->show();

@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -179,7 +178,6 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
 					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -199,7 +197,6 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
@@ -258,7 +255,7 @@ class testFormTags extends CWebTest {
 			case 'item prototype':
 				$sql = 'SELECT * FROM items ORDER BY itemid';
 				$locator = 'name:itemForm';
-				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true), 'Type' => 'Zabbix trapper'];
+				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true).'[{#KEY}]', 'Type' => 'Zabbix trapper'];
 				break;
 
 			case 'web scenario':
@@ -278,7 +275,9 @@ class testFormTags extends CWebTest {
 			case 'template':
 				$sql = 'SELECT * FROM hosts ORDER BY hostid';
 				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
-				$fields = [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers'];
+				$group_field = ($object === 'template') ? 'Template groups' : 'Host groups';
+				$group_name = ($object === 'template') ? 'Templates' : 'Zabbix servers';
+				$fields = [ucfirst($object).' name' => $data['name'], $group_field => $group_name];
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -296,7 +295,7 @@ class testFormTags extends CWebTest {
 		if ($object === 'host prototype') {
 			$data['name'] = $data['name'].' {#KEY}';
 			$form->fill(['Host name' => $data['name']]);
-			$form->fill(['Groups' => 'Zabbix servers']);
+			$form->fill(['Host groups' => 'Zabbix servers']);
 		}
 		elseif ($object === 'web scenario') {
 			$form->fill(['Name' => $data['name']]);
@@ -314,18 +313,18 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
-		$this->query('id', $tags_table)->asMultifieldTable()->one()->fill($data['tags']);
+		$this->query($tags_table)->asMultifieldTable()->one()->fill($data['tags']);
 
 		// Check screenshots of text area right after filling.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
-			$screenshot_area = $this->query('id', $tags_table)->one();
+			$screenshot_area = $this->query($tags_table)->one();
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -351,7 +350,6 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
 					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -366,7 +364,6 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
@@ -381,7 +378,6 @@ class testFormTags extends CWebTest {
 							'value' => ''
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/3": value (tag, value)=(tag without value, ) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.'
 				]
 			],
@@ -510,13 +506,13 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
-		$this->query('id', $tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 
+		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -535,14 +531,11 @@ class testFormTags extends CWebTest {
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error_details = ($object === 'host')
-					? CTestArrayHelper::get($data, 'host_error_details')
-					: CTestArrayHelper::get($data, 'error_details');
 
 			$title = ($object === 'service')
 				? null
 				: (($action === 'add') ? 'Cannot add '.$object : 'Cannot update '.$object);
-			$this->assertMessage(TEST_BAD, $title, $error_details);
+			$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -626,22 +619,19 @@ class testFormTags extends CWebTest {
 			case 'item':
 			case 'item prototype':
 				$form = $this->query('name:itemForm')->asForm()->waitUntilPresent()->one();
-				$form->fill(['Name' => $new_name, 'Key' => 'newkey_'.microtime(true)]);
+				$form->fill(['Name' => $new_name, 'Key' => 'newkey_'.microtime(true).'[{#KEY}]']);
 				$sql_old_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($new_name);
 				break;
 
 			case 'host':
-				$form = $this->query('name:host-form')->asForm()->waitUntilPresent()->one();
-				$form->fill(['Host name' => $new_name]);
-				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
-				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
-				break;
-
 			case 'host prototype':
+			case 'discovered host':
 				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:host-form';
 				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
-				$form->fill(['Host name' => $new_name]);
+				if ($object !== 'discovered host') {
+					$form->fill(['Host name' => $new_name]);
+				}
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
@@ -666,32 +656,43 @@ class testFormTags extends CWebTest {
 				$sql_old_name = 'SELECT NULL FROM services WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM services WHERE name='.zbx_dbstr($new_name);
 				break;
+
 		}
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
-		$element = $this->query('id', $tags_table)->asMultifieldTable()->one();
+		$element = $this->query($tags_table)->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
 		// Click Clone or Full Clone button.
 		$this->query('button', $action)->one()->click();
 		$this->page->waitUntilReady();
 
+		if ($object === 'discovered host') {
+			$form->fill(['Host name' => $new_name]);
+		}
+
 		// Find form again for cloned host and click Add host.
 		$form->invalidate();
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, (
-				($object === 'service')
-					? ucfirst($object).' created'
-					: ucfirst($object).' added'
-			)
-		);
+
+		if ($object === 'discovered host') {
+			$this->assertMessage(TEST_GOOD, ('Host added'));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, (
+					($object === 'service')
+						? ucfirst($object).' created'
+						: ucfirst($object).' added'
+				)
+			);
+		}
 
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount($sql_old_name));
@@ -710,6 +711,7 @@ class testFormTags extends CWebTest {
 		switch ($object) {
 			case 'host':
 			case 'host prototype':
+			case 'discovered host':
 				$this->assertEquals($new_name, $form->getField('Host name')->getValue());
 				break;
 
@@ -730,7 +732,7 @@ class testFormTags extends CWebTest {
 		$form->selectTab('Tags');
 		$element->checkValue($tags);
 
-		if ($object === 'host') {
+		if ($object === 'host' || $object === 'discovered host') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -760,6 +762,7 @@ class testFormTags extends CWebTest {
 
 			case 'host':
 			case 'host prototype':
+			case 'discovered host':
 			case 'template':
 				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		}
@@ -780,10 +783,10 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
 
 		$expected = $data['tags'];
@@ -806,12 +809,12 @@ class testFormTags extends CWebTest {
 		}
 		unset($tag);
 
-		$this->query('id', $tags_table)->asMultifieldTable()->one()->checkValue($expected);
+		$this->query($tags_table)->asMultifieldTable()->one()->checkValue($expected);
 
 		// Check screenshot of text area after saving.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
-			$screenshot_area = $this->query('id', $tags_table)->one();
+			$screenshot_area = $this->query($tags_table)->one();
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -857,7 +860,7 @@ class testFormTags extends CWebTest {
 
 		$form = $this->query($form_selector)->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
-		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
 		// Navigate to host or template for full cloning.
@@ -951,7 +954,7 @@ class testFormTags extends CWebTest {
 		// Get tags of object and return to the list.
 		$form = $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
-		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 		$this->query('button:Cancel')->one()->click();
 
@@ -1077,7 +1080,7 @@ class testFormTags extends CWebTest {
 		$this->page->open($this->link);
 		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
 
 		// Check all tags (inherited from host/template and own) on created element.
 		if ($object === 'web scenario') {
@@ -1131,7 +1134,7 @@ class testFormTags extends CWebTest {
 		}
 		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
 
 		// Check all tags (inherited from host and template and own) on created element.
 		if ($object === 'web scenario') {
@@ -1144,7 +1147,7 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS)));
 
-		// Check empty column "Parent templates" except for inhereted unique template tags.
+		// Check empty column "Parent templates" except for inherited unique template tags.
 		foreach ($tags_table->getRows() as $row) {
 			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
@@ -1171,7 +1174,7 @@ class testFormTags extends CWebTest {
 	private function getInheritedTags() {
 		$inherited_tags = [];
 
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$headers = $tags_table->getHeadersText();
 		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
@@ -1181,7 +1184,7 @@ class testFormTags extends CWebTest {
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
 			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
-			$this->assertFalse($row->getColumn('Action')->children()->one()->detect()->isEnabled());
+			$this->assertFalse($row->getColumn('')->children()->one()->detect()->isEnabled());
 
 			$values = [];
 			// Get disabled row values.
@@ -1283,13 +1286,13 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
 
-		$this->query('id', $tags_table)->asMultifieldTable()->waitUntilPresent()->one()->clear();
+		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->clear();
 		$form->submit();
 		$this->page->waitUntilReady();
 

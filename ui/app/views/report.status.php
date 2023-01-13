@@ -26,8 +26,9 @@
 
 require_once __DIR__.'/../../include/blocks.inc.php';
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('System information'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT_STATUS))
 	->addItem(
 		(new CDiv(
 			new CPartial('administration.system.info', [

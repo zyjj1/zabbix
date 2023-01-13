@@ -139,9 +139,9 @@ function rowsToDivs(array $rows): array {
 	return $divs;
 }
 
-if ($data['errors'] !== null) {
+if (array_key_exists('error', $data)) {
 	$output = [
-		'errors' => $data['errors']
+		'error' => $data['error']
 	];
 }
 else {
@@ -170,9 +170,10 @@ else {
 		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
 		'body' => !$data['diff']
 			? (new CTableInfo())
-					->setNoDataMessage(_('No changes.'))
-					->toString()
+				->setNoDataMessage(_('No changes.'))
+				->toString()
 			: (new CForm())
+				->cleanItems()
 				->addClass('import-compare')
 				->addVar('import_overlayid', $data['import_overlayid'])
 				->addItem(drawToc($data['diff_toc']))

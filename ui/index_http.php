@@ -65,7 +65,10 @@ if ($http_user) {
 
 		if (!empty(CWebUser::$data)) {
 			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-			API::getWrapper()->auth = CWebUser::$data['sessionid'];
+			API::getWrapper()->auth = [
+				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
+				'auth' => CWebUser::$data['sessionid']
+			];
 
 			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));
@@ -83,8 +86,9 @@ echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
-		(new CButton('login', _('Login')))->onClick('document.location = '.
-			json_encode($redirect_to->getUrl()).';')
+		(new CButton('login', _('Login')))
+			->setAttribute('data-url', $redirect_to->getUrl())
+			->onClick('document.location = this.dataset.url;')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();

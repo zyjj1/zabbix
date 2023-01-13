@@ -42,6 +42,7 @@ $font-selected-color: #ffffff;
 $font-alt-color: #cacaca;
 $body-bg-color: #111111;
 $overlay-bg-color: #222222;
+$overlay-border-color: #666666;
 
 // Main menu
 
@@ -97,13 +98,17 @@ $menu-user-arrow-hover-bg-position: -579px -434px;
 $sidebar-server-name-color: #787878;
 
 $menu-main-icons: (
+	dashboards: -600px -856px,
 	dashboard: -600px -664px,
 	problems: -600px -688px,
 	monitoring: -600px -712px,
 	services: -600px -832px,
 	inventory: -600px -736px,
 	reports: -600px -760px,
+	data-collection: -600px -784px,
+	alerts: -600px -879px,
 	configuration: -600px -784px,
+	users: -600px -904px,
 	administration: -600px -808px
 );
 
@@ -139,6 +144,7 @@ $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
 $form-border-color: #666666;
 $form-border-focus-color: #bbbbbb;
+$form-fields-group-border-color: #333333;
 
 $form-disabled-font-color: #7d7d7d;
 $form-disabled-bg-color: #000000;
@@ -471,18 +477,18 @@ $var-icons: (
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -354px -834px,
-	wzrd-action: url($sprite-path) no-repeat -317px -617px
+	wizard-action: url($sprite-path) no-repeat -317px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
 		@extend %form-icon-btn;
 
-		@if $form-icon-btn == 'wzrd-action' {
+		@if $form-icon-btn == 'wizard-action' {
 			margin-top: -16px;
 		}
 	}
@@ -826,6 +832,11 @@ a.link-action {
 	}
 }
 
+.icon-count,
+a.icon-count {
+	color: $ui-bg-color;
+}
+
 .disabled {
 	opacity: .6;
 }
@@ -899,6 +910,21 @@ a.link-action {
 		border-color: lighten($table-border-color, 3%);
 	}
 
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: $ui-bg-color;
+
+		td {
+			border-bottom-color: $table-border-color !important;
+		}
+
+		.timeline-axis,
+		.timeline-td,
+		.timeline-date,
+		.problem-expand-td {
+			border-bottom-color: transparent !important;
+		}
+	}
+
 	&.compact-view {
 		.flh-na-bg,
 		.flh-info-bg,
@@ -940,9 +966,21 @@ a.link-action {
 				background-position: -361px -767px
 			}
 
-			.icon-wzrd-action {
+			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -318px -624px;
 			}
+		}
+	}
+}
+
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
 		}
 	}
 }
@@ -1183,6 +1221,7 @@ td.inactive-bg {
 }
 
 // Multiline input control.
+
 .multilineinput-control {
 	button {
 		&::after {
@@ -1208,6 +1247,7 @@ td.inactive-bg {
 }
 
 // Time selection.
+
 .ui-tabs-nav {
 	.btn-info {
 		&::after {
@@ -1359,6 +1399,22 @@ td.inactive-bg {
 	background-position: -173px -325px;
 }
 
+.icon-action-suppress::before {
+	background-position: -401px -803px;
+}
+
+.icon-action-unsuppress::before {
+	background-position: -401px -836px;
+}
+
+.icon-action-cause::before {
+	background-position: -435px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -434px -656px;
+}
+
 .icon-invisible::before {
 	background-position: -401px -803px;
 }
@@ -1449,19 +1505,6 @@ td.inactive-bg {
 	}
 }
 
-// Overrides.
-.overrides-options-list {
-	> li > div {
-		border: 1px solid $ui-tab-bg-selected-color;
-		background-color: transparent !important;
-
-		> .subfilter-disable-btn {
-			border: none !important;
-			top: 0;
-		}
-	}
-}
-
 .totals-list {
 	> div {
 		border-top: 1px solid $ui-border-color;
@@ -1480,6 +1523,7 @@ td.inactive-bg {
 }
 
 // Widget "Host availability".
+
 .host-avail-widget {
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
@@ -1493,7 +1537,8 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Navigation tree"
+// Widget "Navigation tree".
+
 .navtree {
 	.tree .tree-item > .tree-row {
 		min-width: 410px;
@@ -1501,6 +1546,7 @@ td.inactive-bg {
 }
 
 // Widget "Problems by severity".
+
 .by-severity-widget {
 	> div {
 		min-width: 65px;
@@ -1513,24 +1559,17 @@ td.inactive-bg {
 	}
 }
 
-// InputSecret and ButtonDropdown
+// InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
 }
 
-// Tabfilter
+// Tabfilter.
 
 .filter-container.tabfilter-container {
-
-	.selected.expanded .icon-filter::before {
-		// white icon
-		background: url($sprite-path) no-repeat -87px -547px;
-	}
-
 	.icon-filter::before {
-		// black icon
-		background: url($sprite-path) no-repeat -246px -547px;
+		background: url($sprite-path) no-repeat -87px -547px;
 	}
 
 	.tabfilter-item-label {
@@ -1547,5 +1586,37 @@ td.inactive-bg {
 
 	&>:last-child::after {
 		content: "";
+	}
+}
+
+// Host interfaces.
+
+.interfaces {
+	.interface-row {
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				background-position: -318px -690px;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background-position: -318px -655px;
+				}
+			}
+		}
+	}
+}
+
+// Section (components/_section.scss).
+
+section {
+	.section-toggle {
+		background-position: -318px -654px;
+	}
+
+	&.section-collapsed {
+		.section-toggle {
+			background-position: -318px -690px;
+		}
 	}
 }

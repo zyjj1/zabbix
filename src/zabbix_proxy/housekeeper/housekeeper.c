@@ -20,15 +20,13 @@
 #include "housekeeper.h"
 
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxrtc.h"
-
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 
 static int	hk_period;
 
@@ -46,9 +44,9 @@ static int	hk_period;
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
 {
-	DB_RESULT       result;
-	DB_ROW          row;
-	int             minclock, records = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		minclock, records = 0;
 	zbx_uint64_t	lastid, maxid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
@@ -147,15 +145,18 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	double			sec, time_slept, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	unsigned char		process_type = info->process_type;
+	int			server_num = info->server_num;
+	int			process_num = info->process_num;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	zbx_thread_proxy_housekeeper_args	*housekeeper_args_in = (zbx_thread_proxy_housekeeper_args *)
+			((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
 	{
@@ -171,7 +172,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -181,7 +182,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		sec = zbx_time();
 
-		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			switch (rtc_cmd)
 			{
@@ -214,7 +215,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		hk_period = get_housekeeper_period(time_slept);
 
@@ -234,7 +235,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
-		zbx_dc_cleanup_data_sessions();
+		zbx_dc_cleanup_sessions();
+		zbx_dc_cleanup_autoreg_host();
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), records, sec, sleeptext);

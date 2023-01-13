@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -1822,6 +1822,8 @@ class CExpressionParserTest extends TestCase {
 
 			['find(/host/key,,"like","\\")=0', null, CParser::PARSE_FAIL],
 			['find(/host/key,,"like","\\\\")=0', null, CParser::PARSE_SUCCESS],
+			['find(/host/key,,"like","\\r")=0', null, CParser::PARSE_FAIL],
+			['find(/host/key,,"like","\\\\r")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\\\\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\""")=0', null, CParser::PARSE_FAIL],

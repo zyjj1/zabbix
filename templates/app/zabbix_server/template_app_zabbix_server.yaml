@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T10:49:00Z'
-  groups:
+  version: '6.4'
+  date: '2022-08-25T03:46:56Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: e2d2b4e4ac28483996cc11fe42823d57
       template: 'Zabbix server health'
       name: 'Zabbix server health'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Applications
@@ -69,7 +69,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of alerter processes over 75%'
+              name: 'Zabbix server: Utilization of alerter processes is high'
+              event_name: 'Zabbix server: Utilization of alerter processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -94,7 +95,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of alert manager processes over 75%'
+              name: 'Zabbix server: Utilization of alert manager processes is high'
+              event_name: 'Zabbix server: Utilization of alert manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -119,7 +121,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of alert syncer processes over 75%'
+              name: 'Zabbix server: Utilization of alert syncer processes is high'
+              event_name: 'Zabbix server: Utilization of alert syncer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -144,7 +147,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of availability manager processes over 75%'
+              name: 'Zabbix server: Utilization of availability manager processes is high'
+              event_name: 'Zabbix server: Utilization of availability manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -169,7 +173,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of configuration syncer processes over 75%'
+              name: 'Zabbix server: Utilization of configuration syncer processes is high'
+              event_name: 'Zabbix server: Utilization of configuration syncer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -194,7 +199,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of discoverer processes over 75%'
+              name: 'Zabbix server: Utilization of discoverer processes is high'
+              event_name: 'Zabbix server: Utilization of discoverer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -219,7 +225,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of escalator processes over 75%'
+              name: 'Zabbix server: Utilization of escalator processes is high'
+              event_name: 'Zabbix server: Utilization of escalator processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -244,7 +251,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of history poller processes over 75%'
+              name: 'Zabbix server: Utilization of history poller processes is high'
+              event_name: 'Zabbix server: Utilization of history poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -269,7 +277,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of history syncer processes over 75%'
+              name: 'Zabbix server: Utilization of history syncer processes is high'
+              event_name: 'Zabbix server: Utilization of history syncer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -294,7 +303,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of housekeeper processes over 75%'
+              name: 'Zabbix server: Utilization of housekeeper processes is high'
+              event_name: 'Zabbix server: Utilization of housekeeper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -319,7 +329,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of http poller processes over 75%'
+              name: 'Zabbix server: Utilization of http poller processes is high'
+              event_name: 'Zabbix server: Utilization of http poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -344,7 +355,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of icmp pinger processes over 75%'
+              name: 'Zabbix server: Utilization of icmp pinger processes is high'
+              event_name: 'Zabbix server: Utilization of icmp pinger processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -369,7 +381,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of ipmi manager processes over 75%'
+              name: 'Zabbix server: Utilization of ipmi manager processes is high'
+              event_name: 'Zabbix server: Utilization of ipmi manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -394,7 +407,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of ipmi poller processes over 75%'
+              name: 'Zabbix server: Utilization of ipmi poller processes is high'
+              event_name: 'Zabbix server: Utilization of ipmi poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -419,7 +433,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of java poller processes over 75%'
+              name: 'Zabbix server: Utilization of java poller processes is high'
+              event_name: 'Zabbix server: Utilization of java poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -444,7 +459,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of lld manager processes over 75%'
+              name: 'Zabbix server: Utilization of lld manager processes is high'
+              event_name: 'Zabbix server: Utilization of lld manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -469,7 +485,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of lld worker processes over 75%'
+              name: 'Zabbix server: Utilization of lld worker processes is high'
+              event_name: 'Zabbix server: Utilization of lld worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -494,7 +511,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of ODBC poller processes over 75%'
+              name: 'Zabbix server: Utilization of ODBC poller processes is high'
+              event_name: 'Zabbix server: Utilization of ODBC poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -519,7 +537,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of poller processes over 75%'
+              name: 'Zabbix server: Utilization of poller processes is high'
+              event_name: 'Zabbix server: Utilization of poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -544,7 +563,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of preprocessing manager processes over 75%'
+              name: 'Zabbix server: Utilization of preprocessing manager processes is high'
+              event_name: 'Zabbix server: Utilization of preprocessing manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -569,7 +589,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of preprocessing worker processes over 75%'
+              name: 'Zabbix server: Utilization of preprocessing worker processes is high'
+              event_name: 'Zabbix server: Utilization of preprocessing worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -594,7 +615,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of proxy poller processes over 75%'
+              name: 'Zabbix server: Utilization of proxy poller processes is high'
+              event_name: 'Zabbix server: Utilization of proxy poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -619,7 +641,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of report manager processes over 75%'
+              name: 'Zabbix server: Utilization of report manager processes is high'
+              event_name: 'Zabbix server: Utilization of report manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -644,7 +667,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of report writer processes over 75%'
+              name: 'Zabbix server: Utilization of report writer processes is high'
+              event_name: 'Zabbix server: Utilization of report writer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -669,7 +693,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of self-monitoring processes over 75%'
+              name: 'Zabbix server: Utilization of self-monitoring processes is high'
+              event_name: 'Zabbix server: Utilization of self-monitoring processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -694,7 +719,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of service manager processes over 75%'
+              name: 'Zabbix server: Utilization of service manager processes is high'
+              event_name: 'Zabbix server: Utilization of service manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -719,7 +745,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of snmp trapper processes over 75%'
+              name: 'Zabbix server: Utilization of snmp trapper processes is high'
+              event_name: 'Zabbix server: Utilization of snmp trapper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -744,7 +771,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of task manager processes over 75%'
+              name: 'Zabbix server: Utilization of task manager processes is high'
+              event_name: 'Zabbix server: Utilization of task manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -769,7 +797,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of timer processes over 75%'
+              name: 'Zabbix server: Utilization of timer processes is high'
+              event_name: 'Zabbix server: Utilization of timer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -794,7 +823,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of trapper processes over 75%'
+              name: 'Zabbix server: Utilization of trapper processes is high'
+              event_name: 'Zabbix server: Utilization of trapper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -819,7 +849,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of trigger housekeeper processes over 75%'
+              name: 'Zabbix server: Utilization of trigger housekeeper processes is high'
+              event_name: 'Zabbix server: Utilization of trigger housekeeper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -844,7 +875,8 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of unreachable poller processes over 75%'
+              name: 'Zabbix server: Utilization of unreachable poller processes is high'
+              event_name: 'Zabbix server: Utilization of unreachable poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -869,12 +901,26 @@ zabbix_export:
               expression: 'avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of vmware collector processes over 75%'
+              name: 'Zabbix server: Utilization of vmware collector processes is high'
+              event_name: 'Zabbix server: Utilization of vmware collector processes over 75%'
               priority: AVERAGE
               tags:
                 -
                   tag: scope
                   value: performance
+        -
+          uuid: 6fb9d6a8d3f84c679e7af4b9ef437239
+          name: 'Zabbix stats proxy'
+          type: INTERNAL
+          key: 'zabbix[proxy,discovery]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Zabbix proxy statistics master item.'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 2b2f695ed1ef4a7a871c80df9c911e90
           name: 'Zabbix server: Queue over 10 minutes'
@@ -1073,7 +1119,8 @@ zabbix_export:
             -
               uuid: 456403a2063c4e2298f9e3f60a7a3180
               expression: 'last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0'
-              name: 'Zabbix server: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Zabbix server: Version has changed'
+              event_name: 'Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zabbix server version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1473,6 +1520,385 @@ zabbix_export:
             -
               lld_macro: '{#NODE.NAME}'
               path: $.name
+        -
+          uuid: d6e3db2614914c1b977c7eb1b748bda6
+          name: 'Zabbix proxy discovery'
+          type: DEPENDENT
+          key: zabbix.proxy.discovery
+          delay: '0'
+          description: 'LLD rule with item and trigger prototypes for proxy discovery.'
+          item_prototypes:
+            -
+              uuid: 5cf1d8eae42740c88e2700ec619fc0e7
+              name: 'Proxy [{#PROXY.NAME}]: Certificate'
+              type: DEPENDENT
+              key: 'zabbix.proxy.cert[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Encryption status for connections from the proxy'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].cert.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 38498bb9fc884b2082ff5ecf76cc401e
+              name: 'Proxy [{#PROXY.NAME}]: Compatibility'
+              type: DEPENDENT
+              key: 'zabbix.proxy.compatibility[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Zabbix proxy compatibility'
+              valuemap:
+                name: Compatibility
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].compatibility.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 519cd429ab184d9ba08a50968dc3e1e6
+                  expression: 'last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)<>1'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy not compatibility'
+                  dependencies:
+                    -
+                      name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                      expression: 'last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 5983273711b64a93bd30c7ba983f2b35
+              name: 'Proxy [{#PROXY.NAME}]: Compression'
+              type: DEPENDENT
+              key: 'zabbix.proxy.compression[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Compression status'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].compression.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 01c4a2f48dce46e0a931fc7ab906800d
+              name: 'Proxy [{#PROXY.NAME}]: Host count'
+              type: DEPENDENT
+              key: 'zabbix.proxy.hosts[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The number of enabled hosts assigned to the proxy'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].hosts.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 187a005cd52c4ed69919b0356c1ccd39
+              name: 'Proxy [{#PROXY.NAME}]: Item count'
+              type: DEPENDENT
+              key: 'zabbix.proxy.items[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The number of enabled items on enabled hosts assigned to the proxy'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].items.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: f8c915861df843bc9c95ec8034d66fb7
+              name: 'Proxy [{#PROXY.NAME}]: Last seen, in seconds'
+              type: DEPENDENT
+              key: 'zabbix.proxy.last_seen[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              value_type: FLOAT
+              description: 'The time when the proxy was last seen by the server'
+              valuemap:
+                name: 'Last seen'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].last_seen.first()'
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: ee5eb0e4962b4bb59ac316a4110c86e3
+                  expression: 'last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}'
+                  name: 'Proxy [{#PROXY.NAME}]: Proxy last seen'
+                  event_name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy last seen more than {$PROXY.LAST_SEEN.MAX} seconds ago'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy not updating configuration'
+                  dependencies:
+                    -
+                      name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                      expression: 'last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 541732183fa747d6b7a05351172720bc
+                  expression: 'last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy not updating configuration'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 357461ce5cd24632a1359c8ab31e0422
+              name: 'Proxy [{#PROXY.NAME}]: Mode'
+              type: DEPENDENT
+              key: 'zabbix.proxy.mode[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Proxy mode'
+              valuemap:
+                name: 'Proxy mode'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].passive.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: a68564ff50284903bdc38432638a653b
+              name: 'Proxy [{#PROXY.NAME}]: PSK'
+              type: DEPENDENT
+              key: 'zabbix.proxy.psk[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Encryption status for connections from the proxy'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].psk.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 3e45db48df464b91a4951f13dd298cd5
+              name: 'Proxy [{#PROXY.NAME}]: Required VPS'
+              type: DEPENDENT
+              key: 'zabbix.proxy.requiredperformance[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              value_type: FLOAT
+              units: '!vps'
+              description: 'Required proxy performance (the number of values that need to be collected per second)'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].requiredperformance.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 8986a7d452c448de88dcb054541064e4
+              name: 'Proxy [{#PROXY.NAME}]: Unencrypted'
+              type: DEPENDENT
+              key: 'zabbix.proxy.unencrypted[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Encryption status for connections from the proxy'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].unencrypted.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 22da7ee85c044e128ceb47225ce7aaba
+              name: 'Proxy [{#PROXY.NAME}]: Version'
+              type: DEPENDENT
+              key: 'zabbix.proxy.version[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              trends: '0'
+              value_type: CHAR
+              description: 'Zabbix proxy version'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].version.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+          master_item:
+            key: 'zabbix[proxy,discovery]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#PROXY.NAME}'
+              path: $.name
       tags:
         -
           tag: class
@@ -1483,6 +1909,11 @@ zabbix_export:
         -
           tag: target
           value: zabbix
+      macros:
+        -
+          macro: '{$PROXY.LAST_SEEN.MAX}'
+          value: '600'
+          description: 'The maximum number of seconds that the Zabbix proxy is not seen'
       dashboards:
         -
           uuid: 6815a90fb9b745fd8f1b1f47697893d6
@@ -1491,7 +1922,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1503,10 +1934,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix server performance'
-                        host: 'Zabbix server health'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1519,10 +1950,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix data gathering process busy %'
-                        host: 'Zabbix server health'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1535,10 +1966,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix internal process busy %'
-                        host: 'Zabbix server health'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1552,10 +1983,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Zabbix cache usage, % free'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Zabbix cache usage, % free'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -1568,10 +1999,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Value cache effectiveness'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Value cache effectiveness'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -1585,8 +2016,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Zabbix internal queues'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Zabbix internal queues'
         -
           uuid: 32994a87287449eab12bed911880ef13
           name: 'Zabbix server processes'
@@ -1594,7 +2025,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1606,10 +2037,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Data handling processes'
-                        host: 'Zabbix server health'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1622,10 +2053,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Reporting processes'
-                        host: 'Zabbix server health'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1638,10 +2069,10 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Internal processes'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Internal processes'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1655,8 +2086,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Data gathering processes'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Data gathering processes'
       valuemaps:
         -
           uuid: cee1681b12ff49b6b7d442a851e870b4
@@ -1674,6 +2105,49 @@ zabbix_export:
             -
               value: '3'
               newvalue: Active
+        -
+          uuid: b985f0f026be4889923f5d16393e5383
+          name: Compatibility
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Current
+            -
+              value: '2'
+              newvalue: Outdated
+            -
+              value: '3'
+              newvalue: Unsupported
+        -
+          uuid: 3b60aa68965f47baba665e354e0e79de
+          name: 'Last seen'
+          mappings:
+            -
+              value: '-1'
+              newvalue: Never
+        -
+          uuid: 7c52b5e2d2434edeba089e136a7eb845
+          name: 'Proxy mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Active
+            -
+              value: '1'
+              newvalue: Passive
+        -
+          uuid: 0d2da53a4e404248b9d156b5a7342002
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Off'
+            -
+              value: '1'
+              newvalue: 'On'
         -
           uuid: 97bbea700550483bbd8405b4dd9d8005
           name: 'Value cache operating mode'

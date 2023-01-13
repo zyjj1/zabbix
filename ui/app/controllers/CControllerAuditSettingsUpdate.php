@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -55,7 +55,7 @@ class CControllerAuditSettingsUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG);
 	}
 
 	protected function doAction(): void {

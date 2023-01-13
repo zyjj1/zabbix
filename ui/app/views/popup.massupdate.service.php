@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -23,9 +23,6 @@
  * @var CView $this
  */
 
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-
 // create form
 $form = (new CForm())
 	->setId('massupdate-form')
@@ -47,9 +44,9 @@ $tags_form_grid = (new CFormGrid())
 					->addStyle('margin-bottom: 5px;'),
 				renderTagTable([['tag' => '', 'value' => '']])
 					->setHeader([_('Name'), _('Value'), _('Action')])
-					->setId('tags-table'),
-				(new CScriptTemplate('tag-row-tmpl'))
-					->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
+					->addClass('tags-table'),
+				(new CTemplateTag('tag-row-tmpl'))
+					->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
 			]))
 				->setId('tags-div')
 				->addClass(ZBX_STYLE_TABLE_FORMS)
@@ -60,6 +57,7 @@ $form->addItem($tags_form_grid);
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_SERVICE),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

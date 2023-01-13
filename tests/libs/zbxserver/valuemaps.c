@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
@@ -26,7 +26,6 @@
 
 #include "zbxserver.h"
 #include "log.h"
-#include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 

@@ -18,10 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @dataSource LoginUsers
+ */
 class testPageReportsNotifications extends CLegacyWebTest {
 
 	public function testPageReportsNotifications_CheckLayout() {
@@ -37,7 +41,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['all'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
+			'year' => array_reverse(range(date("Y"), date("Y",strtotime("-11 year"))))
 		];
 		$default_selected = [
 			'media_type' => 'all',
@@ -46,7 +50,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		];
 
 		foreach ($dropdowns as $name => $options) {
-			$dropdown = $this->query('name', $name)->asZDropdown()->one();
+			$dropdown = $this->query('name', $name)->asDropdown()->one();
 			// Check dropdown options.
 			$this->assertEquals($options, $dropdown->getOptions()->asText());
 			// Check default selected dropdown values
@@ -169,7 +173,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Select period
 		if (array_key_exists('period', $data)) {
-			$this->query('name:period')->asZDropdown()->one()->select($data['period']);
+			$this->query('name:period')->asDropdown()->one()->select($data['period']);
 			sleep(3);
 			if ($data['period'] === 'Yearly') {
 				$this->zbxTestAssertElementNotPresentId('year');
@@ -178,12 +182,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Select year
 		if (array_key_exists('year', $data)) {
-			$this->query('name:year')->asZDropdown()->one()->select($data['year']);
+			$this->query('name:year')->asDropdown()->one()->select($data['year']);
 		}
 
 		// Select media
 		if (array_key_exists('media_type', $data)) {
-			$this->query('name:media_type')->asZDropdown()->one()->select($data['media_type']);
+			$this->query('name:media_type')->asDropdown()->one()->select($data['media_type']);
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
 			$media_types = [];
