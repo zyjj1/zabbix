@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup sessions
@@ -29,16 +29,15 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testFormSetup extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -49,14 +48,15 @@ class testFormSetup extends CWebTest {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
 		// Check Welcome section.
-		$this->assertEquals("Welcome to\nZabbix 6.4", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
-		$this->assertEquals('English (en_US)', $language_field->getValue());
+		$this->assertEquals('English (en_GB)', $language_field->getValue());
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
-		$this->assertEquals($hint_text, $this->query('class:hint-box')->one()->getText());
+		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
+				->getAttribute('data-hintbox-contents'));
 		$this->checkButtons('first section');
 
 		$this->assertScreenshot($form, 'Welcome_En');
@@ -64,7 +64,7 @@ class testFormSetup extends CWebTest {
 		// Check that default language can be changed.
 		$language_field->fill('Russian (ru_RU)');
 		$this->page->refresh()->waitUntilReady();
-		$this->assertEquals("Добро пожаловать в\nZabbix 6.4", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Добро пожаловать в\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
@@ -105,7 +105,9 @@ class testFormSetup extends CWebTest {
 			'PHP session',
 			'PHP option "session.auto_start"',
 			'PHP gettext',
-			'PHP option "arg_separator.output"'
+			'PHP option "arg_separator.output"',
+			'PHP curl',
+			'System locale'
 		];
 		$this->assertTableDataColumn($prerequisites, '');
 		$this->checkSections('Check of pre-requesties');
@@ -275,9 +277,11 @@ class testFormSetup extends CWebTest {
 
 		// Check timezone field.
 		$timezones_field = $form->getField('Default time zone');
-
 		$timezones = $timezones_field->getOptions()->asText();
-		$this->assertEquals(426, count($timezones));
+
+		// Note that count of available timezones may differ based on the local environment configuration.
+		$this->assertEquals(420, count($timezones));
+
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
 			$this->assertContains($timezone, $timezones);
@@ -375,7 +379,7 @@ class testFormSetup extends CWebTest {
 	}
 
 	public function getDbConnectionDetails() {
-		return [
+		$provider = [
 			// Incorrect DB host.
 			[
 				[
@@ -572,6 +576,31 @@ class testFormSetup extends CWebTest {
 				]
 			]
 		];
+
+		// MySQL database error depends on php version.
+		$mapping = [
+			'Error connecting to database. Empty cipher.' => [
+				'8.1.0' => 'Cannot connect to MySQL using SSL'
+			],
+			'php_network_getaddresses: getaddrinfo failed: Name or service not known' => [
+				'8.1.0' => 'php_network_getaddresses: getaddrinfo for incorrect_DB_host failed: Name or service not known'
+			]
+		];
+
+		foreach ($provider as &$data) {
+			if (array_key_exists('mysql_error', $data[0]) && array_key_exists($data[0]['mysql_error'], $mapping)) {
+				foreach ($mapping[$data[0]['mysql_error']] as $version => $map) {
+					if (version_compare(phpversion(), $version, '<')) {
+						continue;
+					}
+
+					$data[0]['mysql_error'] = $map;
+				}
+			}
+		}
+		unset($data);
+
+		return $provider;
 	}
 
 	/**
@@ -825,7 +854,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
 		$this->query('button:Back')->one()->click();
-		$this->assertEquals("Welcome to\nZabbix 6.4", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 

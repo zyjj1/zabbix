@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ const char	*zbx_mock_get_parameter_string(const char *path)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return NULL;
 	}
 
 	return parameter;
@@ -53,6 +55,8 @@ const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const ch
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return NULL;
 	}
 
 	return member;
@@ -97,6 +101,8 @@ void	zbx_mock_str_to_token_type(const char *str, int *out)
 		*out = ZBX_TOKEN_USER_MACRO;
 	else if (0 == strcmp(str, "ZBX_TOKEN_FUNC_MACRO"))
 		*out = ZBX_TOKEN_FUNC_MACRO;
+	else if (0 == strcmp(str, "ZBX_TOKEN_USER_FUNC_MACRO"))
+		*out = ZBX_TOKEN_USER_FUNC_MACRO;
 	else if (0 == strcmp(str, "ZBX_TOKEN_SIMPLE_MACRO"))
 		*out = ZBX_TOKEN_SIMPLE_MACRO;
 	else if (0 == strcmp(str, "ZBX_TOKEN_REFERENCE"))
@@ -131,8 +137,12 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 	if (0 == strcmp(str, "ITEM_VALUE_TYPE_TEXT"))
 		return ITEM_VALUE_TYPE_TEXT;
 
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_BIN"))
+		return ITEM_VALUE_TYPE_BIN;
+
 	fail_msg("Unknown value type \"%s\"", str);
-	return ITEM_VALUE_TYPE_MAX;
+
+	return ITEM_VALUE_TYPE_NONE;
 }
 
 /******************************************************************************
@@ -229,6 +239,8 @@ zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return parameter;
@@ -244,6 +256,8 @@ zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const c
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return member;
@@ -259,6 +273,8 @@ double	zbx_mock_get_parameter_float(const char *path)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return parameter;
@@ -274,6 +290,8 @@ double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *na
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return member;
@@ -289,6 +307,8 @@ int	zbx_mock_get_object_member_int(zbx_mock_handle_t object, const char *name)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_int(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return member;
@@ -325,6 +345,9 @@ int	zbx_mock_str_to_return_code(const char *str)
 
 	if (0 == strcmp(str, "CONFIG_ERROR"))
 		return CONFIG_ERROR;
+
+	if (0 == strcmp(str, "SIG_ERROR"))
+		return SIG_ERROR;
 
 	if (0 == strcmp(str, "SYSINFO_RET_OK"))
 		return SYSINFO_RET_OK;

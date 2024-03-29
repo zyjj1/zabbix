@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,13 +29,16 @@ int	zbx_is_ip(const char *ip);
 
 int	zbx_ip_in_list(const char *list, const char *ip);
 
-int	zbx_parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
+int	zbx_parse_serveractive_element(const char *str, char **host, unsigned short *port,
+		unsigned short port_default);
 
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
 
 #define ZBX_IPRANGE_GROUPS_V4	4
 #define ZBX_IPRANGE_GROUPS_V6	8
+
+#define ZBX_PORTRANGE_INIT_PORT	-1
 
 typedef struct
 {
@@ -62,6 +65,12 @@ zbx_iprange_t;
 int	zbx_iprange_parse(zbx_iprange_t *iprange, const char *address);
 void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address);
 int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address);
+int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len);
+int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx, int *ipaddress);
+void	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len);
+int	zbx_portrange_uniq_next(const zbx_range_t *ranges, const int num, int *port);
+int	zbx_portrange_uniq_iter(const zbx_range_t *ranges, const int num, int *idx, int *port);
+
 int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address);
 zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange);
 

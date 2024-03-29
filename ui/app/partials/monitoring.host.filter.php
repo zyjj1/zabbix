@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,10 @@ $filter_tags_table = (new CTable())
 				->setModern(true)
 		))->setColSpan(4)
 );
+
+if (!$data['tags']) {
+	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
 
 foreach (array_values($data['tags']) as $i => $tag) {
 	$filter_tags_table->addRow([
@@ -158,11 +162,10 @@ $template = (new CDiv())
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
 $template = (new CForm('get'))
-	->cleanItems()
 	->setName('zbx_filter')
 	->addItem([
 		$template,
-		(new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE),
+		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
 		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
@@ -252,7 +255,9 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table
-		if (data.tags.length == 0) {
+		$('#tags_' + data.uniqid, container).find('.form_row').remove();
+
+		if (data.tags.length === 0) {
 			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 

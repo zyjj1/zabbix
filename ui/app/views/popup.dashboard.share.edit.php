@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('dashboard')))->removeId())
 	->setId('dashboard-share-form')
 	->setName('dashboard_share_form')
 	->addItem(getMessages());
@@ -33,17 +34,15 @@ $table_user_groups = (new CTable())
 	->addRow(
 		(new CRow(
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->onClick(
-						'return PopUp("popup.generic", '. json_encode([
-							'srctbl' => 'usrgrp',
-							'srcfld1' => 'usrgrpid',
-							'srcfld2' => 'name',
-							'dstfrm' => $form->getName(),
-							'multiselect' => '1'
-						]).', {dialogue_class: "modal-popup-generic"});'
-					)
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'usrgrp',
+						'srcfld1' => 'usrgrpid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'multiselect' => '1'
+					]).', {dialogue_class: "modal-popup-generic"});'
+				)
 			))->setColSpan(3)
 		))->setId('user-group-list-footer')
 	)
@@ -54,17 +53,15 @@ $table_users = (new CTable())
 	->addRow(
 		(new CRow(
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->onClick(
-						'return PopUp("popup.generic", '.json_encode([
-							'srctbl' => 'users',
-							'srcfld1' => 'userid',
-							'srcfld2' => 'fullname',
-							'dstfrm' => $form->getName(),
-							'multiselect' => '1'
-						]).', {dialogue_class: "modal-popup-generic"});'
-					)
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'users',
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfrm' => $form->getName(),
+						'multiselect' => '1'
+					]).', {dialogue_class: "modal-popup-generic"});'
+				)
 			))->setColSpan(3)
 		))->setId('user-list-footer')
 	)

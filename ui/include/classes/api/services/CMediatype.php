@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,21 +35,21 @@ class CMediatype extends CApiService {
 	protected $tableAlias = 'mt';
 	protected $sortColumns = ['mediatypeid'];
 
+	public const OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email',
+		'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
+		'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval', 'content_type',
+		'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
+		'provider', 'parameters'
+	];
+
 	/**
-	 * Get Media types data
-	 *
 	 * @param array $options
-	 * @param array $options['mediatypeids'] filter by Mediatype IDs
-	 * @param boolean $options['type'] filter by Mediatype type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
-	 * @param boolean $options['output'] output only Mediatype IDs if not set.
-	 * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
-	 * @param string $options['pattern'] filter by Host name containing only give pattern
-	 * @param int $options['limit'] output will be limited to given number
-	 * @param string $options['sortfield'] output will be sorted by given property [ 'mediatypeid' ]
-	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
-	 * @return array
+	 *
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array|int
 	 */
-	public function get($options = []) {
+	public function get(array $options = []) {
 		$result = [];
 
 		$sqlParts = [
@@ -84,7 +84,16 @@ class CMediatype extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null
 		];
+
 		$options = zbx_array_merge($defOptions, $options);
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectActions' =>  ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// permission check
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
@@ -137,6 +146,7 @@ class CMediatype extends CApiService {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
 		while ($mediatype = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -157,6 +167,7 @@ class CMediatype extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['type'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -222,7 +233,7 @@ class CMediatype extends CApiService {
 			'smtp_verify_host' =>		['type' => API_INT32],
 			'smtp_authentication' =>	['type' => API_INT32],
 			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
-			'exec_params' =>			['type' => API_STRING_UTF8],
+			'exec_params' =>			['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED],
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
 			'attempt_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'attempt_interval'), 'in' => '0:'.SEC_PER_HOUR],
@@ -288,6 +299,8 @@ class CMediatype extends CApiService {
 			DB::update('media_type', $upd_mediatypes);
 		}
 
+		$mediatypes = $this->extendObjectsByKey($mediatypes, $db_mediatypes, 'mediatypeid', ['type']);
+
 		self::updateParameters($mediatypes, __FUNCTION__, $db_mediatypes);
 		self::updateMessageTemplates($mediatypes, __FUNCTION__, $db_mediatypes);
 
@@ -323,7 +336,7 @@ class CMediatype extends CApiService {
 			'smtp_verify_host' =>		['type' => API_INT32],
 			'smtp_authentication' =>	['type' => API_INT32],
 			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
-			'exec_params' =>			['type' => API_STRING_UTF8],
+			'exec_params' =>			['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED],
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
 			'attempt_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'attempt_interval'), 'in' => '0:'.SEC_PER_HOUR],
@@ -355,9 +368,9 @@ class CMediatype extends CApiService {
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
-				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
-				'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
-				'event_menu_url', 'event_menu_name', 'description', 'provider'
+				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
+				'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+				'event_menu_name', 'description', 'provider'
 			],
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
 			'preservekeys' => true
@@ -434,7 +447,7 @@ class CMediatype extends CApiService {
 					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type', 'provider'
 				],
 				MEDIA_TYPE_EXEC => [
-					'exec_path', 'exec_params'
+					'exec_path', 'exec_params', 'parameters'
 				],
 				MEDIA_TYPE_SMS => [
 					'gsm_modem', 'maxsessions'
@@ -463,11 +476,23 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
+			if (array_key_exists('exec_params', $mediatype)) {
+				if ($type == MEDIA_TYPE_EXEC && !array_key_exists('parameters', $mediatype)) {
+					$parameters = explode("\n", trim($mediatype['exec_params']));
+
+					foreach ($parameters as $sortorder => $value) {
+						$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $value];
+					}
+				}
+
+				unset($mediatype['exec_params']);
+			}
+
 			if ($method === 'update') {
 				switch ($type) {
 					case MEDIA_TYPE_EMAIL:
 						if (array_key_exists('smtp_authentication', $mediatype)
-								&& $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE) {
+								&& $mediatype['smtp_security'] == SMTP_SECURITY_NONE) {
 							$mediatype += [
 								'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
 								'smtp_verify_host' => $db_defaults['smtp_verify_host']
@@ -495,8 +520,10 @@ class CMediatype extends CApiService {
 				}
 
 				if ($type != $db_mediatype['type']) {
-					$mediatype =
-						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])) + $mediatype;
+					$mediatype = array_merge(
+						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])),
+						$mediatype
+					);
 				}
 			}
 		}
@@ -525,7 +552,7 @@ class CMediatype extends CApiService {
 					'smtp_helo' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
 					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
-					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_CONNECTION_SECURITY_NONE, SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])],
+					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_SECURITY_NONE, SMTP_SECURITY_STARTTLS, SMTP_SECURITY_SSL])],
 					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
 					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])],
 					'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))]
@@ -533,8 +560,8 @@ class CMediatype extends CApiService {
 
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication', 'provider']));
 
-				if ($mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
-						|| $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS) {
+				if ($mediatype['smtp_security'] == SMTP_SECURITY_STARTTLS
+						|| $mediatype['smtp_security'] == SMTP_SECURITY_SSL) {
 					$api_input_rules['fields'] += [
 						'smtp_verify_peer' =>	['type' => API_INT32, 'in' => '0,1'],
 						'smtp_verify_host' =>	['type' => API_INT32, 'in' => '0,1']
@@ -566,7 +593,10 @@ class CMediatype extends CApiService {
 			case MEDIA_TYPE_EXEC:
 				$api_input_rules['fields'] = [
 					'exec_path' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'exec_path')],
-					'exec_params' =>	['type' => API_EXEC_PARAMS, 'length' => DB::getFieldLength('media_type', 'exec_params')]
+					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['sortorder']], 'fields' => [
+						'sortorder' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
+						'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_param', 'value')]
+					]]
 				];
 
 				if ($method === 'create' || $type != $db_mediatype['type']) {
@@ -631,7 +661,6 @@ class CMediatype extends CApiService {
 			'smtp_verify_host' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_verify_host')],
 			'smtp_authentication' =>	['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_authentication')],
 			'maxsessions' =>			['type' => API_INT32, 'in' => '0:100'],
-			'exec_params' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'exec_params')],
 			'content_type' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'content_type')],
 			'script' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'script')],
 			'timeout' =>				['type' => API_TIME_UNIT, 'in' => timeUnitToSeconds(DB::getDefault('media_type', 'timeout'))],
@@ -664,15 +693,21 @@ class CMediatype extends CApiService {
 				continue;
 			}
 
-			$db_params = ($method === 'update')
-				? array_column($db_mediatypes[$mediatype['mediatypeid']]['parameters'], null, 'name')
-				: [];
+			$db_params = [];
+
+			if ($method === 'update') {
+				$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
+				$db_uniq_field = $db_mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
+				$db_params = array_column($db_mediatype['parameters'], null, $db_uniq_field);
+			}
+
+			$uniq_field = $mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
 
 			foreach ($mediatype['parameters'] as &$param) {
-				if (array_key_exists($param['name'], $db_params)) {
-					$db_param = $db_params[$param['name']];
+				if (array_key_exists($param[$uniq_field], $db_params)) {
+					$db_param = $db_params[$param[$uniq_field]];
 					$param['mediatype_paramid'] = $db_param['mediatype_paramid'];
-					unset($db_params[$db_param['name']]);
+					unset($db_params[$db_param[$uniq_field]]);
 
 					$upd_param = DB::getUpdatedValues('media_type_param', $param, $db_param);
 
@@ -845,15 +880,29 @@ class CMediatype extends CApiService {
 		return ['mediatypeids' => $mediatypeids];
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts): array {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {
+			$sqlParts = $this->addQuerySelect($this->fieldId('type'), $sqlParts);
+		}
+
+		return $sqlParts;
+	}
+
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
+
+		self::addRelatedActions($options, $result);
 
 		// adding message templates
 		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
 			$message_templates = [];
+
 			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
 				'media_type_message'
 			);
+
 			$related_ids = $relation_map->getRelatedIds();
 
 			if ($related_ids) {
@@ -862,8 +911,9 @@ class CMediatype extends CApiService {
 					'mediatype_messageids' => $related_ids,
 					'preservekeys' => true
 				]);
-				$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
-					[]
+
+				$message_templates = $this->unsetExtraFields($message_templates,
+					['mediatype_messageid', 'mediatypeid']
 				);
 			}
 
@@ -893,23 +943,39 @@ class CMediatype extends CApiService {
 			}
 
 			$parameters = DB::select('media_type_param', [
-				'output' => ['mediatypeid', 'name', 'value'],
+				'output' => ['mediatypeid', 'name', 'value', 'sortorder'],
 				'filter' => ['mediatypeid' => array_keys($result)]
 			]);
 
 			foreach ($parameters as $parameter) {
-				$result[$parameter['mediatypeid']]['parameters'][] = [
-					'name' => $parameter['name'],
-					'value' => $parameter['value']
-				];
+				if ($result[$parameter['mediatypeid']]['type'] == MEDIA_TYPE_EXEC) {
+					$result[$parameter['mediatypeid']]['parameters'][] = [
+						'sortorder' => $parameter['sortorder'],
+						'value' => $parameter['value']
+					];
+				}
+				else {
+					$result[$parameter['mediatypeid']]['parameters'][] = [
+						'name' => $parameter['name'],
+						'value' => $parameter['value']
+					];
+				}
 			}
+
+			foreach ($result as &$mediatype) {
+				if ($mediatype['type'] == MEDIA_TYPE_EXEC) {
+					CArrayHelper::sort($mediatype['parameters'], [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
+					$mediatype['parameters'] = array_values($mediatype['parameters']);
+				}
+			}
+			unset($mediatype);
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Add existing webhook parameters and message templates to $db_mediatypes, regardless of whether they will be
+	 * Add existing parameters and message templates to $db_mediatypes, regardless of whether they will be
 	 * affected by the update.
 	 *
 	 * @static
@@ -934,7 +1000,7 @@ class CMediatype extends CApiService {
 
 		if ($mediatypeids['parameters']) {
 			$options = [
-				'output' => ['mediatype_paramid', 'mediatypeid', 'name', 'value'],
+				'output' => ['mediatype_paramid', 'mediatypeid', 'name', 'value', 'sortorder'],
 				'filter' => ['mediatypeid' => $mediatypeids['parameters']]
 			];
 			$db_params = DBselect(DB::makeSql('media_type_param', $options));
@@ -955,6 +1021,55 @@ class CMediatype extends CApiService {
 			while ($db_message = DBfetch($db_messages)) {
 				$db_mediatypes[$db_message['mediatypeid']]['message_templates'][$db_message['mediatype_messageid']] =
 					array_diff_key($db_message, array_flip(['mediatypeid']));
+			}
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private static function addRelatedActions(array $options, array &$result): void {
+		if ($options['selectActions'] === null) {
+			return;
+		}
+
+		$db_action_mediatypes = DBselect(
+			'SELECT DISTINCT om.mediatypeid,o.actionid'.
+			' FROM opmessage om,operations o'.
+			' WHERE om.operationid=o.operationid'.
+			' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
+		);
+
+		$action_mediatypeids = [];
+
+		while ($row = DBfetch($db_action_mediatypes)) {
+			if ($row['mediatypeid'] == 0) {
+				foreach ($result as $mediatype) {
+					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
+				}
+			}
+			else {
+				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = $row['mediatypeid'];
+			}
+		}
+
+		$action_options = [
+			'output' => $options['selectActions'],
+			'actionids' => array_keys($action_mediatypeids)
+		];
+
+		$db_actions = DBselect(DB::makeSql('actions', $action_options));
+
+		foreach ($result as $mediatype) {
+			$result[$mediatype['mediatypeid']]['actions'] = [];
+		}
+
+		while ($action = DBfetch($db_actions)) {
+			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
+				$result[$mediatypeid]['actions'][] = $action;
+
+				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
 			}
 		}
 	}

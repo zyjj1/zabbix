@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,8 @@ window.service_edit_popup = new class {
 
 		$problem_tags.dynamicRows({
 			template: '#problem-tag-row-tmpl',
-			rows: problem_tags
+			allow_empty: true,
+			rows: problem_tags,
 		});
 
 		$problem_tags.on('tableupdate.dynamicRows', () => this._update());
@@ -98,7 +99,7 @@ window.service_edit_popup = new class {
 				const $tags = $panel.find('.tags-table');
 
 				$tags
-					.dynamicRows({template: '#tag-row-tmpl'})
+					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
 					.on('afteradd.dynamicRows', () => {
 						$tags
 							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
@@ -149,13 +150,13 @@ window.service_edit_popup = new class {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
-			document
-				.getElementById(id)
-				.addEventListener('change', () => this._update());
+		for (const id of ['propagation_rule', 'algorithm']) {
+			document.getElementById(id).addEventListener('change', () => this._update());
 		}
 
 		this._update();
+
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_initTemplates() {
@@ -193,7 +194,6 @@ window.service_edit_popup = new class {
 	}
 
 	_update() {
-		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
 
 		let has_problem_tags = false;
@@ -216,30 +216,24 @@ window.service_edit_popup = new class {
 		document.getElementById('algorithm-not-applicable-warning').style.display =
 			this.children.size > 0 ? 'none' : '';
 
-		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('status_propagation_rules_field').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('status_propagation_value_field').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('weight_label').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
-
 		switch (propagation_rule) {
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_DECREASE ?>':
+				document.getElementById('status_propagation_value_field').style.display = '';
 				document.getElementById('propagation_value_number').style.display = '';
 				document.getElementById('propagation_value_status').style.display = 'none';
 				break;
 
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_FIXED ?>':
+				document.getElementById('status_propagation_value_field').style.display = '';
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = '';
 				break;
 
 			default:
+				document.getElementById('status_propagation_value_field').style.display = 'none';
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = 'none';
-				document.getElementById('status_propagation_value_field').style.display = 'none';
 		}
 
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
@@ -270,7 +264,9 @@ window.service_edit_popup = new class {
 			parameters = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.statusrule.edit', parameters, {dialogueid: 'service_status_rule_edit'});
+		const overlay = PopUp('popup.service.statusrule.edit', parameters,
+			{dialogueid: 'service_status_rule_edit', dialogue_class: 'modal-popup-medium'}
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
@@ -380,7 +376,7 @@ window.service_edit_popup = new class {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
-		}, {dialogueid: 'services'});
+		}, {dialogueid: 'services', dialogue_class: 'modal-popup-generic'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
@@ -410,7 +406,7 @@ window.service_edit_popup = new class {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
-		}, {dialogueid: 'services'});
+		}, {dialogueid: 'services', dialogue_class: 'modal-popup-generic'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
@@ -437,11 +433,14 @@ window.service_edit_popup = new class {
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'service.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('service')) ?>
+		);
 
 		this._post(curl.getUrl(), {serviceids: [this.serviceid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
@@ -471,7 +470,7 @@ window.service_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
 		this._post(curl.getUrl(), fields, (response) => {

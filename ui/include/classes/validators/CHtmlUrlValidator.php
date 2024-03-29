@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,7 @@ class CHtmlUrlValidator {
 	 * URL is validated if schema validation is enabled by CSettingsHelper::VALIDATE_URI_SCHEMES parameter.
 	 *
 	 * Relative URL should start with .php file name.
-	 * Absolute URL schema must match schemes mentioned in ZBX_URL_VALID_SCHEMES comma separated list.
-	 *
-	 * @static
+	 * Absolute URL schema must match the URI schemes comma separated list stored in the DB.
 	 *
 	 * @param string $url                              URL string to validate.
 	 * @param array  $options
@@ -45,11 +43,12 @@ class CHtmlUrlValidator {
 	 *
 	 * @return bool
 	 */
-	public static function validate($url, array $options = []) {
+	public static function validate(string $url, array $options = []): bool {
 		$options += [
 			'allow_user_macro' => true,
 			'allow_event_tags_macro' => false,
 			'allow_inventory_macro' => INVENTORY_URL_MACRO_NONE,
+			'allow_manualinput_macro' => false,
 			'validate_uri_schemes' => (bool) CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES)
 		];
 
@@ -58,43 +57,51 @@ class CHtmlUrlValidator {
 		}
 
 		if ($options['allow_inventory_macro'] != INVENTORY_URL_MACRO_NONE) {
-			$macro_parser = new CMacroParser([
+			$parser_options = [
 				'macros' => ['{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}'],
 				'ref_type' => ($options['allow_inventory_macro'] == INVENTORY_URL_MACRO_TRIGGER)
 					? CMacroParser::REFERENCE_NUMERIC
 					: CMacroParser::REFERENCE_NONE
-			]);
+			];
+			$macro_parsers = [new CMacroParser($parser_options), new CMacroFunctionParser($parser_options)];
 
 			// Macros allowed only at the beginning of $url.
-			if ($macro_parser->parse($url, 0) != CParser::PARSE_FAIL) {
-				return true;
-			}
-		}
-
-		if ($options['allow_event_tags_macro'] === true) {
-			$macro_parser = new CMacroParser([
-				'macros' => ['{EVENT.TAGS}'],
-				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
-			]);
-
-			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
-				if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
+			foreach ($macro_parsers as $macro_parser) {
+				if ($macro_parser->parse($url, 0) != CParser::PARSE_FAIL) {
 					return true;
 				}
 			}
+		}
+
+		$macro_parsers = [];
+
+		if ($options['allow_event_tags_macro'] === true) {
+			$parser_options = [
+				'macros' => ['{EVENT.TAGS}'],
+				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
+			];
+			array_push($macro_parsers, new CMacroParser($parser_options), new CMacroFunctionParser($parser_options));
 		}
 
 		if ($options['allow_user_macro'] === true) {
-			$user_macro_parser = new CUserMacroParser();
+			array_push($macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
+		}
 
+		if ($options['allow_manualinput_macro'] === true) {
+			$macro_parsers[] = new CMacroParser(['macros' => ['{MANUALINPUT}']]);
+		}
+
+		if ($macro_parsers) {
 			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
-				if ($user_macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
-					return true;
+				foreach ($macro_parsers as $macro_parser) {
+					if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
+						return true;
+					}
 				}
 			}
 		}
 
-		$url_parts = parse_url($url);
+		$url_parts = parse_url(preg_replace('/[\r\n\t]/', '', trim($url, "\x00..\x1F\x20")));
 		if (!$url_parts) {
 			return false;
 		}
@@ -109,13 +116,11 @@ class CHtmlUrlValidator {
 			if (array_key_exists('host', $url_parts)) {
 				return true;
 			}
-			else {
-				return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '/');
-			}
+
+			return array_key_exists('path', $url_parts) && $url_parts['path'] !== '/';
 		}
-		else {
-			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
-		}
+
+		return array_key_exists('path', $url_parts) && $url_parts['path'] !== '';
 	}
 
 	/**
@@ -127,8 +132,8 @@ class CHtmlUrlValidator {
 	 */
 	public static function validateSameSite(string $url): bool {
 		$root_path = __DIR__.'/../../../';
-		preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $url, $url_parts);
+		preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $url, $url_parts);
 
-		return (array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']));
+		return array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']);
 	}
 }

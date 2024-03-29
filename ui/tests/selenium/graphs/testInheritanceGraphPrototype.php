@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,7 +93,8 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 						['itemName' => 'testInheritanceItemPrototype1']
 					],
 					'errors'=> [
-						'Graph with name "testInheritanceGraphPrototype4" already exists in graphs or graph prototypes.'
+						'Graph prototype "testInheritanceGraphPrototype4" already exists on the LLD rule with '.
+								'key "inheritance-discovery-rule" of the template "Inheritance test template".'
 					]
 				]
 			]

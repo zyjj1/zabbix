@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_HOUSEKEEPING_EDIT));
 
 $form = (new CForm())
-	->setId('housekeeping')
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping')))->removeId())
+	->setId('housekeeping-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
@@ -124,20 +125,17 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Override item history period'), 'hk_history_global'),
-		[
-			(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
+		new CLabel([
+			_('Override item history period'),
 			array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data)
-				? new CSpan([
-					' ',
-					makeWarningIcon(
-						_('This setting should be enabled, because history tables contain compressed chunks.')
-					)
-						->addStyle('display:none;')
-						->addClass('js-hk-history-warning')
-				])
+				? makeWarningIcon(
+					_('This setting should be enabled, because history tables contain compressed chunks.')
+				)
+					->addStyle('display:none;')
+					->addClass('js-hk-history-warning')
 				: null
-		]
+		], 'hk_history_global'),
+		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_history'))
@@ -153,20 +151,15 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Override item trend period'), 'hk_trends_global'),
-		[
-			(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1),
+		new CLabel([
+			_('Override item trend period'),
 			array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data)
-				? new CSpan([
-					' ',
-					makeWarningIcon(
-						_('This setting should be enabled, because trend tables contain compressed chunks.')
-					)
-						->addStyle('display:none;')
-						->addClass('js-hk-trends-warning')
-				])
+				? makeWarningIcon(_('This setting should be enabled, because trend tables contain compressed chunks.'))
+					->addStyle('display:none;')
+					->addClass('js-hk-trends-warning')
 				: null
-		]
+		], 'hk_trends_global'),
+		(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_trends'))
@@ -181,11 +174,6 @@ $house_keeper_tab = (new CFormList())
 		switch ($data['extension_err_code']) {
 			case ZBX_EXT_ERR_UNDEFINED:
 				$timescaledb_error = _('Unable to retrieve TimescaleDB compression support status.');
-				break;
-
-			case ZBX_TIMESCALEDB_POSTGRES_TOO_OLD:
-				$timescaledb_error = _('Compression is not supported.').' '.
-					_('PostgreSQL database server version is too old.');
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE:
@@ -223,19 +211,19 @@ $house_keeper_tab = (new CFormList())
 				$timescaledb_error = '';
 		}
 
-		$timescaledb_error = $timescaledb_error !== ''
-			? (makeErrorIcon($timescaledb_error))->addStyle('margin-left: 5px;')
-			: null;
+		$timescaledb_error = $timescaledb_error !== '' ? makeErrorIcon($timescaledb_error) : null;
 
 		$compression_status_checkbox = (new CCheckBox('compression_status'))
-			->setChecked($data['compression_status'] == 1)
+			->setChecked($data['compression_availability'] && $data['compression_status'] == 1
+				|| $data['compression_not_detected']
+			)
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab
 			->addRow((new CTag('h4', true, _('History and trends compression')))->addClass('input-section-header'))
 			->addRow(
-				new CLabel(_('Enable compression'), 'compression_status'),
-				[$compression_status_checkbox, $timescaledb_error]
+				new CLabel([_('Enable compression'), $timescaledb_error], 'compression_status'),
+				$compression_status_checkbox
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))

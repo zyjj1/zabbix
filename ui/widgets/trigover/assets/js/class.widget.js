@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,29 +18,14 @@
 **/
 
 
-class CWidgetTrigerOver extends CWidget {
+class CWidgetTriggerOver extends CWidget {
 
-	_registerEvents() {
-		super._registerEvents();
-
+	onStart() {
 		this._events = {
 			...this._events,
 
 			acknowledgeCreated: (e, response) => {
-				for (let i = overlays_stack.length - 1; i >= 0; i--) {
-					const overlay = overlays_stack.getById(overlays_stack.stack[i]);
-
-					if (overlay.type === 'hintbox') {
-						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
-
-						if (this._content_body.contains(element)) {
-							hintBox.deleteHint(overlay.element);
-						}
-					}
-				}
-
 				clearMessages();
-
 				addMessage(makeMessageBox('good', [], response.success.title));
 
 				if (this._state === WIDGET_STATE_ACTIVE) {
@@ -50,15 +35,11 @@ class CWidgetTrigerOver extends CWidget {
 		}
 	}
 
-	_activateEvents() {
-		super._activateEvents();
-
+	onActivate() {
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
-
+	onDeactivate() {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,15 @@
  * @var array $data
  */
 
-(new CWidgetView($data))
-	->addItem($data['style'] == STYLE_TOP
+if ($data['error'] !== null) {
+	$table = (new CTableInfo())->setNoDataMessage($data['error']);
+}
+else {
+	$table = $data['style'] == STYLE_TOP
 		? (new CPartial('table.top', $data))->getOutput()
-		: (new CPartial('table.left', $data))->getOutput()
-	)
+		: (new CPartial('table.left', $data))->getOutput();
+}
+
+(new CWidgetView($data))
+	->addItem($table)
 	->show();

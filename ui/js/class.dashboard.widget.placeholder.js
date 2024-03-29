@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._placeholder_box_label = document.createElement('div');
 		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
 
-		this._placeholder_box_label_wrap = document.createElement('span');
+		this._placeholder_box_label_wrap = document.createElement('div');
 
 		this._placeholder_box_label.appendChild(this._placeholder_box_label_wrap);
 		this._placeholder_box.appendChild(this._placeholder_box_label);
@@ -127,6 +127,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	resize() {
 		if (!this._target.classList.contains(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN)) {
 			this._placeholder_box_label_wrap.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+
 			if (this._placeholder_box_label.scrollHeight > this._placeholder_box_label.clientHeight) {
 				this._placeholder_box_label_wrap.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
 			}

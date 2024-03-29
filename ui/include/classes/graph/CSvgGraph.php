@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,14 +184,14 @@ class CSvgGraph extends CSvg {
 		$this->left_y_min = $options['axes']['left_y_min'];
 		$this->left_y_max = $options['axes']['left_y_max'];
 		$this->left_y_units = $options['axes']['left_y_units'] !== null
-			? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $options['axes']['left_y_units'])))
+			? trim(preg_replace('/\s+/', ' ', $options['axes']['left_y_units']))
 			: null;
 
 		$this->show_right_y_axis = $options['axes']['show_right_y_axis'];
 		$this->right_y_min = $options['axes']['right_y_min'];
 		$this->right_y_max = $options['axes']['right_y_max'];
 		$this->right_y_units = $options['axes']['right_y_units'] !== null
-			? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $options['axes']['right_y_units'])))
+			? trim(preg_replace('/\s+/', ' ', $options['axes']['right_y_units']))
 			: null;
 
 		$this->show_x_axis = $options['axes']['show_x_axis'];
@@ -778,7 +778,7 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $this->max_value_left ?: 1;
 		}
 
-		$this->left_y_is_binary = $this->left_y_units === 'B' || $this->left_y_units === 'Bps';
+		$this->left_y_is_binary = isBinaryUnits($this->left_y_units);
 
 		$calc_power = $this->left_y_units === '' || $this->left_y_units[0] !== '!';
 
@@ -809,7 +809,7 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $this->max_value_right ?: 1;
 		}
 
-		$this->right_y_is_binary = $this->right_y_units === 'B' || $this->right_y_units === 'Bps';
+		$this->right_y_is_binary = isBinaryUnits($this->right_y_units);
 
 		$calc_power = $this->right_y_units === '' || $this->right_y_units[0] !== '!';
 
@@ -1068,22 +1068,14 @@ class CSvgGraph extends CSvg {
 				$bar_stack_x1 = $group_x1;
 
 				foreach ($bar_group as $bar_group_index => $bar_stack) {
-					$sum_positive = 0;
-					$sum_negative = 0;
+					$sum = 0;
 
 					$bar_stack_x2 = $group_x1 + ($bar_group_index + 1) * $metric_width;
 
 					foreach ($bar_stack as [$metric_index, $point_value]) {
-						if ($point_value >= 0) {
-							$value_from = $sum_positive;
-							$value_to = $sum_positive + $point_value;
-							$sum_positive += $point_value;
-						}
-						else {
-							$value_from = $point_value + $point_value;
-							$value_to = $point_value;
-							$sum_negative += $point_value;
-						}
+						$value_from = $sum;
+						$value_to = $sum + $point_value;
+						$sum += $point_value;
 
 						if ($max_value - $min_value == INF) {
 							$bar_y1 = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,

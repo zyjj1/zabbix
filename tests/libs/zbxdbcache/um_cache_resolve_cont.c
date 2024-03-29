@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -164,6 +164,9 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		zbx_dbsync_t		gmacros, hmacros, htmpls;
 		struct zbx_json_parse	jp;
 		zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+		const char		*config_source_ip = "";
+		char			*config_ssl_ca_location = NULL, *config_ssl_cert_location = NULL,
+					*config_ssl_key_location = NULL;
 
 		step = (zbx_mock_step_t *)zbx_malloc(NULL, sizeof(zbx_mock_step_t));
 
@@ -175,7 +178,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		um_mock_cache_init(&step->mock_cache, hconfig);
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
 		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls,
-				&config_vault);
+				&config_vault, get_program_type());
 
 		mock_dbsync_clear(&gmacros);
 		mock_dbsync_clear(&hmacros);
@@ -186,7 +189,8 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		if (FAIL == zbx_json_open(vault, &jp))
 			fail_msg("invalid vault json");
 
-		DCsync_kvs_paths(&jp, &config_vault);
+		zbx_dc_sync_kvs_paths(&jp, &config_vault, config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location);
 		step->cache->refcount++;
 
 		zbx_free(vault);

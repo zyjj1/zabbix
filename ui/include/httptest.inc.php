@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/items.inc.php';
 
 function httptest_authentications($type = null) {
 	$authentication_types = [
-		HTTPTEST_AUTH_NONE => _('None'),
-		HTTPTEST_AUTH_BASIC => _('Basic'),
-		HTTPTEST_AUTH_NTLM => _('NTLM'),
-		HTTPTEST_AUTH_KERBEROS => _('Kerberos'),
-		HTTPTEST_AUTH_DIGEST => _('Digest')
+		ZBX_HTTP_AUTH_NONE => _('None'),
+		ZBX_HTTP_AUTH_BASIC => _('Basic'),
+		ZBX_HTTP_AUTH_NTLM => _('NTLM'),
+		ZBX_HTTP_AUTH_KERBEROS => _('Kerberos'),
+		ZBX_HTTP_AUTH_DIGEST => _('Digest')
 	];
 
 	if (is_null($type)) {
@@ -242,7 +242,7 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $
 	$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$name = (new CLink(CHtml::encode($template['name']),
+		$name = (new CLink($template['name'],
 			(new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
@@ -250,7 +250,7 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(CHtml::encode($template['name']));
+		$name = new CSpan($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -272,7 +272,7 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $p
 		$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$name = new CLink(CHtml::encode($template['name']),
+			$name = new CLink($template['name'],
 				(new CUrl('httpconf.php'))
 					->setArgument('form', 'update')
 					->setArgument('hostid', $template['hostid'])
@@ -281,10 +281,10 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $p
 			);
 		}
 		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
 	}

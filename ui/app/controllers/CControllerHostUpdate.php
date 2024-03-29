@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
  * Controller for host update.
  */
 class CControllerHostUpdate extends CControllerHostUpdateGeneral {
+
+	private $host;
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields());
@@ -47,7 +49,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		}
 
 		$this->host = API::Host()->get([
-			'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
+			'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxyid', 'ipmi_authtype',
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'flags', 'inventory_mode'
 			],
@@ -86,7 +88,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'host' => $this->getInput('host', $this->host['host']),
 				'name' => $this->getInput('visiblename', $this->host['name']),
 				'status' => $this->getInput('status', $this->host['status']),
-				'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
+				'proxyid' => $this->getInput('proxyid', $this->host['proxyid']),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),

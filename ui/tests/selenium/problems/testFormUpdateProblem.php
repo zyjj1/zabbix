@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,18 +37,18 @@ class testFormUpdateProblem extends CWebTest {
 	protected static $hostid;
 
 	/**
-	 * Ids of the triggers for problems.
-	 *
-	 * @var array
-	 */
-	protected static $triggerids;
-
-	/**
-	 * Time when events were created.
+	 * Time when acknowledge was created.
 	 *
 	 * @var string
 	 */
-	protected static $time;
+	protected static $acktime;
+
+	/**
+	 * Eventid for problem suppression.
+	 *
+	 * @var integer
+	 */
+	protected static $eventid_for_icon_test;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -106,73 +106,69 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				'description' => 'Trigger for float',
 				'expression' => 'last(/Host for Problems Update/float)=0',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => 'Trigger for char',
 				'expression' => 'last(/Host for Problems Update/char)=0',
-				'priority' => 1,
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
 				'manual_close' => 1
 			],
 			[
 				'description' => 'Trigger for log',
 				'expression' => 'last(/Host for Problems Update/log)=0',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Trigger for unsigned',
 				'expression' => 'last(/Host for Problems Update/unsigned)=0',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => 'Trigger for text',
 				'expression' => 'last(/Host for Problems Update/text)=0',
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => 'Trigger for icon test',
 				'expression' => 'last(/Host for Problems Update/log)=0',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
-		self::$triggerids = CDataHelper::getIds('description');
 
-		// Create events.
-		self::$time = time();
-		$i=0;
-		foreach (self::$triggerids as $name => $id) {
-			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.(100550 + $i).', 0, 0, '.
-					zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-			$i++;
+		// Create problems and events.
+		$time = time();
+		foreach (CDataHelper::getIds('description') as $name => $id) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
 		}
 
-		// Create problems.
-		$j=0;
-		foreach (self::$triggerids as $name => $id) {
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.(100550 + $j).', 0, 0, '.
-					zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
-			);
-			$j++;
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.zbx_dbstr('Trigger for char'));
+
+		$eventids = [];
+		foreach (['Trigger for text', 'Trigger for unsigned', 'Trigger for icon test'] as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
 		}
 
-		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for float').', '.
-				zbx_dbstr('Trigger for log').', '.zbx_dbstr('Trigger for unsigned').', '.zbx_dbstr('Trigger for text').', '.
-				zbx_dbstr('Trigger for icon test').')'
-		);
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
+		self::$eventid_for_icon_test = $eventids['Trigger for icon test'];
 
 		// Suppress the problem: 'Trigger for text'.
-		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, 100554, NULL, 0)');
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, '.
+				$eventids['Trigger for text'].', NULL, 0)'
+		);
 
-		// Acknowledge the problem: 'Trigger for unsigned'.
+		// Acknowledge the problem: 'Trigger for unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => 100553,
+			'eventids' => $eventids['Trigger for unsigned'],
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
+
+		$event = CDataHelper::call('event.get', [
+			'eventids' => $eventids['Trigger for unsigned'],
+			'selectAcknowledges' => ['clock']
+		]);
+		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public function getLayoutData() {
@@ -210,13 +206,15 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
-					// If problem is Aknowledged - label is changed to Unacknowledge.
+					// If problem is Acknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
-							'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
+						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
-					'history' => [' Admin (Zabbix Administrator) Acknowledged event'],
+					'history' => [" Admin (Zabbix Administrator)".
+							"\nAcknowledged event"
+					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
@@ -237,7 +235,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char'],
 					// If more than one problems selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Convert to cause', 'Close problem', ''
+						'Acknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'close_enabled' => true,
 					'Acknowledge' => true,
@@ -255,7 +253,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
 					// If more than one problem selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
+						'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
@@ -278,7 +276,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	public function testFormUpdateProblem_Layout($data) {
 		// Open filtered Problems list.
-		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
@@ -315,16 +313,16 @@ class testFormUpdateProblem extends CWebTest {
 		// Check Hintboxes.
 		if (CTestArrayHelper::get($data, 'hintboxes')) {
 			foreach ($data['hintboxes'] as $field => $text) {
-				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
+				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
-				$hint->query('class:overlay-close-btn')->waitUntilClickable()->one()->click();
+				$hint->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
 			}
 		}
 
 		// Check History field.
 		if (array_key_exists('history', $data)) {
-			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$time).$data['history'][0]];
+			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$acktime).$data['history'][0]];
 			$history_table = $form->getField('History')->asTable();
 			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
 			$this->assertEquals($history, $history_table->getRows()->asText());
@@ -347,7 +345,7 @@ class testFormUpdateProblem extends CWebTest {
 			'id:severity' => ['value' => 'Not classified', 'enabled' => false],
 			'id:suppress_problem' => ['value' => false, 'enabled' => true],
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
-			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
+			'id:suppress_until_problem' => ['maxlength' => 255, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
@@ -635,7 +633,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+15y'
+						'id:suppress_until_problem' => 'now+5y'
 					],
 					'db_check' => [
 						[
@@ -783,7 +781,7 @@ class testFormUpdateProblem extends CWebTest {
 			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		}
 		else {
-			$table->findRow('Problem', $data['problems'][0])->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+			$table->findRow('Problem', $data['problems'][0])->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -806,6 +804,7 @@ class testFormUpdateProblem extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $message);
 
 			// Check db change.
+			// DB values "action" and "new_severity" may depend on previous test cases in data provider.
 			foreach ($data['db_check'] as $event) {
 				$sql = CDBHelper::getRow('SELECT message, action, new_severity, suppress_until'.
 						' FROM acknowledges'.
@@ -849,7 +848,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Ack')
+		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Update')
 				->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
@@ -874,7 +873,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$row = $table->findRow('Problem', 'Trigger for icon test');
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
@@ -885,19 +884,21 @@ class testFormUpdateProblem extends CWebTest {
 		$table->waitUntilReloaded();
 
 		// Check suppressed icon and hint.
-		$this->checkIconAndHint($row, 'icon-action-suppress', "Suppressed till: Indefinitely".
+		$this->checkIconAndHint($row, 'zi-eye-off', "Suppressed till: Indefinitely".
 				"\nManually by: Admin (Zabbix Administrator)"
 		);
 
 		// Suppress the problem in DB: 'Trigger for icon test'.
-		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10051, 100555, NULL, 0)');
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)
+				VALUES (10051, '.self::$eventid_for_icon_test.', NULL, 0)'
+		);
 
 		// Assert that eye icon stopped blinking.
 		$this->page->refresh();
-		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress"]')->exists());
+		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[not(contains(@class, "js-blink"))]')->exists());
 
 		// Unsuppress problem.
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$form->fill(['id:unsuppress_problem' => true]);
 		$form->submit();
 		$dialog->ensureNotPresent();
@@ -905,7 +906,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table->waitUntilReloaded();
 
 		// Check unsuppressed icon and hint.
-		$this->checkIconAndHint($row, 'icon-action-unsuppress', 'Unsuppressed by: Admin (Zabbix Administrator)');
+		$this->checkIconAndHint($row, 'zi-eye', 'Unsuppressed by: Admin (Zabbix Administrator)');
 
 		// Unsuppress the problem in DB: 'Trigger for icon test'.
 		DBexecute('DELETE FROM event_suppress WHERE event_suppressid=10051');
@@ -913,11 +914,11 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check that eye icon disappeared.
 		$this->assertFalse($row->getColumn('Info')->query("xpath:.//button[@class=".
-				CXPathHelper::fromClass('icon-action-unsuppress')."]")->exists()
+				CXPathHelper::fromClass('zi-eye')."]")->exists()
 		);
 
 		// Check Suppress/Unsuppress icon in History table.
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form->invalidate();
 		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'User action');
@@ -926,7 +927,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check Actions hint in Problem row.
 		$row->invalidate();
-		$unsuppress_button = 'xpath:.//button[contains(@class, "icon-action-unsuppress")]';
+		$unsuppress_button = 'xpath:.//button['.CXPathHelper::fromClass('zi-eye').']';
 		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue"]')->asOverlayDialog()
 				->one()->waitUntilReady();
@@ -960,7 +961,9 @@ class testFormUpdateProblem extends CWebTest {
 		foreach ([0, 1] as $i)  {
 			$action_row = $table->getRow($i);
 			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
-			$query = ($i === 0) ? 'xpath:.//span[@title="Unsuppressed"]' : 'xpath:.//*[contains(@class, "icon-action-suppress")]';
+			$query = ($i === 0)
+				? 'xpath:.//span[@title="Unsuppressed"]'
+				: 'xpath:.//*['.CXPathHelper::fromClass('zi-eye-off').']';
 			$this->assertTrue($action_row->getColumn($action)->query($query)->exists());
 		}
 	}
@@ -973,7 +976,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	private function checkIconAndHint($row, $class, $text) {
 		// Assert blinking icon in Info column.
-		$icon = $row->getColumn('Info')->query("xpath:.//button[@class='".$class." blink']");
+		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink'])->waitUntilVisible();
 		$this->assertTrue($icon->exists());
 
 		// Check icon hintbox.
@@ -984,6 +987,6 @@ class testFormUpdateProblem extends CWebTest {
 		$hint->asOverlayDialog()->close();
 
 		// Assert non-blinking icon in Actions column.
-		$this->assertTrue($row->getColumn('Actions')->query("xpath:.//button[@class='".$class." cursor-pointer']")->exists());
+		$this->assertTrue($row->getColumn('Actions')->query('xpath:.//button['.CXPathHelper::fromClass($class).']')->exists());
 	}
 }

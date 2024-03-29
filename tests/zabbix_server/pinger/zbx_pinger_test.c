@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,9 +22,28 @@
 #include "zbxmockutil.h"
 #include "zbxcommon.h"
 
-#include "../../../src/zabbix_server/pinger/pinger.c"
+#include "zbxicmpping.h"
+
+#include "../../../src/libs/zbxpinger/pinger.c"
 
 #define MAX_ERR_LEN 256
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	ZBX_UNUSED(local_server_num);
+	ZBX_UNUSED(local_process_type);
+	ZBX_UNUSED(local_process_num);
+
+	return 0;
+}
+
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	ZBX_UNUSED(flags);
+
+	return 0;
+}
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -34,6 +53,7 @@ void	zbx_mock_test_entry(void **state)
 	char			error[MAX_ERR_LEN];
 	int			ret;
 	int			count, interval, size, timeout;
+	unsigned char		allow_redirect;
 	char			*returned_addr = NULL;
 
 	ZBX_UNUSED(state);
@@ -42,7 +62,7 @@ void	zbx_mock_test_entry(void **state)
 	key =  zbx_mock_get_parameter_string("in.key");
 
 	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count,
-			&interval, &size, &timeout, &type, error, MAX_ERR_LEN);
+			&interval, &size, &timeout, &type, &allow_redirect, error, MAX_ERR_LEN);
 	if (SUCCEED != ret)
 		printf("zbx_pinger_test error: %s\n", error);
 
@@ -60,4 +80,3 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(returned_addr);
 }
-

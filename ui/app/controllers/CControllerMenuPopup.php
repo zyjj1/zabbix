@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,13 @@
 
 class CControllerMenuPopup extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',
+			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro,drule',
 			'data' => 'array'
 		];
 
@@ -54,13 +58,12 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'history':
-			case 'item':
 				$rules = [
-					'itemid' => 'required|db items.itemid',
-					'backurl' => 'required|string'
+					'itemid' => 'required|db items.itemid'
 				];
 				break;
 
+			case 'item':
 			case 'item_prototype':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
@@ -81,8 +84,9 @@ class CControllerMenuPopup extends CController {
 			case 'trigger':
 				$rules = [
 					'triggerid' => 'required|db triggers.triggerid',
+					'backurl' => 'required|string',
 					'eventid' => 'db events.eventid',
-					'acknowledge' => 'in 0,1',
+					'show_update_problem' => 'in 0,1',
 					'show_rank_change_cause' => 'in 0,1',
 					'show_rank_change_symptom' => 'in 0,1',
 					'ids' => 'array_db events.eventid'
@@ -91,6 +95,12 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger_macro':
 				$rules = [];
+				break;
+
+			case 'drule':
+				$rules = [
+					'druleid' => 'required|db drules.druleid'
+				];
 				break;
 		}
 
@@ -181,8 +191,12 @@ class CControllerMenuPopup extends CController {
 			}
 
 			$all_scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
-				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				? API::Script()->getScriptsByHosts(['hostid' => $data['hostid']])
 				: [];
+
+			if ($all_scripts) {
+				$all_scripts = array_key_exists($data['hostid'], $all_scripts) ? $all_scripts[$data['hostid']] : [];
+			}
 
 			$scripts = [];
 			$urls = [];
@@ -230,7 +244,8 @@ class CControllerMenuPopup extends CController {
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'csrf_token' => CCsrfTokenHelper::get('scriptexec')
 			];
 
 			if ($has_goto) {
@@ -250,37 +265,8 @@ class CControllerMenuPopup extends CController {
 				}
 			}
 
-			foreach (array_values($scripts) as $script) {
-				$menu_data['scripts'][] = [
-					'name' => $script['name'],
-					'menu_path' => $script['menu_path'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
-
-			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
-					'label' => $url['name'],
-					'menu_path' => $url['menu_path'],
-					'url' => $url['url'],
-					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
-					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
-				];
-			}
-
-			if (array_key_exists('urls', $menu_data)) {
-				foreach ($menu_data['urls'] as &$url) {
-					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
-						unset($url['target'], $url['rel']);
-					}
-				}
-				unset($url);
-			}
+			$menu_data = self::addScripts($menu_data, $scripts);
+			$menu_data = self::addUrls($menu_data, $urls);
 
 			if (array_key_exists('tags', $data)) {
 				$menu_data['tags'] = $data['tags'];
@@ -305,7 +291,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'key_', 'name', 'flags', 'type', 'value_type', 'history', 'trends'],
+			'output' => ['hostid', 'key_', 'name_resolved', 'flags', 'type', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid'],
@@ -338,7 +324,7 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
-				'name' => $db_item['name'],
+				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
@@ -352,7 +338,8 @@ class CControllerMenuPopup extends CController {
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'binary_value_type' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
 			];
 		}
 
@@ -388,6 +375,7 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
+				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
 				'trigger_prototypes' => $db_item_prototype['triggers']
@@ -399,6 +387,25 @@ class CControllerMenuPopup extends CController {
 		error(_('No permissions to referred object or it does not exist!'));
 
 		return null;
+	}
+
+	/**
+	 * Validates URLs for supported schemes.
+	 *
+	 * @param array  $urls
+	 * @param array  $urls[]['url']
+	 *
+	 * @return array
+	 */
+	private static function sanitizeMapElementUrls(array $urls): array {
+		foreach ($urls as &$url) {
+			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
+			}
+		}
+		unset($url);
+
+		return $urls;
 	}
 
 	/**
@@ -430,10 +437,6 @@ class CControllerMenuPopup extends CController {
 		foreach ($selement['urls'] as $url_nr => $url) {
 			if ($url['name'] === '' || $url['url'] === '') {
 				unset($selement['urls'][$url_nr]);
-			}
-			elseif (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
-				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
-					zbx_jsvalue($url['url'], false, false)).'\');';
 			}
 		}
 
@@ -505,7 +508,7 @@ class CControllerMenuPopup extends CController {
 						}
 
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						return $menu_data;
 
@@ -525,7 +528,7 @@ class CControllerMenuPopup extends CController {
 							$menu_data['show_suppressed'] = true;
 						}
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						if ($selement['tags']) {
 							$menu_data['evaltype'] = $selement['evaltype'];
@@ -562,7 +565,7 @@ class CControllerMenuPopup extends CController {
 						$db_triggers = API::Trigger()->get([
 							'output' => ['triggerid', 'description'],
 							'selectHosts' => ['hostid', 'name', 'status'],
-							'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+							'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 							'triggerids' => array_column($selement['elements'], 'triggerid'),
 							'preservekeys' => true
 						]);
@@ -581,7 +584,7 @@ class CControllerMenuPopup extends CController {
 							}
 							unset($item);
 
-							CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+							CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 							$with_hostname = count($hosts) > 1;
 
@@ -592,8 +595,8 @@ class CControllerMenuPopup extends CController {
 
 								$items[] = [
 									'name' => $with_hostname
-										? $item['hostname'].NAME_DELIMITER.$item['name']
-										: $item['name'],
+										? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+										: $item['name_resolved'],
 									'params' => [
 										'itemid' => $item['itemid'],
 										'action' => in_array(
@@ -618,7 +621,7 @@ class CControllerMenuPopup extends CController {
 							'type' => 'map_element_trigger',
 							'triggers' => $triggers,
 							'items' => $items,
-							'showEvents' => $show_events,
+							'show_events' => $show_events,
 							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 							'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 							'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
@@ -635,7 +638,7 @@ class CControllerMenuPopup extends CController {
 						}
 
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 
 						return $menu_data;
@@ -645,7 +648,7 @@ class CControllerMenuPopup extends CController {
 							'type' => 'map_element_image'
 						];
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						return $menu_data;
 				}
@@ -661,18 +664,23 @@ class CControllerMenuPopup extends CController {
 	 * Prepare data for trigger context menu popup.
 	 *
 	 * @param array  $data
-	 * @param string $data['triggerid']
-	 * @param string $data['eventid']      (optional) Mandatory for Acknowledge menu and event rank change.
-	 * @param array  $data['ids']          (optional) Event IDs that are used in event rank change to symptom.
-	 * @param bool   $data['acknowledge']  (optional) Whether to show Acknowledge menu.
+	 *        string $data['triggerid']                 Trigger ID.
+	 *        string $data['backurl']                   URL from where the menu popup was called.
+	 *        string $data['eventid']                   (optional) Mandatory for "Update problem", "Mark as cause"
+	 *                                                  and "Mark selected as symptoms" context menus.
+	 *        array  $data['ids']                       (optional) Event IDs that are used in event rank change to
+	 *                                                  symptom.
+	 *        bool   $data['show_update_problem']       (optional) Whether to show "Update problem".
+	 *        bool   $data['show_rank_change_cause']    (optional) Whether to show "Mark as cause".
+	 *        bool   $data['show_rank_change_symptom']  (optional) Whether to show "Mark selected as symptoms".
 	 *
-	 * @return mixed
+	 * @return array|null
 	 */
-	private static function getMenuDataTrigger(array $data) {
+	private static function getMenuDataTrigger(array $data): ?array {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+			'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 			'triggerids' => $data['triggerid'],
 			'preservekeys' => true
 		]);
@@ -708,7 +716,7 @@ class CControllerMenuPopup extends CController {
 			}
 			unset($item);
 
-			CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+			CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 			$with_hostname = count($hosts) > 1;
 			$items = [];
@@ -716,8 +724,8 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $item['hostname'].NAME_DELIMITER.$item['name']
-						: $item['name'],
+						? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+						: $item['name_resolved'],
 					'params' => [
 						'itemid' => $item['itemid'],
 						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
@@ -731,8 +739,9 @@ class CControllerMenuPopup extends CController {
 			$menu_data = [
 				'type' => 'trigger',
 				'triggerid' => $data['triggerid'],
+				'backurl' => $data['backurl'],
 				'items' => $items,
-				'showEvents' => $show_events,
+				'show_events' => $show_events,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
@@ -750,7 +759,7 @@ class CControllerMenuPopup extends CController {
 
 				$events = API::Event()->get([
 					'output' => ['eventid', 'r_eventid', 'urls', 'cause_eventid'],
-					'select_acknowledges' => ['action'],
+					'selectAcknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
 
@@ -774,30 +783,28 @@ class CControllerMenuPopup extends CController {
 
 						// Show individual menus depending on location.
 						$menu_data['show_rank_change_cause'] = array_key_exists('show_rank_change_cause', $data)
-							? $data['show_rank_change_cause']
-							: false;
+							&& $data['show_rank_change_cause'];
 						$menu_data['show_rank_change_symptom'] = array_key_exists('show_rank_change_symptom', $data)
-							? $data['show_rank_change_symptom']
-							: false;
+							&& $data['show_rank_change_symptom'];
+						$menu_data['csrf_tokens']['acknowledge'] = CCsrfTokenHelper::get('acknowledge');
 					}
 				}
 			}
 
-			if (array_key_exists('acknowledge', $data)) {
-				$menu_data['acknowledge'] = ((bool) $data['acknowledge']
-						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
-							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-							|| $can_be_closed
-							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
-						)
-				);
+			if (array_key_exists('show_update_problem', $data)) {
+				$menu_data['show_update_problem'] = $data['show_update_problem']
+					&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+						|| $can_be_closed
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
+					);
 			}
 
 			$scripts_by_events = [];
 
 			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
-				$scripts_by_events = API::Script()->getScriptsByEvents([$event['eventid']]);
+				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
@@ -853,36 +860,11 @@ class CControllerMenuPopup extends CController {
 			$scripts = self::sortEntitiesByMenuPath($scripts);
 			$urls = self::sortEntitiesByMenuPath($urls);
 
-			foreach (array_values($scripts) as $script) {
-				$menu_data['scripts'][] = [
-					'name' => $script['name'],
-					'menu_path' => $script['menu_path'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
+			$menu_data = self::addScripts($menu_data, $scripts);
+			$menu_data = self::addUrls($menu_data, $urls);
 
-			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
-					'label' => $url['name'],
-					'menu_path' => $url['menu_path'],
-					'url' => $url['url'],
-					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
-					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
-				];
-			}
-
-			if (array_key_exists('urls', $menu_data)) {
-				foreach ($menu_data['urls'] as &$url) {
-					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
-						unset($url['target'], $url['rel']);
-					}
-				}
-				unset($url);
+			if ($scripts) {
+				$menu_data['csrf_tokens']['scriptexec'] = CCsrfTokenHelper::get('scriptexec');
 			}
 
 			return $menu_data;
@@ -897,8 +879,8 @@ class CControllerMenuPopup extends CController {
 	 * Process menu path and sort scripts or URLs according to it.
 	 *
 	 * @param array  $entities                 Scripts and URLs.
-	 * @param string $entities[]['name']       Name of the ccript or URL.
-	 * @param string $entities[]['menu_path']  Menu path of the ccript or URL.
+	 * @param string $entities[]['name']       Name of the script or URL.
+	 * @param string $entities[]['menu_path']  Menu path of the script or URL.
 	 *
 	 * @return array
 	 */
@@ -952,6 +934,74 @@ class CControllerMenuPopup extends CController {
 		return ['type' => 'trigger_macro'];
 	}
 
+	private static function addScripts(array $menu_data, array $scripts): array {
+		$fields = ['name', 'menu_path', 'scriptid', 'confirmation', 'manualinput', 'manualinput_prompt',
+			'manualinput_validator_type', 'manualinput_validator', 'manualinput_default_value'
+		];
+
+		foreach ($scripts as $script) {
+			$menu_data['scripts'][] = array_intersect_key($script, array_flip($fields));
+		}
+
+		return $menu_data;
+	}
+
+	private static function addUrls(array $menu_data, array $urls): array {
+		$fields = ['scriptid', 'manualinput', 'manualinput_prompt', 'manualinput_validator_type',
+			'manualinput_validator', 'manualinput_default_value'
+		];
+
+		foreach ($urls as $url) {
+			$menu_data_parameters = [
+				'label' => $url['name'],
+				'menu_path' => $url['menu_path'],
+				'confirmation' => $url['confirmation']
+			];
+
+			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+				$menu_data_parameters += [
+					'url' => $url['url'],
+					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : ''
+				];
+			}
+			else {
+				$menu_data_parameters += [
+					'url' => 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');'
+				];
+			}
+
+			if (array_key_exists('scriptid', $url)) {
+				$menu_data_parameters += array_intersect_key($url, array_flip($fields));
+			}
+
+			$menu_data['urls'][] = $menu_data_parameters;
+		}
+
+		return $menu_data;
+	}
+
+	private static function getMenuDataDRule(array $data): ?array {
+		$db_drules_count = API::DRule()->get([
+			'output' => [],
+			'druleids' => $data['druleid'],
+			'countOutput' => true
+		]);
+
+		if ($db_drules_count > 0) {
+			$menu_data = [
+				'type' => 'drule',
+				'druleid' => $data['druleid'],
+				'allowed_ui_conf_drules' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
+			];
+
+			return $menu_data;
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
 	protected function doAction() {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
@@ -982,6 +1032,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
+				break;
+
+			case 'drule':
+				$menu_data = self::getMenuDataDRule($data);
 				break;
 		}
 

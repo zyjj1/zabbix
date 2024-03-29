@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,10 +42,20 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
-void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
-int	zbx_function_param_quote(char **param, int forced);
+char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted);
+int	zbx_function_param_quote(char **param, int forced, int esc_bs);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
+
+#define ZBX_BACKSLASH_ESC_OFF		0
+#define ZBX_BACKSLASH_ESC_ON		1
+
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos);
+void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+int	zbx_function_param_parse_count(const char *expr);
 
 typedef enum
 {
@@ -62,6 +72,7 @@ int	zbx_is_double_suffix(const char *str, unsigned char flags);
 double	zbx_str2double(const char *str);
 int	zbx_suffixed_number_parse(const char *number, int *len);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op);
 
 /* token START */
 /* tokens used in expressions */
@@ -74,6 +85,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_TOKEN_REFERENCE		0x00040
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 #define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
+#define ZBX_TOKEN_USER_FUNC_MACRO	0x00200
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000
@@ -194,7 +206,7 @@ int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_to
 int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token);
 /* token END */
 
@@ -240,5 +252,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define ZBX_CONDITION_OPERATOR_NO			11
 #define ZBX_CONDITION_OPERATOR_EXIST		12
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
+
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
 
 #endif /* ZABBIX_EXPR_H */

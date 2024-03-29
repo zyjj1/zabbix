@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -533,7 +533,9 @@ class CCorrelation extends CApiService {
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Correlation "%1$s" already exists.', $duplicates[0]['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Event correlation "%1$s" already exists.',
+				$duplicates[0]['name'])
+			);
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ $html_page = (new CHtmlPage())->setWebLayoutMode($web_layout_mode);
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
-		->cleanItems()
 		->setName('filter_view_as')
 		->addVar('itemids', $data['itemids'])
 ];
@@ -149,6 +148,7 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 								'srcfld1' => 'itemid',
 								'dstfld1' => 'itemids_',
 								'real_hosts' => true,
+								'resolve_macros' => true,
 								'value_types' => [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]
 							]
 						]
@@ -227,7 +227,8 @@ if ($data['plaintext']) {
 		foreach ($screen as $text) {
 			$pre->addItem([$text, BR()]);
 		}
-		$html_page->addItem($pre);
+
+		$html_page->addItem($pre->addClass(ZBX_STYLE_NOWRAP));
 	}
 }
 else {
@@ -238,7 +239,8 @@ else {
 
 	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
 		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to'],
-			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
+			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
+		);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.host.edit.js.php');
 
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
@@ -43,9 +45,6 @@ $data += [
 			(new CSimpleButton(_('Clone')))
 				->onClick('view.clone();')
 				->removeAttribute('id'),
-			(new CSimpleButton(_('Full clone')))
-				->onClick('view.fullClone();')
-				->removeAttribute('id'),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host?'))
 				->setAttribute('data-hostid', $data['hostid'])
@@ -55,11 +54,19 @@ $data += [
 		]
 ];
 
-if ($data['warning']) {
-	CMessageHelper::addWarning($data['warning']);
-	show_messages();
+if ($data['warnings']) {
+	foreach ($data['warnings'] as $msg) {
+		CMessageHelper::addWarning($msg);
+	}
 
-	$data['warning'] = null;
+	if (count($data['warnings']) > 1) {
+		show_messages(null, _('Cloned host parameter values have been modified.'));
+	}
+	else {
+		show_messages();
+	}
+
+	$data['warnings'] = null;
 }
 
 (new CHtmlPage())

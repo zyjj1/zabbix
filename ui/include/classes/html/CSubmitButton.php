@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,13 +24,7 @@
  */
 class CSubmitButton extends CSimpleButton {
 
-	/**
-	 * @param string $caption
-	 * @param string $name
-	 * @param string $value
-	 * @param string $class
-	 */
-	public function __construct($caption, $name = null, $value = null) {
+	public function __construct($caption = '', $name = null, $value = null) {
 		parent::__construct($caption);
 		$this->setAttribute('type', 'submit');
 

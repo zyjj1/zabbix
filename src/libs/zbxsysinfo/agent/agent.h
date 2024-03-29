@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,5 @@
 
 #include "zbxsysinfo.h"
 
-extern ZBX_METRIC	parameters_agent[];
-
+zbx_metric_t	*get_parameters_agent(void);
 #endif /* ZABBIX_SYSINFO_AGENT_H */

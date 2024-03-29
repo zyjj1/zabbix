@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,64 +188,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of templates',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'templates.php?form=update&templateid=10001',
-						'text_present' => 'Templates'
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=9999999',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=abc',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not integer.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not integer.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=-1',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "templateid" field.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid%5B%5D=1',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not correct: invalid data type.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is mandatory.'
-						]
-					]
-				]
-			],
-			[
 				'title' => 'Configuration of host',
 				'check_server_name' => true,
 				'server_name_on_page' => false,
@@ -323,64 +265,6 @@ class testUrlParameters extends CLegacyWebTest {
 							'Controller: host.edit',
 							'action: host.edit',
 							'hostid:'
-						]
-					]
-				]
-			],
-			[
-				'title' => 'Configuration of maintenance periods',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=1',
-						'text_present' => 'Maintenance periods'
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=9999999',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=abc',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not integer.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not integer.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=-1',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "maintenanceid" field.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid[]=1',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not correct: invalid data type.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is mandatory.'
 						]
 					]
 				]
@@ -491,73 +375,6 @@ class testUrlParameters extends CLegacyWebTest {
 							'Zabbix has received an incorrect request.',
 							'Field "sysmapid" is mandatory.'
 						]
-					]
-				]
-			],
-			[
-				'title' => 'Configuration of discovery rules',
-				'check_server_name' => true,
-				'server_name_on_page' => false,
-				'test_cases' => [
-					[
-						'url' => 'zabbix.php?action=discovery.edit&druleid=2',
-						'text_present' => 'Discovery rules'
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.edit&druleid=9999999',
-						'text_not_present' => 'Discovery rules',
-						'access_denied' => true,
-						'text_present' => [
-							'You are logged in as "Admin". You have no permissions to access this page.'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.edit&druleid=abc',
-						'text_not_present' => 'Discovery rules',
-						'fatal_error' => true,
-						'text_present' => [
-							'Incorrect value "abc" for "druleid" field.',
-							'Controller: discovery.edit',
-							'action: discovery.edit',
-							'druleid: abc'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.edit&druleid=',
-						'text_not_present' => 'Discovery rules',
-						'fatal_error' => true,
-						'text_present' => [
-							'Incorrect value "" for "druleid" field.',
-							'Controller: discovery.edit',
-							'action: discovery.edit',
-							'druleid:'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.edit&druleid=-1',
-						'text_not_present' => 'Discovery rules',
-						'fatal_error' => true,
-						'text_present' => [
-							'Incorrect value "-1" for "druleid" field.',
-							'Controller: discovery.edit',
-							'action: discovery.edit',
-							'druleid: -1'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.edit&druleid[]=1',
-						'text_not_present' => 'Discovery rules',
-						'fatal_error' => true,
-						'text_present' => [
-							'Incorrect value for "druleid" field.',
-							'Controller: discovery.edit',
-							'action: discovery.edit',
-							'druleid: array'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.edit',
-						'text_present' => 'Discovery rules'
 					]
 				]
 			],

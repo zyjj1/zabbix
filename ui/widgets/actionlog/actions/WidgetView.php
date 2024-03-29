@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CArrayHelper,
-	CRangeTimeParser;
+	CSettingsHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -33,8 +33,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'from' => 'string',
-			'to' => 'string'
+			'has_custom_time_period' => 'in 1'
 		]);
 	}
 
@@ -53,6 +52,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'message' => $this->fields_values['message'],
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -97,40 +97,41 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
-		$search_strings = [];
+		$search = $data['message'] === '' ? null : $data['message'];
 
-		if ($data['message']) {
-			$search_strings = explode(' ', $data['message']);
+		$time_from = $this->fields_values['time_period']['from_ts'];
+		$time_to = $this->fields_values['time_period']['to_ts'];
+
+		$alerts = [];
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+
+		foreach (eventSourceObjects() as $eventSource) {
+			$alerts = array_merge($alerts, API::Alert()->get([
+				'output' => ['actionid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject', 'message', 'status',
+					'retries', 'error', 'alerttype'
+				],
+				'selectMediatypes' => ['name', 'maxattempts'],
+				'eventsource' => $eventSource['source'],
+				'eventobject' => $eventSource['object'],
+				'userids' => $userids ?: null,
+				'actionids' => $actionids ?: null,
+				'mediatypeids' => $mediatypeids ?: null,
+				'filter' => ['status' => $data['statuses']],
+				'search' => [
+					'subject' => $search,
+					'message' => $search
+				],
+				'searchByAny' => true,
+				'time_from' => $time_from - 1,
+				'time_till' => $time_to + 1,
+				'sortfield' => 'alertid',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $limit
+			]));
 		}
 
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($this->getInput('from'));
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($this->getInput('to'));
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-
-		$alerts = API::Alert()->get([
-			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
-				'mediatypeid', 'alerttype'
-			],
-			'selectMediatypes' => ['name', 'maxattempts'],
-			'userids' => $userids ?: null,
-			'actionids' => $actionids ?: null,
-			'mediatypeids' => $mediatypeids ?: null,
-			'filter' => ['status' => $data['statuses']],
-			'search' => [
-				'subject' => $search_strings,
-				'message' => $search_strings
-			],
-			'searchByAny' => true,
-			'time_from' => $time_from - 1,
-			'time_till' => $time_to + 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => $this->fields_values['show_lines']
-		]);
+		CArrayHelper::sort($alerts, [['field' => $sortfield, 'order' => $sortorder]]);
+		$alerts = array_slice($alerts, 0, $this->fields_values['show_lines'], true);
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';
@@ -243,5 +244,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 		CArrayHelper::sort($prepared_data, ['name']);
 
 		return $prepared_data;
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

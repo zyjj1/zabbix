@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@ window.sla_edit_popup = new class {
 
 		$service_tags.dynamicRows({
 			template: '#service-tag-row-tmpl',
-			rows: service_tags
+			rows: service_tags,
+			allow_empty: true
 		});
 
 		// Setup Excluded downtimes.
@@ -75,6 +76,9 @@ window.sla_edit_popup = new class {
 			});
 
 		this._update();
+
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	_initTemplates() {
@@ -124,7 +128,7 @@ window.sla_edit_popup = new class {
 				row_index,
 				name: row.querySelector(`[name="excluded_downtimes[${row_index}][name]"`).value,
 				period_from: row.querySelector(`[name="excluded_downtimes[${row_index}][period_from]"`).value,
-				period_to: row.querySelector(`[name="excluded_downtimes[${row_index}][period_to]"`).value,
+				period_to: row.querySelector(`[name="excluded_downtimes[${row_index}][period_to]"`).value
 			};
 		}
 		else {
@@ -138,7 +142,8 @@ window.sla_edit_popup = new class {
 		}
 
 		const overlay = PopUp('popup.sla.excludeddowntime.edit', popup_params, {
-			dialogueid: 'sla_excluded_downtime_edit'
+			dialogueid: 'sla_excluded_downtime_edit',
+			dialogue_class: 'modal-popup-medium'
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -167,16 +172,19 @@ window.sla_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'sla.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
 
 		this._post(curl.getUrl(), {slaids: [this.slaid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
@@ -199,7 +207,7 @@ window.sla_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.slaid !== null ? 'sla.update' : 'sla.create');
 
 		this._post(curl.getUrl(), fields, (response) => {

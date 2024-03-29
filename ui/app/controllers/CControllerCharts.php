@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ abstract class CControllerCharts extends CController {
 			$filter_items = API::Item()->get([
 				'output' => ['itemid'],
 				'hostids' => $hostids,
-				'search' => ['name' => $name],
+				'search' => ['name_resolved' => $name],
 				'preservekeys' => true
 			]);
 
@@ -75,13 +75,13 @@ abstract class CControllerCharts extends CController {
 
 		$items = [];
 		if ($graph_items || $filter_items) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'name'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'name_resolved'],
 				'hostids' => $hostids,
 				'itemids' => array_keys($graph_items + $filter_items),
 				'selectTags' => ['tag', 'value'],
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 		}
 
 		return $this->addTagsToGraphs($graphs, $items);
@@ -125,14 +125,15 @@ abstract class CControllerCharts extends CController {
 	 * @return array
 	 */
 	protected function getSimpleGraphs(array $hostids, string $name): array {
-		return API::Item()->get([
-			'output' => ['itemid', 'name'],
-			'hostids' => $hostids,
-			'search' => $name !== '' ? ['name' => $name] : null,
-			// TODO VM: filter by tags
+		return CArrayHelper::renameObjectsKeys(API::Item()->get([
+			'output' => ['itemid', 'name_resolved'],
 			'selectTags' => ['tag', 'value'],
+			// TODO VM: filter by tags
+			'hostids' => $hostids,
+			'search' => $name !== '' ? ['name_resolved' => $name] : null,
+			'filter' => ['value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]],
 			'preservekeys' => true
-		]);
+		]), ['name_resolved' => 'name']);
 	}
 
 	/**
@@ -315,6 +316,7 @@ abstract class CControllerCharts extends CController {
 
 	/**
 	 * Collect available options of subfilter from existing items and hosts selected by primary filter.
+	 * All currently selected options will be included as well, regardless their presence in the retrieved data.
 	 *
 	 * @param array $graphs                       Host/Simple graphs selected by primary filter.
 	 * @param array $graphs[]['tags']             Item tags.
@@ -332,6 +334,28 @@ abstract class CControllerCharts extends CController {
 			'tags' => []
 		];
 
+		// First, add currently selected options, regardless their presence in the retrieved data.
+
+		foreach (array_keys($subfilter['tagnames']) as $tagname) {
+			$subfilter_options['tagnames'][$tagname] = [
+				'name' => $tagname,
+				'selected' => true,
+				'count' => 0
+			];
+		}
+
+		foreach ($subfilter['tags'] as $tag => $values) {
+			foreach (array_keys($values) as $value) {
+				$subfilter_options['tags'][$tag][$value] = [
+					'name' => $value,
+					'selected' => true,
+					'count' => 0
+				];
+			}
+		}
+
+		// Second, add options represented by the selected data.
+
 		foreach ($graphs as $graph) {
 			foreach ($graph['tags'] as $tag) {
 				if (!array_key_exists($tag['tag'], $subfilter_options['tagnames'])) {
@@ -340,8 +364,6 @@ abstract class CControllerCharts extends CController {
 						'selected' => array_key_exists($tag['tag'], $subfilter['tagnames']),
 						'count' => 0
 					];
-
-					$subfilter_options['tags'][$tag['tag']] = [];
 				}
 
 				$subfilter_options['tags'][$tag['tag']][$tag['value']] = [

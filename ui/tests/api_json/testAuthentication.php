@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,11 +27,13 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testAuthentication extends CAPITest {
 
 	public const TEST_DATA_TO_RESOLVE = [
-		'disabled_usrgrpid' => 'Disabled user group for API tests'
+		'disabled_usrgrpid' => 'Disabled user group for API tests',
+		'mfaid' => 'Default MFA method'
 	];
 
 	public static $data = [
-		'disabled_usrgrpid' => null
+		'disabled_usrgrpid' => null,
+		'mfaid' => null
 	];
 
 	public static function authentication_get_data() {
@@ -41,7 +43,7 @@ class testAuthentication extends CAPITest {
 					'output' => ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 						'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'saml_auth_enabled',
 						'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval',
-						'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
+						'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid', 'mfa_status'
 					]
 				],
 				'get_result' => [
@@ -68,7 +70,10 @@ class testAuthentication extends CAPITest {
 					// SAML fields.
 					'saml_auth_enabled' => [ZBX_AUTH_SAML_DISABLED, ZBX_AUTH_SAML_ENABLED],
 					'saml_case_sensitive' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
-					'saml_jit_status' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
+					'saml_jit_status' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
+
+					// MFA fields.
+					'mfa_status' => [MFA_DISABLED, MFA_ENABLED]
 				],
 				'expected_error' => null
 			]
@@ -107,6 +112,9 @@ class testAuthentication extends CAPITest {
 			$this->assertContains($result['saml_auth_enabled'], $get_result['saml_auth_enabled']);
 			$this->assertContains($result['saml_case_sensitive'], $get_result['saml_case_sensitive']);
 			$this->assertContains($result['saml_jit_status'], $get_result['saml_jit_status']);
+
+			// MFA fields.
+			$this->assertContains($result['mfa_status'], $get_result['mfa_status']);
 		}
 	}
 
@@ -185,6 +193,12 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
 			],
+			'Test invalid LDAP enabled without LDAP servers' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+				],
+				'expected_error' => 'At least one LDAP server must exist.'
+			],
 
 			// Invalid SAML auth tests.
 			'Test invalid SAML auth' => [
@@ -203,10 +217,32 @@ class testAuthentication extends CAPITest {
 			],
 			'Test setting up the SAML JIT status without specifying deprovisioned user group' => [
 				'authentication' => [
+					'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED,
 					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
 					'disabled_usrgrpid' => 0
 				],
 				'expected_error' => 'Deprovisioned users group cannot be empty.'
+			],
+
+			// Invalid MFA auth settings.
+			'Test invalid MFA status' => [
+				'authentication' => [
+					'mfa_status' => 999
+				],
+				'expected_error' => 'Invalid parameter "/mfa_status": value must be one of '.
+					implode(', ', [MFA_DISABLED, MFA_ENABLED]).'.'
+			],
+			'Test invalid mfaid' => [
+				'authentication' => [
+					'mfaid' => 'userdirectory_invalidid_1'
+				],
+				'expected_error' => 'Invalid parameter "/mfaid": a number is expected.'
+			],
+			'Test invalid MFA enabled without MFA methods' => [
+				'authentication' => [
+					'mfa_status' => MFA_ENABLED
+				],
+				'expected_error' => 'At least one MFA method must exist.'
 			]
 		];
 	}
@@ -262,12 +298,6 @@ class testAuthentication extends CAPITest {
 			],
 
 			// Valid LDAP auth tests.
-			'Test valid LDAP enabled' => [
-				'authentication' => [
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
-				],
-				'expected_error' => null
-			],
 			'Test valid LDAP JIT status' => [
 				'authentication' => [
 					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
@@ -305,6 +335,31 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
 					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
+				],
+				'expected_error' => null
+			],
+			'Test setting up the deprovisioned user group without unchecking disabled SAML JIT status' => [
+				'authentication' => [
+					'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
+					'disabled_usrgrpid' => 0
+				],
+				'expected_error' => null
+			],
+			'Test setting up the deprovisioned user group without unchecking disabled LDAP JIT status' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
+					'disabled_usrgrpid' => 0
+				],
+				'expected_error' => null
+			],
+
+			//Valid MFA settings tests
+			'Test valid MFA settings' => [
+				'authentication' => [
+					'mfa_status' => MFA_ENABLED,
+					'mfaid' =>  self::TEST_DATA_TO_RESOLVE['mfaid']
 				],
 				'expected_error' => null
 			]
@@ -376,6 +431,22 @@ class testAuthentication extends CAPITest {
 						}
 
 						$test_data['disabled_usrgrpid'] = self::$data['disabled_usrgrpid'];
+
+						break;
+
+					case 'mfaid':
+						if (!self::$data['mfaid']) {
+							$params = [[
+								'type' => MFA_TYPE_TOTP,
+								'name' => 'Default MFA method',
+								'hash_function' => TOTP_HASH_SHA1,
+								'code_length' => TOTP_CODE_LENGTH_6
+							]];
+							$response = CDataHelper::call('mfa.create', $params);
+							self::$data['mfaid'] = reset($response['mfaids']);
+						}
+
+						$test_data['mfaid'] = self::$data['mfaid'];
 
 						break;
 				}

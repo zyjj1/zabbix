@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('host_view');
 
 $table = (new CTableInfo());
@@ -61,11 +60,13 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_link = new CLink('', (new CUrl('zabbix.php'))
-		->setArgument('action', 'problem.view')
-		->setArgument('filter_name', '')
-		->setArgument('severities', $data['filter']['severities'])
-		->setArgument('hostids', [$host['hostid']]));
+	$problems_link = new CLink('',
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'problem.view')
+			->setArgument('severities', $data['filter']['severities'])
+			->setArgument('hostids', [$host['hostid']])
+			->setArgument('filter_set', '1')
+	);
 
 	$total_problem_count = 0;
 
@@ -110,7 +111,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$table->addRow([
 		[$host_name, $maintenance_icon],
 		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
-		getHostAvailabilityTable($host['interfaces']),
+		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
 		$host['tags'],
 		($host['status'] == HOST_STATUS_MONITORED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
@@ -121,7 +122,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'latest.view')
 						->setArgument('hostids', [$host['hostid']])
-						->setArgument('filter_name', '')
+						->setArgument('filter_set', '1')
 				)
 				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
 				CViewHelper::showNum($host['items_count'])

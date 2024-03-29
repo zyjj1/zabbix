@@ -16,7 +16,6 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
@@ -28,7 +27,8 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a
 
 zabbix_js_LDADD += @ZBXJS_LIBS@ $(LIBXML2_LIBS)
 

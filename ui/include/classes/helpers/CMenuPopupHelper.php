@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ class CMenuPopupHelper {
 				'has_related_reports' => $has_related_reports,
 				'can_edit_dashboards' => $can_edit_dashboards,
 				'can_view_reports' => $can_view_reports,
-				'can_create_reports' => $can_create_reports
+				'can_create_reports' => $can_create_reports,
+				'csrf_token' => CCsrfTokenHelper::get('dashboard')
 			]
 		];
 	}
@@ -125,33 +126,37 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for Ajax trigger menu popup.
 	 *
-	 * @param string $triggerid
-	 * @param string $eventid      (optional) Mandatory for "Acknowledge", "Convert as cause" and
-	 *                             "Mark selected as symptoms" context menus.
-	 * @param array  $options      (optional) Whether to show "Acknowledge" menu, "Convert as cause" or
-	 *                             "Mark selected as symptoms" context menus.
+	 * @param array  $data
+	 *        string $data['triggerid']                 Trigger ID.
+	 *        string $data['backurl']                   URL from where the menu popup was called.
+	 *        string $data['eventid']                   (optional) Mandatory for "Update problem", "Mark as cause"
+	 *                                                  and "Mark selected as symptoms" context menus.
+	 *        bool   $data['show_update_problem']       (optional) Whether to show "Update problem".
+	 *        bool   $data['show_rank_change_cause']    (optional) Whether to show "Mark as cause".
+	 *        bool   $data['show_rank_change_symptom']  (optional) Whether to show "Mark selected as symptoms".
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(string $triggerid, string $eventid = '0', array $options = []): array {
-		$data = [
+	public static function getTrigger(array $data): array {
+		$menu = [
 			'type' => 'trigger',
 			'data' => [
-				'triggerid' => $triggerid
+				'triggerid' => $data['triggerid'],
+				'backurl' => $data['backurl']
 			]
 		];
 
-		if ($eventid != 0) {
-			$data['data']['eventid'] = $eventid;
+		if (array_key_exists('eventid', $data) && $data['eventid'] != 0) {
+			$menu['data']['eventid'] = $data['eventid'];
 
-			if ($options) {
-				foreach ($options as $key => $value) {
-					$data['data'][$key] = (int) $value;
+			foreach (['show_update_problem', 'show_rank_change_cause', 'show_rank_change_symptom'] as $option) {
+				if (array_key_exists($option, $data)) {
+					$menu['data'][$option] = (int) $data[$option];
 				}
 			}
 		}
 
-		return $data;
+		return $menu;
 	}
 
 	/**
@@ -204,6 +209,22 @@ class CMenuPopupHelper {
 				'backurl' => $data['backurl']
 			],
 			'context' => $data['context']
+		];
+	}
+
+	/**
+	 * Prepare data for discovery rule configuration popup menu.
+	 *
+	 * @param string $druleid
+	 *
+	 * @return array
+	 */
+	public static function getDRule(string $druleid): array {
+		return [
+			'type' => 'drule',
+			'data' => [
+				'druleid' => $druleid
+			]
 		];
 	}
 }

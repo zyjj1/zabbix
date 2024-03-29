@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,12 +21,64 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
+if (array_key_exists('error', $data)) {
+	$output = [
+		'error' => $data['error']
+	];
+}
+else {
+	$buttons = [];
+
+	if ($data['diff']) {
+		$buttons[] = [
+			'title' => _('Import'),
+			'class' => 'js-import',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'focused' => true,
+			'action' => 'popup_import_compare.submitImportComparePopup();'
+		];
+	}
+
+	$buttons[] = [
+		'title' => $data['diff'] ? _('Cancel') : _('Close'),
+		'cancel' => true,
+		'class' => ZBX_STYLE_BTN_ALT,
+		'action' => ''
+	];
+
+	$output = [
+		'header' => $data['title'],
+		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
+		'body' => !$data['diff']
+			? (new CTableInfo())
+				->setNoDataMessage(_('No changes.'))
+				->toString()
+			: (new CForm())
+				->addClass('import-compare')
+				->addItem(drawToc($data['diff_toc']))
+				->addItem(drawDiff($data['diff']))
+				->addItem(
+					(new CScriptTag('popup_import_compare.init();'))->setOnDocumentReady()
+				)
+				->toString(),
+		'buttons' => $buttons,
+		'no_changes' => !$data['diff']
+	];
+}
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);
 
 function drawToc(array $toc): CDiv {
-	$change_types_list = (new CTag('ul', true))
-		->addClass(ZBX_STYLE_TOC_LIST);
+	$change_types_list = (new CList())->addClass(ZBX_STYLE_TOC_LIST);
 
 	foreach ($toc as $change_type => $entity_types) {
 		$change_types_list->addItem(drawChangeType($change_type, $entity_types));
@@ -38,59 +90,51 @@ function drawToc(array $toc): CDiv {
 }
 
 function drawChangeType(string $name, array $entity_types): CTag {
-	$entity_types_list = (new CTag('ul', true))
-		->addClass(ZBX_STYLE_TOC_SUBLIST);
+	$entity_types_list = (new CList())->addClass(ZBX_STYLE_TOC_SUBLIST);
 
 	foreach ($entity_types as $entity_type => $entities) {
 		$entity_types_list->addItem(drawEntityType($entity_type, $entities));
 	}
 
-	return (new CTag('li', true))
-		->addItem((new CDiv())
+	return new CListItem([
+		(new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CTag('button', true))
-				->addClass(ZBX_STYLE_TOC_ITEM)
-				->addClass(ZBX_STYLE_TOC_ARROW)
-				->addItem((new CSpan())
-					->addClass(ZBX_STYLE_ARROW_DOWN)
-				)
-				->addItem($name)
-			)
-		)
-		->addItem($entity_types_list);
+			->addItem(
+				(new CButtonLink([(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name]))
+					->addClass(ZBX_STYLE_TOC_ITEM)
+					->addClass(ZBX_STYLE_TOC_ARROW)
+			),
+		$entity_types_list
+	]);
 }
 
 function drawEntityType(string $name, array $entities): CTag {
-	$entities_list = (new CTag('ul', true))
-		->addClass(ZBX_STYLE_TOC_SUBLIST);
+	$entities_list = (new CList())->addClass(ZBX_STYLE_TOC_SUBLIST);
 
 	foreach ($entities as $entity) {
 		$entities_list->addItem(drawEntity($entity));
 	}
 
-	return (new CTag('li', true))
-		->addItem((new CDiv())
+	return new CListItem([
+		(new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CTag('button', true))
-				->addClass(ZBX_STYLE_TOC_ITEM)
-				->addClass(ZBX_STYLE_TOC_ARROW)
-				->addItem((new CSpan())
-					->addClass(ZBX_STYLE_ARROW_DOWN)
-				)
-				->addItem($name)
-			)
-		)
-		->addItem($entities_list);
+			->addItem(
+				(new CButtonLink([(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name]))
+					->addClass(ZBX_STYLE_TOC_ITEM)
+					->addClass(ZBX_STYLE_TOC_ARROW)
+			),
+		$entities_list
+	]);
 }
 
 function drawEntity(array $entity): CTag {
-	return (new CTag('li', true))
-		->addItem((new CDiv())
+	return new CListItem(
+		(new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))
-				->addClass(ZBX_STYLE_TOC_ITEM)
+			->addItem(
+				(new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))->addClass(ZBX_STYLE_TOC_ITEM)
 			)
-		);
+	);
 }
 
 function drawDiff(array $diff): CDiv {
@@ -138,55 +182,3 @@ function rowsToDivs(array $rows): array {
 
 	return $divs;
 }
-
-if (array_key_exists('error', $data)) {
-	$output = [
-		'error' => $data['error']
-	];
-}
-else {
-	$buttons = [];
-
-	if ($data['diff']) {
-		$buttons[] = [
-			'title' => _('Import'),
-			'class' => '',
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'focused' => true,
-			'action' => 'submitImportComparePopup(overlay);'
-		];
-	}
-
-	$buttons[] = [
-		'title' => $data['diff'] ? _('Cancel') : _('Close'),
-		'cancel' => true,
-		'class' => ZBX_STYLE_BTN_ALT,
-		'action' => ''
-	];
-
-	$output = [
-		'header' => $data['title'],
-		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
-		'body' => !$data['diff']
-			? (new CTableInfo())
-				->setNoDataMessage(_('No changes.'))
-				->toString()
-			: (new CForm())
-				->cleanItems()
-				->addClass('import-compare')
-				->addVar('import_overlayid', $data['import_overlayid'])
-				->addItem(drawToc($data['diff_toc']))
-				->addItem(drawDiff($data['diff']))
-				->toString(),
-		'buttons' => $buttons,
-		'no_changes' => !$data['diff']
-	];
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

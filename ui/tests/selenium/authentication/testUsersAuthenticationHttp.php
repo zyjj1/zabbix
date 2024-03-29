@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,16 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_USER	= 2;
 	const LOGIN_HTTP	= 3;
 
-	public function testFormAdministrationAuthenticationHttp_Layout() {
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
+	public function testUsersAuthenticationHttp_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('HTTP settings');
@@ -60,16 +69,16 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		$this->assertEquals('2048', $form->getField('Remove domain name')->getAttribute('maxlength'));
 
 		// Check hintbox.
-		$form->getLabel('Enable HTTP authentication')->query('class:icon-help-hint')->one()->click();
+		$form->getLabel('Enable HTTP authentication')->query('class:zi-help-filled-small')->one()->click();
 		$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 		$this->assertEquals('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
 			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
 
 		// Close the hintbox.
-		$hintbox->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
+		$hintbox->query('class:btn-overlay-close')->one()->click()->waitUntilNotPresent();
 
 		// Check confirmation popup.
-		foreach (['button:Cancel', 'class:overlay-close-btn', 'button:Ok'] as $button) {
+		foreach (['button:Cancel', 'class:btn-overlay-close', 'button:Ok'] as $button) {
 			$form->fill(['Enable HTTP authentication' => true]);
 			$dialog = COverlayDialogElement::find()->one();
 			$this->assertEquals('Confirm changes', $dialog->getTitle());
@@ -316,11 +325,6 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 					],
 					'pages' => [
 						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
-							'target' => 'Global view'
-						],
-						[
 							'page' => 'index.php',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'Global view'
@@ -359,11 +363,6 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						[
 							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
-							'target' => 'Global view'
-						],
-						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
 							'target' => 'Global view'
 						],
 						[
@@ -522,6 +521,13 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 			case self::LOGIN_GUEST:
 				$this->page->open($page['page']);
 
+				if ($page['page'] !== 'zabbix.php?action=user.list') {
+					$this->query('button:Login')->one()->click();
+					$this->page->waitUntilReady();
+					$this->query('link:sign in as guest')->one()->click();
+					$this->page->waitUntilReady();
+				}
+
 				return 'guest';
 
 			case self::LOGIN_USER:
@@ -579,10 +585,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 							break;
 					}
 
-					$message = CMessageElement::find()->one();
-					$this->assertEquals('msg-bad msg-global', $message->getAttribute('class'));
-					$message_title= $message->getText();
-					$this->assertStringContainsString($check['error'], $message_title);
+					$this->assertMessage(TEST_BAD, $check['error']);
 				}
 
 				continue;

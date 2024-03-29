@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -216,7 +216,7 @@ class CConditionFormula {
 		}
 
 		if ($level != 0 || isset($this->formula[$this->pos]) || $state == self::STATE_AFTER_OPERATOR) {
-			$this->error = _s('check expression starting from "%1$s"',
+			$this->error = _s('incorrect syntax near "%1$s"',
 				substr($this->formula, $this->pos == 0 ? 0 : $this->pos - 1)
 			);
 			$this->isValid = false;

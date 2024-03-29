@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2022 Zabbix SIA
+dnl Copyright (C) 2001-2024 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.4.0beta6])
+AC_INIT([Zabbix],[7.0.0beta3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -53,19 +53,18 @@ AC_PROG_EGREP
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
-  mtent.h fcntl.h sys/param.h arpa/inet.h \
+  fcntl.h sys/param.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
-  sys/socket.h sys/loadavg.h arpa/inet.h \
-  sys/vmmeter.h strings.h vm/vm_param.h \
+  sys/loadavg.h sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
-  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
+  stdint.h mach/host_info.h mach/mach_host.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h)
+  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h poll.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -77,6 +76,9 @@ AC_CHECK_HEADERS(resolv.h, [], [], [
 #  include <arpa/nameser.h>
 #endif
 #ifdef HAVE_NETDB_H
+#if defined(_AIX)       /* AIX 5.1 needs this to get hstrerror() declaration */
+#define _USE_IRS
+#endif
 #  include <netdb.h>
 #endif
 ])
@@ -166,7 +168,7 @@ dnl *****************************************************************
 
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
-AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(inet_ntoa, nsl)
 AC_SEARCH_LIBS(clock_gettime, rt)
 AC_SEARCH_LIBS(dlopen, dl)
 
@@ -181,6 +183,7 @@ AC_SEARCH_LIBS(jail_getname, jail, [AC_DEFINE([HAVE_LIBJAIL], 1, [Define to 1 if
 
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
+AC_CHECK_LIB(pthread, main)
 
 dnl check for DNS lookup functions
 found_resolv="no"
@@ -843,6 +846,14 @@ clock_gettime(CLOCK_REALTIME, &tp);
 ]])],[AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,Define to 1 if function 'clock_gettime' exists.)
 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
+AC_MSG_CHECKING(for function getrlimit in resource.h)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <sys/resource.h>
+]], [[struct rlimit rlim;
+getrlimit(RLIMIT_NOFILE, &rlim);
+]])],[AC_DEFINE(HAVE_GETRLIMIT,1,Define to 1 if function 'getrlimit' exists.)
+AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                      Checks for macros                        *
@@ -1021,14 +1032,12 @@ freebsd*)
 netbsd*)
 	ARCH="netbsd"
 	;;
-osf*)
-	ARCH="osf"
-	;;
 openbsd*)
 	ARCH="openbsd"
 	;;
 *)
 	ARCH="unknown"
+	AC_DEFINE([ZBX_UNKNOWN_ARCH], 1, [Define to 1 if unsupported architecture was detected.])
 	;;
 esac
 
@@ -1243,7 +1252,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([USE_TESTS], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1538,6 +1547,9 @@ ZBXJS_LIBS="$ZBXJS_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 AM_CONDITIONAL(HAVE_LIBXML2, test "x$have_libxml2" = "xyes")
 
+AM_CONDITIONAL(HAVE_SSH, [test "x$have_ssh" = "xyes (libssh)"])
+AM_CONDITIONAL(HAVE_SSH2, [test "x$have_ssh" = "xyes (libssh2)"])
+
 dnl Check if Zabbix internal IPC services are used
 have_ipcservice="no"
 if test "x$have_ipmi" = "xyes"; then
@@ -1570,6 +1582,16 @@ if test "x$have_ipcservice" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 fi
 
+dnl Check multhithread SSL libs requirements [by default - skip]
+mt_required="no"
+if test "x$server" = "xyes"; then
+	mt_required="yes"
+fi
+
+if test "x$proxy" = "xyes"; then
+	mt_required="yes"
+fi
+
 dnl Check for GnuTLS libgnutls [by default - skip]
 LIBGNUTLS_CHECK_CONFIG([no])
 if test "x$want_gnutls" = "xyes"; then
@@ -1587,10 +1609,13 @@ if test "x$want_gnutls" = "xyes"; then
 	TLS_CFLAGS="$GNUTLS_CFLAGS"
 	TLS_LDFLAGS="$GNUTLS_LDFLAGS"
 	TLS_LIBS="$GNUTLS_LIBS"
+	AC_SUBST(TLS_CFLAGS)
+	AC_SUBST(TLS_LDFLAGS)
+	AC_SUBST(TLS_LIBS)
 fi
 
 dnl Check for OpenSSL libssl and libcrypto [by default - skip]
-LIBOPENSSL_CHECK_CONFIG([no])
+LIBOPENSSL_CHECK_CONFIG([no], [$mt_required])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-gnutls or --with-openssl).])
@@ -1598,6 +1623,8 @@ if test "x$want_openssl" = "xyes"; then
 
 	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
+	elif test "x$accept_openssl_version" != "xyes" -a "$mt_required" = "yes"; then
+		AC_MSG_ERROR([OpenSSL library version requirement for server or proxy not met (>= 1.1.0)])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
@@ -1608,6 +1635,9 @@ if test "x$want_openssl" = "xyes"; then
 	TLS_LIBS="$OPENSSL_LIBS"
 fi
 AC_SUBST(TLS_CFLAGS)
+
+AM_CONDITIONAL(HAVE_OPENSSL, [test "x$have_tls" = "xOpenSSL" || test "x$have_tls" = "xOpenSSL (PSK not supported)"])
+AM_CONDITIONAL(HAVE_GNUTLS, [test "x$have_tls" = "xGnuTLS"])
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $TLS_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $TLS_LIBS"
@@ -1636,28 +1666,28 @@ if test "x$agent" = "xyes"; then
 	if test "x$want_libmodbus" = "xyes"; then
 		if test "x$found_libmodbus" = "xyes"; then
 			have_libmodbus="yes"
+
+			AGENT_CFLAGS="$AGENT_CFLAGS $LIBMODBUS_CFLAGS"
+			AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBMODBUS_LDFLAGS"
+			AGENT_LIBS="$AGENT_LIBS $LIBMODBUS_LIBS"
 		fi
 	fi
-	LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
-	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
-	LIBS="$LIBS $LIBMODBUS_LIBS"
 fi
 AM_CONDITIONAL(HAVE_LIBMODBUS, [test "x$have_libmodbus" = "xyes"])
 
 if test "x$agent2" = "xyes"; then
-	AC_CHECK_PROGS([GO], [go], [no])
-	if test "x$GO" = "xno"; then
-		AC_MSG_ERROR([Unable to find "go" executable in path])
-	fi
 	AC_DEFINE(ZBX_BUILD_AGENT2,1,[Define to 1 if Agent2 is being built.])
 fi
 
 if test "x$webservice" = "xyes"; then
+	AC_DEFINE(ZBX_BUILD_WEBSERVICE,1,[Define to 1 if Web Service is being built.])
+fi
+
+if test "x$agent2" = "xyes" || test "x$webservice" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
 	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
 	fi
-	AC_DEFINE(ZBX_BUILD_WEBSERVICE,1,[Define to 1 if Web Service is being built.])
 fi
 
 if test "x$java" = "xyes"; then
@@ -1690,9 +1720,11 @@ AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
 AC_SUBST(LDAP_CPPFLAGS)
 
+dnl Currently required cURL library version is 7.19.1 . When it is
+dnl increased all the functionality in zbxcurl.h must be revised.
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+LIBCURL_CHECK_CONFIG(, [7.19.1], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])
@@ -1791,6 +1823,19 @@ fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
 
+TIMES_CHECK_NULL_ARG([no])
+
+have_stacksize="no"
+
+AC_ARG_WITH(stacksize,[
+Override default thread stack size:
+AS_HELP_STRING([--with-stacksize=STACKSIZE], [Set default thread stack size in kilobytes.])],
+[case "${withval}" in
+  [[0-9]][[0-9]][[0-9]]|[[0-9]][[0-9]][[0-9]][[0-9]]|[[0-9]][[0-9]][[0-9]][[0-9]][[0-9]])
+    AC_DEFINE_UNQUOTED(HAVE_STACKSIZE, ${withval}, [Override default thread stack size.]) ;;
+  *) AC_MSG_ERROR([bad value ${withval} for --with-stacksize]) ;;
+esac])
+
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
 
@@ -1798,8 +1843,8 @@ SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
 PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
 AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
 AGENT2_CONFIG_FILE="${sysconfdir}/zabbix_agent2.conf"
-AGENT2_CONFIG_PATH="${sysconfdir}/zabbix_agent2.d"
-AGENT2_CONFIG_PLUGINS_PATH="${AGENT2_CONFIG_PATH}/plugins.d"
+AGENT2_CONFIG_DIR="${sysconfdir}/zabbix_agent2.d"
+AGENT2_PLUGIN_CONFIG_DIR="${AGENT2_CONFIG_DIR}/plugins.d"
 WEBSERVICE_CONFIG_FILE="${sysconfdir}/zabbix_web_service.conf"
 
 EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
@@ -1845,6 +1890,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
 		\${abs_top_builddir}/src/libs/zbxstr/libzbxstr.a \
+		\${abs_top_builddir}/src/libs/zbxfile/libzbxfile.a \
 		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
@@ -1859,6 +1905,8 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
+		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
+		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -1878,8 +1926,8 @@ AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
 AC_SUBST(AGENT2_CONFIG_FILE)
-AC_SUBST(AGENT2_CONFIG_PATH)
-AC_SUBST(AGENT2_CONFIG_PLUGINS_PATH)
+AC_SUBST(AGENT2_CONFIG_DIR)
+AC_SUBST(AGENT2_PLUGIN_CONFIG_DIR)
 AC_SUBST(WEBSERVICE_CONFIG_FILE)
 
 AC_SUBST(EXTERNAL_SCRIPTS_PATH)
@@ -1890,14 +1938,7 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 
 AC_SUBST(LOAD_MODULE_PATH)
 
-GOBIN=${sbindir}
-GOCMD=go
-GOWORKDIR=$ac_abs_confdir/go/src/zabbix
-
-export GOBIN=${GOBIN}
-AC_SUBST(GOBIN)
-AC_SUBST(GOCMD)
-AC_SUBST(GOWORKDIR)
+AC_SUBST(GO)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1922,6 +1963,9 @@ case "x$ARCH" in
 		;;
 esac
 
+found_cmocka="no"
+found_yaml="no"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *
@@ -1929,29 +1973,44 @@ dnl *                                                               *
 dnl *****************************************************************
 
 m4_ifdef([CONF_TESTS],[CONF_TESTS])
+AM_CONDITIONAL([TESTS],[test "x$found_cmocka" = "xyes"])
 
 AC_CONFIG_FILES([
 	Makefile
 	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/option-patches/Makefile
 	database/oracle/Makefile
+	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
+	database/postgresql/option-patches/Makefile
+	database/postgresql/timescaledb/Makefile
+	database/postgresql/timescaledb/option-patches/Makefile
+	database/postgresql/timescaledb/option-patches/with-compression/Makefile
+	database/postgresql/timescaledb/option-patches/without-compression/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
 	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxalgo/Makefile
+	src/libs/zbxasyncpoller/Makefile
+	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
+	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
+	src/libs/zbxconnector/Makefile
+	src/libs/zbxdbconfigworker/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
-	src/libs/zbxconf/Makefile
+	src/libs/zbxcfg/Makefile
 	src/libs/zbxcrypto/Makefile
+	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile
+	src/libs/zbxdbsyncer/Makefile
 	src/libs/zbxcacheconfig/Makefile
 	src/libs/zbxcachehistory/Makefile
 	src/libs/zbxcachevalue/Makefile
@@ -1960,20 +2019,23 @@ AC_CONFIG_FILES([
 	src/libs/zbxdbschema/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
+	src/libs/zbxdiscoverer/Makefile
 	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxeval/Makefile
+	src/libs/zbxevent/Makefile
 	src/libs/zbxexec/Makefile
 	src/libs/zbxexport/Makefile
 	src/libs/zbxexpr/Makefile
+	src/libs/zbxfile/Makefile
 	src/libs/zbxgetopt/Makefile
-	src/libs/zbxha/Makefile
 	src/libs/zbxhash/Makefile
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxip/Makefile
 	src/libs/zbxipcservice/Makefile
+	src/libs/zbxipmi/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxkvs/Makefile
 	src/libs/zbxlog/Makefile
@@ -1983,16 +2045,24 @@ AC_CONFIG_FILES([
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
+	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpoller/Makefile
+	src/libs/zbxagentget/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
+	src/libs/zbxproxybuffer/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
-	src/libs/zbxserver/Makefile
+	src/libs/zbxexpression/Makefile
+	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
+	src/libs/zbxvmware/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
 	src/libs/zbxsysinfo/aix/Makefile
@@ -2003,64 +2073,77 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/linux/Makefile
 	src/libs/zbxsysinfo/netbsd/Makefile
 	src/libs/zbxsysinfo/openbsd/Makefile
-	src/libs/zbxsysinfo/osf/Makefile
 	src/libs/zbxsysinfo/osx/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxstats/Makefile
+	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
+	src/libs/zbxhttppoller/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
+	src/libs/zbxtimekeeper/Makefile
+	src/libs/zbxtrapper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
+	src/libs/zbxalerter/Makefile
+	src/libs/zbxpinger/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
+	src/zabbix_agent/active_checks/Makefile
+	src/zabbix_agent/agent_conf/Makefile
+	src/zabbix_agent/listener/Makefile
+	src/zabbix_agent/metrics/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/autoreg/Makefile
+	src/zabbix_proxy/cachehistory/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
+	src/zabbix_proxy/discovery/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
+	src/zabbix_proxy/poller/Makefile
+	src/zabbix_proxy/preproc/Makefile
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
+	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
-	src/zabbix_server/alerter/Makefile
-	src/zabbix_server/availability/Makefile
+	src/zabbix_server/autoreg/Makefile
+	src/zabbix_server/actions/Makefile
+	src/zabbix_server/postinit/Makefile
+	src/zabbix_server/cachehistory/Makefile
+	src/zabbix_server/connector/Makefile
+	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile
-	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/diag/Makefile
-	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/discovery/Makefile
 	src/zabbix_server/escalator/Makefile
+	src/zabbix_server/events/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
-	src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/lld/Makefile
-	src/zabbix_server/odbc/Makefile
-	src/zabbix_server/pinger/Makefile
+	src/zabbix_server/operations/Makefile
 	src/zabbix_server/poller/Makefile
-	src/zabbix_server/preprocessor/Makefile
+	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
-	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/service/Makefile
-	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/vmware/Makefile
 	man/Makefile
 	])
 AC_OUTPUT
@@ -2084,11 +2167,11 @@ AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
 AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
 
-AGENT2_CONFIG_PATH=`eval echo "${AGENT2_CONFIG_PATH}"`
-AGENT2_CONFIG_PATH=`eval echo "${AGENT2_CONFIG_PATH}"`
+AGENT2_CONFIG_DIR=`eval echo "${AGENT2_CONFIG_DIR}"`
+AGENT2_CONFIG_DIR=`eval echo "${AGENT2_CONFIG_DIR}"`
 
-AGENT2_CONFIG_PLUGINS_PATH=`eval echo "${AGENT2_CONFIG_PLUGINS_PATH}"`
-AGENT2_CONFIG_PLUGINS_PATH=`eval echo "${AGENT2_CONFIG_PLUGINS_PATH}"`
+AGENT2_PLUGIN_CONFIG_DIR=`eval echo "${AGENT2_PLUGIN_CONFIG_DIR}"`
+AGENT2_PLUGIN_CONFIG_DIR=`eval echo "${AGENT2_PLUGIN_CONFIG_DIR}"`
 
 WEBSERVICE_CONFIG_FILE=`eval echo "${WEBSERVICE_CONFIG_FILE}"`
 WEBSERVICE_CONFIG_FILE=`eval echo "${WEBSERVICE_CONFIG_FILE}"`
@@ -2266,13 +2349,37 @@ fi
 
 echo "
   LDAP support:          ${found_ldap}
-  IPv6 support:          ${have_ipv6}"
+  IPv6 support:          ${have_ipv6}
+  cmocka support:        ${found_cmocka}"
+
+if test "x$found_cmocka" != "xno"; then
+
+echo "  cmocka library details:
+    Compiler flags:      ${CMOCKA_CFLAGS}
+    Linker flags:        ${CMOCKA_LDFLAGS}
+    Libraries:           ${CMOCKA_LIBS}
+    Library location:    ${CMOCKA_LIBRARY_PATH}"
+
+fi
+
+echo "
+  yaml support:          ${found_yaml}"
+
+if test "x$found_yaml" != "xno"; then
+
+echo "  yaml library details:
+    Compiler flags:      ${YAML_CFLAGS}
+    Linker flags:        ${YAML_LDFLAGS}
+    Libraries:           ${YAML_LIBS}
+    Library location:    ${YAML_LIBRARY_PATH}"
+
+fi
 
 echo
 echo "***********************************************************"
 echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
-echo "*              <http://www.zabbix.com>                    *"
+echo "*              <https://www.zabbix.com>                   *"
 echo "***********************************************************"
 echo

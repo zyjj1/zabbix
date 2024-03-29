@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,23 +25,23 @@
 class CControllerChartsView extends CControllerCharts {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'from'                  => 'range_time',
-			'to'                    => 'range_time',
-			'view_as'               => 'in '.HISTORY_GRAPH.','.HISTORY_VALUES,
-			'filter_set'            => 'in 1',
-			'filter_rst'            => 'in 1',
-			'filter_hostids'        => 'array_id',
-			'filter_name'           => 'string',
-			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,
-			'subfilter_set'         => 'in 1',
-			'subfilter_tagnames'    => 'array',
-			'subfilter_tags'        => 'array',
-			'page'                  => 'ge 1'
+			'from' =>				'range_time',
+			'to' =>					'range_time',
+			'view_as' =>			'in '.HISTORY_GRAPH.','.HISTORY_VALUES,
+			'filter_set' =>			'in 1',
+			'filter_rst' =>			'in 1',
+			'filter_hostids' =>		'array_id',
+			'filter_name' =>		'string',
+			'filter_show' =>		'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,
+			'subfilter_set' =>		'in 1',
+			'subfilter_tagnames' =>	'array',
+			'subfilter_tags' =>		'array',
+			'page' =>				'ge 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,22 +20,31 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource EntitiesTags
- * @dataSource Services
+ * @dataSource EntitiesTags, Services, Actions
  *
  * @backup services
  */
 class testPageServicesServices extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 19;
+	const SERVICE_COUNT = 20;
 
 	const LAYOUT_PARENT = 'Parent for 2 levels of child services';
 	const LAYOUT_CHILD = 'Child service with child service';
@@ -48,16 +57,6 @@ class testPageServicesServices extends CWebTest {
 
 	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
 	const TABLE_SELECTOR = 'id:service-list';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
-
 
 	/**
 	 * Set parent and child services to Problem status and link the child services to the corresponding problem events.
@@ -221,7 +220,7 @@ class testPageServicesServices extends CWebTest {
 			);
 		}
 
-		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']');
+		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('js-edit-service').']');
 		$this->assertEquals($edit, $edit_button->one(false)->isClickable());
 		$table->invalidate();
 		$this->assertTableStats(1);
@@ -609,7 +608,7 @@ class testPageServicesServices extends CWebTest {
 		// Fill filter form with data.
 		$filter_form->fill(CTestArrayHelper::get($data, 'filter'));
 
-		// If data contains Tags fill them separataly, because tags form is more complicated.
+		// If data contains Tags fill them separately, because tags form is more complicated.
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			if (CTestArrayHelper::get($data['Tags'], 'Source')) {
 				$filter_form->getField('id:filter_tag_source')->asSegmentedRadio()->fill($data['Tags']['Source']);
@@ -747,8 +746,8 @@ class testPageServicesServices extends CWebTest {
 			$this->query('button:Delete')->one()->click();
 		}
 		else {
-			$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
-				->waitUntilClickable()->click();
+			$table->findRow('Name', $name)->query("xpath:.//button[".CXPathHelper::fromClass('js-delete-service')."]")
+					->one()->waitUntilClickable()->click();
 		}
 
 		$this->page->dismissAlert();
@@ -772,8 +771,8 @@ class testPageServicesServices extends CWebTest {
 		$this->assertTableStats($before_rows_count);
 
 		// Delete service pressing cross button.
-		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
-				->waitUntilClickable()->click();
+		$table->findRow('Name', $name)->query("xpath:.//button[".CXPathHelper::fromClass('js-delete-service')."]")
+				->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service deleted');
@@ -799,8 +798,8 @@ class testPageServicesServices extends CWebTest {
 
 		// Delete child service pressing cross button.
 		$table->invalidate();
-		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
-				->waitUntilClickable()->click();
+		$table->findRow('Name', $name)->query("xpath:.//button[".CXPathHelper::fromClass('js-delete-service')."]")
+				->one()->waitUntilClickable()->click();
 
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -833,8 +832,8 @@ class testPageServicesServices extends CWebTest {
 		$this->assertFalse($table->query("xpath://td/a[text()=".CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Delete parent service.
-		$table->findRow('Name', $name, true)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
-				->waitUntilClickable()->click();
+		$table->findRow('Name', $name, true)->query("xpath:.//button[".CXPathHelper::fromClass('js-delete-service')."]")
+				->one()->waitUntilClickable()->click();
 
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -1487,7 +1486,7 @@ class testPageServicesServices extends CWebTest {
 		$form->getField('Status calculation rule')->fill($data['parent']['Status calculation rule']);
 
 		if (array_key_exists('Additional rules', $data['parent'])) {
-			$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+			$form->fill(['Advanced configuration' => true]);
 
 			// Remove the additional rules from previous test cases.
 			$form->getFieldContainer('Additional rules')->query('button:Remove')->all(false)->click();
@@ -1527,6 +1526,7 @@ class testPageServicesServices extends CWebTest {
 
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form = $this->query('id:service-form')->asForm()->one();
+				$form->fill(['Advanced configuration' => true]);
 
 				$form->fill($child_service['fields']);
 				$form->submit();

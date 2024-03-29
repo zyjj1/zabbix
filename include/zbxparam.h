@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,4 +56,7 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 		size_t maxerrlen);
 int	zbx_get_key_param(char *param, int num, char *buf, size_t max_len);
 int	zbx_num_key_param(char *param);
+
+void	zbx_unquote_key_param(char *param);
+int	zbx_quote_key_param(char **param, int forced);
 #endif /* ZABBIX_PARAM_H */

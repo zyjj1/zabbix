@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,13 @@
 
 class CWidgetItem extends CWidget {
 
-	_registerEvents() {
-		super._registerEvents();
+	static AGGREGATE_NONE = 0;
 
+	onStart() {
 		this._events.resize = () => {
 			const margin = 5;
 			const padding = 10;
-			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
+			const header_height = this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
 
 			this._target.style.setProperty(
 				'--content-height',
@@ -35,20 +35,27 @@ class CWidgetItem extends CWidget {
 		}
 	}
 
-	_activateEvents() {
-		super._activateEvents();
-
+	onActivate() {
 		this._resize_observer = new ResizeObserver(this._events.resize);
 		this._resize_observer.observe(this._target);
 	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
-
+	onDeactivate() {
 		this._resize_observer.disconnect();
 	}
 
-	_hasPadding() {
+	getUpdateRequestData() {
+		const update_request_data = super.getUpdateRequestData();
+
+		if (this.getFieldsData().aggregate_function !== CWidgetItem.AGGREGATE_NONE
+				&& !this.getFieldsReferredData().has('time_period')) {
+			update_request_data.has_custom_time_period = 1;
+		}
+
+		return update_request_data;
+	}
+
+	hasPadding() {
 		return false;
 	}
 }

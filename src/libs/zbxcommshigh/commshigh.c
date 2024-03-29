@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,14 @@
 
 #include "zbxcommon.h"
 #include "zbxjson.h"
-#include "log.h"
+#include "zbxlog.h"
+#include "zbxtime.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"
 #endif
 
-#include "zbxalgo.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*config_tls_server_cert_issuer;
@@ -36,11 +36,11 @@ extern char	*config_tls_server_cert_subject;
 extern char	*config_tls_psk_identity;
 #endif
 
-static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
+static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_addr_ptr_t *addrs,
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
 {
-	int	ret, i;
+	int	i, ret = FAIL;
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
@@ -51,7 +51,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, connect_timeout, tls_connect,
 				tls_arg1, tls_arg2)))
 		{
-			zbx_socket_timeout_set(s, timeout);
+			zbx_socket_set_deadline(s, timeout);
 			break;
 		}
 
@@ -59,22 +59,21 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
-		zbx_vector_ptr_remove(addrs, 0);
-		zbx_vector_ptr_append(addrs, addr);
+		zbx_vector_addr_ptr_remove(addrs, 0);
+		zbx_vector_addr_ptr_append(addrs, addr);
 	}
 
 	return ret;
 }
 
-int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls)
 {
 	int		res;
 	const char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
-			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
-			connect_timeout);
+			addrs->values[0]->ip, addrs->values[0]->port, timeout, connect_timeout);
 
 	switch (config_tls->connect_mode)
 	{
@@ -114,7 +113,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			{
 				int	now = (int)time(NULL);
 
-				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
+				if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
 					lastlogtime = now;
@@ -217,14 +216,15 @@ out:
  *             info     - [IN] info message (optional)                        *
  *             version  - [IN] the version data (optional)                    *
  *             protocol - [IN] the transport protocol                         *
- *             timeout - [IN] timeout for this operation                      *
+ *             timeout  - [IN] timeout for this operation                     *
+ *             ext      - [IN] additional data to merge into response json    *
  *                                                                            *
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
-		int timeout)
+int	zbx_send_response_json(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
+		int timeout, const char *ext)
 {
 	struct zbx_json	json;
 	const char	*resp;
@@ -232,7 +232,7 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init_with(&json, ext);
 
 	resp = SUCCEED == result ? ZBX_PROTO_VALUE_SUCCESS : ZBX_PROTO_VALUE_FAILED;
 
@@ -258,6 +258,27 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send json SUCCEED or FAIL to socket along with an info message    *
+ *                                                                            *
+ * Parameters: sock     - [IN] socket descriptor                              *
+ *             result   - [IN] SUCCEED or FAIL                                *
+ *             info     - [IN] info message (optional)                        *
+ *             version  - [IN] the version data (optional)                    *
+ *             protocol - [IN] the transport protocol                         *
+ *             timeout  - [IN] timeout for this operation                     *
+ *                                                                            *
+ * Return value: SUCCEED - data successfully transmitted                      *
+ *               NETWORK_ERROR - network related error occurred               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
+		int timeout)
+{
+	return zbx_send_response_json(sock, result, info, version, protocol, timeout, NULL);
 }
 
 /******************************************************************************

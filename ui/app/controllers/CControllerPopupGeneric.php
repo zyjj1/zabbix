@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,8 +142,13 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $disableids = [];
 
+	/**
+	 * @var array
+	 */
+	private $page_options = [];
+
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		$this->popup_properties = [
 			'hosts' => [
@@ -209,7 +214,7 @@ class CControllerPopupGeneric extends CController {
 			'proxies' => [
 				'title' => _('Proxies'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'proxyid,host',
+				'allowed_src_fields' => 'proxyid,name',
 				'form' => [
 					'name' => 'proxiesform',
 					'id' => 'proxies'
@@ -324,7 +329,8 @@ class CControllerPopupGeneric extends CController {
 				'allowed_src_fields' => 'key',
 				'table_columns' => [
 					_('Key'),
-					_('Name')
+					_('Name'),
+					''
 				]
 			],
 			'graphs' => [
@@ -560,7 +566,7 @@ class CControllerPopupGeneric extends CController {
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
-			'context' =>							'string|in host,template',
+			'context' =>							'string|in host,template,audit',
 			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
@@ -575,7 +581,9 @@ class CControllerPopupGeneric extends CController {
 			'hostids' =>							'array',
 			'host_pattern' =>						'array|not_empty',
 			'host_pattern_wildcard_allowed' =>		'in 1',
-			'host_pattern_multiple' =>				'in 1'
+			'host_pattern_multiple' =>				'in 1',
+			'hide_host_filter' =>					'in 1',
+			'resolve_macros' =>						'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -594,15 +602,6 @@ class CControllerPopupGeneric extends CController {
 		// Set disabled options to property for ability to modify them in result fetching.
 		if ($ret && $this->hasInput('disableids')) {
 			$this->disableids = $this->getInput('disableids');
-		}
-
-		if ($ret && $this->getInput('value_types', [])) {
-			foreach ($this->getInput('value_types') as $value_type) {
-				if (!is_numeric($value_type) || $value_type < 0 || $value_type > 15) {
-					error(_s('Incorrect value "%1$s" for "%2$s" field.', $value_type, 'value_types'));
-					$ret = false;
-				}
-			}
 		}
 
 		if (!$ret) {
@@ -871,7 +870,8 @@ class CControllerPopupGeneric extends CController {
 
 		// Host dropdown.
 		if (in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER)
-				&& ($this->source_table !== 'item_prototypes' || !$this->page_options['parent_discoveryid'])) {
+				&& ($this->source_table !== 'item_prototypes' || !$this->page_options['parent_discoveryid'])
+				&& !$this->hasInput('hide_host_filter')) {
 
 			$src_name = 'hosts';
 			if (!array_key_exists('monitored_hosts', $host_options)
@@ -1259,6 +1259,11 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				$records = API::User()->get($options);
+
+				if ($this->hasInput('context')) {
+					$records[0] = ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => ''];
+				}
+
 				CArrayHelper::sort($records, ['username']);
 				break;
 
@@ -1467,8 +1472,12 @@ class CControllerPopupGeneric extends CController {
 
 			case 'items':
 			case 'item_prototypes':
+				$name_field = $this->source_table === 'items' && $this->getInput('resolve_macros', 0)
+					? 'name_resolved'
+					: 'name';
+
 				$options += [
-					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'output' => ['itemid', $name_field, 'key_', 'flags', 'type', 'value_type', 'status'],
 					'selectHosts' => ['name'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
@@ -1500,13 +1509,19 @@ class CControllerPopupGeneric extends CController {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					if ($this->hasInput('normal_only')) {
-						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-					}
+					$records = [];
 
-					$records = !$this->host_preselect_required || $this->hostids
-						? API::Item()->get($options + ['webitems' => true])
-						: [];
+					if (!$this->host_preselect_required || $this->hostids) {
+						if ($this->hasInput('normal_only')) {
+							$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+						}
+
+						$records = API::Item()->get($options + ['webitems' => true]);
+
+						if ($this->getInput('resolve_macros', 0)) {
+							$records = CArrayHelper::renameObjectsKeys($records, ['name_resolved' => 'name']);
+						}
+					}
 				}
 
 				CArrayHelper::sort($records, ['name']);
@@ -1557,19 +1572,26 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'sysmaps':
-				$options += [
-					'output' => API_OUTPUT_EXTEND
-				];
+				$records = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'preservekeys' => true
+				]);
 
-				$records = API::Map()->get($options);
+				$records = CArrayHelper::renameObjectsKeys($records, ['sysmapid' => 'id']);
 
 				CArrayHelper::sort($records, ['name']);
 				break;
 
 			case 'drules':
+				$filter = [];
+
+				if ($this->getInput('enabled_only', 0)) {
+					$filter['status'] = DRULE_STATUS_ACTIVE;
+				}
+
 				$records = API::DRule()->get([
 					'output' => ['druleid', 'name'],
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'filter' => $filter,
 					'preservekeys' => true
 				]);
 
@@ -1579,7 +1601,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'dchecks':
 				$records = API::DRule()->get([
-					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports'],
+					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports', 'allow_redirect'],
 					'output' => ['druleid', 'name']
 				]);
 
@@ -1588,12 +1610,12 @@ class CControllerPopupGeneric extends CController {
 
 			case 'proxies':
 				$options += [
-					'output' => ['proxyid', 'host']
+					'output' => ['proxyid', 'name']
 				];
 
 				$records = API::Proxy()->get($options);
-				CArrayHelper::sort($records, ['host']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id']);
 				break;
 
 			case 'roles':

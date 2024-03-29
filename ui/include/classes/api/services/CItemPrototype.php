@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,32 +40,7 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN,
 		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE,
 		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
-	];
-
-	/**
-	 * @inheritDoc
-	 */
-	protected const PREPROC_TYPES_WITH_PARAMS = [
-		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
-		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
-		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
-	];
-
-	/**
-	 * @inheritDoc
-	 */
-	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [
-		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
-		ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
-		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
-		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
+		ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_SNMP_GET_VALUE
 	];
 
 	/**
@@ -85,7 +60,8 @@ class CItemPrototype extends CItemGeneral {
 		ITEM_VALUE_TYPE_STR => ['valuemapid'],
 		ITEM_VALUE_TYPE_LOG => ['logtimefmt'],
 		ITEM_VALUE_TYPE_UINT64 => ['units', 'trends', 'valuemapid'],
-		ITEM_VALUE_TYPE_TEXT => []
+		ITEM_VALUE_TYPE_TEXT => [],
+		ITEM_VALUE_TYPE_BINARY => []
 	];
 
 	/**
@@ -145,20 +121,19 @@ class CItemPrototype extends CItemGeneral {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// templateids
@@ -317,23 +292,11 @@ class CItemPrototype extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
+			self::prepareItemsForApi($result, false);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
-			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
-
-		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		foreach ($result as &$item) {
-			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
-				$item['query_fields'] = json_last_error() ? [] : $query_fields;
-			}
-
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = self::headersStringToArray($item['headers']);
-			}
-		}
-		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
@@ -355,6 +318,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -397,14 +361,17 @@ class CItemPrototype extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -426,7 +393,7 @@ class CItemPrototype extends CItemGeneral {
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	self::getPreprocessingValidationRules()
+			'preprocessing' =>	self::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO)
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -435,20 +402,24 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::addUuid($items);
+
+		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
 	 * @param array $items
 	 */
 	public static function createForce(array &$items): void {
+		self::prepareItemsForDb($items);
 		$itemids = DB::insert('items', $items);
+		self::prepareItemsForApi($items);
 
 		$ins_items_discovery = [];
 		$host_statuses = [];
@@ -528,13 +499,9 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
-		 * fields as they stored in database.
-		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -544,6 +511,7 @@ class CItemPrototype extends CItemGeneral {
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
+			$item['host_status'] = $db_item['host_status'];
 
 			if ($db_item['templateid'] != 0) {
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
@@ -559,7 +527,7 @@ class CItemPrototype extends CItemGeneral {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 			else {
-				$item += array_intersect_key($db_item, array_flip(['value_type']));
+				$item += array_intersect_key($db_item, array_flip(['type', 'value_type']));
 
 				$api_input_rules = self::getValidationRules();
 			}
@@ -574,24 +542,18 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'host_status', 'flags', 'ruleid']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags', 'ruleid']);
 
 		self::validateUniqueness($items);
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
-		self::checkPreprocessingSteps($items);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public static function getPreprocessingValidationRules(int $flags = 0x00): array {
-		return parent::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
 	}
 
 	/**
@@ -599,11 +561,19 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -625,7 +595,7 @@ class CItemPrototype extends CItemGeneral {
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	self::getPreprocessingValidationRules()
+			'preprocessing' =>	self::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO)
 		]];
 	}
 
@@ -634,6 +604,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -678,7 +650,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
-		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
+		CArrayHelper::sort($items, ['itemid']);
 
 		self::addFieldDefaultsByType($items, $db_items);
 
@@ -687,6 +659,8 @@ class CItemPrototype extends CItemGeneral {
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
+
+		self::prepareItemsForDb($items);
 
 		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
@@ -726,6 +700,9 @@ class CItemPrototype extends CItemGeneral {
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
 
+		self::prepareItemsForApi($items);
+		self::prepareItemsForApi($db_items);
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
 
@@ -737,7 +714,7 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($item_prototypes as $i => $item_prototype) {
 			if (!in_array($item_prototype['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
 					|| !array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
-				unset($item_prototype[$i]);
+				unset($item_prototypes[$i]);
 				continue;
 			}
 		}
@@ -838,6 +815,7 @@ class CItemPrototype extends CItemGeneral {
 			return;
 		}
 
+		self::prepareItemsForApi($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -895,8 +873,7 @@ class CItemPrototype extends CItemGeneral {
 			$item_indexes = array_flip(array_column($items, 'itemid'));
 
 			foreach ($items as $i => $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT
-						&& array_key_exists($item['master_itemid'], $item_indexes)) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists($item['master_itemid'], $item_indexes)) {
 					$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
 
 					unset($items[$i]);
@@ -925,7 +902,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $tpl_links
 	 * @param array $hostids
 	 */
-	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
+	private static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
 		$items_to_link = [];
 		$items_to_update = [];
 
@@ -1048,17 +1025,14 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items,
 			array $upd_db_items): array {
+		$parent_indexes = array_flip(array_column($items, 'itemid'));
 
 		foreach ($items as &$item) {
-			if (!array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
+			unset($item['uuid']);
 			$item = self::unsetNestedObjectIds($item);
 		}
 		unset($item);
 
-		$parent_indexes = array_flip(array_column($items, 'itemid'));
 		$upd_items = [];
 
 		foreach ($upd_db_items as $upd_db_item) {
@@ -1138,8 +1112,8 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
@@ -1178,7 +1152,9 @@ class CItemPrototype extends CItemGeneral {
 		$parent_indexes = [];
 
 		foreach ($items as $i => &$item) {
+			$item['uuid'] = '';
 			$item = self::unsetNestedObjectIds($item);
+
 			$parent_indexes[$item['hostid']][$item['key_']] = $i;
 		}
 		unset($item);
@@ -1197,9 +1173,11 @@ class CItemPrototype extends CItemGeneral {
 			] + $item;
 
 			$upd_item += [
+				'headers' => [],
 				'tags' => [],
 				'preprocessing' => [],
-				'parameters' => []
+				'parameters' => [],
+				'query_fields' => []
 			];
 
 			$upd_items[] = $upd_item;
@@ -1288,7 +1266,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,h.status AS host_status'.
+			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,i.flags,'.
+				'h.status AS host_status'.
 			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
@@ -1300,11 +1279,11 @@ class CItemPrototype extends CItemGeneral {
 		$db_items = [];
 		$i = 0;
 		$tpl_itemids = [];
+		$internal_fields = array_flip(['type', 'key_', 'hostid', 'flags']);
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'type'  => $row['type'],
 				'templateid' => 0,
 				'host_status' => $row['host_status']
 			];
@@ -1319,8 +1298,12 @@ class CItemPrototype extends CItemGeneral {
 
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row, array_flip(['key_', 'hostid']));
+					$item += array_intersect_key($row, $internal_fields);
 				}
+			}
+
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
+				unset($row['type']);
 			}
 
 			$items[$i++] = $item;
@@ -1371,12 +1354,6 @@ class CItemPrototype extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
 
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
@@ -1522,7 +1499,7 @@ class CItemPrototype extends CItemGeneral {
 		DBselect(
 			'SELECT NULL'.
 			' FROM items i'.
-			' WHERE '.dbConditionInt('i.itemid', $del_itemids).
+			' WHERE '.dbConditionId('i.itemid', $del_itemids).
 			' FOR UPDATE'
 		);
 

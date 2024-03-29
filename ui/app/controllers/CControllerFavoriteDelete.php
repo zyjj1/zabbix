@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,8 +73,8 @@ class CControllerFavoriteDelete extends CController {
 				if (addrm_fav !== null) {
 					addrm_fav.title = "'._('Add to favorites').'";
 					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
-					addrm_fav.classList.add("btn-add-fav");
-					addrm_fav.classList.remove("btn-remove-fav");
+					addrm_fav.classList.add("'.ZBX_ICON_STAR.'");
+					addrm_fav.classList.remove("'.ZBX_ICON_STAR_FILLED.'");
 				}
 				else {
 					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {

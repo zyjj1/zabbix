@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,16 +23,43 @@ import (
 	"encoding/json"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/wmi"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Wmi",
+		"wmi.get", "Execute WMI query and return the first selected object.",
+		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+// wmiFmtAdapter returns value adapted to the format of classic C Zabbix agent for compatibility reasons.
+// Boolean values should be converted to "True" and "False" strings starting with capital letter.
+func wmiFmtAdapter(value interface{}) interface{} {
+	switch v := value.(type) {
+	case bool:
+		if v {
+			return "True"
+		} else {
+			return "False"
+		}
+	default:
+		return value
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -41,25 +68,29 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	switch key {
 	case "wmi.get":
-		return wmi.QueryValue(params[0], params[1])
+		value, err := wmi.QueryValue(params[0], params[1])
+		if err != nil {
+			return nil, err
+		}
+
+		return wmiFmtAdapter(value), err
 	case "wmi.getall":
 		m, err := wmi.QueryTable(params[0], params[1])
 		if err != nil {
 			return nil, err
 		}
+		for i := range m {
+			for k := range m[i] {
+				m[i][k] = wmiFmtAdapter(m[i][k])
+			}
+		}
 		b, err := json.Marshal(&m)
 		if err != nil {
 			return nil, err
 		}
+
 		return string(b), nil
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Wmi",
-		"wmi.get", "Execute WMI query and return the first selected object.",
-		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
-	)
 }

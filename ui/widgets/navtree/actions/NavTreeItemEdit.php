@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ use Widgets\NavTree\Widget;
 class NavTreeItemEdit extends CController {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -62,7 +62,7 @@ class NavTreeItemEdit extends CController {
 	protected function doAction(): void {
 		$sysmapid = $this->getInput('sysmapid');
 
-		$sysmap = ['sysmapid' => $sysmapid, 'name' => ''];
+		$sysmap = [];
 
 		if ($sysmapid != 0) {
 			$sysmaps = API::Map()->get([
@@ -72,9 +72,17 @@ class NavTreeItemEdit extends CController {
 
 			if ($sysmaps) {
 				$sysmap = $sysmaps[0];
+				$sysmap = [
+					'id' => $sysmap['sysmapid'],
+					'name' => $sysmap['name']
+				];
 			}
 			else {
-				$sysmap['name'] = _('Inaccessible map');
+				$sysmap = [
+					'id' => $sysmapid,
+					'name' => _('Inaccessible map'),
+					'inaccessible' => true
+				];
 			}
 		}
 

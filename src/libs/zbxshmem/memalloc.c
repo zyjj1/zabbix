@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "zbxshmem.h"
 
 #include "zbxstr.h"
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -624,6 +623,43 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: allocate the required shared memory size                          *
+ *                                                                            *
+ * Return value: SUCCEED - the memory was allocated successfully              *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: When allocating shared memory with default zbx_shmem_create()    *
+ *           function the available memory will reduced by the allocator      *
+ *           overhead. This function estimates the overhead and requests      *
+ *           enough memory so the available memory is greater or equal to the *
+ *           requested size.                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+		int allow_oom, char **error)
+{
+	void	*base = NULL;
+
+	descr = ZBX_NULL2STR(descr);
+	param = ZBX_NULL2STR(param);
+
+	base = (void *)((zbx_shmem_info_t *)(base) + 1);
+	base = ALIGNPTR(base);
+	base = (void *)((void **)base + ZBX_SHMEM_BUCKET_COUNT);
+	base = (void *)((char *)base + strlen(descr) + 1);
+	base = (void *)((char *)base + strlen(param) + 1);
+	base = ALIGN8(base);
+
+	size += (size_t )base;
+
+	size += 8;
+	size += 2 * SHMEM_SIZE_FIELD;
+
+	return zbx_shmem_create(info, size, descr, param, allow_oom, error);
+}
+
 void	zbx_shmem_destroy(zbx_shmem_info_t *info)
 {
 	(void)shmdt(info->base);
@@ -756,6 +792,9 @@ void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_shmem_stats_t *stats)
 		stats->free_chunks += counter;
 		stats->chunks_num[i] = counter;
 	}
+
+	if (__UINT64_C(0xffffffffffffffff) == stats->min_chunk_size)
+		stats->min_chunk_size = 0;
 
 	stats->overhead = info->total_size - info->used_size - info->free_size;
 	stats->used_chunks = stats->overhead / (2 * SHMEM_SIZE_FIELD) + 1 - stats->free_chunks;

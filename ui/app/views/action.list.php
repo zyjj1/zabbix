@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,7 @@ $filter = (new CFilter())
 $current_url->removeArgument('filter_rst');
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('action')))->removeId())
 	->setId('action-list')
 	->setName('action_list');
 
@@ -166,19 +167,19 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-action')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'action.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-action')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'action.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-action')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'action_'.$data['eventsource'])
 ]);

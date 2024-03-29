@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CControllerTemplateDashboardEdit extends CController {
 	private array $dashboard;
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -33,9 +33,7 @@ class CControllerTemplateDashboardEdit extends CController {
 			'dashboardid' => 'db dashboard.dashboardid'
 		];
 
-		$ret = $this->validateInput($fields);
-
-		$ret = $ret && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
+		$ret = $this->validateInput($fields) && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -68,9 +66,7 @@ class CControllerTemplateDashboardEdit extends CController {
 	protected function doAction(): void {
 		if ($this->hasInput('dashboardid')) {
 			$dashboard = $this->dashboard;
-			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], $dashboard['templateid'],
-				false
-			);
+			$dashboard['pages'] = CDashboardHelper::preparePages($dashboard['pages'], $dashboard['templateid'], false);
 		}
 		else {
 			$dashboard = [
@@ -91,10 +87,11 @@ class CControllerTemplateDashboardEdit extends CController {
 		}
 
 		$data = [
+			// The dashboard property shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
-			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
-			'widget_last_type' => CDashboardHelper::getWidgetLastType(true),
-			'time_period' => getTimeSelectorPeriod([]),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
+			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
+			'dashboard_time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
 		];
 

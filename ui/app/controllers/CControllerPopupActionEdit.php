@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,15 @@
 
 
 class CControllerPopupActionEdit extends CController {
+
+	/**
+	 * @var mixed
+	 */
+	private $action;
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -81,7 +90,7 @@ class CControllerPopupActionEdit extends CController {
 				'actionids' => $this->getInput('actionid'),
 				'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 					'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
-					'opconditions', 'opmessage_usr', 'opmessage_grp'
+					'opconditions', 'opmessage_usr', 'opmessage_grp', 'optag'
 				],
 				'selectRecoveryOperations' => $operation_options,
 				'selectUpdateOperations' => $operation_options,
@@ -137,6 +146,12 @@ class CControllerPopupActionEdit extends CController {
 
 			$data['action']['filter']['conditions'] = array_values($data['action']['filter']['conditions']);
 
+			if ($data['action']['filter']['formula'] !== '') {
+				$data['action']['filter']['conditions'] = array_values(CConditionHelper::sortConditionsByFormulaId(
+					$data['action']['filter']['conditions']
+				));
+			}
+
 			foreach ($data['action']['filter']['conditions'] as $row_index => &$condition) {
 				$condition_names = actionConditionValueToString([$data['action']]);
 				$data['condition_name'][] = $condition_names[0][$row_index];
@@ -146,12 +161,6 @@ class CControllerPopupActionEdit extends CController {
 				];
 			}
 			unset($condition);
-
-			if ($data['action']['filter']['formula'] !== '') {
-				$data['action']['filter']['conditions'] = array_values(CConditionHelper::sortConditionsByFormulaId(
-					$data['action']['filter']['conditions']
-				));
-			}
 
 			sortOperations($eventsource, $data['action']['operations']);
 

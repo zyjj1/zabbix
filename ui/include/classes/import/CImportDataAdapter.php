@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,9 +79,17 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
+				if ($template['vendor']) {
+					$template['vendor_name'] = $template['vendor']['name'];
+					$template['vendor_version'] = $template['vendor']['version'];
+				}
+				else {
+					$template += array_fill_keys(['vendor_name', 'vendor_version'], '');
+				}
+
 				$templates[] = CArrayHelper::getByKeys($template, [
 					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
-					'valuemaps'
+					'valuemaps', 'vendor_name', 'vendor_version'
 				]);
 			}
 		}
@@ -99,8 +107,6 @@ class CImportDataAdapter {
 
 		if (array_key_exists('hosts', $this->data)) {
 			foreach ($this->data['hosts'] as $host) {
-				$host = CArrayHelper::renameKeys($host, ['proxyid' => 'proxy_hostid']);
-
 				if (array_key_exists('interfaces', $host)) {
 					foreach ($host['interfaces'] as $index => $interface) {
 						$host['interfaces'][$index] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
@@ -394,13 +400,6 @@ class CImportDataAdapter {
 					unset($message_template);
 				}
 
-				if ($media_type['type'] == MEDIA_TYPE_EXEC && array_key_exists('parameters', $media_type)) {
-					$media_type['exec_params'] = $media_type['parameters']
-						? implode("\n", $media_type['parameters'])."\n"
-						: '';
-					unset($media_type['parameters']);
-				}
-
 				$media_types[] = CArrayHelper::renameKeys($media_type, $keys);
 			}
 		}
@@ -417,6 +416,10 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	protected function formatDiscoveryRule(array $discovery_rule, $host) {
+		if (!$discovery_rule['filter']) {
+			unset($discovery_rule['filter']);
+		}
+
 		$discovery_rule = $this->renameItemFields($discovery_rule);
 		$discovery_rule = $this->formatDiscoveryRuleOverrideFields($discovery_rule);
 

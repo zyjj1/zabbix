@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,17 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup graphs
  */
 class testPageHostGraph extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	public function testPageHostGraph_CheckLayout() {
 		$host_name = 'Host to check graph 1';
@@ -69,8 +80,8 @@ class testPageHostGraph extends CLegacyWebTest {
 				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $hostid)
 				->getUrl() => $host_name,
-			'items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
-			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
+			'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
+			'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
 			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Graphs',
 			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
 			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Web scenarios'
@@ -90,7 +101,7 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		// Check table headers on page.
 		$xpath = '//form[@name="graphForm"]//thead/tr/th[not(@class)]';
-		$get_headers = $this->webDriver->findElements(WebDriverBy::xpath($xpath));
+		$get_headers = $this->query('xpath', $xpath)->all();
 		foreach ($get_headers as $row) {
 			$table_headers[] = $row->getText();
 		}
@@ -101,24 +112,21 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		foreach (CDBHelper::getAll($sql) as $graph) {
 			// Get graph row in table.
-			$element = $this->webDriver->findElement(
-					WebDriverBy::xpath('//table[@class="list-table"]/tbody//input[@value="'.$graph['graphid'].'"]/../..')
-			);
+			$element = $this->query('xpath://table[@class="list-table"]/tbody//input[@value="'.
+					$graph['graphid'].'"]/../..')->one();
 
 			// Check name value.
 			$this->assertEquals($graph['name'],
-					$element->findElement(WebDriverBy::xpath('./td/a[@href="graphs.php?form=update&graphid='.
-							$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]'))->getText()
+					$element->query('xpath:./td/a[@href="graphs.php?form=update&graphid='.
+							$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]')->one()->getText()
 			);
 
 			// Check width value.
-			$this->assertEquals($graph['width'], $element->findElement(WebDriverBy::xpath('./td[3]'))->getText());
+			$this->assertEquals($graph['width'], $element->query('xpath:./td[3]')->one()->getText());
 			// Check height value.
-			$this->assertEquals($graph['height'], $element->findElement(WebDriverBy::xpath('./td[4]'))->getText());
+			$this->assertEquals($graph['height'], $element->query('xpath:./td[4]')->one()->getText());
 			// Check graph type value.
-			$this->assertEquals($types[$graph['graphtype']],
-					$element->findElement(WebDriverBy::xpath('./td[5]'))->getText()
-			);
+			$this->assertEquals($types[$graph['graphtype']], $element->query('xpath:./td[5]')->one()->getText());
 		}
 
 		// Check table footer.
@@ -142,7 +150,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					],
 					'target_type' => 'Hosts',
 					'group' => 'Group for host graph check',
-					'error' => 'No target selected.'
+					'error' => 'Field "copy_targetids" is mandatory.'
 				]
 			],
 			// Copy graph to the same host.
@@ -157,7 +165,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Host to delete graphs'
 					],
-					'error' => 'Graph "Delete graph 1" already exists on "Host to delete graphs".'
+					'error' => 'Graph "Delete graph 1" already exists on the host "Host to delete graphs".'
 				]
 			],
 			// Copy graph to host without item.
@@ -172,7 +180,8 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Empty host'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty host".'
+					'error' => 'Cannot copy graph "Delete graph 3", because the item with key "graph[1]" does not '.
+							'exist on the host "Empty host".'
 				]
 			],
 			// Copy several graphs to host.
@@ -202,7 +211,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Host to check graph 1'
 					],
-					'error' => 'Graph with name "Delete graph 5" already exists in graphs or graph prototypes.'
+					'error' => 'Graph "Delete graph 5" already exists on the host "Host to check graph 1".'
 				]
 			],
 			// Copy all graphs to host.
@@ -243,7 +252,7 @@ class testPageHostGraph extends CLegacyWebTest {
 						'Delete graph 4'
 					],
 					'target_type' => 'Host groups',
-					'error' => 'No target selected.'
+					'error' => 'Field "copy_targetids" is mandatory.'
 				]
 			],
 			// Copy graph to host group without item.
@@ -257,7 +266,8 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Empty group'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty host".'
+					'error' => 'Cannot copy graph "Delete graph 3", because the item with key "graph[1]" does not '.
+							'exist on the host "Empty host".'
 				]
 			],
 			// Copy several graphs to host group.
@@ -286,7 +296,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Group to copy graph'
 					],
-					'error' => 'Graph with name "Delete graph 3" already exists in graphs or graph prototypes.'
+					'error' => 'Graph "Delete graph 3" already exists on the host "Host with item and without graph 1".'
 				]
 			],
 			// Copy all graphs to host group.
@@ -325,7 +335,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					],
 					'target_type' => 'Templates',
 					'group' => 'Templates',
-					'error' => 'No target selected.'
+					'error' => 'Field "copy_targetids" is mandatory.'
 				]
 			],
 			// Copy graph to the same template.
@@ -341,7 +351,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Template to test graphs'
 					],
-					'error' => 'Graph "Graph to check copy" already exists on "Template to test graphs".'
+					'error' => 'Graph "Graph to check copy" already exists on the template "Template to test graphs".'
 				]
 			],
 			// Copy graph to template without item.
@@ -357,7 +367,8 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Empty template'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty template".'
+					'error' => 'Cannot copy graph "Delete graph 3", because the item with key "graph[1]" does not '.
+							'exist on the template "Empty template".'
 				]
 			],
 			// Copy several graphs to template.
@@ -388,7 +399,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Template with item graph'
 					],
-					'error' => 'Graph with name "Delete graph 3" already exists in graphs or graph prototypes.'
+					'error' => 'Graph "Delete graph 3" already exists on the template "Template with item graph".'
 				]
 			],
 			// Copy all graphs to host group.
@@ -428,22 +439,23 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->selectGraph($data);
 		$this->zbxTestClickButtonText('Copy');
 
-		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Template groups', 'Host groups', 'Hosts', 'Templates']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Template groups', 'Host groups', 'Templates', 'Hosts']);
 		$this->zbxTestClickXpathWait('//label[@for="'.$copy_type.'"][text()="'.$data['target_type'].'"]');
 
 		// Select check boxes of defined targets.
 		if (array_key_exists('targets', $data)) {
 			$this->zbxTestClickButtonMultiselect('copy_targetids');
 			$this->zbxTestLaunchOverlayDialog($data['target_type']);
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			$hosts_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 			// Select hosts or templates.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
 				// Select host group.
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$hosts_dialog->query('button:Select')->one()->click();
 				$this->zbxTestLaunchOverlayDialog(rtrim($data['target_type'], "s").' groups');
-				COverlayDialogElement::find()->all()->last()->query('link', $data['group'])->waitUntilVisible()->one()->click();
-				COverlayDialogElement::find()->one()->waitUntilReady();
+				COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link', $data['group'])->waitUntilVisible()->one()->click();
+				COverlayDialogElement::find()->all()->waitUntilReady();
 				foreach ($data['targets'] as $target) {
 					$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($target));
 					$this->zbxTestCheckboxSelect('item_'.$hostid);
@@ -460,10 +472,10 @@ class testPageHostGraph extends CLegacyWebTest {
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 		}
 
-		$this->zbxTestClick('copy');
+		$dialog->submit();
 
 		if (array_key_exists('error', $data)) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 		else {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));

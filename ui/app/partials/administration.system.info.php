@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,16 @@ $info_table = (new CTableInfo())
 		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
 			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
 		$data['system_info']['server_details']
+	])
+	->addRow([
+		_('Zabbix server version'),
+		$status['has_status'] ? $status['server_version'] : '',
+		''
+	])
+	->addRow([
+		_('Zabbix frontend version'),
+		ZABBIX_VERSION,
+		''
 	])
 	->addRow([
 		_('Number of hosts (enabled/disabled)'),
@@ -115,15 +125,6 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	}
 }
 
-// Warn if database history tables have not been upgraded.
-if (!$data['system_info']['float_double_precision']) {
-	$info_table->addRow([
-		_('Database history tables upgraded'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		''
-	]);
-}
-
 if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
 	$info_table->addRow([
 		_('Database history tables use primary key'),
@@ -191,6 +192,18 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		);
 	}
 
+	foreach ($data['system_info']['dbversion_status'] as $dbversion ) {
+		if ($dbversion['database'] === 'Oracle') {
+			$db_error = _(
+				'Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions.'
+			);
+
+			$info_table->addRow(
+				(new CRow([$dbversion['database'], '', $db_error]))->addClass(ZBX_STYLE_RED)
+			);
+		}
+	}
+
 	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])) {
 		$info_table->addRow((new CRow([
 			_('Housekeeping'),
@@ -198,7 +211,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			(new CCol([
 				_('This setting should be enabled, because history tables contain compressed chunks.'),
 				' ',
-				new CLink(_('Configuration').'&hellip;',
+				new CLink([_('Configuration'), HELLIP()],
 					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 				)
 			]))->addClass(ZBX_STYLE_RED)
@@ -212,7 +225,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			(new CCol([
 				_('This setting should be enabled, because trend tables contain compressed chunks.'),
 				' ',
-				new CLink(_('Configuration').'&hellip;',
+				new CLink([_('Configuration'), HELLIP()],
 					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 				)
 			]))->addClass(ZBX_STYLE_RED)

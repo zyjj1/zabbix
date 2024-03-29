@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -85,7 +84,7 @@ func (b *pluginBroker) handleConnection() {
 	for {
 		t, data, err := comms.Read(b.conn)
 		if err != nil {
-			if errors.Is(err, net.ErrClosed) {
+			if isErrConnectionClosed(err) {
 				log.Tracef("closed connection to loaded %s plugin", b.pluginName)
 
 				return
@@ -302,13 +301,14 @@ func (b *pluginBroker) stop() {
 	b.tx <- &r
 }
 
-func (b *pluginBroker) export(key string, params []string) (*comms.ExportResponse, error) {
+func (b *pluginBroker) export(key string, params []string, timeout int) (*comms.ExportResponse, error) {
 	data := comms.ExportRequest{
 		Common: comms.Common{
 			Type: comms.ExportRequestType,
 		},
-		Key:    key,
-		Params: params,
+		Key:     key,
+		Params:  params,
+		Timeout: timeout,
 	}
 
 	r := request{
@@ -335,7 +335,7 @@ func (b *pluginBroker) register() (*comms.RegisterResponse, error) {
 			Common: comms.Common{
 				Type: comms.RegisterRequestType,
 			},
-			Version: strconv.Itoa(comms.MajorVersion),
+			ProtocolVersion: comms.ProtocolVersion,
 		},
 		out: make(chan interface{}),
 	}

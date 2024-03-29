@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,15 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.host.view.js.php');
 
@@ -75,7 +76,6 @@ else {
 $html_page
 	->addItem(
 		(new CForm())
-			->cleanItems()
 			->setName('host_view')
 			->addClass('is-loading')
 	)

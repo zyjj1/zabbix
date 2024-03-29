@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-		->setAttribute('placeholder', '{$MACRO}');
+		->setAttribute('placeholder', '{$MACRO}')
+		->disableSpellcheck();
 
 	if ($i == 0) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
@@ -100,6 +101,7 @@ $save_button = (new CSubmit('update', _('Update')))->setAttribute('data-removed-
 $tab_view->setFooter(makeFormFooter($save_button));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('macros')))->removeId())
 	->setName('macrosForm')
 	->disablePasswordAutofill()
 	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())

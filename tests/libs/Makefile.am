@@ -1,10 +1,13 @@
 SUBDIRS = \
 	zbxcommon \
-	zbxconf \
+	zbxcfg \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhistory \
 	zbxjson \
+	zbxmodules \
+	zbxpoller \
+	zbxpreproc \
 	zbxsysinfo \
 	zbxcommshigh \
 	zbxcommon \
@@ -12,7 +15,10 @@ SUBDIRS = \
 	zbxprometheus \
 	zbxcomms \
 	zbxregexp \
-	zbxserver \
+	zbxexpression \
+	zbxtagfilter \
 	zbxtrends \
 	zbxtime \
-	zbxeval
+	zbxeval \
+	zbxfile \
+	zbxhttp

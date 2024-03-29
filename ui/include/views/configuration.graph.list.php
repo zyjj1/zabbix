@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('configuration.graph.list.js.php');
@@ -118,7 +119,7 @@ else {
 							'popup' => [
 								'filter_preselect' => [
 									'id' => 'filter_groupids_',
-									'submit_as' => 'groupid'
+									'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -141,7 +142,8 @@ $url = (new CUrl('graphs.php'))
 // create form
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
@@ -172,6 +174,8 @@ $graphTable = (new CTableInfo())
 		$info_column
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('graphs.php');
+
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
@@ -193,7 +197,7 @@ foreach ($data['graphs'] as $graph) {
 	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
-		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
+		$name[] = (new CLink($graph['discoveryRule']['name'],
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
@@ -214,7 +218,7 @@ foreach ($data['graphs'] as $graph) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
 	}
 
-	$name[] = new CLink(CHtml::encode($graph['name']), $url);
+	$name[] = new CLink($graph['name'], $url);
 	$info_icons = [];
 	$discover = null;
 
@@ -229,12 +233,12 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('context', $data['context'])
 					->getUrl()
 			))
-				->addSID()
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
-	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
-		$info_icons[] = getGraphLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+	elseif ($graph['graphDiscovery'] && $graph['graphDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
 	}
 
 	$graphTable->addRow([
@@ -250,25 +254,45 @@ foreach ($data['graphs'] as $graph) {
 }
 
 // buttons
-$buttonsArray = [];
+$buttons = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy')];
+	$buttons['graph.masscopyto'] = [
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeId()
+	];
 }
-$buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
-	? _('Delete selected graph prototypes?')
-	: _('Delete selected graphs?')
+$buttons['graph.massdelete'] = [
+	'name' => _('Delete'),
+	'confirm_singular' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototype?')
+		: _('Delete selected graph?'),
+	'confirm_plural' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototypes?')
+		: _('Delete selected graphs?'),
+	'csrf_token' => $csrf_token
 ];
 
 // append table to form
 $graphForm->addItem([
 	$graphTable,
 	$data['paging'],
-	new CActionButtonList('action', 'group_graphid', $buttonsArray,
-		$data['parent_discoveryid']
-			? $data['parent_discoveryid']
-			: $data['hostid']
+	new CActionButtonList('action', 'group_graphid', $buttons,
+		$data['parent_discoveryid'] ?: $data['hostid']
 	)
 ]);
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
+		'checkbox_object' => 'group_graphid',
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
 
 $html_page
 	->addItem($graphForm)

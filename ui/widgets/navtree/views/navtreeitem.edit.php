@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,10 +29,27 @@
 use Widgets\NavTree\Widget;
 
 $form = (new CForm('post'))
-	->cleanItems()
 	->setId('widget-dialogue-form')
-	->setName('widget_dialogue_form')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->setName('widget_dialogue_form');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$multiselect = (new CMultiSelect([
+	'name' => 'sysmapid',
+	'object_name' => 'sysmaps',
+	'multiple' => false,
+	'data' => $data['sysmap'] ? [$data['sysmap']] : [],
+	'add_post_js' => false,
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'sysmaps',
+			'srcfld1' => 'sysmapid',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'sysmapid'
+		]
+	]
+]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -45,13 +62,8 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Linked map')),
-		new CFormField([
-			new CVar('sysmapid', $data['sysmap']['sysmapid']),
-			(new CTextBox('sysmapname', $data['sysmap']['name'], true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
-		])
+		new CLabel(_('Linked map'), 'sysmapid_ms'),
+		new CFormField($multiselect)
 	]);
 
 if ($data['depth'] >= Widget::MAX_DEPTH) {
@@ -72,11 +84,14 @@ else {
 
 $form
 	->addItem($form_grid)
-	->addItem((new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady());
+	->addItem(
+		(new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady()
+	);
 
 $output = [
 	'body' => $form->toString(),
-	'script_inline' => $this->readJsFile('navtreeitem.edit.js.php', null, '')
+	'script_inline' => $multiselect->getPostJs().
+		$this->readJsFile('navtreeitem.edit.js.php', null, '')
 ];
 
 if ($messages = get_and_clear_messages()) {

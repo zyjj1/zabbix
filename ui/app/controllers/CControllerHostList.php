@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerHostList extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -36,8 +36,9 @@ class CControllerHostList extends CController {
 			'filter_ip'           => 'string',
 			'filter_dns'          => 'string',
 			'filter_port'         => 'string',
+			'filter_status'       => 'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
 			'filter_monitored_by' => 'in '.ZBX_MONITORED_BY_ANY.','.ZBX_MONITORED_BY_SERVER.','.ZBX_MONITORED_BY_PROXY,
-			'filter_proxyids'     => 'array_db hosts.proxy_hostid',
+			'filter_proxyids'     => 'array_db hosts.proxyid',
 			'filter_evaltype'     => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags'         => 'array',
 			'sort'                => 'in name,status',
@@ -64,6 +65,7 @@ class CControllerHostList extends CController {
 			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hosts.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
 			CProfile::update('web.hosts.filter_monitored_by',
 				$this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY), PROFILE_TYPE_INT
 			);
@@ -98,6 +100,7 @@ class CControllerHostList extends CController {
 			CProfile::delete('web.hosts.filter_dns');
 			CProfile::delete('web.hosts.filter_host');
 			CProfile::delete('web.hosts.filter_port');
+			CProfile::delete('web.hosts.filter_status');
 			CProfile::delete('web.hosts.filter_monitored_by');
 			CProfile::deleteIdx('web.hosts.filter_templates');
 			CProfile::deleteIdx('web.hosts.filter_groups');
@@ -115,6 +118,7 @@ class CControllerHostList extends CController {
 			'templates' => CProfile::getArray('web.hosts.filter_templates', []),
 			'groups' => CProfile::getArray('web.hosts.filter_groups', []),
 			'port' => CProfile::get('web.hosts.filter_port', ''),
+			'status' => CProfile::get('web.hosts.filter_status', -1),
 			'monitored_by' => CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY),
 			'proxyids' => CProfile::getArray('web.hosts.filter_proxyids', []),
 			'evaltype' => CProfile::get('web.hosts.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
@@ -142,7 +146,6 @@ class CControllerHostList extends CController {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groups'],
-				'editable' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
@@ -171,7 +174,7 @@ class CControllerHostList extends CController {
 				$proxyids = $filter['proxyids']
 					? $filter['proxyids']
 					: array_keys(API::Proxy()->get([
-						'output' => [],
+						'output' => ['proxyid'],
 						'preservekeys' => true
 					]));
 				break;
@@ -193,12 +196,13 @@ class CControllerHostList extends CController {
 			'sortfield' => $sort_field,
 			'limit' => $limit,
 			'search' => [
-				'name' => ($filter['host'] === '') ? null : $filter['host'],
-				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
-				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+				'name' => $filter['host'] === '' ? null : $filter['host'],
+				'ip' => $filter['ip'] === '' ? null : $filter['ip'],
+				'dns' => $filter['dns'] === '' ? null : $filter['dns']
 			],
 			'filter' => [
-				'port' => ($filter['port'] === '') ? null : $filter['port']
+				'port' => $filter['port'] === '' ? null : $filter['port'],
+				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
 			'proxyids' => $proxyids
 		]);
@@ -222,7 +226,7 @@ class CControllerHostList extends CController {
 		);
 
 		$hosts = API::Host()->get([
-			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
+			'output' => ['name', 'proxyid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
 				'status', 'tls_connect', 'tls_accept', 'active_available'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
@@ -234,8 +238,8 @@ class CControllerHostList extends CController {
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectHostDiscovery' => ['parent_hostid', 'ts_delete'],
+			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
+			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
@@ -253,19 +257,11 @@ class CControllerHostList extends CController {
 
 		order_result($hosts, $sort_field, $sort_order);
 
-		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7).
-		$db_items_active_count = API::Item()->get([
-			'groupCount' => true,
-			'countOutput' => true,
-			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-			'hostids' => array_column($hosts, 'hostid')
-		]);
+		$hostids = array_column($hosts, 'hostid');
 
-		$item_active_by_hostid = [];
-
-		foreach ($db_items_active_count as $value) {
-			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
-		}
+		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7) and ITEM_TYPE_ZABBIX (0).
+		$active_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
+		$passive_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, $hostids);
 
 		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
@@ -299,7 +295,7 @@ class CControllerHostList extends CController {
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
-		$proxy_hostids = [];
+		$proxyids = [];
 		$maintenanceids = [];
 
 		foreach ($hosts as &$host) {
@@ -309,8 +305,8 @@ class CControllerHostList extends CController {
 			]);
 
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
-			if (array_key_exists($host['hostid'], $item_active_by_hostid)
-					&& $item_active_by_hostid[$host['hostid']] > 0) {
+			if (array_key_exists($host['hostid'], $active_item_count_by_hostid)
+					&& $active_item_count_by_hostid[$host['hostid']] > 0) {
 				$host['interfaces'][] = [
 					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
 					'available' => $host['active_available'],
@@ -319,8 +315,11 @@ class CControllerHostList extends CController {
 			}
 			unset($host['active_available']);
 
-			if ($host['proxy_hostid']) {
-				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];
+			$host['has_passive_checks'] = array_key_exists($host['hostid'], $passive_item_count_by_hostid)
+				&& $passive_item_count_by_hostid[$host['hostid']] > 0;
+
+			if ($host['proxyid']) {
+				$proxyids[$host['proxyid']] = $host['proxyid'];
 			}
 
 			if ($host['status'] == HOST_STATUS_MONITORED &&
@@ -332,10 +331,10 @@ class CControllerHostList extends CController {
 
 		$proxies = [];
 
-		if ($proxy_hostids) {
+		if ($proxyids) {
 			$proxies = API::Proxy()->get([
-				'proxyids' => $proxy_hostids,
-				'output' => ['host'],
+				'output' => ['name'],
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
 		}
@@ -345,11 +344,11 @@ class CControllerHostList extends CController {
 
 		if ($filter['proxyids']) {
 			$filter_proxies = API::Proxy()->get([
-				'output' => ['proxyid', 'host'],
+				'output' => ['proxyid', 'name'],
 				'proxyids' => $filter['proxyids']
 			]);
 
-			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'host' => 'name']);
+			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id']);
 		}
 
 		$db_maintenances = [];

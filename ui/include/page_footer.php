@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			CProfiler::getInstance()->stop();
 			CProfiler::getInstance()->show();
 
-			(new CButton(null))
+			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_DEBUG)
 				->show();
 		}
@@ -65,7 +65,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	insertPagePostJs(true);
 
-	require_once 'include/views/js/common.init.js.php';
+	if (CWebUser::isLoggedIn()) {
+		require_once 'include/views/js/common.init.js.php';
+	}
 
 	echo '</div></body></html>';
 }

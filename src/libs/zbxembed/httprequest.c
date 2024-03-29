@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,20 +25,16 @@
 #include "zbxhttp.h"
 #include "duktape.h"
 #include "zbxalgo.h"
+#include "zbxcurl.h"
+#include "global.h"
 
 #ifdef HAVE_LIBCURL
 
-#define ZBX_HTTPAUTH_NONE		CURLAUTH_NONE
-#define ZBX_HTTPAUTH_BASIC		CURLAUTH_BASIC
-#define ZBX_HTTPAUTH_DIGEST		CURLAUTH_DIGEST
-#if LIBCURL_VERSION_NUM >= 0x072600
-#	define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_NEGOTIATE
-#else
-#	define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_GSSNEGOTIATE
-#endif
-#define ZBX_HTTPAUTH_NTLM		CURLAUTH_NTLM
-
-extern char	*CONFIG_SOURCE_IP;
+#define ZBX_HTTPAUTH_NONE	CURLAUTH_NONE
+#define ZBX_HTTPAUTH_BASIC	CURLAUTH_BASIC
+#define ZBX_HTTPAUTH_DIGEST	CURLAUTH_DIGEST
+#define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_NEGOTIATE
+#define ZBX_HTTPAUTH_NTLM	CURLAUTH_NTLM
 
 typedef struct
 {
@@ -51,6 +47,7 @@ typedef struct
 	size_t			headers_in_alloc;
 	size_t			headers_in_offset;
 	unsigned char		custom_header;
+	size_t			headers_sz;
 }
 zbx_es_httprequest_t;
 
@@ -58,13 +55,17 @@ zbx_es_httprequest_t;
 /* in case of error. Be careful with using ZBX_CURL_SETOPT(), duk_push_error_object() and duk_error()  */
 /* in functions - it is easy to get memory leaks because duk_error() causes longjmp().                 */
 /* Note that the caller of ZBX_CURL_SETOPT() must define variable 'int err_index' and label 'out'.     */
-#define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)							\
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
-	{												\
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,					\
-				"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
-		goto out;										\
-	}
+#define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)								\
+	do													\
+	{													\
+		if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
+		{												\
+			err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,				\
+					"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
+			goto out;										\
+		}												\
+	}													\
+	while(0)
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -113,9 +114,16 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
-	request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1);
-	if (NULL != request)
+
+	if (NULL != (request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1)))
 	{
+		zbx_es_env_t	*env;
+
+		if (NULL == (env = zbx_es_get_env(ctx)))
+			return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+		env->http_req_objects--;
+
 		if (NULL != request->headers)
 			curl_slist_free_all(request->headers);
 		if (NULL != request->handle)
@@ -138,12 +146,20 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
+#define MAX_HTTPREQUEST_OBJECT_COUNT	10
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
+	zbx_es_env_t		*env;
 	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	if (MAX_HTTPREQUEST_OBJECT_COUNT == env->http_req_objects)
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "maximum count of HttpRequest objects was reached");
 
 	duk_push_this(ctx);
 
@@ -165,10 +181,12 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, env->config_source_ip, err);
 
+	duk_push_string(ctx, "\xff""\xff""d");
 	duk_push_pointer(ctx, request);
-	duk_put_prop_string(ctx, -2, "\xff""\xff""d");
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	duk_push_c_function(ctx, es_httprequest_dtor, 1);
 	duk_set_finalizer(ctx, -2);
@@ -182,7 +200,10 @@ out:
 		return duk_throw(ctx);
 	}
 
+	env->http_req_objects++;
+
 	return 0;
+#undef MAX_HTTPREQUEST_OBJECT_COUNT
 }
 
 /******************************************************************************
@@ -192,10 +213,12 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 {
+#define ZBX_ES_MAX_HEADERS_SIZE	ZBX_KIBIBYTE * 128
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
 	char			*utf8 = NULL;
 	int			err_index = -1;
+	size_t			header_sz;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
@@ -206,9 +229,20 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 		goto out;
 	}
 
+	header_sz = strlen(utf8);
+
+	if (ZBX_ES_MAX_HEADERS_SIZE < request->headers_sz + header_sz)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "headers exceeded maximum size of "
+				ZBX_FS_UI64 " bytes.", ZBX_ES_MAX_HEADERS_SIZE);
+
+		goto out;
+	}
+
 	request->headers = curl_slist_append(request->headers, utf8);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	request->custom_header = 1;
+	request->headers_sz += header_sz + 1;
 out:
 	zbx_free(utf8);
 
@@ -216,6 +250,7 @@ out:
 		return duk_throw(ctx);
 
 	return 0;
+#undef ZBX_ES_MAX_HEADERS_SIZE
 }
 
 /******************************************************************************
@@ -233,6 +268,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	curl_slist_free_all(request->headers);
 	request->headers = NULL;
 	request->custom_header = 0;
+	request->headers_sz = 0;
 
 	return 0;
 }
@@ -248,11 +284,12 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
 {
 	zbx_es_httprequest_t	*request;
-	char			*url = NULL, *contents = NULL;
+	char			*url = NULL, *contents = NULL, *error = NULL;
 	CURLcode		err;
 	int			err_index = -1;
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
+	duk_size_t		contents_len = 0;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
@@ -274,10 +311,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &contents))
+		if (NULL == (contents = es_get_buffer_dyn(ctx, 1, &contents_len)))
 		{
-			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
-					"cannot convert request contents to utf8");
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot obtain second parameter");
 			goto out;
 		}
 	}
@@ -298,9 +334,12 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 		{
 			curl_slist_free_all(request->headers);
 			request->headers = NULL;
+			request->headers_sz = 0;
 		}
 
-		if (NULL != contents)
+		/* the post parameter will be converted to string and have terminating zero */
+		/* unless it had buffer or object type                                      */
+		if (NULL != contents && DUK_TYPE_STRING == duk_get_type(ctx, 1))
 		{
 			if (SUCCEED == zbx_json_open(contents, &jp))
 				request->headers = curl_slist_append(NULL, "Content-Type: application/json");
@@ -312,8 +351,17 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
+
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
-	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
+
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ACCEPT_ENCODING, "", err);
+
+	if (SUCCEED != zbx_curl_setopt_https(request->handle, &error))
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "%s", error);
+		goto out;
+	}
 
 	request->data_offset = 0;
 	request->headers_in_offset = 0;
@@ -324,9 +372,13 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 				curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != request->data)
+		zbx_http_convert_to_utf8(request->handle, &request->data, &request->data_offset, &request->data_alloc);
 out:
 	zbx_free(url);
 	zbx_free(contents);
+	zbx_free(error);
 
 	if (-1 != err_index)
 		return duk_throw(ctx);

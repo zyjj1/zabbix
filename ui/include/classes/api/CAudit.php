@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ class CAudit {
 	public const ACTION_LOGIN_FAILED = 9;
 	public const ACTION_HISTORY_CLEAR = 10;
 	public const ACTION_CONFIG_REFRESH = 11;
+	public const ACTION_PUSH = 12;
 
 	/**
 	 * Audit resources.
@@ -85,7 +86,10 @@ class CAudit {
 	public const RESOURCE_SLA = 48;
 	public const RESOURCE_USERDIRECTORY = 49;
 	public const RESOURCE_TEMPLATE_GROUP = 50;
-
+	public const RESOURCE_CONNECTOR = 51;
+	public const RESOURCE_LLD_RULE = 52;
+	public const RESOURCE_HISTORY = 53;
+	public const RESOURCE_MFA = 54;
 
 	/**
 	 * Audit details actions.
@@ -114,8 +118,10 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_LLD_RULE => 'items',
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
@@ -128,8 +134,9 @@ class CAudit {
 		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MAINTENANCE => 'maintenances',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
+		self::RESOURCE_MFA => 'mfa',
 		self::RESOURCE_MODULE => 'module',
-		self::RESOURCE_PROXY => 'hosts',
+		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -166,8 +173,10 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_LLD_RULE => 'name',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
@@ -180,8 +189,9 @@ class CAudit {
 		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MAINTENANCE => 'name',
 		self::RESOURCE_MEDIA_TYPE => 'name',
+		self::RESOURCE_MFA => 'name',
 		self::RESOURCE_MODULE => 'id',
-		self::RESOURCE_PROXY => 'host',
+		self::RESOURCE_PROXY => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
@@ -207,8 +217,10 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_LLD_RULE => 'discoveryrule',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
 		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
@@ -221,6 +233,7 @@ class CAudit {
 		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MAINTENANCE => 'maintenance',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
+		self::RESOURCE_MFA => 'mfa',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
@@ -246,6 +259,40 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => [
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
 		],
+		self::RESOURCE_CONNECTOR => [
+			[
+				'paths' => ['connector.password'],
+				'conditions' => [
+					'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST
+					]
+				]
+			],
+			[
+				'paths' => ['connector.token'],
+				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
+			],
+			['paths' => ['connector.ssl_key_password']]
+		],
+		self::RESOURCE_LLD_RULE => [
+			[
+				'paths' => ['discoveryrule.password'],
+				'conditions' => [
+					[
+						'type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_JMX
+						]
+					],
+					[
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
+						]
+					]
+				]
+			],
+			['paths' => ['discoveryrule.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
+		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
@@ -261,8 +308,8 @@ class CAudit {
 					],
 					[
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-							HTTPTEST_AUTH_DIGEST
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
 						]
 					]
 				]
@@ -280,8 +327,8 @@ class CAudit {
 					],
 					[
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-							HTTPTEST_AUTH_DIGEST
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
 						]
 					]
 				]
@@ -293,13 +340,14 @@ class CAudit {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
+		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_TEMPLATE => [
 			'paths' => ['template.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		self::RESOURCE_USER => ['paths' => ['user.passwd']],
+		self::RESOURCE_USER => ['paths' => ['user.passwd', 'user.mfa_totp_secrets.totp_secret']],
 		self::RESOURCE_USERDIRECTORY => ['paths' => ['userdirectory.bind_password']]
 	];
 
@@ -323,6 +371,7 @@ class CAudit {
 		'action.operations.opgroup' => 'opgroup',
 		'action.operations.optemplate' => 'optemplate',
 		'action.operations.opinventory' => 'opinventory',
+		'action.operations.optag' => 'optag',
 		'action.recovery_operations' => 'operations',
 		'action.recovery_operations.opmessage' => 'opmessage',
 		'action.recovery_operations.opmessage_grp' => 'opmessage_grp',
@@ -337,6 +386,7 @@ class CAudit {
 		'action.update_operations.opcommand' => 'opcommand',
 		'action.update_operations.opcommand_grp' => 'opcommand_grp',
 		'action.update_operations.opcommand_hst' => 'opcommand_hst',
+		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',
 		'correlation.filter.conditions' => 'corr_condition',
 		'correlation.operations' => 'corr_operation',
@@ -345,6 +395,24 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_page',
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
+		'discoveryrule.filter' => 'items',
+		'discoveryrule.filter.conditions' => 'item_condition',
+		'discoveryrule.lld_macro_paths' => 'lld_macro_path',
+		'discoveryrule.overrides' => 'lld_override',
+		'discoveryrule.overrides.filter' => 'lld_override',
+		'discoveryrule.overrides.filter.conditions' => 'lld_override_condition',
+		'discoveryrule.overrides.operations' => 'lld_override_operation',
+		'discoveryrule.overrides.operations.opdiscover' => 'lld_override_opdiscover',
+		'discoveryrule.overrides.operations.ophistory' => 'lld_override_ophistory',
+		'discoveryrule.overrides.operations.opinventory' => 'lld_override_opinventory',
+		'discoveryrule.overrides.operations.opperiod' => 'lld_override_opperiod',
+		'discoveryrule.overrides.operations.opseverity' => 'lld_override_opseverity',
+		'discoveryrule.overrides.operations.opstatus' => 'lld_override_opstatus',
+		'discoveryrule.overrides.operations.optag' => 'lld_override_optag',
+		'discoveryrule.overrides.operations.optemplate' => 'lld_override_optemplate',
+		'discoveryrule.overrides.operations.optrends' => 'lld_override_optrends',
+		'discoveryrule.parameters' => 'item_parameter',
+		'discoveryrule.preprocessing' => 'item_preproc',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
@@ -391,6 +459,7 @@ class CAudit {
 		'templategroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
+		'user.mfa_totp_secrets' => 'mfa_totp_secret',
 		'userdirectory.provision_media' => 'userdirectory_media',
 		'userdirectory.provision_groups' => 'userdirectory_idpgroup',
 		'userdirectory.provision_groups.user_groups' => 'userdirectory_usrgrp',
@@ -416,6 +485,7 @@ class CAudit {
 		'action.operations.opcommand_hst' => 'opcommand_hstid',
 		'action.operations.opgroup' => 'opgroupid',
 		'action.operations.optemplate' => 'optemplateid',
+		'action.operations.optag' => 'optagid',
 		'action.recovery_operations' => 'operationid',
 		'action.recovery_operations.opmessage_grp' => 'opmessage_grpid',
 		'action.recovery_operations.opmessage_usr' => 'opmessage_usrid',
@@ -426,6 +496,7 @@ class CAudit {
 		'action.update_operations.opmessage_usr' => 'opmessage_usrid',
 		'action.update_operations.opcommand_grp' => 'opcommand_grpid',
 		'action.update_operations.opcommand_hst' => 'opcommand_hstid',
+		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',
 		'dashboard.users' => 'dashboard_userid',
@@ -433,6 +504,17 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_pageid',
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'discoveryrule.filter.conditions' => 'item_conditionid',
+		'discoveryrule.headers' => 'sortorder',
+		'discoveryrule.lld_macro_paths' => 'lld_macro_pathid',
+		'discoveryrule.overrides' => 'lld_overrideid',
+		'discoveryrule.overrides.filter.conditions' => 'lld_override_conditionid',
+		'discoveryrule.overrides.operations' => 'lld_override_operationid',
+		'discoveryrule.overrides.operations.optag' => 'lld_override_optagid',
+		'discoveryrule.overrides.operations.optemplate' => 'lld_override_optemplateid',
+		'discoveryrule.parameters' => 'item_parameterid',
+		'discoveryrule.preprocessing' => 'item_preprocid',
+		'discoveryrule.query_fields' => 'sortorder',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
@@ -441,12 +523,16 @@ class CAudit {
 		'hostprototype.tags' => 'hosttagid',
 		'hostprototype.templates' => 'hosttemplateid',
 		'iconmap.mappings' => 'iconmappingid',
+		'item.headers' => 'sortorder',
 		'item.parameters' => 'item_parameterid',
 		'item.preprocessing' => 'item_preprocid',
 		'item.tags' => 'itemtagid',
+		'item.query_fields' => 'sortorder',
+		'itemprototype.headers' => 'sortorder',
 		'itemprototype.parameters' => 'item_parameterid',
 		'itemprototype.preprocessing' => 'item_preprocid',
 		'itemprototype.tags' => 'itemtagid',
+		'itemprototype.query_fields' => 'sortorder',
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
 		'maintenance.tags' => 'maintenancetagid',
@@ -477,6 +563,7 @@ class CAudit {
 		'templategroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
+		'user.mfa_totp_secrets' => 'mfa_totp_secretid',
 		'userdirectory.provision_media' => 'userdirectory_mediaid',
 		'userdirectory.provision_groups' => 'userdirectory_idpgroupid',
 		'userdirectory.provision_groups.user_groups' => 'userdirectory_usrgrpid',
@@ -601,7 +688,7 @@ class CAudit {
 	 * @return bool
 	 */
 	private static function isAuditEnabled(): bool {
-		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
+		return CSettingsHelper::getPublic(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
 	}
 
 	/**
@@ -652,7 +739,9 @@ class CAudit {
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_details = self::convertKeysToPaths($api_name, self::intersectObjects($db_object, $object));
+				$db_details = self::convertKeysToPaths($api_name,
+					self::intersectObjects($api_name, $db_object, $object)
+				);
 
 				return self::handleUpdate($resource, $details, $db_details);
 		}
@@ -662,23 +751,45 @@ class CAudit {
 	 * Computes the intersection of $db_object and $object using keys for comparison.
 	 * Recursively removes $db_object properties if they are not present in $object.
 	 *
-	 * @param array $db_object
-	 * @param array $object
+	 * @param string $path
+	 * @param array  $db_object
+	 * @param array  $object
 	 *
 	 * @return array
 	 */
-	private static function intersectObjects(array $db_object, array $object): array {
+	private static function intersectObjects(string $path, array $db_object, array $object): array {
 		foreach ($db_object as $db_key => &$db_value) {
 			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
 				unset($db_object[$db_key]);
 				continue;
 			}
 
-			if (is_int($db_key) || !is_array($db_value)) {
+			if (!is_array($db_value)) {
 				continue;
 			}
 
-			$db_value = self::intersectObjects($db_value, $object[$db_key]);
+			$key = $db_key;
+			$subpath = $path.'.'.$db_key;
+
+			if (is_int($db_key)) {
+				$key = null;
+
+				$pk = self::NESTED_OBJECTS_ID_FIELD_NAMES[$path];
+
+				foreach ($object as $i => $nested_object) {
+					if (bccomp($nested_object[$pk], $db_key) == 0) {
+						$key = $i;
+						$subpath = $path;
+						break;
+					}
+				}
+
+				if ($key === null) {
+					continue;
+				}
+			}
+
+			$db_value = self::intersectObjects($subpath, $db_value, $object[$key]);
 		}
 		unset($db_value);
 
@@ -822,6 +933,12 @@ class CAudit {
 		$table_name = self::TABLE_NAMES[$resource];
 
 		if ($object_path !== self::API_NAMES[$resource]) {
+			$abstract_object_path = self::getAbstractPath($object_path);
+
+			if (!array_key_exists($abstract_object_path, self::NESTED_OBJECTS_TABLE_NAMES)) {
+				return false;
+			}
+
 			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
 		}
 

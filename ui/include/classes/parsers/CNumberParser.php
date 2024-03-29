@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ class CNumberParser extends CParser {
 		'with_float' => true,
 		'with_size_suffix' => false,
 		'with_time_suffix' => false,
-		'with_year' => false
+		'with_year' => false,
+		'is_binary_size' => true
 	];
 
 	/**
@@ -56,30 +57,33 @@ class CNumberParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private $suffixes;
+	private $suffixes = '';
 
 	/**
 	 * Suffix multiplier table for value calculation.
 	 *
 	 * @var array
 	 */
-	private static $suffix_multipliers;
+	private $suffix_multipliers = [];
 
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
 
-		if ($this->options['with_size_suffix'] && $this->options['with_year']) {
+		if (!$this->options['with_time_suffix'] && $this->options['with_year']) {
 			throw new Exception('Ambiguous options.');
 		}
 
 		if ($this->options['with_size_suffix']) {
-			$this->suffixes .= ZBX_BYTE_SUFFIXES;
-			self::$suffix_multipliers = ZBX_BYTE_SUFFIX_MULTIPLIERS;
+			$this->suffixes .= ZBX_SIZE_SUFFIXES;
+
+			$this->suffix_multipliers += $this->options['is_binary_size']
+				? ZBX_SIZE_SUFFIX_MULTIPLIERS_BINARY
+				: ZBX_SIZE_SUFFIX_MULTIPLIERS;
 		}
 
 		if ($this->options['with_time_suffix']) {
 			$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
-			self::$suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
+			$this->suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
 		}
 	}
 
@@ -134,7 +138,7 @@ class CNumberParser extends CParser {
 		$number = (float) $this->number;
 
 		if ($this->suffix !== null) {
-			$number *= self::$suffix_multipliers[$this->suffix];
+			$number *= $this->suffix_multipliers[$this->suffix];
 		}
 
 		return $number;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,64 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-/**
- * Returns the names of supported event sources.
- *
- * If the $source parameter is passed, returns the name of the specific source, otherwise - returns an array of all
- * supported sources.
- *
- * @param int $source
- *
- * @return array|string
- */
-function eventSource($source = null) {
-	$sources = [
-		EVENT_SOURCE_TRIGGERS => _('trigger'),
-		EVENT_SOURCE_DISCOVERY => _('discovery'),
-		EVENT_SOURCE_AUTOREGISTRATION => _('autoregistration'),
-		EVENT_SOURCE_INTERNAL => _x('internal', 'event source'),
-		EVENT_SOURCE_SERVICE => _('service')
-	];
-
-	if ($source === null) {
-		return $sources;
-	}
-
-	return array_key_exists($source, $sources) ?  $sources[$source] : _('Unknown');
-}
-
-/**
- * Returns the names of supported event objects.
- *
- * If the $source parameter is passed, returns the name of the specific object, otherwise - returns an array of all
- * supported objects.
- *
- * @param int $object
- *
- * @return array|string
- */
-function eventObject($object = null) {
-	$objects = [
-		EVENT_OBJECT_TRIGGER => _('trigger'),
-		EVENT_OBJECT_DHOST => _('discovered host'),
-		EVENT_OBJECT_DSERVICE => _('discovered service'),
-		EVENT_OBJECT_AUTOREGHOST => _('autoregistered host'),
-		EVENT_OBJECT_ITEM => _('item'),
-		EVENT_OBJECT_LLDRULE => _('low-level discovery rule'),
-		EVENT_OBJECT_SERVICE => _('service')
-	];
-
-	if ($object === null) {
-		return $objects;
-	}
-	elseif (isset($objects[$object])) {
-		return $objects[$object];
-	}
-	else {
-		return _('Unknown');
-	}
-}
 
 /**
  * Returns all supported event source-object pairs.
@@ -138,28 +80,19 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param array  $event                              An array of event data.
  * @param string $event['eventid']                   Event ID.
  * @param string $event['r_eventid']                 OK event ID.
- * @param string $event['objectid']                  Object ID.
+ * @param string $event['cause_eventid']             Cause event ID.
  * @param string $event['correlationid']             OK Event correlation ID.
  * @param string $event['userid']                    User ID who generated the OK event.
  * @param string $event['name']                      Event name.
  * @param string $event['acknowledged']              State of acknowledgement.
- * @param array  $event['acknowledges']              List of problem updates.
- * @param string $event['acknowledges'][]['action']  Action performed in update.
  * @param CCOl   $event['opdata']                    Operational data with expanded macros.
  * @param string $event['comments']                  Trigger description with expanded macros.
  * @param array  $allowed                            An array of user role rules.
  * @param bool   $allowed['ui_correlation']          Whether user is allowed to visit event correlation page.
- * @param bool   $allowed['add_comments']            Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']                   Whether user is allowed to close problems.
- * @param bool   $allowed['suppress_problems']       Whether user is allowed to manually suppress/unsuppress problems.
- * @param bool   $allowed['rank_change']             Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
 function make_event_details(array $event, array $allowed) {
-	$can_be_closed = $allowed['close'] && !isEventClosed($event);
 	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
@@ -181,16 +114,9 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed
-					|| $allowed['suppress_problems'] || $allowed['rank_change'])
-				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-eventid', $event['eventid'])
-					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-				)
+			(new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+			)
 		]);
 
 	if ($event['r_eventid'] != 0) {
@@ -214,7 +140,7 @@ function make_event_details(array $event, array $allowed) {
 				}
 			}
 			else {
-				$correlation_name = _('Correlation rule');
+				$correlation_name = _('Event correlation rule');
 			}
 
 			$table->addRow([_('Resolved by'), $correlation_name]);
@@ -311,7 +237,7 @@ function isEventUpdating(bool $in_closing, array $event): bool {
 					|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
 					ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
 
-				// If currently is symptom and there is an active task.
+				// If currently is cause or symptom and there is an active task.
 				if ($acknowledge['taskid'] != 0) {
 					$in_updating = true;
 					break;
@@ -321,6 +247,48 @@ function isEventUpdating(bool $in_closing, array $event): bool {
 	}
 
 	return $in_updating;
+}
+
+/**
+ * Calculate and return a rank change icon depending on current event rank change. If event is currently a cause event
+ * and it is undergoing a rank change, return cause event icon. If event is currently a symptom event and it is
+ * undergoing a rank change, return symptom event icon. Icon can be displayed regardless if current status is in closing.
+ *
+ * @param array  $event                              Event data.
+ * @param array  $event['acknowledges']              List of event acknowledges.
+ * @param int    $event['acknowledges'][]['action']  Event action type.
+ * @param string $event['acknowledges'][]['taskid']  Task ID.
+ *
+ * @return Ctag|null
+ */
+function getEventStatusUpdateIcon(array $event): ?Ctag {
+	$icon = null;
+	$icon_class = '';
+
+	foreach ($event['acknowledges'] as $acknowledge) {
+		// If currently is symptom and there is an active task to convert to cause, set icon style to cause.
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+				&& $acknowledge['taskid'] != 0) {
+			$icon_class = ZBX_ICON_ARROW_RIGHT_TOP;
+			break;
+		}
+
+		// If currently is cause and there is an active task to convert to symptom, set icon style to symptom.
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
+				ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM && $acknowledge['taskid'] != 0) {
+			$icon_class = ZBX_ICON_ARROW_TOP_RIGHT;
+			break;
+		}
+	}
+
+	if ($icon_class !== '') {
+		$icon = (new CSpan())
+			->addClass($icon_class)
+			->addClass('js-blink')
+			->setTitle(_('Updating'));
+	}
+
+	return $icon;
 }
 
 /**
@@ -370,7 +338,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			_('Status'),
 			_('Age'),
 			_('Duration'),
-			_('Ack'),
+			_('Update'),
 			_('Actions')
 		]);
 
@@ -378,7 +346,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid',
 			'cause_eventid'
 		],
-		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+		'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 			'suppress_until', 'taskid'
 		],
 		'source' => EVENT_SOURCE_TRIGGERS,
@@ -445,7 +413,6 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		if ($event['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
 			$value_clock = $event['r_clock'];
 			$can_be_closed = false;
 		}
@@ -464,7 +431,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		$cell_status = new CSpan($value_str);
 
 		if (isEventUpdating($in_closing, $event)) {
-			$cell_status->addClass('blink');
+			$cell_status->addClass('js-blink');
 		}
 
 		/*
@@ -476,14 +443,11 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		// Create acknowledge link.
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 				|| $can_be_closed || $allowed['suppress_problems'] || $allowed['rank_change'])
-			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			? (new CLink(_('Update')))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->setAttribute('data-eventid', $event['eventid'])
 				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-			);
+			: new CSpan(_('Update'));
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -498,7 +462,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $users)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $users, $is_acknowledged)
 		]);
 	}
 
@@ -796,9 +760,8 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					}
 				}
 
-				$tags[$element[$key]][] = (new CButton(null))
-					->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP, true);
+				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
+					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
 			}
 		}
 		else {

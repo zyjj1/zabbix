@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,27 +65,6 @@ function graph_item_drawtype2str($drawtype) {
 			return _('Gradient line');
 		default:
 			return _('Unknown');
-	}
-}
-
-function graph_item_aggr_fnc2str($calc_fnc) {
-	switch ($calc_fnc) {
-		case AGGREGATE_NONE:
-			return _('none');
-		case AGGREGATE_MIN:
-			return _('min');
-		case AGGREGATE_MAX:
-			return _('max');
-		case AGGREGATE_AVG:
-			return _('avg');
-		case AGGREGATE_COUNT:
-			return _('count');
-		case AGGREGATE_SUM:
-			return _('sum');
-		case AGGREGATE_FIRST:
-			return _('first');
-		case AGGREGATE_LAST:
-			return _('last');
 	}
 }
 
@@ -314,10 +293,10 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 				->setArgument('filter_hostids', [$template['hostid']]);
 		}
 
-		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+		$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(CHtml::encode($template['name']));
+		$name = new CSpan($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -354,13 +333,13 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 				$url->setArgument('hostid', $template['hostid']);
 			}
 
-			$name = new CLink(CHtml::encode($template['name']), $url);
+			$name = new CLink($template['name'], $url);
 		}
 		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$graphid = $parent_templates['links'][$graphid]['graphid'];
 	}
@@ -426,60 +405,6 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 	}
 
 	return $result;
-}
-
-/**
- * Copy specified graph to specified host.
- *
- * @param string $graphid
- * @param string $hostid
- *
- * @return array
- */
-function copyGraphToHost($graphid, $hostid) {
-	$graphs = API::Graph()->get([
-		'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period', 'show_triggers',
-			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type',
-			'ymin_itemid', 'ymax_itemid'
-		],
-		'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-		'selectHosts' => ['hostid', 'name'],
-		'graphids' => $graphid
-	]);
-	$graph = reset($graphs);
-	$host = reset($graph['hosts']);
-
-	if ($host['hostid'] == $hostid) {
-		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $host['name']));
-
-		return false;
-	}
-
-	$graph['gitems'] = getSameGraphItemsForHost(
-		$graph['gitems'],
-		$hostid,
-		true,
-		[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-	);
-
-	if (!$graph['gitems']) {
-		$host = get_host_by_hostid($hostid);
-
-		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
-
-		return false;
-	}
-
-	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid'] && $itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
-		$graph['ymax_itemid'] = $itemid;
-	}
-
-	if ($graph['ymin_itemid'] && $itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
-		$graph['ymin_itemid'] = $itemid;
-	}
-
-	return API::Graph()->create($graph);
 }
 
 function get_next_color($palettetype = 0) {
@@ -549,6 +474,7 @@ function get_next_color($palettetype = 0) {
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 	$x = (int) $x;
 	$y = (int) $y;
+	$string = strtr($string, ['&' => '&#38;']);
 
 	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
@@ -590,6 +516,8 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
  * @return array
  */
 function imageTextSize($fontsize, $angle, $string) {
+	$string = strtr($string, ['&' => '&#38;']);
+
 	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
@@ -821,8 +749,8 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	];
 
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
-		$clearance_min = $rows * 0.05;
-		$clearance_max = $rows * 0.1;
+		$clearance_min = min(0.5, $rows * 0.05);
+		$clearance_max = min(1, $rows * 0.1);
 
 		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
 			if ($interval == INF) {
@@ -851,6 +779,10 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 			$min = truncateFloat($min);
 			$max = truncateFloat($max);
 
+			if (is_infinite($min) || is_infinite($max)) {
+				break;
+			}
+
 			if ($min > $scale_min || $max < $scale_max) {
 				continue;
 			}
@@ -871,6 +803,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				'power' => $power
 			];
 
+			// Expression optimized to avoid overflow.
 			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
 
 			if ($best_result_value === null || $result_value < $best_result_value) {

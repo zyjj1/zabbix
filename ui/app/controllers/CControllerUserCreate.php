@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'url' =>			'db users.url',
 			'refresh' =>		'required|db users.refresh|not_empty',
 			'rows_per_page' =>	'required|db users.rows_per_page',
-			'roleid' =>			'id',
+			'roleid' =>			'required|id',
 			'form_refresh' =>	'int32'
 		];
 

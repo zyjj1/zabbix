@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,31 +139,6 @@ class PostgresqlDbBackend extends DbBackend {
 	}
 
 	/**
-	* Check if database is using IEEE754 compatible double precision columns.
-	*
-	* @return bool
-	*/
-	public function isDoubleIEEE754() {
-		global $DB;
-
-		$conditions_or = [
-			'(table_name=\'history\' AND column_name=\'value\')',
-			'(table_name=\'trends\' AND column_name IN (\'value_min\', \'value_avg\', \'value_max\'))'
-		];
-
-		$sql =
-			'SELECT COUNT(*) cnt FROM information_schema.columns'.
-				' WHERE table_catalog='.zbx_dbstr($DB['DATABASE']).
-					' AND table_schema='.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public').
-					' AND data_type=\'double precision\''.
-					' AND ('.implode(' OR ', $conditions_or).')';
-
-		$result = DBfetch(DBselect($sql));
-
-		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
-	}
-
-	/**
 	 * Check is current connection contain requested cipher list.
 	 *
 	 * @return bool
@@ -177,7 +152,7 @@ class PostgresqlDbBackend extends DbBackend {
 			$is_secure = ($row && $row['ssl'] === 'on');
 		}
 		else {
-			$is_secure = (bool) DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
+			$is_secure = (bool) DBfetch(DBselect('SELECT datname,usename,ssl,client_addr,cipher FROM pg_stat_ssl'.
 				' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
 					' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 		}
@@ -272,23 +247,6 @@ class PostgresqlDbBackend extends DbBackend {
 			return false;
 		}
 
-		$timescale_v1 = DBfetch(DBselect(
-			'SELECT NULL FROM pg_catalog.pg_class c'.
-			' JOIN pg_catalog.pg_namespace n'.
-			' ON n.oid=c.relnamespace'.
-			' WHERE n.nspname='.zbx_dbstr('timescaledb_information').
-			' AND c.relname='.zbx_dbstr('compressed_hypertable_stats')
-		));
-
-		if ($timescale_v1) {
-			$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
-				' FROM timescaledb_information.compressed_hypertable_stats'.
-				' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
-			));
-
-			return (bool) $result['chunks'];
-		}
-
 		$query = implode(' UNION ', array_map(function ($table) {
 			return 'SELECT number_compressed_chunks chunks'.
 				' FROM hypertable_compression_stats('.zbx_dbstr($table).')'.
@@ -297,6 +255,6 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$result = DBfetch(DBselect($query));
 
-		return (bool) $result['chunks'];
+		return $result && $result['chunks'];
 	}
 }

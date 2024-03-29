@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $html_page = new CHtmlPage();
@@ -45,6 +46,7 @@ $url = (new CUrl('graphs.php'))
 
 // Create form.
 $graphForm = (new CForm('post', $url))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('graphs.php')))->removeId())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -112,7 +114,7 @@ $graphFormList
 			->setFocusableElementId('label-graphtype')
 			->setValue($data['graphtype'])
 			->addOptions(CSelect::createOptionsFromArray(graphType()))
-			->setDisabled($readonly)
+			->setReadonly($readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -371,6 +373,7 @@ else {
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
+	->addClass('list-numbered')
 	->setColumns([
 		(new CTableColumn())->addClass('table-col-handle'),
 		(new CTableColumn())->addClass('table-col-no'),
@@ -441,7 +444,8 @@ $items_table->addRow(
 						->setAttribute('data-parameters', json_encode($parameters_add))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend(JSON.parse(this.dataset.parameters), view.getOnlyHostParam())
+								jQuery.extend(JSON.parse(this.dataset.parameters), view.getOnlyHostParam()),
+								{dialogue_class: "modal-popup-generic", trigger_element: this}
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
@@ -498,10 +502,11 @@ if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
-		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
+		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+		CCsrfTokenHelper::get('graphs.php'), 'context'
 	);
 
-	if ($readonly) {
+	if ($readonly && $data['parent_discoveryid'] === null) {
 		$updateButton->setEnabled(false);
 	}
 
@@ -550,7 +555,9 @@ $html_page
 			'normal_only' => $data['normal_only'],
 			'parent_discoveryid' => $data['parent_discoveryid']
 		],
-		'items' => $data['items']
+		'items' => $data['items'],
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

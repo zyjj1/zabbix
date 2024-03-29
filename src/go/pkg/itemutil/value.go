@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,44 +29,58 @@ import (
 
 const StateNotSupported = 1
 
+func ValueToString(u interface{}) *string {
+	var s string
+
+	switch v := u.(type) {
+	case string:
+		s = v
+	case *string:
+		return v
+	case int:
+		s = strconv.FormatInt(int64(v), 10)
+	case int8:
+		s = strconv.FormatInt(int64(v), 10)
+	case int16:
+		s = strconv.FormatInt(int64(v), 10)
+	case int32:
+		s = strconv.FormatInt(int64(v), 10)
+	case int64:
+		s = strconv.FormatInt(v, 10)
+	case uint:
+		s = strconv.FormatUint(uint64(v), 10)
+	case uint8:
+		s = strconv.FormatUint(uint64(v), 10)
+	case uint16:
+		s = strconv.FormatUint(uint64(v), 10)
+	case uint32:
+		s = strconv.FormatUint(uint64(v), 10)
+	case uint64:
+		s = strconv.FormatUint(v, 10)
+	case float32:
+		s = strconv.FormatFloat(float64(v), 'f', 6, 64)
+	case float64:
+		s = strconv.FormatFloat(v, 'f', 6, 64)
+	default:
+		// note that this conversion is slow and it's better to return known value type
+		s = fmt.Sprintf("%v", u)
+	}
+
+	return &s
+}
+
 func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.Result) {
-	var value string
+	var value *string
 	switch v := u.(type) {
 	case *plugin.Result:
 		return v
 	case plugin.Result:
 		return &v
-	case string:
-		value = u.(string)
-	case *string:
-		value = *u.(*string)
-	case int:
-		value = strconv.FormatInt(int64(v), 10)
-	case int8:
-		value = strconv.FormatInt(int64(v), 10)
-	case int16:
-		value = strconv.FormatInt(int64(v), 10)
-	case int32:
-		value = strconv.FormatInt(int64(v), 10)
-	case int64:
-		value = strconv.FormatInt(v, 10)
-	case uint:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint8:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint16:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint32:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint64:
-		value = strconv.FormatUint(v, 10)
-	case float32:
-		value = strconv.FormatFloat(float64(v), 'f', 6, 64)
-	case float64:
-		value = strconv.FormatFloat(v, 'f', 6, 64)
+	case nil:
+		return &plugin.Result{Itemid: itemid, Value: nil, Ts: ts}
 	default:
-		// note that this conversion is slow and it's better to return known value type
-		value = fmt.Sprintf("%v", u)
+		value = ValueToString(u)
 	}
-	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}
+
+	return &plugin.Result{Itemid: itemid, Value: value, Ts: ts}
 }

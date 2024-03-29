@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@ typedef enum
 #endif
 	ZBX_MUTEX_MODBUS,
 	ZBX_MUTEX_TREND_FUNC,
+	ZBX_MUTEX_REMOTE_COMMANDS,
+	ZBX_MUTEX_PROXY_BUFFER,
+	ZBX_MUTEX_VPS_MONITOR,
 	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }

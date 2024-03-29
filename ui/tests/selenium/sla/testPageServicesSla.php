@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup sla, profiles
@@ -31,17 +31,16 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
  */
 class testPageServicesSla extends CWebTest {
 
-	use TableTrait;
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CTagBehavior::class
 		];
 	}
 
@@ -304,7 +303,7 @@ class testPageServicesSla extends CWebTest {
 		foreach ($reference_schedules as $schedule) {
 			if (array_key_exists('rows', $schedule)) {
 				// Find the corresponding row and open the Custom schedule dialog.
-				$table->findRow('Name', $schedule['name'])->query('class:icon-description')->one()->click();
+				$table->findRow('Name', $schedule['name'])->query('class:zi-alert-with-content')->one()->click();
 				$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilReady()->one();
 				$schedule_table = $overlay->query('class:list-table')->asTable()->one();
 				$displayed_days = $schedule_table->getRows()->asText();

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	if ($data['service'] !== null && !$data['is_filtered']) {
 		$filter
 			->addTab(
-				(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
+				(new CLink(_('Info'), '#tab_info'))
+					->addClass(ZBX_STYLE_BTN)
+					->addClass(ZBX_ICON_CIRCLE_INFO),
 				(new CDiv())
 					->setId('tab_info')
 					->addClass(ZBX_STYLE_FILTER_CONTAINER)

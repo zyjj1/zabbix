@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ $change_container = new CDiv(new CPartial('configuration.valuemap', [
 	'context' => $data['context'],
 	'valuemaps' => [],
 	'readonly' => false,
-	'form' => 'massupdate'
+	'form' => 'massupdate',
+	'table_id' => 'valuemap-table'
 ]));
 
 $update_existing = (new CDiv(
@@ -47,9 +48,7 @@ $rename_container = (new CTable())
 		_('Action')
 	])
 	->setFooter(new CCol(
-		(new CButton('null', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
+		(new CButtonLink(_('Add')))->addClass('element-table-add')
 	));
 
 $remove_container = (new CDiv())->addClass('valuemap-remove');
@@ -86,7 +85,7 @@ $remove_all_container = (new CDiv())->addItem((new CDiv(
 
 $form_list = (new CFormList('valuemap-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[valuemaps]', 'valuemap-div', _('Original')))
+		(new CVisibilityBox('visible[valuemaps]', 'valuemap-field', _('Original')))
 			->setLabel(_('Value mapping'))
 			->setChecked(array_key_exists('valuemaps', $data['visible'])),
 		(new CDiv([
@@ -104,7 +103,7 @@ $form_list = (new CFormList('valuemap-form-list'))
 			$rename_container->setAttribute('data-type', ZBX_ACTION_RENAME),
 			$remove_container->setAttribute('data-type', ZBX_ACTION_REMOVE),
 			$remove_all_container->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL)
-		]))->setId('valuemap-div')
+		]))->setId('valuemap-field')
 	);
 
 $form_list->show();

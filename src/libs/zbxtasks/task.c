@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "zbxtasks.h"
 
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 
@@ -272,13 +271,13 @@ zbx_tm_data_result_t	*zbx_tm_data_result_create(zbx_uint64_t parent_taskid, int 
  *             status       - [IN] the task status (see ZBX_TM_STATUS_*)      *
  *             clock        - [IN] the task creation time                     *
  *             ttl          - [IN] the task expiration period in seconds      *
- *             proxy_hostid - [IN] the destination proxy identifier (or 0)    *
+ *             proxyid      - [IN] the destination proxy identifier (or 0)    *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
  ******************************************************************************/
 zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsigned char status, int clock, int ttl,
-		zbx_uint64_t proxy_hostid)
+		zbx_uint64_t proxyid)
 {
 	zbx_tm_task_t	*task;
 
@@ -289,7 +288,7 @@ zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsig
 	task->status = status;
 	task->clock = clock;
 	task->ttl = ttl;
-	task->proxy_hostid = proxy_hostid;
+	task->proxyid = proxyid;
 	task->data = NULL;
 
 	return task;
@@ -316,7 +315,7 @@ static int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
 
 	zbx_db_insert_prepare(&db_insert, "task_remote_command", "taskid", "command_type", "execute_on", "port",
 			"authtype", "username", "password", "publickey", "privatekey", "command", "alertid",
-			"parent_taskid", "hostid", NULL);
+			"parent_taskid", "hostid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -359,7 +358,7 @@ static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_
 	zbx_tm_remote_command_result_t	*data;
 
 	zbx_db_insert_prepare(&db_insert, "task_remote_command_result", "taskid", "status", "parent_taskid", "info",
-			NULL);
+			(char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -399,7 +398,7 @@ static int	tm_save_check_now_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	zbx_db_insert_t		db_insert;
 	zbx_tm_check_now_t	*data;
 
-	zbx_db_insert_prepare(&db_insert, "task_check_now", "taskid", "itemid", NULL);
+	zbx_db_insert_prepare(&db_insert, "task_check_now", "taskid", "itemid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -438,7 +437,7 @@ static int	tm_save_data_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	zbx_db_insert_t	db_insert;
 	zbx_tm_data_t	*data;
 
-	zbx_db_insert_prepare(&db_insert, "task_data", "taskid", "type", "data", "parent_taskid", NULL);
+	zbx_db_insert_prepare(&db_insert, "task_data", "taskid", "type", "data", "parent_taskid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -483,7 +482,7 @@ static int	tm_save_data_result_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	zbx_db_insert_t		db_insert;
 	zbx_tm_data_result_t	*data;
 
-	zbx_db_insert_prepare(&db_insert, "task_result", "taskid", "status", "parent_taskid", "info", NULL);
+	zbx_db_insert_prepare(&db_insert, "task_result", "taskid", "status", "parent_taskid", "info", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -529,7 +528,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	}
 
 	if (0 != ids_num)
-		taskid = DBget_maxid_num("task", ids_num);
+		taskid = zbx_db_get_maxid_num("task", ids_num);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -560,7 +559,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 			tasks[i]->taskid = taskid++;
 	}
 
-	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", "ttl", "proxy_hostid", NULL);
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", "ttl", "proxyid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -568,7 +567,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, tasks[i]->taskid, (int)tasks[i]->type, (int)tasks[i]->status,
-				tasks[i]->clock, tasks[i]->ttl, tasks[i]->proxy_hostid);
+				tasks[i]->clock, tasks[i]->ttl, tasks[i]->proxyid);
 	}
 
 	ret = zbx_db_insert_execute(&db_insert);
@@ -660,8 +659,8 @@ void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status)
 	zbx_vector_uint64_sort(&taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where", status);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids.values, taskids.values_num);
-	DBexecute("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids.values, taskids.values_num);
+	zbx_db_execute("%s", sql);
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&taskids);
@@ -1150,28 +1149,28 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_t
  *                                                                            *
  * Parameters: data         - [IN] task data                                  *
  *             len          - [IN] length of data                             *
- *             proxy_hostid - [IN] proxy identifier                           *
+ *             proxyid - [IN] proxy identifier                           *
  *                                                                            *
  * Return value: The created data task id or 0 on failure.                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid)
+static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint64_t proxyid)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
 
-	taskid = DBget_maxid("task");
+	taskid = zbx_db_get_maxid("task");
 
-	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxy_hostid);
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxyid);
 
 	task->data = zbx_tm_data_create(task->taskid, data, len, ZBX_TM_DATA_TYPE_TEST_ITEM);
 
-	DBbegin();
+	zbx_db_begin();
 
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;
 
-	DBcommit();
+	zbx_db_commit();
 
 	zbx_tm_task_free(task);
 
@@ -1191,29 +1190,29 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint6
  ******************************************************************************/
 static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret, time_start;
 
 	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; sleep(1))
 	{
-		result = DBselect("select status,info"
+		result = zbx_db_select("select status,info"
 				" from task_result"
 				" where parent_taskid=" ZBX_FS_UI64,
 				taskid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			*info = zbx_strdup(NULL, row[1]);
 
 			if (SUCCEED != (ret = atoi(row[0])))
 				ret = FAIL;
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return ret;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	*info = zbx_strdup(NULL, "Timeout while waiting for result.");
@@ -1227,18 +1226,18 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
  *                                                                            *
  * Parameters: data         - [IN] task data                                  *
  *             len          - [IN] length of data                             *
- *             proxy_hostid - [IN] proxy identifier                           *
+ *             proxyid - [IN] proxy identifier                           *
  *             info         - [OUT] task result or error reason               *
  *                                                                            *
  * Return value: SUCCEED - if task was executed without errors                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid, char **info)
+int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxyid, char **info)
 {
 	zbx_uint64_t	taskid;
 
-	if (0 == (taskid = zbx_create_task_data(data, len, proxy_hostid)))
+	if (0 == (taskid = zbx_create_task_data(data, len, proxyid)))
 	{
 		*info = zbx_strdup(NULL, "Cannot create task.");
 		return FAIL;

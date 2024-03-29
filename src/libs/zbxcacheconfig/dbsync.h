@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 
 #include "dbconfig.h"
 
+#include "zbxalgo.h"
+#include "zbxdb.h"
+
 /* no changes */
 #define ZBX_DBSYNC_ROW_NONE	0
 /*  a new object must be added to configuration cache */
@@ -40,12 +43,6 @@
 #define ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS	__UINT64_C(0x0040)
 #define ZBX_DBSYNC_UPDATE_MACROS		__UINT64_C(0x0080)
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#	define ZBX_HOST_TLS_OFFSET	4
-#else
-#	define ZBX_HOST_TLS_OFFSET	0
-#endif
-
 #define ZBX_DBSYNC_TRIGGER_ERROR	0x80
 
 /******************************************************************************
@@ -60,7 +57,7 @@
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-typedef char **(*zbx_dbsync_preproc_row_func_t)(char **row);
+typedef char **(*zbx_dbsync_preproc_row_func_t)(zbx_dbsync_t *sync, char **row);
 
 typedef struct
 {
@@ -90,7 +87,7 @@ struct zbx_dbsync
 	zbx_vector_ptr_t		rows;
 
 	/* the database result set for ZBX_DBSYNC_ALL mode */
-	DB_RESULT			dbresult;
+	zbx_db_result_t			dbresult;
 
 	/* the row preprocessing function */
 	zbx_dbsync_preproc_row_func_t	preproc_row_func;
@@ -115,6 +112,7 @@ int	zbx_dbsync_env_changelog_num(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
 
 int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);
@@ -162,5 +160,9 @@ int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync);
 void	zbx_dbsync_clear_user_macros(void);
 
+int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,6 +64,10 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$subfilters_fields = self::getSubfilterFields($filter);
 			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
+
+			if ($filter['state'] != -1) {
+				$subfilters['state'] = [];
+			}
 
 			$page = $this->getInput('page', 1);
 			$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');

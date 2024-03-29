@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ zbx_history_record_t;
 
 ZBX_VECTOR_DECL(history_record, zbx_history_record_t)
 
-int     history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
+int	zbx_history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
 
 void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
@@ -44,7 +44,6 @@ int	zbx_history_record_compare_asc_func(const zbx_history_record_t *d1, const zb
 int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
 
 void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t *value, int value_type);
-char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type);
 void	zbx_history_value_print(char *buffer, size_t size, const zbx_history_value_t *value, int value_type);
 void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char value_type, zbx_variant_t *var);
 
@@ -61,11 +60,19 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
-void	zbx_history_check_version(struct zbx_json *json, int *result);
+void	zbx_history_check_version(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions);
 
 #define FLUSH_SUCCEED		0
 #define FLUSH_FAIL		-1
 #define FLUSH_DUPL_REJECTED	-2
+
+#define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
+#define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
+#define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
+#define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
+#define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
+#define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
+#define ZBX_DC_FLAG_HASTRIGGER	0x40	/* value is used in trigger expression */
 
 typedef struct
 {
@@ -79,6 +86,6 @@ typedef struct
 	unsigned char		state;
 	int			ttl;		/* time-to-live of the history value */
 }
-ZBX_DC_HISTORY;
+zbx_dc_history_t;
 
 #endif

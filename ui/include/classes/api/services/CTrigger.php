@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,9 +31,16 @@ class CTrigger extends CTriggerGeneral {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
+
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname'];
+
+	public const OUTPUT_FIELDS = ['triggerid', 'expression', 'description', 'url', 'status', 'value', 'priority',
+		'lastchange', 'comments', 'error', 'templateid', 'type', 'state', 'flags', 'recovery_mode',
+		'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name'
+	];
 
 	/**
 	 * Get Triggers data.
@@ -129,22 +136,33 @@ class CTrigger extends CTriggerGeneral {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
+
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
-				' FROM functions f,items i,hosts_groups hgg'.
-					' LEFT JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE t.triggerid=f.triggerid '.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.zbx_dbstr($permission).
-					' OR MIN(permission) IS NULL'.
-					' OR MIN(permission)='.PERM_DENY.
+				' FROM functions f1'.
+				' JOIN items i1 ON f1.itemid=i1.itemid'.
+				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
+					' AND p1.ugsetid=p.ugsetid'.
+				' WHERE t.triggerid=f1.triggerid'.
+					' AND p1.permission IS NULL'.
 			')';
 		}
 
@@ -705,7 +723,7 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $options['expandDescription'] !== null) {
+		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
 			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 		}
 
@@ -867,7 +885,7 @@ class CTrigger extends CTriggerGeneral {
 			unset($trigger);
 
 			$sql_select = ['triggerid'];
-			foreach (['parent_triggerid', 'ts_delete'] as $field) {
+			foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
 				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
 					$sql_select[] = $field;
 				}

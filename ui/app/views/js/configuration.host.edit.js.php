@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,15 +31,75 @@
 		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form = document.getElementById(form_name);
 			this.form.addEventListener('submit', this.events.submit);
+			this.form_name = form_name;
 
 			host_edit.init({form_name, host_interfaces, host_is_discovered});
+			this.initEvents();
+		},
+
+		initEvents() {
+			this.form.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('js-edit-linked-template')) {
+					this.editTemplate({templateid: e.target.dataset.templateid});
+				}
+				else if (target.classList.contains('js-update-item')) {
+					this.editItem(target, target.dataset);
+				}
+			});
+		},
+
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', target.dataset, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+					const data = e.detail;
+
+					if ('success' in data) {
+						postMessageOk(data.success.title);
+
+						if ('messages' in data.success) {
+							postMessageDetails('success', data.success.messages);
+						}
+					}
+
+					location.href = location.href;
+				}, {once: true}
+			);
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			});
 		},
 
 		submit(button) {
 			this.setLoading(button);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
-			const curl = new Curl(this.form.getAttribute('action'), false);
+			const curl = new Curl(this.form.getAttribute('action'));
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -58,7 +118,7 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					const url = new Curl('zabbix.php', false);
+					const url = new Curl('zabbix.php');
 					url.setArgument('action', 'host.list');
 
 					location.href = url.getUrl();
@@ -70,18 +130,8 @@
 		},
 
 		clone() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			url.setArgument('clone', 1);
-
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
-			delete fields.sid;
-
-			post(url.getUrl(), fields);
-		},
-
-		fullClone() {
-			const url = new Curl('', false);
-			url.setArgument('full_clone', 1);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
 			delete fields.sid;
@@ -99,6 +149,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.massdelete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('host')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -117,7 +170,7 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					const url = new Curl('zabbix.php', false);
+					const url = new Curl('zabbix.php');
 					url.setArgument('action', 'host.list');
 
 					location.href = url.getUrl();

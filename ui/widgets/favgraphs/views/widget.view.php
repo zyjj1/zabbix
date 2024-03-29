@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,12 +37,12 @@ foreach ($data['graphs'] as $graph) {
 		$data['allowed_ui_latest_data']
 			? new CLink($graph['label'], $url)
 			: $graph['label'],
-		(new CButton())
-			->setAttribute('data-itemid', $graph['itemid'])
-			->onClick('rm4favorites("itemid", this.dataset.itemid);')
-			->addClass(ZBX_STYLE_BTN_REMOVE)
-			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
-			->removeId()
+		(new CCol(
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))
+				->setAttribute('data-itemid', $graph['itemid'])
+				->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
+				->onClick('rm4favorites("itemid", this.dataset.itemid);')
+		))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]);
 }
 

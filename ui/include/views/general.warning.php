@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ $page_header
 
 $buttons = array_key_exists('buttons', $data)
 	? $data['buttons']
-	: [(new CButton(null, _('Retry')))->onClick('document.location.reload();')];
+	: [(new CSimpleButton(_('Retry')))->onClick('document.location.reload();')];
 
 echo '<body>';
 

@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
  *  - show_problems - show problems in hintbox when mouse is moved over the problem zone;
  *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
  */
-jQuery(function() {
+(function ($) {
 	"use strict";
 
 	// Makes SBox selection cancelable pressing Esc.
@@ -66,14 +66,17 @@ jQuery(function() {
 	 */
 	function dropDocumentListeners(e, graph) {
 		let widgets_boxing = 0; // Number of widgets with active SBox.
-		ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-			if (widget.getType() === 'svggraph' && widget._svg !== null) {
-				const options = jQuery(widget._svg).data('options');
-				if (options !== undefined && options.boxing) {
-					widgets_boxing++;
+
+		for (const dashboard_page of ZABBIX.Dashboard.getDashboardPages()) {
+			dashboard_page.getWidgets().forEach((widget) => {
+				if (widget.getType() === 'svggraph' && widget._svg !== null) {
+					const options = jQuery(widget._svg).data('options');
+					if (options !== undefined && options.boxing) {
+						widgets_boxing++;
+					}
 				}
-			}
-		});
+			});
+		}
 
 		if (widgets_boxing == 0 || (e && 'keyCode' in e && e.keyCode == 27)) {
 			jQuery(document)
@@ -117,7 +120,9 @@ jQuery(function() {
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
+			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
+				graph.closest('.dashboard-grid-widget-container')
+			);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -128,19 +133,20 @@ jQuery(function() {
 
 			graph.data('widget')._pauseUpdating();
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
-
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
 
 				data.isTriggerHintBoxFrozen = false;
-				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
+				data.isHintBoxFrozen = false; // Unfreeze because only unfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
 				destroyHintbox(graph);
 			});
 
 			repositionHintBox(e, graph);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
+
 			graph
 				.off('mouseup', hintboxSilentMode)
 				.on('mouseup', {graph: graph}, hintboxSilentMode);
@@ -149,8 +155,8 @@ jQuery(function() {
 	}
 
 	/**
-	 * Silent mode means that hintbox is waiting for click to be repositionated. Once user clicks on graph, existing
-	 * hintbox will be repositionated with a new values in the place where user clicked on.
+	 * Silent mode means that hintbox is waiting for click to be repositioned. Once user clicks on graph, existing
+	 * hintbox will be repositioned with a new values in the place where user clicked on.
 	 */
 	function hintboxSilentMode(e) {
 		var graph = e.data.graph,
@@ -253,12 +259,71 @@ jQuery(function() {
 				to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
 
 			if (seconds > data.minPeriod && (from_offset > 0 || to_offset > 0)) {
-				jQuery.publish('timeselector.rangeoffset', {
+				const widget = graph.data('widget');
+
+				updateTimeSelector(widget, {
+					method: 'rangeoffset',
+					from: data.timePeriod.from,
+					to: data.timePeriod.to,
 					from_offset: Math.max(0, Math.ceil(from_offset)),
 					to_offset: Math.ceil(to_offset)
-				});
+				})
+					.then((time_period) => {
+						if (time_period === null) {
+							return;
+						}
+
+						widget._startUpdating();
+						widget.feedback({time_period});
+						widget.broadcast({_timeperiod: time_period});
+					});
 			}
 		}
+	}
+
+	function updateTimeSelector(widget, data) {
+		widget._schedulePreloader();
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'timeselector.calc');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((time_period) => {
+				if ('error' in time_period) {
+					throw {error: time_period.error};
+				}
+
+				if ('has_fields_errors' in time_period) {
+					throw new Error();
+				}
+
+				return time_period;
+			})
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Unexpected server error.');
+				}
+
+				widget._updateMessages(messages, title);
+
+				return null;
+			})
+			.finally(() => {
+				widget._hidePreloader();
+			});
 	}
 
 	// Read SVG nodes and find closest past value to the given x in each data set.
@@ -436,7 +501,7 @@ jQuery(function() {
 	// Position hintbox near current mouse position.
 	function repositionHintBox(e, graph) {
 		// Use closest positioned ancestor for offset calculation.
-		var offset = graph.parent().offsetParent().offset(),
+		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
 			hbox = jQuery(graph.hintBoxItem),
 			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
 			mouse_distance = 15,
@@ -582,20 +647,20 @@ jQuery(function() {
 
 			if (show_hint) {
 				// Calculate time at mouse position.
-				var time = parseInt(data.timeFrom) + parseInt((offsetX - data.dimX) * data.spp);
+				const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
 
 				html = jQuery('<div>')
-						.addClass('svg-graph-hintbox')
-						.append(
-							jQuery('<div>')
-								.addClass('header')
-								.html(time2str(time))
-						)
-						.append(html)
-						.append(points_total > data.hintMaxRows
-							? makeHintBoxFooter(data.hintMaxRows, points_total)
-							: null
-						);
+					.addClass('svg-graph-hintbox')
+					.append(
+						jQuery('<div>')
+							.addClass('header')
+							.html(time.format(PHP_ZBX_FULL_DATE_TIME))
+					)
+					.append(html)
+					.append(points_total > data.hintMaxRows
+						? makeHintBoxFooter(data.hintMaxRows, points_total)
+						: null
+					);
 			}
 		}
 		else {
@@ -604,7 +669,9 @@ jQuery(function() {
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+				hbox = hintBox.createBox(e, graph, html, '', false, false,
+					graph.closest('.dashboard-grid-widget-container')
+				);
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -653,7 +720,7 @@ jQuery(function() {
 						isHintBoxFrozen: false,
 						isTriggerHintBoxFrozen: false,
 						spp: widget._svg_options.spp || null,
-						timeFrom: widget._svg_options.time_from,
+						timePeriod: widget._svg_options.time_period,
 						minPeriod: widget._svg_options.min_period,
 						boxing: false
 					})
@@ -669,6 +736,7 @@ jQuery(function() {
 		activate: function () {
 			const widget = jQuery(this).data('widget');
 			const graph = jQuery(widget._svg);
+			const data = graph.data('options');
 
 			graph
 				.on('mousemove', (e) => {
@@ -685,7 +753,24 @@ jQuery(function() {
 				graph
 					.on('dblclick', function() {
 						hintBox.hideHint(graph, true);
-						jQuery.publish('timeselector.zoomout');
+
+						const widget = graph.data('widget');
+
+						updateTimeSelector(widget, {
+							method: 'zoomout',
+							from: data.timePeriod.from,
+							to: data.timePeriod.to,
+						})
+							.then((time_period) => {
+								if (time_period === null) {
+									return;
+								}
+
+								widget._startUpdating();
+								widget.feedback({time_period});
+								widget.broadcast({_timeperiod: time_period});
+							});
+
 						return false;
 					})
 					.on('mousedown', {graph}, startSBoxDrag);
@@ -761,7 +846,7 @@ jQuery(function() {
 					.append(hint_body)
 					.append(triggers_length > data.hintMaxRows
 						? makeHintBoxFooter(data.hintMaxRows, triggers_length)
-						:null
+						: null
 					);
 
 				graph.data('simpleTriggersHintbox', true);
@@ -770,7 +855,9 @@ jQuery(function() {
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+				hbox = hintBox.createBox(e, graph, html, '', false, false,
+					graph.closest('.dashboard-grid-widget-container')
+				);
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -822,4 +909,4 @@ jQuery(function() {
 
 		return methods.init.apply(this, arguments);
 	};
-});
+})(jQuery);

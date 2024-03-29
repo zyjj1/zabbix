@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ function getSystemStatusData(array $filter) {
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
 	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
-	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
+	$filter_tags = array_key_exists('tags', $filter) && $filter['tags'] ? $filter['tags'] : null;
 	$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
@@ -135,13 +135,8 @@ function getSystemStatusData(array $filter) {
 		'preservekeys' => true
 	];
 
-	if (array_key_exists('severities', $filter)) {
-		$filter_severities = implode(',', $filter['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-			$options['severities'] = $filter['severities'];
-		}
+	if (array_key_exists('severities', $filter) && $filter['severities']) {
+		$options['severities'] = $filter['severities'];
 	}
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
@@ -185,13 +180,13 @@ function getSystemStatusData(array $filter) {
 		$data['triggers'] = API::Trigger()->get($options);
 
 		if ($show_opdata && $data['triggers']) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name_resolved', 'key_', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			foreach ($data['triggers'] as &$trigger) {
 				foreach ($trigger['functions'] as $function) {
@@ -258,11 +253,11 @@ function getSystemStatusData(array $filter) {
 		// actions & tags
 		$problems_data = API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
-			'eventids' => array_keys($visible_problems),
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
 			'selectTags' => ['tag', 'value'],
+			'eventids' => array_keys($visible_problems),
 			'preservekeys' => true
 		]);
 
@@ -586,7 +581,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			_('Problem'),
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
-			_('Ack'),
+			_('Update'),
 			_('Actions'),
 			_('Tags')
 		]));
@@ -639,7 +634,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 
 		if ($show_timeline) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, false);
 			}
 			$data['last_clock'] = $problem['clock'];
 
@@ -669,9 +664,9 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 					? getUserFullname($actions['users'][$unsuppression_action['userid']])
 					: _('Inaccessible user');
 
-				$info_icons[] = (new CSimpleButton())
-					->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
-					->addClass('blink')
+				$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
+					->addClass(ZBX_STYLE_COLOR_ICON)
+					->addClass('js-blink')
 					->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 			}
 			elseif ($problem['suppression_data']) {
@@ -738,14 +733,11 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 				|| $can_be_closed || $allowed['suppress'])
-			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			? (new CLink(_('Update')))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->setAttribute('data-eventid', $problem['eventid'])
 				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-			);
+			: new CSpan(_('Update'));
 
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),
@@ -759,7 +751,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
-			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users']),
+			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $is_acknowledged),
 			$tags[$problem['eventid']]
 		]));
 	}

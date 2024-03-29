@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,18 +23,26 @@ class CWarning extends Ctag {
 
 	public function __construct($header, $messages = [], $buttons = []) {
 		parent::__construct('output', true);
-		$this->addItem($header);
-		$this->addClass(ZBX_STYLE_MSG_BAD);
-		$this->addClass('msg-global');
+
+		$this
+			->addItem(
+				new CSpan($header)
+			)
+			->addClass(ZBX_STYLE_MSG_GLOBAL)
+			->addClass(ZBX_STYLE_MSG_BAD);
+
 		if ($messages) {
-			parent::addItem(
-				(new CDiv(
-					(new CList($messages))
-						->addClass(ZBX_STYLE_LIST_DASHED)
-						->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
-				))->addClass(ZBX_STYLE_MSG_DETAILS)
-			);
+			$this
+				->addItem(
+					(new CDiv(
+						(new CList($messages))->addClass(ZBX_STYLE_LIST_DASHED)
+					))->addClass(ZBX_STYLE_MSG_DETAILS)
+				)
+				->addClass(ZBX_STYLE_COLLAPSIBLE);
 		}
-		parent::addItem((new CDiv($buttons))->addClass('msg-buttons'));
+
+		$this->addItem(
+			(new CDiv($buttons))->addClass('msg-buttons')
+		);
 	}
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ class CControllerActionOperationConditionCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -31,7 +31,7 @@ class CControllerActionOperationConditionCheck extends CController {
 			'actionid' =>		'db actions.actionid',
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 			'source' =>			'db actions.eventsource|required|in '. EVENT_SOURCE_TRIGGERS,
-			'condition_type' =>	'db opconditions.conditiontype|in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+			'condition_type' =>	'db opconditions.conditiontype|in '.ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			'operator' =>		'db opconditions.conditiontype|in '.implode(',', [
 									CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL
 								]),
@@ -55,7 +55,7 @@ class CControllerActionOperationConditionCheck extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 	}
 
 	/**
@@ -63,17 +63,9 @@ class CControllerActionOperationConditionCheck extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'title' => _('New condition'),
-			'command' => '',
-			'message' => '',
-			'errors' => null,
-			'action' => $this->getAction(),
-			'type' => $this->getInput('type'),
 			'conditiontype' => $this->getInput('condition_type'),
 			'value' => $this->getInput('value'),
-			'operator' => $this->getInput('operator'),
-			'eventsource' => $this->getInput('source'),
-			'allowed_conditions' => get_conditions_by_eventsource($this->getInput('source'))
+			'operator' => $this->getInput('operator')
 		];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,8 @@
 **/
 
 #include "zbxcommon.h"
-#include "log.h"
-#include "setproctitle.h"
-#include "zbxthreads.h"
+
+#include "zbxstr.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 {
@@ -231,14 +230,14 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: print application parameters on stdout with layout suitable for   *
+ * Purpose: prints application parameters on stdout with layout suitable for  *
  *          80-column terminal                                                *
  *                                                                            *
- * Comments:  usage_message - is global variable which must be initialized    *
- *                            in each zabbix application                      *
+ * Parameters:  usage_message - [IN]                                          *
+ *              progname      - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_usage(void)
+void	zbx_print_usage(const char **usage_message, const char *progname)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -246,7 +245,7 @@ void	zbx_usage(void)
 	const char	**p = usage_message;
 
 	if (NULL != *p)
-		printf("usage:\n");
+		printf("Usage:\n");
 
 	while (NULL != *p)
 	{
@@ -284,34 +283,48 @@ void	zbx_usage(void)
 }
 
 static const char	copyright_message[] =
-	"Copyright (C) 2022 Zabbix SIA\n"
+	"Copyright (C) 2024 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
 static const char	help_message_footer[] =
 	"Report bugs to: <https://support.zabbix.com>\n"
-	"Zabbix home page: <http://www.zabbix.com>\n"
+	"Zabbix home page: <https://www.zabbix.com>\n"
 	"Documentation: <https://www.zabbix.com/documentation>";
 
 /******************************************************************************
  *                                                                            *
- * Purpose: print help of application parameters on stdout by application     *
+ * Purpose: prints help of application parameters on stdout by application    *
  *          request with parameter '-h'                                       *
  *                                                                            *
- * Comments:  help_message - is global variable which must be initialized     *
- *                            in each zabbix application                      *
+ * Parameters: param         - [IN] pointer to modification parameter         *
+ *             help_message  - [IN]                                           *
+ *             usage_message - [IN]                                           *
+ *             progname      - [IN]                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_help(void)
+void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname)
 {
 	const char	**p = help_message;
 
-	zbx_usage();
+	zbx_print_usage(usage_message, progname);
 	printf("\n");
 
 	while (NULL != *p)
+	{
+		if (NULL != param && NULL != strstr(*p, "{DEFAULT_CONFIG_FILE}"))
+		{
+			char	*ptr;
+
+			ptr = zbx_string_replace(*p++, "{DEFAULT_CONFIG_FILE}", param);
+			printf("%s\n", ptr);
+			zbx_free(ptr);
+			continue;
+		}
+
 		printf("%s\n", *p++);
+	}
 
 	printf("\n");
 	puts(help_message_footer);
@@ -322,40 +335,12 @@ void	zbx_help(void)
  * Purpose: print version and compilation time of application on stdout       *
  *          by application request with parameter '-V'                        *
  *                                                                            *
- * Comments:  title_message - is global variable which must be initialized    *
- *                            in each zabbix application                      *
- *                                                                            *
  ******************************************************************************/
-void	zbx_version(void)
+void	zbx_print_version(const char *title_message)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: set process title                                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_setproctitle(const char *fmt, ...)
-{
-#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	char	title[MAX_STRING_LEN];
-	va_list	args;
-
-	va_start(args, fmt);
-	zbx_vsnprintf(title, sizeof(title), fmt, args);
-	va_end(args);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __func__, title);
-#endif
-
-#if defined(HAVE_FUNCTION_SETPROCTITLE)
-	setproctitle("%s", title);
-#elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	setproctitle_set_status(title);
-#endif
 }
 
 /******************************************************************************
@@ -565,82 +550,6 @@ int	zbx_alarm_timed_out(void)
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
 }
 
-/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
-/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
-/******************************************************************************
- *                                                                            *
- * Purpose: react to "/etc/resolv.conf" update                                *
- *                                                                            *
- * Comments: it is intended to call this function in the end of each process  *
- *           main loop. The purpose of calling it at the end (instead of the  *
- *           beginning of main loop) is to let the first initialization of    *
- *           libc resolver proceed internally.                                *
- *                                                                            *
- ******************************************************************************/
-static void	update_resolver_conf(void)
-{
-#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
-
-	static time_t	mtime = 0;
-	zbx_stat_t	buf;
-
-	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
-	{
-		mtime = buf.st_mtime;
-
-		if (0 != res_init())
-			zabbix_log(LOG_LEVEL_WARNING, "update_resolver_conf(): res_init() failed");
-	}
-
-#undef ZBX_RESOLV_CONF_FILE
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
- *          log file after rotation                                           *
- *                                                                            *
- * Parameters: time_now - [IN] the time for compare in seconds                *
- *                                                                            *
- ******************************************************************************/
-void	__zbx_update_env(double time_now)
-{
-	static double	time_update = 0;
-
-	/* handle /etc/resolv.conf update and log rotate less often than once a second */
-	if (1.0 < time_now - time_update)
-	{
-		time_update = time_now;
-		zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
-		update_resolver_conf();
-#endif
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Print error text to the stderr                                    *
- *                                                                            *
- * Parameters: fmt - format of message                                        *
- *                                                                            *
- ******************************************************************************/
-void	zbx_error(const char *fmt, ...)
-{
-	va_list	args;
-
-	va_start(args, fmt);
-
-	fprintf(stderr, "%s [%li]: ", progname, zbx_get_thread_id());
-	vfprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
-	fflush(stderr);
-
-	va_end(args);
-}
-
 zbx_uint64_t	suffix2factor(char c)
 {
 	switch (c)
@@ -666,11 +575,4 @@ zbx_uint64_t	suffix2factor(char c)
 		default:
 			return 1;
 	}
-}
-
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
 }

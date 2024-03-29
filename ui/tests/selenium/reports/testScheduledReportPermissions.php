@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @dataSource ScheduledReports
@@ -33,15 +33,16 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testScheduledReportPermissions extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	protected static $roleids;
@@ -328,7 +329,7 @@ class testScheduledReportPermissions extends CWebTest {
 					// User with admin type should see "Inaccessible user" in columns 'Generate report by' and 'Recipient'
 					$this->assertEquals($owner, $row->getColumn('Generate report by')->getText());
 
-					if ($row->getColumn('Recipient')->query('class:icon-user')->one(false)->isValid()) {
+					if ($row->getColumn('Recipient')->query('class:zi-user-filled-small')->one(false)->isValid()) {
 						$this->assertEquals($owner, $row->getColumn('Recipient')->getText());
 					}
 					else {

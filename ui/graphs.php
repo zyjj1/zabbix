@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = hasRequest('parent_discoveryid') ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
-$page['scripts'] = ['colorpicker.js', 'multiselect.js'];
+$page['scripts'] = ['colorpicker.js', 'multiselect.js', 'items.js', 'multilineinput.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -34,13 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
-	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
-								IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-									COPY_TYPE_TO_TEMPLATE
-								]),
-								'isset({copy})'
-							],
-	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null],
 	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && {form} == "update"'],
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
@@ -62,15 +55,14 @@ $fields = [
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'copy_targetids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	'readonly' =>			[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
+	'checkbox_hash' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'copy' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
@@ -299,10 +291,11 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 		'discover' => getRequest('discover', DB::getDefault('graphs', 'discover'))
 	]);
 
-	show_messages($result, _('Graph updated'), _('Cannot update graph'));
+	show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
+	$graphs_count = count($graphIds);
 
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
@@ -319,7 +312,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($graphs, 'graphid'));
 		}
-		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
+
+		$messageSuccess = _n('Graph prototype deleted', 'Graph prototypes deleted', $graphs_count);
+		$messageFailed = _n('Cannot delete graph prototype', 'Cannot delete graph prototypes', $graphs_count);
+
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
@@ -336,56 +333,12 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 			uncheckTableRows($hostid, zbx_objectValues($graphs, 'graphid'));
 		}
-		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
+
+		$messageSuccess = _n('Graph deleted', 'Graphs deleted', $graphs_count);
+		$messageFailed = _n('Cannot delete graph', 'Cannot delete graphs', $graphs_count);
+
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
-}
-elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('copy')
-		&& hasRequest('group_graphid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		$result = true;
-
-		$options = [
-			'output' => ['hostid'],
-			'editable' => true,
-			'templated_hosts' => true
-		];
-
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$options['hostids'] = getRequest('copy_targetids');
-		}
-		else {
-			$options['groupids'] = getRequest('copy_targetids');
-		}
-
-		$dbHosts = API::Host()->get($options);
-
-		DBstart();
-		foreach (getRequest('group_graphid') as $graphid) {
-			foreach ($dbHosts as $host) {
-				if (!copyGraphToHost($graphid, $host['hostid'])) {
-					$result = false;
-				}
-			}
-		}
-		$result = DBend($result);
-
-		$graphs_count = count(getRequest('group_graphid'));
-
-		if ($result) {
-			uncheckTableRows(
-				(getRequest('parent_discoveryid') == 0) ? $hostid : getRequest('parent_discoveryid')
-			);
-			unset($_REQUEST['group_graphid']);
-		}
-		show_messages($result,
-			_n('Graph copied', 'Graphs copied', $graphs_count),
-			_n('Cannot copy graph', 'Cannot copy graphs', $graphs_count)
-		);
-	}
-	else {
-		error(_('No target selected.'));
-	}
-	show_messages();
 }
 
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
@@ -423,7 +376,7 @@ $filter = [
 	'hosts' => []
 ];
 
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
@@ -452,14 +405,7 @@ if ($hostid == 0 && count($filter['hosts']) == 1) {
 	$hostid = reset($filter['hosts'])['id'];
 }
 
-if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
-	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
-	$data['action'] = 'graph.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
-}
-elseif (isset($_REQUEST['form'])) {
+if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
@@ -747,6 +693,7 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectGraphDiscovery'	=> ['status', 'ts_delete'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),

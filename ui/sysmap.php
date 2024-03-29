@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,16 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js',
-	'colorpicker.js', 'class.tagfilteritem.js'
+$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'colorpicker.js',
+	'class.tagfilteritem.js'
 ];
 $page['type'] = detect_page_type();
-
-require_once dirname(__FILE__).'/include/page_header.php';
 
 if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
+
+require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [

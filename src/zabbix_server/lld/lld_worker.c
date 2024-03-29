@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,22 +19,26 @@
 
 #include "lld_worker.h"
 #include "lld.h"
+#include "lld_protocol.h"
+
+#include "../events/events.h"
 
 #include "zbxnix.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "../events.h"
-#include "lld_protocol.h"
 #include "zbxtime.h"
-#include "zbxdbwrap.h"
 #include "zbx_item_constants.h"
+#include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: registers lld worker with lld manager                             *
  *                                                                            *
- * Parameters: socket - [IN] the connections socket                           *
+ * Parameters: socket - [IN] connections socket                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_register_worker(zbx_ipc_socket_t *socket)
@@ -51,7 +55,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
  * Purpose: processes lld task and updates rule state/error in configuration  *
  *          cache and database                                                *
  *                                                                            *
- * Parameters: message - [IN] the message with LLD request                    *
+ * Parameters: message - [IN] message with LLD request                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_task(zbx_ipc_message_t *message)
@@ -60,15 +64,17 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	char			*value, *error;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
-	DC_ITEM			item;
+	zbx_dc_item_t		item;
 	int			errcode, mtime;
 	unsigned char		state, meta;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_lld_deserialize_item_value(message->data, &itemid, &hostid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
+	zbx_lld_deserialize_item_value(message->data, &itemid, &hostid, &value, &ts, &meta, &lastlogsize, &mtime,
+			&error);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
 	if (SUCCEED != errcode)
 		goto out;
 
@@ -107,7 +113,10 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 						NULL, NULL, error);
 			}
 
+			zbx_db_begin();
 			zbx_process_events(NULL, NULL);
+			zbx_db_commit();
+
 			zbx_clean_events();
 		}
 
@@ -143,19 +152,19 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_ptr_append(&diffs, &diff);
 
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 		if (16 < sql_offset)
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
-		DCconfig_items_apply_changes(&diffs);
+		zbx_dc_config_items_apply_changes(&diffs);
 
 		zbx_vector_ptr_destroy(&diffs);
 		zbx_free(sql);
 	}
 
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 out:
 	zbx_free(value);
 	zbx_free(error);
@@ -165,9 +174,6 @@ out:
 
 ZBX_THREAD_ENTRY(lld_worker_thread, args)
 {
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
-
 	char			*error = NULL;
 	zbx_ipc_socket_t	lld_socket;
 	zbx_ipc_message_t	message;
@@ -196,7 +202,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	time_stat = zbx_time();
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -205,7 +211,8 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
 			zbx_setproctitle("%s #%d [processed " ZBX_FS_UI64 " LLD rules, idle " ZBX_FS_DBL " sec during "
@@ -216,7 +223,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 			time_idle = 0;
 			processed_num = 0;
 		}
-
+#undef STAT_INTERVAL
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_socket_read(&lld_socket, &message))
 		{
@@ -245,8 +252,4 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	DBclose();
-
-	zbx_ipc_socket_close(&lld_socket);
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,44 +31,59 @@
 		(new CInput('hidden', 'interfaces[#{iface.interfaceid}][type]', '#{iface.type}'))
 			->setId('interface_type_#{iface.interfaceid}'),
 		(new CDiv(
-			(new CSimpleButton())->addClass(ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE)
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->addClass(ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE)
 		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL),
 		(new CDiv('#{iface.type_name}'))
-			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL.' '.ZBX_STYLE_HOST_INTERFACE_CELL_TYPE),
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_TYPE),
 		(new CDiv(
 			(new CTextBox('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}', false, DB::getFieldLength('interface', 'ip')))
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
-		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL.' '.ZBX_STYLE_HOST_INTERFACE_CELL_IP),
+		))
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_IP),
 		(new CDiv(
 			(new CTextBox('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}', false, DB::getFieldLength('interface', 'dns')))
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
-		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_DNS),
+		))
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_DNS),
 		(new CDiv(
 			(new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
 				->addValue('IP', INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
 				->addValue('DNS', INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
-				->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_USEIP.' '.ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
+				->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_USEIP)
+				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setModern()
-		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_USEIP),
+		))
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_USEIP),
 		(new CDiv(
 			(new CTextBox('interfaces[#{iface.interfaceid}][port]', '#{iface.port}', false, DB::getFieldLength('interface', 'port')))
 				->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setAriaRequired()
-		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_PORT),
+		))
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_PORT),
 		(new CDiv([
 			(new CInput('radio', 'mainInterfaces[#{iface.type}]', '#{iface.interfaceid}'))
-				->addClass(ZBX_STYLE_CHECKBOX_RADIO . ' ' . ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE)
+				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+				->addClass(ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE)
 				->setId('interface_main_#{iface.interfaceid}'),
 			(new CLabel(new CSpan(), 'interface_main_#{iface.interfaceid}'))
 				->addClass('checkboxLikeLabel')
 				->addStyle('height: 16px; width: 16px;')
-		]))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_DEFAULT),
+		]))
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_DEFAULT),
 		(new CDiv(
-			(new CSimpleButton(_('Remove')))->addClass(ZBX_STYLE_BTN_LINK . ' ' . ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
-		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_ACTION),
+			(new CButtonLink(_('Remove')))->addClass(ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
+		))
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_ACTION),
 		(new CDiv(
 			(new CFormGrid())
 				->setId('snmp_details_#{iface.interfaceid}')
@@ -108,7 +123,7 @@
 						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
 					(new CFormField(
 						(new CNumericBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
-							'#{iface.details.max_repetitions}', 20, false, false, false
+							'#{iface.details.max_repetitions}', 10, false, false, false
 						))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					))
 						->setId('snmp_repetition_count_field_#{iface.interfaceid}')
@@ -208,9 +223,13 @@
 					)
 				)
 		))
-			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS . ' ' . ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS)
+			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
 	])
-	->addClass(ZBX_STYLE_HOST_INTERFACE_ROW.' '.ZBX_STYLE_LIST_ACCORDION_ITEM.' '.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
+	->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
+	->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
+	->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
 	->setId('interface_row_#{iface.interfaceid}')
 	->setAttribute('data-type', '#{iface.type}')
 	->setAttribute('data-interfaceid', '#{iface.interfaceid}')

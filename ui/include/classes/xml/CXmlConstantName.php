@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -243,6 +243,7 @@ class CXmlConstantName {
 	const LOG = 'LOG';
 	const UNSIGNED = 'UNSIGNED';
 	const TEXT = 'TEXT';
+	const BINARY = 'BINARY';
 
 	const ORIGINAL_ERROR = 'ORIGINAL_ERROR';
 	const DISCARD_VALUE = 'DISCARD_VALUE';
@@ -280,6 +281,7 @@ class CXmlConstantName {
 	const XML_TO_JSON = 'XML_TO_JSON';
 	const SNMP_WALK_VALUE = 'SNMP_WALK_VALUE';
 	const SNMP_WALK_TO_JSON = 'SNMP_WALK_TO_JSON';
+	const SNMP_GET_VALUE = 'SNMP_GET_VALUE';
 
 	const AND_OR = 'AND_OR';
 	const XML_AND = 'AND';
@@ -324,6 +326,14 @@ class CXmlConstantName {
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	const MACRO_TYPE_VAULT = 'VAULT';
 
+	// Constants for low-level discovery rules.
+	const LLD_DELETE_AFTER = 'DELETE_AFTER';
+	const LLD_DELETE_NEVER = 'DELETE_NEVER';
+	const LLD_DELETE_IMMEDIATELY = 'DELETE_IMMEDIATELY';
+	const LLD_DISABLE_AFTER = 'DISABLE_AFTER';
+	const LLD_DISABLE_NEVER = 'DISABLE_NEVER';
+	const LLD_DISABLE_IMMEDIATELY = 'DISABLE_IMMEDIATELY';
+
 	// Constants for low-level discovery rule overrides.
 	const LLD_OVERRIDE_STOP_NO = 'NO_STOP';
 	const LLD_OVERRIDE_STOP_YES = 'STOP';
@@ -356,6 +366,12 @@ class CXmlConstantName {
 	const DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE = 'ITEM_PROTOTYPE';
 	const DASHBOARD_WIDGET_FIELD_TYPE_GRAPH = 'GRAPH';
 	const DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE = 'GRAPH_PROTOTYPE';
+	const DASHBOARD_WIDGET_FIELD_TYPE_MAP = 'MAP';
+	const DASHBOARD_WIDGET_FIELD_TYPE_SERVICE = 'SERVICE';
+	const DASHBOARD_WIDGET_FIELD_TYPE_SLA = 'SLA';
+	const DASHBOARD_WIDGET_FIELD_TYPE_USER = 'USER';
+	const DASHBOARD_WIDGET_FIELD_TYPE_ACTION = 'ACTION';
+	const DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE = 'MEDIA_TYPE';
 
 	// Constants for value map mapping type.
 	const MAPPING_EQUAL = 'EQUAL';

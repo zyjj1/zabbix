@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,14 +65,14 @@ class CZabbixServer {
 	/**
 	 * Zabbix server host name.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $host;
 
 	/**
 	 * Zabbix server port number.
 	 *
-	 * @var string
+	 * @var int|null
 	 */
 	protected $port;
 
@@ -147,10 +147,12 @@ class CZabbixServer {
 	 * @param string      $sid
 	 * @param null|string $hostid
 	 * @param null|string $eventid
+	 * @param null|string $manualinput
 	 *
 	 * @return bool|array
 	 */
-	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null) {
+	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null,
+			$manualinput = null) {
 		$params = [
 			'request' => 'command',
 			'scriptid' => $scriptid,
@@ -166,7 +168,32 @@ class CZabbixServer {
 			$params['eventid'] = $eventid;
 		}
 
+		if ($manualinput !== null) {
+			$params['manualinput'] = $manualinput;
+		}
+
 		return $this->request($params);
+	}
+
+	/**
+	 * @param array  $data
+	 *        string $data['itemid']  (optional) Item ID.
+	 *        string $data['host']    (optional) Technical name of the host.
+	 *        string $data['key']     (optional) Item key.
+	 *        string $data['value']   Item value.
+	 *        string $data['clock']   (optional) Time when the value was received.
+	 *        string $data['ns']      (optional) Nanoseconds when the value was received.
+	 * @param string $sid             User session ID or user API token.
+	 *
+	 * @return array|bool
+	 */
+	public function pushHistory(array $data, string $sid) {
+		return $this->request([
+			'request' => 'history.push',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
 	}
 
 	/**
@@ -198,18 +225,12 @@ class CZabbixServer {
 	/**
 	 * Request server to test item.
 	 *
-	 * @param array  $data    Array of item properties to test.
-	 * @param string $sid     User session ID.
+	 * @param array  $data  Array of item properties to test.
+	 * @param string $sid   User session ID.
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
-	public function testItem(array $data, $sid) {
-		/*
-		 * Timeout for 'item.test' request is increased because since message can be forwarded from server to proxy and
-		 * later to agent, it might take more time due network latency.
-		 */
-		$this->timeout = 60;
-
+	public function testItem(array $data, string $sid) {
 		return $this->request([
 			'request' => 'item.test',
 			'data' => $data,
@@ -350,6 +371,9 @@ class CZabbixServer {
 					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
+			]],
+			'server stats' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'version' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -378,7 +402,7 @@ class CZabbixServer {
 
 		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
 			if ((time() - $active_node[0]['lastaccess']) <
-					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HA_FAILOVER_DELAY))) {
 				return true;
 			}
 		}
@@ -610,7 +634,7 @@ class CZabbixServer {
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
 				}
 
-				$this->error = $dErrorMsg.$errorMsg;
+				$this->error = rtrim($dErrorMsg.$errorMsg);
 			}
 
 			$this->socket = $socket;

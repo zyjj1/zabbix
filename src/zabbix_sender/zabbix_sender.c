@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
-#include "cfg.h"
-#include "log.h"
+#include "zbxcfg.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"
@@ -28,16 +28,17 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxfile.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
 #endif
 
-const char	*progname = NULL;
-const char	title_message[] = "zabbix_sender";
-const char	syslog_app_name[] = "zabbix_sender";
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+static const char	title_message[] = "zabbix_sender";
+static const char	syslog_app_name[] = "zabbix_sender";
 
-const char	*usage_message[] = {
+static const char	*usage_message[] = {
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]", "[-N]", "[-r]",
 	"-i input-file", NULL,
@@ -130,12 +131,13 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
-
-static unsigned char	get_program_type(void)
+static unsigned char	zbx_program_type = ZBX_PROGRAM_TYPE_SENDER;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+static unsigned char	get_zbx_program_type(void)
 {
-	return program_type;
+	return zbx_program_type;
 }
+#endif
 
 static int	config_timeout = 3;
 
@@ -146,7 +148,7 @@ static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 #define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
 #define CONFIG_SENDER_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MAX)
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
 	"General options:",
@@ -323,7 +325,7 @@ static int	WITH_TIMESTAMPS = 0;
 static int	WITH_NS = 0;
 static int	REAL_TIME = 0;
 
-char		*CONFIG_SOURCE_IP = NULL;
+char		*config_source_ip = NULL;
 static char	*ZABBIX_SERVER = NULL;
 static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
@@ -334,7 +336,7 @@ static char	*config_file = NULL;
 
 typedef struct
 {
-	zbx_vector_ptr_t	addrs;
+	zbx_vector_addr_ptr_t	addrs;
 	ZBX_THREAD_HANDLE	*thread;
 }
 zbx_send_destinations_t;
@@ -390,7 +392,7 @@ static void	main_signal_handler(int sig)
 
 typedef struct
 {
-	zbx_vector_ptr_t		*addrs;
+	zbx_vector_addr_ptr_t		*addrs;
 	struct zbx_json			json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
@@ -400,7 +402,6 @@ typedef struct
 	int				fds[2];
 #endif
 	zbx_config_tls_t		*zbx_config_tls;
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 }
 zbx_thread_sendval_args;
 
@@ -430,8 +431,8 @@ static void	zbx_thread_handle_pipe_response(zbx_thread_sendval_args *sendval_arg
 	{
 		zbx_addr_t	*addr = sendval_args->addrs->values[0];
 
-		zbx_vector_ptr_remove(sendval_args->addrs, 0);
-		zbx_vector_ptr_append(sendval_args->addrs, addr);
+		zbx_vector_addr_ptr_remove(sendval_args->addrs, 0);
+		zbx_vector_addr_ptr_append(sendval_args->addrs, addr);
 	}
 }
 #endif
@@ -485,9 +486,8 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 			{
 				if (destinations[j].thread == &threads[i])
 				{
-					zbx_vector_ptr_clear_ext(&destinations[j].addrs,
-							(zbx_clean_func_t)zbx_addr_free);
-					zbx_vector_ptr_destroy(&destinations[j].addrs);
+					zbx_vector_addr_ptr_clear_ext(&destinations[j].addrs, zbx_addr_free);
+					zbx_vector_addr_ptr_destroy(&destinations[j].addrs);
 					destinations[j] = destinations[--destinations_count];
 					break;
 				}
@@ -541,7 +541,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 			case 0:
 				if (' ' == *p || '\t' == *p)
 				{
-					/* skipping the leading spaces */;
+					/* skipping the leading spaces */
 				}
 				else if ('"' == *p)
 				{
@@ -700,7 +700,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
+	if (SUCCEED == zbx_connect_to_server(&sock, config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
 	{
 		if (1 == sendval_args->sync_timestamp)
@@ -810,6 +810,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
 			sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+			sendval_args[i].zbx_config_tls = sendval_args[0].zbx_config_tls;
 		}
 
 		destinations[i].thread = &threads[i];
@@ -817,7 +818,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 		if (-1 == pipe(sendval_args[i].fds))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s",
-					strerror_from_system((unsigned long)errno));
+					zbx_strerror_from_system((unsigned long)errno));
 			threads[i] = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 			continue;
 		}
@@ -845,7 +846,8 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+		void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
@@ -862,7 +864,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
 			sizeof(zbx_send_destinations_t) * destinations_count);
 
-	zbx_vector_ptr_create(&destinations[destinations_count - 1].addrs);
+	zbx_vector_addr_ptr_create(&destinations[destinations_count - 1].addrs);
 
 	zbx_addr_copy(&destinations[destinations_count - 1].addrs, addrs);
 
@@ -871,7 +873,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 
 static void	zbx_fill_from_config_file(char **dst, char *src)
 {
-	/* helper function, only for TYPE_STRING configuration parameters */
+	/* helper function, only for ZBX_CFG_TYPE_STRING configuration parameters */
 
 	if (NULL != src)
 	{
@@ -891,49 +893,49 @@ static void	zbx_load_config(const char *config_file_in)
 		*cfg_tls_cipher_cert13 = NULL, *cfg_tls_cipher_cert = NULL,
 		*cfg_tls_cipher_psk13 = NULL, *cfg_tls_cipher_psk = NULL;
 
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,	MIN,			MAX */
-		{"SourceIP",			&cfg_source_ip,				TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"Hostname",			&cfg_hostname,				TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&cfg_tls_ca_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&cfg_tls_crl_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&cfg_tls_cert_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&cfg_tls_key_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&cfg_tls_cipher_cert13,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&cfg_tls_cipher_cert,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&cfg_tls_cipher_psk13,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
-			PARM_OPT,	0,			INT_MAX},
+			MANDATORY,		MIN,			MAX */
+		{"SourceIP",			&cfg_source_ip,				ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ServerActive",		&cfg_active_hosts,			ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"Hostname",			&cfg_hostname,				ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSConnect",			&cfg_tls_connect,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCAFile",			&cfg_tls_ca_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&cfg_tls_crl_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCertFile",			&cfg_tls_cert_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&cfg_tls_key_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&cfg_tls_psk_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert13",		&cfg_tls_cipher_cert13,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert",		&cfg_tls_cipher_cert,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK13",		&cfg_tls_cipher_psk13,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 
 	/* do not complain about unknown parameters in agent configuration file */
-	parse_cfg_file(config_file_in, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(config_file_in, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	/* get first hostname only */
 	if (NULL != cfg_hostname)
@@ -950,7 +952,7 @@ static void	zbx_load_config(const char *config_file_in)
 		zbx_free(cfg_hostname);
 	}
 
-	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
+	zbx_fill_from_config_file(&config_source_ip, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
@@ -1016,20 +1018,18 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_help();
+				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
 				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
-				zbx_version();
+				zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
-				break;
 			case 'I':
-				if (NULL == CONFIG_SOURCE_IP)
-					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
+				if (NULL == config_source_ip)
+					config_source_ip = zbx_strdup(config_source_ip, zbx_optarg);
 				break;
 			case 'z':
 				if (NULL == ZABBIX_SERVER)
@@ -1140,9 +1140,8 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_usage();
+				zbx_print_usage(usage_message, zbx_progname);
 				exit(EXIT_FAILURE);
-				break;
 		}
 	}
 
@@ -1379,8 +1378,8 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		zbx_usage();
-		printf("Try '%s --help' for more information.\n", progname);
+		zbx_print_usage(usage_message, zbx_progname);
+		printf("Try '%s --help' for more information.\n", zbx_progname);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1431,7 +1430,7 @@ static void	parse_commandline(int argc, char **argv)
 					(0x7c0 <= opt_mask && opt_mask <= 0x7c3))))
 	{
 		zbx_error("too few or mutually exclusive options used");
-		zbx_usage();
+		zbx_print_usage(usage_message, zbx_progname);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1496,18 +1495,24 @@ int	main(int argc, char **argv)
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
-	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
+	zbx_progname = get_program_name(argv[0]);
+
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+#ifndef _WINDOWS
+	zbx_init_library_nix(get_zbx_progname);
+#endif
 	zbx_config_tls = zbx_config_tls_new();
-
-	progname = get_program_name(argv[0]);
-
-	zbx_init_library_cfg(program_type);
 
 	parse_commandline(argc, argv);
 
 	if (NULL != config_file)
+	{
+		zbx_init_library_cfg(zbx_program_type, config_file);
 		zbx_load_config(config_file);
+	}
+
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
@@ -1516,7 +1521,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1567,14 +1572,14 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_zbx_program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{
 #if defined(_WINDOWS)
-			zbx_tls_init_parent(get_program_type);
+			zbx_tls_init_parent(get_zbx_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls, get_program_type);
+			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type, NULL);
 		}
 #else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
@@ -1594,9 +1599,9 @@ int	main(int argc, char **argv)
 	}
 #endif
 	sendval_args->zbx_config_tls = zbx_config_tls;
-	sendval_args->zbx_get_program_type_cb_arg = get_program_type;
 	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
+			ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
 
 	if (INPUT_FILE)
@@ -1839,9 +1844,11 @@ int	main(int argc, char **argv)
 			ret = SUCCEED;
 
 			zbx_json_addobject(&sendval_args->json, NULL);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&sendval_args->json);
 
 			succeed_count++;
@@ -1868,13 +1875,11 @@ exit:
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
-#if defined(_WINDOWS)
-		zbx_tls_library_deinit();
-#endif
+		zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-	zabbix_close_log();
+	zbx_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif

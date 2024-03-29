@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,21 +20,20 @@
 #include "datasender.h"
 
 #include "zbxcommshigh.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"
-#include "zbxavailability.h"
-#include "zbxnum.h"
 #include "zbxtime.h"
-#include "../taskmanager/taskmanager.h"
-
-extern zbx_vector_ptr_t	zbx_addrs;
-extern char		*CONFIG_HOSTNAME;
-extern char		*CONFIG_SOURCE_IP;
+#include "../taskmanager/taskmanager_proxy.h"
+#include "zbxjson.h"
+#include "zbxproxybuffer.h"
+#include "version.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxtypes.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -52,7 +51,8 @@ extern char		*CONFIG_SOURCE_IP;
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
  *                                                                            *
- * Parameters: buffer - [IN] the contents of a packet (JSON)                  *
+ * Parameters: buffer - [IN] contents of a packet (JSON)                      *
+ *             state  - [OUT]                                                 *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
@@ -66,11 +66,11 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 	if (NULL == buffer || '\0' == *buffer || SUCCEED != zbx_json_open(buffer, &jp))
 		return;
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_UPLOAD, value, sizeof(value), NULL))
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, value, sizeof(value), NULL))
 	{
-		if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED))
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED))
 			*state = ZBX_PROXY_UPLOAD_ENABLED;
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED))
+		else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
 			*state = ZBX_PROXY_UPLOAD_DISABLED;
 	}
 }
@@ -81,8 +81,8 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *config_tls,
-		const zbx_thread_info_t *info, int config_timeout)
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_thread_info_t *info,
+		zbx_thread_datasender_args *args)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
@@ -91,7 +91,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
-				host_avail_records = 0;
+				host_avail_records = 0, data_read = FAIL;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
@@ -103,34 +103,36 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, args->config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp &&
+	if (SUCCEED == upload_state && args->config_proxydata_frequency <= now - data_timestamp &&
 			ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 	{
-		if (SUCCEED == get_interface_availability_data(&j, &availability_ts))
+		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+		history_records = zbx_pb_history_get_rows(&j, &history_lastid, &more_history);
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+		discovery_records = zbx_pb_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
 		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
-		areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+		areg_records = zbx_pb_autoreg_get_rows(&j, &areg_lastid, &more_areg);
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
-		host_avail_records = proxy_get_host_active_availability(&j);
+		host_avail_records = zbx_proxy_get_host_active_availability(&j);
 
 		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
 						ZBX_PROXY_DATA_MORE != more_areg)
 		{
 			data_timestamp = now;
 		}
+
+		data_read = SUCCEED;
 	}
 
 	zbx_vector_tm_task_create(&tasks);
@@ -156,6 +158,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	if (0 != flags)
 	{
 		size_t	buffer_size, reserved;
+		time_t	time_connect;
 
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg)
@@ -170,7 +173,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
 
-		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
@@ -182,11 +185,14 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
+		time_connect = time(NULL);
+
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		/* retry till have a connection */
-		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, config_tls))
+		if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
+				args->config_timeout, args->config_proxydata_frequency, LOG_LEVEL_WARNING,
+				args->zbx_config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -221,7 +227,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 			if (0 != (flags & ZBX_DATASENDER_DB_UPDATE))
 			{
-				DBbegin();
+				zbx_db_begin();
 
 				if (0 != (flags & ZBX_DATASENDER_TASKS))
 				{
@@ -236,31 +242,24 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
-				{
-					zbx_uint64_t	history_maxid;
-					DB_RESULT	result;
-					DB_ROW		row;
-
-					result = DBselect("select max(id) from proxy_history");
-
-					if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-						history_maxid = history_lastid;
-					else
-						ZBX_STR2UINT64(history_maxid, row[0]);
-
-					DBfree_result(result);
-
-					reset_proxy_history_count(history_maxid - history_lastid);
-					proxy_set_hist_lastid(history_lastid);
-				}
+					zbx_pb_set_history_lastid(history_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
-					proxy_set_dhis_lastid(discovery_lastid);
+					zbx_pb_discovery_set_lastid(discovery_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
-					proxy_set_areg_lastid(areg_lastid);
+					zbx_pb_autoreg_set_lastid(areg_lastid);
 
-				DBcommit();
+				zbx_db_commit();
+			}
+
+			if (SUCCEED == data_read)
+			{
+				/* elapsed time being greater than connection timeout means */
+				/* there were connection retries and the 'more' flag might  */
+				/* not represent the latest database buffer state           */
+				if (time(NULL) - time_connect <= args->config_timeout)
+					zbx_pb_update_state(*more);
 			}
 		}
 
@@ -301,11 +300,12 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg,
+			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -320,8 +320,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		do
 		{
-			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state,
-					datasender_args_in->zbx_config_tls, info, datasender_args_in->config_timeout);
+			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, info,
+					datasender_args_in);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;

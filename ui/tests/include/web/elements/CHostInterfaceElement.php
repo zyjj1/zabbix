@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 					$element = $row->query($xpath)->one(false);
 
 					if ($element->isValid()) {
-						$form = $element->asForm(['normalized' => true]);
+						$form = $element->asGridForm(['normalized' => true]);
 						$fields = $form->getFields();
 					}
 				}
@@ -170,7 +170,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 		$element = $row->query($xpath)->one(false);
 
 		if ($element->isValid()) {
-			$form = $element->asForm(['normalized' => true]);
+			$form = $element->asGridForm(['normalized' => true]);
 
 			// Expand row for SNMP interface.
 			$button = $row->getColumn(0)->query('tag:button')->one();

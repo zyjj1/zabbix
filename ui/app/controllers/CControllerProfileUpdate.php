@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.charts.filter.active':
+				case 'web.connector.filter.active':
 				case 'web.correlation.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':
@@ -52,7 +53,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hosts.graphs.filter.active':
 				case 'web.hosts.host_discovery.filter.active':
 				case 'web.hosts.httpconf.filter.active':
-				case 'web.hosts.items.filter.active':
+				case 'web.hosts.items.list.filter.active':
 				case 'web.hosts.triggers.filter.active':
 				case 'web.hostsmon.filter.active':
 				case 'web.httpdetails.filter.active':
@@ -79,7 +80,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.graphs.filter.active':
 				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
-				case 'web.templates.items.filter.active':
+				case 'web.templates.items.list.filter.active':
 				case 'web.templates.triggers.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':

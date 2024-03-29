@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,31 +30,26 @@ window.ldap_edit_popup = new class {
 		this.overlay = null;
 		this.dialogue = null;
 		this.form = null;
-		this.advanced_chbox = null;
 	}
 
 	init({provision_groups, provision_media}) {
 		this.overlay = overlays_stack.getById('ldap_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.advanced_chbox = document.getElementById('advanced_configuration');
 		this.allow_jit_chbox = document.getElementById('provision_status');
 		this.provision_groups_table = document.getElementById('ldap-user-groups-table');
 
-		this.toggleAdvancedConfiguration(this.advanced_chbox.checked);
 		this.toggleAllowJitProvisioning(this.allow_jit_chbox.checked);
 		this.toggleGroupConfiguration();
 
 		this._addEventListeners();
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
+
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_addEventListeners() {
-		this.advanced_chbox.addEventListener('change', (e) => {
-			this.toggleAdvancedConfiguration(e.target.checked);
-		});
-
 		this.allow_jit_chbox.addEventListener('change', (e) => {
 			this.toggleAllowJitProvisioning(e.target.checked);
 		});
@@ -85,18 +80,12 @@ window.ldap_edit_popup = new class {
 					this.editProvisionMediaType(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove()
+					e.target.closest('tr').remove();
 				}
 			});
 
 		if (document.getElementById('bind-password-btn') !== null) {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
-		}
-	}
-
-	toggleAdvancedConfiguration(checked) {
-		for (const element of this.form.querySelectorAll('.advanced-configuration')) {
-			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 		}
 	}
 
@@ -144,7 +133,9 @@ window.ldap_edit_popup = new class {
 		let fields = {...{provision_status: <?= JIT_PROVISIONING_DISABLED ?>}, ...getFormFields(this.form)};
 		fields = this.preprocessFormFields(fields);
 
-		const test_overlay = PopUp('popup.ldap.test.edit', fields, {dialogueid: 'ldap_test_edit'});
+		const test_overlay = PopUp('popup.ldap.test.edit', fields,
+			{dialogueid: 'ldap_test_edit', dialogue_class: 'modal-popup-medium'}
+		);
 		test_overlay.xhr.then(() => this.overlay.unsetLoading());
 	}
 
@@ -153,7 +144,7 @@ window.ldap_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const fields = this.preprocessFormFields(getFormFields(this.form));
-		const curl = new Curl(this.form.getAttribute('action'), false);
+		const curl = new Curl(this.form.getAttribute('action'));
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
@@ -202,11 +193,6 @@ window.ldap_edit_popup = new class {
 	preprocessFormFields(fields) {
 		this.trimFields(fields);
 
-		if (fields.advanced_configuration != 1) {
-			delete fields.start_tls;
-			delete fields.search_filter;
-		}
-
 		if (fields.provision_status != <?= JIT_PROVISIONING_ENABLED ?>) {
 			delete fields.group_basedn;
 			delete fields.group_name;
@@ -222,8 +208,6 @@ window.ldap_edit_popup = new class {
 		if (fields.userdirectoryid == null) {
 			delete fields.userdirectoryid;
 		}
-
-		delete fields.advanced_configuration;
 
 		return fields;
 	}
@@ -275,7 +259,9 @@ window.ldap_edit_popup = new class {
 
 		popup_params.idp_type = <?= IDP_TYPE_LDAP ?>;
 
-		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
+		const overlay = PopUp('popup.usergroupmapping.edit', popup_params,
+			{dialogueid: 'user_group_edit', dialogue_class: 'modal-popup-medium'}
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const new_row = this._renderProvisionGroupRow({...e.detail, ...{row_index}});
@@ -312,7 +298,9 @@ window.ldap_edit_popup = new class {
 			};
 		}
 
-		const overlay = PopUp('popup.mediatypemapping.edit', popup_params, {dialogueid: 'media_type_mapping_edit'});
+		const overlay = PopUp('popup.mediatypemapping.edit', popup_params,
+			{dialogueid: 'media_type_mapping_edit', dialogue_class: 'modal-popup-medium'}
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const mapping = {...e.detail, ...{row_index: row_index}};

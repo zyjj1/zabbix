@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@
 
 #include "zbxtypes.h"
 
-int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		int *scope, char **error);
+int	rtc_option_get_parameter(const char *param, size_t *size, char **error);
+int	rtc_option_get_pid(const char *param, size_t *size, pid_t *pid, char **error);
+int	rtc_option_get_process_type(const char *param, size_t *size, int *proc_type, char **error);
+int	rtc_option_get_process_num(const char *param, size_t *size, int *proc_num, char **error);
+int	rtc_option_get_prof_scope(const char *param, size_t pos, int *scope);
 
 #endif

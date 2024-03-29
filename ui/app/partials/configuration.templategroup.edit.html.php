@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
  */
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup')))->removeId())
 	->setId('templategroupForm')
 	->setName('templategroupForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('groupid', $data['groupid'])
-	->addItem((new CInput('submit'))->addStyle('display: none;'));
+	->addVar('groupid', $data['groupid']);
 
 $form_grid = (new CFormGrid())
 	->addItem([

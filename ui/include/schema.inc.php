@@ -28,6 +28,22 @@ return [
 			]
 		]
 	],
+	'ugset' => [
+		'key' => 'ugsetid',
+		'fields' => [
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'hash' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
 	'users' => [
 		'key' => 'userid',
 		'fields' => [
@@ -193,6 +209,22 @@ return [
 			]
 		]
 	],
+	'hgset' => [
+		'key' => 'hgsetid',
+		'fields' => [
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'hash' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
 	'hosts' => [
 		'key' => 'hostid',
 		'fields' => [
@@ -201,12 +233,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'host' => [
 				'null' => false,
@@ -329,18 +361,6 @@ return [
 				'length' => 512,
 				'default' => ''
 			],
-			'proxy_address' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'auto_compress' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
-			],
 			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -363,6 +383,18 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
+				'default' => ''
+			],
+			'vendor_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			],
+			'vendor_version' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
 				'default' => ''
 			]
 		]
@@ -398,6 +430,44 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'hgset_group' => [
+		'key' => 'hgsetid,groupid',
+		'fields' => [
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hgset',
+				'ref_field' => 'hgsetid'
+			],
+			'groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hstgrp',
+				'ref_field' => 'groupid'
+			]
+		]
+	],
+	'host_hgset' => [
+		'key' => 'hostid',
+		'fields' => [
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			],
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hgset',
+				'ref_field' => 'hgsetid'
 			]
 		]
 	],
@@ -439,8 +509,13 @@ return [
 		]
 	],
 	'group_discovery' => [
-		'key' => 'groupid',
+		'key' => 'groupdiscoveryid',
 		'fields' => [
+			'groupdiscoveryid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
 			'groupid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -472,6 +547,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -483,12 +564,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'name' => [
 				'null' => false,
@@ -513,6 +594,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'concurrency_max' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
@@ -614,6 +707,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'allow_redirect' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -658,13 +757,13 @@ return [
 			'http_user' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => ''
 			],
 			'http_password' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => ''
 			],
 			'hostid' => [
@@ -962,7 +1061,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '90d'
+				'default' => '31d'
 			],
 			'trends' => [
 				'null' => false,
@@ -1040,13 +1139,13 @@ return [
 			'username' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => ''
 			],
 			'password' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => ''
 			],
 			'publickey' => [
@@ -1089,7 +1188,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '30d'
+				'default' => '7d'
 			],
 			'evaltype' => [
 				'null' => false,
@@ -1114,7 +1213,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '3s'
+				'default' => ''
 			],
 			'url' => [
 				'null' => false,
@@ -1124,8 +1223,7 @@ return [
 			],
 			'query_fields' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'posts' => [
@@ -1228,11 +1326,23 @@ return [
 				'length' => 32,
 				'default' => ''
 			],
-			'name_upper' => [
+			'lifetime_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'enabled_lifetime_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2'
+			],
+			'enabled_lifetime' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '0'
 			]
 		]
 	],
@@ -1394,12 +1504,6 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'exec_params' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
 			'maxsessions' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -1498,6 +1602,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => ''
+			],
+			'sortorder' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -1578,6 +1688,19 @@ return [
 				'default' => NULL,
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
+			],
+			'mfa_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'mfaid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'mfa',
+				'ref_field' => 'mfaid'
 			]
 		]
 	],
@@ -1602,6 +1725,44 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
+			]
+		]
+	],
+	'ugset_group' => [
+		'key' => 'ugsetid,usrgrpid',
+		'fields' => [
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'ugset',
+				'ref_field' => 'ugsetid'
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			]
+		]
+	],
+	'user_ugset' => [
+		'key' => 'userid',
+		'fields' => [
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'ugset',
+				'ref_field' => 'ugsetid'
 			]
 		]
 	],
@@ -1732,6 +1893,36 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
+			],
+			'manualinput' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'manualinput_prompt' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'manualinput_validator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'manualinput_validator_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'manualinput_default_value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],
@@ -1878,6 +2069,35 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'optag' => [
+		'key' => 'optagid',
+		'fields' => [
+			'optagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'operations',
+				'ref_field' => 'operationid'
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],
@@ -2404,7 +2624,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '365d'
+				'default' => '31d'
 			],
 			'hk_sessions_mode' => [
 				'null' => false,
@@ -2434,7 +2654,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '90d'
+				'default' => '31d'
 			],
 			'hk_trends_mode' => [
 				'null' => false,
@@ -2667,7 +2887,7 @@ return [
 			'url' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'report_test_timeout' => [
@@ -2720,7 +2940,7 @@ return [
 			'geomaps_tile_url' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'length' => 2048,
 				'default' => ''
 			],
 			'geomaps_max_zoom' => [
@@ -2779,6 +2999,79 @@ return [
 				'default' => NULL,
 				'ref_table' => 'usrgrp',
 				'ref_field' => 'usrgrpid'
+			],
+			'timeout_zabbix_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_simple_check' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_snmp_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_external_check' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_db_monitor' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_http_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_ssh_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_telnet_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'timeout_script' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s'
+			],
+			'auditlog_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'mfa_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'mfaid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'mfa',
+				'ref_field' => 'mfaid'
 			]
 		]
 	],
@@ -3513,6 +3806,31 @@ return [
 			]
 		]
 	],
+	'permission' => [
+		'key' => 'ugsetid,hgsetid',
+		'fields' => [
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'ugset',
+				'ref_field' => 'ugsetid'
+			],
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hgset',
+				'ref_field' => 'hgsetid'
+			],
+			'permission' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2'
+			]
+		]
+	],
 	'services' => [
 		'key' => 'serviceid',
 		'fields' => [
@@ -4095,7 +4413,7 @@ return [
 			'url' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			]
 		]
@@ -4123,7 +4441,7 @@ return [
 			'url' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'elementtype' => [
@@ -4689,12 +5007,42 @@ return [
 			]
 		]
 	],
+	'history_bin' => [
+		'key' => 'itemid,clock,ns',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ns' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_BLOB,
+				'length' => 2048,
+				'default' => ''
+			]
+		]
+	],
 	'proxy_history' => [
 		'key' => 'id',
 		'fields' => [
 			'id' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
+				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'itemid' => [
@@ -4782,7 +5130,7 @@ return [
 		'fields' => [
 			'id' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
+				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'clock' => [
@@ -4833,6 +5181,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => ''
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
 				'default' => ''
 			]
 		]
@@ -5176,12 +5530,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'host' => [
 				'null' => false,
@@ -5231,7 +5585,7 @@ return [
 		'fields' => [
 			'id' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
+				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'clock' => [
@@ -5469,18 +5823,19 @@ return [
 		]
 	],
 	'globalvars' => [
-		'key' => 'globalvarid',
+		'key' => 'name',
 		'fields' => [
-			'globalvarid' => [
+			'name' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
 			],
-			'snmp_lastsize' => [
+			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
-				'length' => 20,
-				'default' => '0'
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
@@ -5508,6 +5863,12 @@ return [
 				'default' => '0'
 			],
 			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'status' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -5733,19 +6094,19 @@ return [
 			'url_a' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'url_b' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'url_c' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'host_networks' => [
@@ -6040,6 +6401,24 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'disable_source' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ts_disable' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -6080,6 +6459,24 @@ return [
 				'default' => '0'
 			],
 			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'disable_source' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ts_disable' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -6191,6 +6588,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'secret' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -6218,6 +6621,24 @@ return [
 				'default' => '0'
 			],
 			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'disable_source' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ts_disable' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -6289,6 +6710,30 @@ return [
 				'default' => '0'
 			],
 			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			]
+		]
+	],
+	'item_rtname' => [
+		'key' => 'itemid',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'name_resolved' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'name_resolved_upper' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
@@ -6790,12 +7235,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			]
 		]
 	],
@@ -6975,7 +7420,7 @@ return [
 			],
 			'info' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			]
 		]
@@ -7506,7 +7951,7 @@ return [
 			'value_str' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'value_groupid' => [
@@ -8054,7 +8499,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '90d'
+				'default' => '31d'
 			]
 		]
 	],
@@ -8976,24 +9421,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			],
-			'lastaccess' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'version' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'compatibility' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
@@ -9412,6 +9839,441 @@ return [
 				'length' => 20,
 				'ref_table' => 'scim_group',
 				'ref_field' => 'scim_groupid'
+			]
+		]
+	],
+	'connector' => [
+		'key' => 'connectorid',
+		'fields' => [
+			'connectorid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'protocol' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'data_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'max_records' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'max_senders' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'max_attempts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'timeout' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '5s'
+			],
+			'http_proxy' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'authtype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'username' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'password' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'token' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'verify_peer' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'verify_host' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'ssl_cert_file' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'ssl_key_file' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'ssl_key_password' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'tags_evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'item_value_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '31'
+			],
+			'attempt_interval' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '5s'
+			]
+		]
+	],
+	'connector_tag' => [
+		'key' => 'connector_tagid',
+		'fields' => [
+			'connector_tagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'connectorid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'connector',
+				'ref_field' => 'connectorid'
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			]
+		]
+	],
+	'proxy' => [
+		'key' => 'proxyid',
+		'fields' => [
+			'proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'operating_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
+			],
+			'tls_connect' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'tls_accept' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'tls_issuer' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
+			],
+			'tls_subject' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
+			],
+			'tls_psk_identity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'tls_psk' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 512,
+				'default' => ''
+			],
+			'allowed_addresses' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'address' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '127.0.0.1'
+			],
+			'port' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '10051'
+			],
+			'custom_timeouts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'timeout_zabbix_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_simple_check' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_snmp_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_external_check' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_db_monitor' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_http_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_ssh_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_telnet_agent' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'timeout_script' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			]
+		]
+	],
+	'proxy_rtdata' => [
+		'key' => 'proxyid',
+		'fields' => [
+			'proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
+			],
+			'lastaccess' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'version' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'compatibility' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'mfa' => [
+		'key' => 'mfaid',
+		'fields' => [
+			'mfaid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'hash_function' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'code_length' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '6'
+			],
+			'api_hostname' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
+			],
+			'clientid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
+			],
+			'client_secret' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
+	'mfa_totp_secret' => [
+		'key' => 'mfa_totp_secretid',
+		'fields' => [
+			'mfa_totp_secretid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'mfaid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'mfa',
+				'ref_field' => 'mfaid'
+			],
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'totp_secret' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],

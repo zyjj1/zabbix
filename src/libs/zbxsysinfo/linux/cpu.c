@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "zbxnum.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

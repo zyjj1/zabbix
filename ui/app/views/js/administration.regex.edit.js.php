@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -231,9 +231,7 @@
 		});
 
 		$('#tbl_expr')
-			.dynamicRows({
-				template: '#row-expression-tmpl'
-			})
+			.dynamicRows({template: '#row-expression-tmpl', allow_empty: true})
 			.on('change', '.js-expression-type-select', (e) => {
 				$(e.target)
 					.closest('[data-index]')
@@ -249,7 +247,7 @@
 				url.setArgument(field.name, field.value);
 			});
 
-			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+			redirect(url.getUrl(), 'post', 'action', undefined, true);
 		});
 	});
 </script>

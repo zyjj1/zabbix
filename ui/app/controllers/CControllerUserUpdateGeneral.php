@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,10 @@ abstract class CControllerUserUpdateGeneral extends CController {
 			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
 				? GROUP_GUI_ACCESS_INTERNAL
 				: GROUP_GUI_ACCESS_LDAP;
+
+		if (!$usrgrps) {
+			return $system_gui_access == GROUP_GUI_ACCESS_INTERNAL;
+		}
 
 		foreach($usrgrps as $usrgrp) {
 			$gui_access = ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM)
@@ -130,6 +134,19 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				return false;
 			}
 		}
+		else {
+			[$db_user] = API::User()->get([
+				'output' => [],
+				'selectRole' => ['roleid'],
+				'userids' => $this->getInput('userid')
+			]);
+
+			if ($db_user['role']) {
+				error(_s('Field "%1$s" is mandatory.', 'roleid'));
+
+				return false;
+			}
+		}
 
 		return true;
 	}
@@ -161,19 +178,13 @@ abstract class CControllerUserUpdateGeneral extends CController {
 		if ($this instanceof CControllerUserProfileUpdate) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
-				'userids' => CWebUser::$data['userid'],
-				'filter' => [
-					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
-				]
+				'userids' => CWebUser::$data['userid']
 			]);
 		}
 		elseif ($this->getInput('user_groups', [])) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
-				'usrgrpids' => $this->getInput('user_groups'),
-				'filter' => [
-					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
-				]
+				'usrgrpids' => $this->getInput('user_groups')
 			]);
 		}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ typedef struct
 }
 zbx_vc_item_stats_t;
 
-int	zbx_vc_init(char **error);
+int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error);
 
 void	zbx_vc_destroy(void);
 
@@ -118,5 +118,7 @@ void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, in
 void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem);
 void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
+
+void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items);
 
 #endif

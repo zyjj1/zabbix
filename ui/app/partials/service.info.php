@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,8 +77,8 @@ if (array_key_exists('slas', $data)) {
 
 			$sla_html[] = ': ';
 			$sla_html[] = CSlaHelper::getSliTag($current_period_sli, (float) $sla['slo']);
-			$sla_html[] = (new CLink())
-				->addClass(ZBX_STYLE_ICON_DESCRIPTION)
+			$sla_html[] = (new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
+				->setAttribute('data-content', '?')
 				->setHint($hint);
 		}
 
@@ -86,7 +86,7 @@ if (array_key_exists('slas', $data)) {
 	}
 
 	if ($data['slas_count'] > count($data['slas'])) {
-		$slas[] = (new CDiv('&hellip;'))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
+		$slas[] = (new CDiv(HELLIP()))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
 	}
 }
 
@@ -97,8 +97,7 @@ if (array_key_exists('slas', $data)) {
 			(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME),
 			(new CDiv(
 				$data['is_editable']
-					? (new CButton(null))
-						->addClass(ZBX_STYLE_BTN_EDIT)
+					? (new CButtonIcon(ZBX_ICON_PENCIL, _('Edit')))
 						->addClass('js-edit-service')
 						->setAttribute('data-serviceid', $data['service']['serviceid'])
 						->setEnabled(!$data['service']['readonly'])

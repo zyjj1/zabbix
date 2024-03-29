@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,6 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
-
-ZBX_METRIC	parameter_hostname =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     0,              system_hostname,        NULL};
 
 int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

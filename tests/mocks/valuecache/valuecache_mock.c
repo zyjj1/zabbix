@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,13 +24,14 @@
 
 #include "zbxcachevalue.h"
 #include "zbxnum.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "history.h"
 #include "zbxcacheconfig.h"
+#include "zbx_dbversion_constants.h"
 
 #include <setjmp.h>
 #include <cmocka.h>
@@ -54,7 +55,7 @@ void	__wrap_zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
-int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 void	__wrap_zbx_elastic_version_extract(void);
 int	__wrap_zbx_elastic_version_get(void);
@@ -108,6 +109,12 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 				value->dbl = atof(data);
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				break;
+			case ITEM_VALUE_TYPE_NONE:
+			default:
+				fail_msg("Unexpected value type: %c", value_type);
 		}
 	}
 	else
@@ -197,6 +204,10 @@ static void	zbx_vcmock_ds_clone_record(const zbx_history_record_t *src, unsigned
 			log->timestamp = src->value.log->timestamp;
 			dst->value.log = log;
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			fail_msg("Unexpected value type: %c", value_type);
 	}
 }
 
@@ -328,23 +339,6 @@ zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts value cache mode from text format                        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vcmock_str_to_cache_mode(const char *mode)
-{
-	if (0 == strcmp(mode, "ZBX_VC_MODE_NORMAL"))
-		return ZBX_VC_MODE_NORMAL;
-
-	if (0 == strcmp(mode, "ZBX_VC_MODE_LOWMEM"))
-		return ZBX_VC_MODE_LOWMEM;
-
-	fail_msg("Unknown value cache mode \"%s\"", mode);
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: converts value cache item status from text format                 *
  *                                                                            *
  ******************************************************************************/
@@ -408,13 +402,17 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_mock_assert_double_eq(prefix, expected->value.dbl, returned->value.dbl);
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_NONE:
+			default:
+				fail_msg("Unexpected value type: %c", value_type);
 		}
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads ZBX_DC_HISTORY vector from input data                       *
+ * Purpose: reads zbx_dc_history_t vector from input data                     *
  *                                                                            *
  * Parameters: handle  - [IN] the history data handle in input data           *
  *             history - [OUT] the history records                            *
@@ -424,7 +422,7 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
 {
 	zbx_mock_handle_t	hitem, hdata;
 	zbx_mock_error_t	err;
-	ZBX_DC_HISTORY		*data;
+	zbx_dc_history_t	*data;
 	const char		*itemid;
 
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(handle, &hitem))))
@@ -435,8 +433,8 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
 					zbx_mock_error_string(err));
 		}
 
-		data = (ZBX_DC_HISTORY *)zbx_malloc(NULL, sizeof(ZBX_DC_HISTORY));
-		memset(data, 0, sizeof(ZBX_DC_HISTORY));
+		data = (zbx_dc_history_t *)zbx_malloc(NULL, sizeof(zbx_dc_history_t));
+		memset(data, 0, sizeof(zbx_dc_history_t));
 
 		itemid = zbx_mock_get_object_member_string(hitem, "itemid");
 		if (SUCCEED != zbx_is_uint64(itemid, &data->itemid))
@@ -452,12 +450,12 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees ZBX_DC_HISTORY structure                                    *
+ * Purpose: frees zbx_dc_history_t structure                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vcmock_free_dc_history(void *ptr)
 {
-	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)ptr;
+	zbx_dc_history_t	*h = (zbx_dc_history_t *)ptr;
 
 	switch (h->value_type)
 	{
@@ -470,6 +468,13 @@ void	zbx_vcmock_free_dc_history(void *ptr)
 			zbx_free(h->value.log->value);
 			zbx_free(h->value.log);
 			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			fail_msg("Unexpected value type: %c", h->value_type);
 	}
 
 	zbx_free(h);
@@ -627,7 +632,7 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (NULL == (item = zbx_hashset_search(&vc_ds.items, &h->itemid)))
 		{
@@ -648,13 +653,10 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 	return SUCCEED;
 }
 
-int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type)
 {
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
-	ZBX_UNUSED(error);
-
-	return SUCCEED;
 }
 
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
@@ -739,31 +741,6 @@ void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemi
 	*seconds = atoi(zbx_mock_get_object_member_string(handle, "seconds"));
 	*count = atoi(zbx_mock_get_object_member_string(handle, "count"));
 	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "end"), end);
-}
-
-/*
- * cache working mode handling
- */
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sets value cache mode if the specified key is present in input    *
- *          data                                                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
-{
-	const char		*data;
-	zbx_mock_handle_t	hmode;
-	zbx_mock_error_t	err;
-
-	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hitem, key, &hmode))
-	{
-		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hmode, &data)))
-			fail_msg("Cannot read \"%s\" parameter: %s", key, zbx_mock_error_string(err));
-
-		zbx_vc_set_mode(zbx_vcmock_str_to_cache_mode(data));
-	}
 }
 
 /*

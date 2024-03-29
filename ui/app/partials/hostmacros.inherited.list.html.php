@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,39 +73,38 @@ else {
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
+				->disableSpellcheck()
 		];
 
-		if (!$data['readonly']) {
-			$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
+		$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
 
-			if (array_key_exists('hostmacroid', $macro)) {
-				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
-			}
+		if (array_key_exists('hostmacroid', $macro)) {
+			$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
+		}
 
-			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
+		$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 
-			if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
-				$inherited_macro = $macro[$macro['inherited_level']];
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
-			}
+		if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
+			$inherited_macro = $macro[$macro['inherited_level']];
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
+		}
 
-			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-				$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
-				$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
-				$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
-			}
+		if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
+			$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
+			$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
+			$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
+		}
 
-			if (array_key_exists('allow_revert', $macro)) {
-				$macro_value->setAttribute('placeholder', 'value');
-				$macro_value->addRevertButton();
-				$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
-					|| array_key_exists('value', $macro)
-				);
+		if (array_key_exists('allow_revert', $macro)) {
+			$macro_value->setAttribute('placeholder', 'value');
+			$macro_value->addRevertButton();
+			$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
+				|| array_key_exists('value', $macro)
+			);
 
-				$macro_cell[] = new CVar('macros[' . $i . '][allow_revert]', '1');
-			}
+			$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
 		}
 
 		if (array_key_exists('value', $macro)) {
@@ -155,7 +154,7 @@ else {
 
 		// Parent host macro value.
 		if ($is_hostprototype) {
-			$row[] = array_key_exists('parent_host', $macro) ? '&lArr;' : '';
+			$row[] = array_key_exists('parent_host', $macro) ? LARR() : '';
 			$row[] = (new CDiv(array_key_exists('parent_host', $macro) ? '"'.$macro['parent_host']['value'].'"' : null))
 				->setAdaptiveWidth($inherited_width)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
@@ -166,26 +165,24 @@ else {
 
 		if (array_key_exists('template', $macro)) {
 			if ($macro['template']['rights'] == PERM_READ_WRITE) {
-				$link = (new CLink(CHtml::encode($macro['template']['name']),
-					'templates.php?form=update&templateid='.$macro['template']['templateid'])
-				)
-					->addClass('unknown')
-					->setTarget('_blank');
+				$link = (new CLink($macro['template']['name']))
+					->addClass('js-edit-linked-template')
+					->setAttribute('data-templateid', $macro['template']['templateid']);
 			}
 			else {
-				$link = new CSpan(CHtml::encode($macro['template']['name']));
+				$link = new CSpan($macro['template']['name']);
 			}
 
 			$template_macro = [$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'];
 		}
 
-		$row[] = array_key_exists('template', $macro) ? '&lArr;' : '';
+		$row[] = array_key_exists('template', $macro) ? LARR() : '';
 		$row[] = (new CDiv(array_key_exists('template', $macro) ? $template_macro : null))
 			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 		// Global macro value.
-		$row[] = array_key_exists('global', $macro) ? '&lArr;' : '';
+		$row[] = array_key_exists('global', $macro) ? LARR() : '';
 		$row[] = (new CDiv(array_key_exists('global', $macro) ? '"'.$macro['global']['value'].'"' : null))
 			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);

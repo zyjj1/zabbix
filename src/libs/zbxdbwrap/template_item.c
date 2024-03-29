@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,15 @@
 
 #include "zbxdbhigh.h"
 
-#include "log.h"
+#include "template.h"
+
 #include "zbxcacheconfig.h"
+#include "zbxdb.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+
+#include "zbxalgo.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
@@ -117,15 +122,15 @@ zbx_lld_rule_map_t;
 
 typedef struct
 {
-	zbx_uint64_t		overrideid;
-	zbx_uint64_t		itemid;
-	char			*name;
-	char			*formula;
-	zbx_vector_ptr_t	override_conditions;
-	zbx_vector_ptr_t	override_operations;
-	unsigned char		step;
-	unsigned char		evaltype;
-	unsigned char		stop;
+	zbx_uint64_t				overrideid;
+	zbx_uint64_t				itemid;
+	char					*name;
+	char					*formula;
+	zbx_vector_ptr_t			override_conditions;
+	zbx_vector_lld_override_operation_t	override_operations;
+	unsigned char				step;
+	unsigned char				evaltype;
+	unsigned char				stop;
 }
 lld_override_t;
 
@@ -141,11 +146,11 @@ lld_override_codition_t;
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	unsigned char	type;
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select type,interfaceid"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
@@ -153,12 +158,12 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
 				" and main=1",
 			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UCHAR(type, row[0]);
 		ZBX_STR2UINT64(interfaceids[type - 1], row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -179,8 +184,8 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  ******************************************************************************/
 static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *items)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, i;
 	unsigned char		interface_type;
@@ -214,11 +219,12 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				" and hi.hostid=" ZBX_FS_UI64
 			" where",
 			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		item = (zbx_template_item_t *)zbx_malloc(NULL, sizeof(zbx_template_item_t));
 
@@ -384,7 +390,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 
 		item->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG;
 
-		if (SUCCEED != DBis_null(row[26]))
+		if (SUCCEED != zbx_db_is_null(row[26]))
 		{
 			unsigned char	uchar_orig;
 			zbx_uint64_t	uint64_orig;
@@ -409,19 +415,20 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	}				\
 }
 
-#define SET_FLAG_UINT64(r, i, f)			\
-							\
-{							\
-	if (SUCCEED == DBis_null(r))			\
-		uint64_orig = 0;			\
-	else						\
-		ZBX_STR2UINT64(uint64_orig, (r));	\
-	if (uint64_orig != (i))				\
-	{						\
-		item->upd_flags |= f;			\
-		i##_orig = uint64_orig;			\
-	}						\
-}
+#define SET_FLAG_UINT64(r, i, f)				\
+	do							\
+	{							\
+		if (SUCCEED == zbx_db_is_null(r))		\
+			uint64_orig = 0;			\
+		else						\
+			ZBX_STR2UINT64(uint64_orig, (r));	\
+		if (uint64_orig != (i))				\
+		{						\
+			item->upd_flags |= f;			\
+			i##_orig = uint64_orig;			\
+		}						\
+	}							\
+	while(0)
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
@@ -490,7 +497,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		zbx_vector_lld_macro_ptr_create(&item->template_lld_macros);
 		zbx_vector_ptr_append(items, item);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 
@@ -513,8 +520,8 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 	zbx_lld_rule_condition_t	*condition;
 	int				i, index;
 	zbx_vector_uint64_t		itemids;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid, item_conditionid;
@@ -551,11 +558,11 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select item_conditionid,itemid,operator,macro,value from item_condition where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
-		result = DBselect("%s", sql);
+		result = zbx_db_select("%s", sql);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
@@ -634,7 +641,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -670,7 +677,7 @@ static int	calculate_template_lld_rule_conditionids(zbx_vector_ptr_t *rules)
 	if (0 == conditions_num)
 		goto out;
 
-	conditionid = DBget_maxid_num("item_condition", conditions_num);
+	conditionid = zbx_db_get_maxid_num("item_condition", conditions_num);
 
 	for (i = 0; i < rules->values_num; i++)
 	{
@@ -765,24 +772,26 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: save (insert or update) template item                             *
+ * Purpose: saves (inserts or updates) template item                          *
  *                                                                            *
- * Parameters: hostid            - [IN] parent host id                        *
- *             itemid            - [IN/OUT] item id used for insert           *
- *                                          operations                        *
- *             item              - [IN] item to be saved                      *
- *             db_insert_items   - [IN] prepared item bulk insert             *
- *             db_insert_irtdata - [IN] prepared item discovery bulk insert   *
- *             sql               - [IN/OUT] sql buffer pointer used for       *
- *                                          update operations                 *
- *             sql_alloc         - [IN/OUT] sql buffer already allocated      *
- *                                          memory                            *
- *             sql_offset        - [IN/OUT] offset for writing within sql     *
- *                                          buffer                            *
+ * Parameters: hostid             - [IN] parent host id                       *
+ *             itemid             - [IN/OUT] item id used for insert          *
+ *                                           operations                       *
+ *             item               - [IN] item to be saved                     *
+ *             db_insert_items    - [IN] prepared item bulk insert            *
+ *             db_insert_irtdata  - [IN] prepared item discovery bulk insert  *
+ *             audit_context_mode - [IN]                                      *
+ *             sql                - [IN/OUT] sql buffer pointer used for      *
+ *                                           update operations                *
+ *             sql_alloc          - [IN/OUT] sql buffer already allocated     *
+ *                                           memory                           *
+ *             sql_offset         - [IN/OUT] offset for writing within sql    *
+ *                                           buffer                           *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_template_item_t *item,
-		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata, char **sql, size_t *sql_alloc,
+		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata,
+		zbx_db_insert_t *db_insert_irtname, int audit_context_mode, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
 	int			i;
@@ -795,6 +804,11 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		char		*str_esc;
 		const char	*d = "";
 
+		/* Even if there are no updates for an item, we must create audit entry for it */
+		/* to accommodate other entities changes that depend on an item (like tags).   */
+		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_UPDATE, item->itemid, item->name,
+				item->flags);
+
 		if (0 == item->upd_flags)
 			goto dependent;
 
@@ -804,56 +818,60 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=%s", d,			\
-					DBsql_id_ins(item->field));						\
+					zbx_db_sql_id_ins(item->field));					\
 			d = ",";										\
 														\
-			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					item->field##_orig, item->field);					\
-		}
+			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
+					item->flags, item->field##_orig, item->field);				\
+		}												\
+
 #define PREPARE_UPDATE_STR(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
-			str_esc = DBdyn_escape_string(item->field);						\
+			str_esc = zbx_db_dyn_escape_string(item->field);					\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"='%s'", d, str_esc);		\
 			d = ",";										\
 			zbx_free(str_esc);									\
 														\
-			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					item->field##_orig, item->field);					\
-		}
+			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
+					item->flags, item->field##_orig, item->field);				\
+		}												\
+
 #define PREPARE_UPDATE_STR_SECRET(FLAG_POSTFIX, field)								\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
-			str_esc = DBdyn_escape_string(item->field);						\
+			str_esc = zbx_db_dyn_escape_string(item->field);					\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"='%s'", d, str_esc);		\
 			d = ",";										\
 			zbx_free(str_esc);									\
 														\
-			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					(0 == strcmp("", item->field##_orig) ? "" : ZBX_MACRO_SECRET_MASK),	\
-					(0 == strcmp("", item->field) ? "" : ZBX_MACRO_SECRET_MASK));		\
-		}
-#define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
+			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
+					item->flags, (0 == strcmp("", item->field##_orig) ? "" :		\
+					ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->field) ? "" :		\
+					ZBX_MACRO_SECRET_MASK));						\
+		}												\
+
+#define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)				\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=%d", d, (int)item->field);	\
 			d = ",";										\
 														\
-			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					(int)item->field##_orig, (int)item->field);				\
-		}
-#define PREPARE_UPDATE_UINT64(FLAG_POSTFIX, field)								\
+			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
+					item->flags, (int)item->field##_orig, (int)item->field);		\
+		}												\
+
+#define PREPARE_UPDATE_UINT64(FLAG_POSTFIX, field)			\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=" ZBX_FS_UI64, d,		\
 					item->field);								\
 			d = ",";										\
 														\
-			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					item->field##_orig, item->field);					\
+			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
+					item->flags, item->field##_orig, item->field);				\
 		}
 
-		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
 		PREPARE_UPDATE_STR(NAME, name)
 		PREPARE_UPDATE_UC(TYPE, type)
@@ -905,6 +923,21 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		ZBX_UNUSED(d);
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
+
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME))
+		{
+			if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			{
+				str_esc = zbx_db_dyn_escape_string(item->name);
+
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_rtname set"
+						" name_resolved='%s',name_resolved_upper=upper('%s')"
+						" where itemid=" ZBX_FS_UI64 ";\n",
+						str_esc, str_esc, item->itemid);
+				zbx_free(str_esc);
+				zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+			}
+		}
 	}
 	else
 	{
@@ -923,8 +956,11 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
-		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
-		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
+		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
+
+		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
+		zbx_audit_item_update_json_add_data(audit_context_mode, *itemid, item, hostid);
 
 		item->itemid = (*itemid)++;
 	}
@@ -937,8 +973,8 @@ dependent:
 			dependent->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_UPDATE_MASTER_ITEMID;
 
 		dependent->master_itemid = item->itemid;
-		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, sql, sql_alloc,
-				sql_offset);
+		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, db_insert_irtname,
+				audit_context_mode, sql, sql_alloc, sql_offset);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -946,19 +982,21 @@ dependent:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: saves template items to the target host in database               *
+ * Purpose: saves template items to target host in database                   *
  *                                                                            *
- * Parameters:  hostid - [IN] the target host                                 *
- *              items  - [IN] the template items                              *
+ * Parameters:                                                                *
+ *              hostid             - [IN] target host                         *
+ *              items              - [IN] template items                      *
+ *              audit_context_mode - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
+static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	int			new_items = 0, upd_items = 0, i;
 	zbx_uint64_t		itemid = 0;
-	zbx_db_insert_t		db_insert_items, db_insert_irtdata;
+	zbx_db_insert_t		db_insert_items, db_insert_irtdata, db_insert_irtname;
 	zbx_template_item_t	*item;
 
 	if (0 == items->values_num)
@@ -976,7 +1014,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 
 	if (0 != new_items)
 	{
-		itemid = DBget_maxid_num("items", new_items);
+		itemid = zbx_db_get_maxid_num("items", new_items);
 
 		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type",
 				"value_type", "delay", "history", "trends", "status", "trapper_hosts", "units",
@@ -987,15 +1025,17 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"timeout", "url", "query_fields", "posts", "status_codes", "follow_redirects",
 				"post_type", "http_proxy", "headers", "retrieve_mode", "request_method",
 				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
-				"verify_host", "allow_traps", "discover", NULL);
+				"verify_host", "allow_traps", "discover", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", NULL);
+		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
+				"name_resolved_upper", (char *)NULL);
 	}
 
 	if (0 != upd_items)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1006,7 +1046,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		if (0 == item->master_itemid)
 		{
 			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
-					&sql, &sql_alloc, &sql_offset);
+					&db_insert_irtname, audit_context_mode, &sql, &sql_alloc, &sql_offset);
 		}
 	}
 
@@ -1015,16 +1055,18 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		zbx_db_insert_execute(&db_insert_items);
 		zbx_db_insert_clean(&db_insert_items);
 
+		zbx_db_insert_execute(&db_insert_irtname);
+		zbx_db_insert_clean(&db_insert_irtname);
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 	}
 
 	if (0 != upd_items)
 	{
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
 		zbx_free(sql);
 	}
@@ -1035,13 +1077,15 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
  * Purpose: saves template lld rule item conditions to the target host in     *
  *          database                                                          *
  *                                                                            *
- * Parameters:  items          - [IN] the template items                      *
- *              rules          - [IN] the lld rule mapping                    *
- *              new_conditions - [IN] the number of new item conditions to    *
- *                                    be inserted                             *
+ * Parameters:  items              - [IN] template items                      *
+ *              rules              - [IN] lld rule mapping                    *
+ *              new_conditions     - [IN] number of new item conditions to be *
+ *                                        inserted                            *
+ *              audit_context_mode - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules, int new_conditions)
+static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules, int new_conditions,
+		int audit_context_mode)
 {
 	char				*macro_esc, *value_esc;
 	int				i, j, index;
@@ -1062,7 +1106,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 	if (0 != new_conditions)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_condition", "item_conditionid", "itemid", "operator", "macro",
-				"value", NULL);
+				"value", (char *)NULL);
 
 		/* insert lld rule conditions for new items */
 		for (i = 0; i < items->values_num; i++)
@@ -1092,15 +1136,16 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				zbx_db_insert_add_values(&db_insert, rule->conditionid, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
 
-				zbx_audit_discovery_rule_update_json_add_filter_conditions(item->itemid,
-						rule->conditionid, condition->op, condition->macro, condition->value);
+				zbx_audit_discovery_rule_update_json_add_filter_conditions(audit_context_mode,
+						item->itemid, rule->conditionid, condition->op, condition->macro,
+						condition->value);
 
 				rule->conditionid++;
 			}
 		}
 	}
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* update lld rule conditions for existing items */
 	for (i = 0; i < rules->values_num; i++)
@@ -1123,8 +1168,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			if (0 == condition->upd_flags)
 				continue;
 
-			zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(rule->itemid,
-					rule->conditionids.values[j]);
+			zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(audit_context_mode,
+					rule->itemid, rule->conditionids.values[j]);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_condition set ");
 			if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_OPERATOR))
@@ -1132,41 +1177,41 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%soperator=%d", d,
 						(int)condition->op);
 				d = ",";
-				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(rule->itemid,
-						rule->conditionids.values[j], (int)condition->op_orig,
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(audit_context_mode,
+						rule->itemid, rule->conditionids.values[j], (int)condition->op_orig,
 						(int)condition->op);
 			}
 			if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO))
 			{
-				macro_esc = DBdyn_escape_string(condition->macro);
+				macro_esc = zbx_db_dyn_escape_string(condition->macro);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smacro='%s'", d, macro_esc);
 				d = ",";
 				zbx_free(macro_esc);
 
-				zbx_audit_discovery_rule_update_json_update_filter_conditions_macro(rule->itemid,
-						rule->conditionids.values[j], condition->macro_orig,
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_macro(audit_context_mode,
+						rule->itemid, rule->conditionids.values[j], condition->macro_orig,
 						condition->macro);
 			}
 			if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_VALUE))
 			{
-				value_esc = DBdyn_escape_string(condition->value);
+				value_esc = zbx_db_dyn_escape_string(condition->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 				zbx_free(value_esc);
 
-				zbx_audit_discovery_rule_update_json_update_filter_conditions_value(rule->itemid,
-						rule->conditionids.values[j], condition->value_orig,
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_value(audit_context_mode,
+						rule->itemid, rule->conditionids.values[j], condition->value_orig,
 						condition->value);
 			}
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_conditionid=" ZBX_FS_UI64 ";\n",
 					rule->conditionids.values[j]);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		/* delete removed rule conditions */
 		for (j = index; j < rule->conditionids.values_num; j++)
 		{
-			zbx_audit_discovery_rule_update_json_delete_filter_conditions(rule->itemid,
+			zbx_audit_discovery_rule_update_json_delete_filter_conditions(audit_context_mode, rule->itemid,
 					rule->conditionids.values[j]);
 			zbx_vector_uint64_append(&item_conditionids, rule->conditionids.values[j]);
 		}
@@ -1179,8 +1224,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			zbx_db_insert_add_values(&db_insert, rule->conditionid, rule->itemid,
 					(int)condition->op, condition->macro, condition->value);
 
-			zbx_audit_discovery_rule_update_json_add_filter_conditions(rule->itemid, rule->conditionid,
-					condition->op, condition->macro, condition->value);
+			zbx_audit_discovery_rule_update_json_add_filter_conditions(audit_context_mode, rule->itemid,
+					rule->conditionid, condition->op, condition->macro, condition->value);
 
 			rule->conditionid++;
 		}
@@ -1190,15 +1235,15 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 	if (0 != item_conditionids.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_condition where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_conditionid", item_conditionids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_conditionid", item_conditionids.values,
 				item_conditionids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 	if (0 != new_conditions)
 	{
@@ -1216,8 +1261,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
  *                                                                            *
  * Purpose: saves host item prototypes in database                            *
  *                                                                            *
- * Parameters:  hostid  - [IN] the target host                                *
- *              items   - [IN] the template items                             *
+ * Parameters:  hostid  - [IN] target host                                    *
+ *              items   - [IN] template items                                 *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
@@ -1229,8 +1274,8 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 	}
 	zbx_proto_t;
 
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
@@ -1266,11 +1311,11 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 				" and r.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids.values, itemids.values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids.values, itemids.values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		proto = (zbx_proto_t *)zbx_malloc(NULL, sizeof(zbx_proto_t));
 
@@ -1279,13 +1324,13 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 
 		zbx_vector_ptr_append(&prototypes, proto);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == prototypes.values_num)
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert, "item_discovery", "itemdiscoveryid", "itemid",
-					"parent_itemid", NULL);
+					"parent_itemid", (char *)NULL);
 
 	for (i = 0; i < prototypes.values_num; i++)
 	{
@@ -1426,7 +1471,7 @@ static void	free_template_item(zbx_template_item_t *item)
  *                                                                            *
  * Purpose: frees lld rule condition                                          *
  *                                                                            *
- * Parameters:  item  - [IN] the lld rule condition                           *
+ * Parameters:  condition  - [IN]                                             *
  *                                                                            *
  ******************************************************************************/
 static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
@@ -1480,7 +1525,7 @@ static int	template_item_compare_func(const void *d1, const void *d2)
  * Parameters: items       - [IN] vector of new/updated items                 *
  *                                                                            *
  ******************************************************************************/
-static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
+static void	copy_template_items_preproc(const zbx_vector_ptr_t *items, int audit_context_mode)
 {
 	int				i, j, new_preproc_num = 0, update_preproc_num = 0, delete_preproc_num = 0;
 	char				*sql = NULL;
@@ -1506,7 +1551,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, preproc->item_preprocid);
-				zbx_audit_item_delete_preproc(item->itemid, item->flags, preproc->item_preprocid);
+				zbx_audit_item_delete_preproc(audit_context_mode, item->itemid, item->flags,
+						preproc->item_preprocid);
 				continue;
 			}
 
@@ -1524,14 +1570,14 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_preproc_num)
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_preproc_num)
 	{
-		new_preprocid = DBget_maxid_num("item_preproc", new_preproc_num);
+		new_preprocid = zbx_db_get_maxid_num("item_preproc", new_preproc_num);
 
 		zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params",
-				"error_handler", "error_handler_params", NULL);
+				"error_handler", "error_handler_params", (char *)NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1549,8 +1595,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 						preproc->type, preproc->params, preproc->error_handler,
 						preproc->error_handler_params);
 
-				zbx_audit_item_update_json_add_item_preproc(item->itemid, new_preprocid, item->flags,
-						preproc->step, preproc->type, preproc->params,
+				zbx_audit_item_update_json_add_item_preproc(audit_context_mode, item->itemid, new_preprocid,
+						item->flags, preproc->step, preproc->type, preproc->params,
 						preproc->error_handler, preproc->error_handler_params);
 
 				new_preprocid++;
@@ -1561,8 +1607,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			if (0 == (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE))
 				continue;
 
-			zbx_audit_item_update_json_update_item_preproc_create_entry(item->itemid, item->flags,
-					preproc->item_preprocid);
+			zbx_audit_item_update_json_update_item_preproc_create_entry(audit_context_mode, item->itemid,
+					item->flags, preproc->item_preprocid);
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_preproc set ");
 
@@ -1571,22 +1617,24 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d, preproc->type);
 				d = ",";
 
-				zbx_audit_item_update_json_update_item_preproc_type(item->itemid, item->flags,
-						preproc->item_preprocid, preproc->type_orig, preproc->type);
+				zbx_audit_item_update_json_update_item_preproc_type(audit_context_mode, item->itemid,
+						item->flags, preproc->item_preprocid, preproc->type_orig,
+						preproc->type);
 			}
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_PARAMS))
 			{
 				char	*params_esc;
 
-				params_esc = DBdyn_escape_string(preproc->params);
+				params_esc = zbx_db_dyn_escape_string(preproc->params);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sparams='%s'", d, params_esc);
 
 				zbx_free(params_esc);
 				d = ",";
 
-				zbx_audit_item_update_json_update_item_preproc_params(item->itemid, item->flags,
-						preproc->item_preprocid, preproc->params_orig, preproc->params);
+				zbx_audit_item_update_json_update_item_preproc_params(audit_context_mode, item->itemid,
+						item->flags, preproc->item_preprocid, preproc->params_orig,
+						preproc->params);
 			}
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER))
@@ -1595,39 +1643,39 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 						preproc->error_handler);
 				d = ",";
 
-				zbx_audit_item_update_json_update_item_preproc_error_handler(item->itemid, item->flags,
-						preproc->item_preprocid, preproc->error_handler_orig,
-						preproc->error_handler);
+				zbx_audit_item_update_json_update_item_preproc_error_handler(audit_context_mode,
+						item->itemid, item->flags, preproc->item_preprocid,
+						preproc->error_handler_orig, preproc->error_handler);
 			}
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
 			{
 				char	*params_esc;
 
-				params_esc = DBdyn_escape_string(preproc->error_handler_params);
+				params_esc = zbx_db_dyn_escape_string(preproc->error_handler_params);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror_handler_params='%s'", d,
 						params_esc);
 
 				zbx_free(params_esc);
 
-				zbx_audit_item_update_json_update_item_preproc_error_handler_params(item->itemid,
-						item->flags, preproc->item_preprocid,
+				zbx_audit_item_update_json_update_item_preproc_error_handler_params(audit_context_mode,
+						item->itemid, item->flags, preproc->item_preprocid,
 						preproc->error_handler_params_orig, preproc->error_handler_params);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_preprocid=" ZBX_FS_UI64 ";\n",
 					preproc->item_preprocid);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 	}
 
 	if (0 != update_preproc_num)
 	{
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 	}
 
 	if (0 != new_preproc_num)
@@ -1640,9 +1688,9 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_preproc where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_preprocid", deleteids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_preprocid", deleteids.values,
 				deleteids.values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 		delete_preproc_num = deleteids.values_num;
 	}
@@ -1655,12 +1703,14 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template item tags                                           *
+ * Purpose: copies template item tags                                         *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters:                                                                *
+ *             items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
+static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_context_mode)
 {
 	int				i, j, new_tag_num = 0, update_tag_num = 0, delete_tag_num = 0;
 	char				*sql = NULL;
@@ -1686,7 +1736,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			{
 				zbx_vector_uint64_append(&deleteids, tag->tagid);
-				zbx_audit_item_delete_tag(item->itemid, item->flags, tag->tagid);
+				zbx_audit_item_delete_tag(audit_context_mode, item->itemid, item->flags, tag->tagid);
 				continue;
 			}
 
@@ -1704,12 +1754,12 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_tag_num)
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_tag_num)
 	{
-		new_tagid = DBget_maxid_num("item_tag", new_tag_num);
-		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+		new_tagid = zbx_db_get_maxid_num("item_tag", new_tag_num);
+		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1725,8 +1775,8 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			if (0 == tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, tag->tag, tag->value);
-				zbx_audit_item_update_json_add_item_tag(item->itemid, new_tagid, item->flags, tag->tag,
-						tag->value);
+				zbx_audit_item_update_json_add_item_tag(audit_context_mode, item->itemid, new_tagid,
+						item->flags, tag->tag, tag->value);
 				new_tagid++;
 
 				continue;
@@ -1735,20 +1785,20 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			if (0 == (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 				continue;
 
-			zbx_audit_item_update_json_update_item_tag_create_entry(item->itemid, item->flags,
-					tag->tagid);
+			zbx_audit_item_update_json_update_item_tag_create_entry(audit_context_mode, item->itemid,
+					item->flags, tag->tagid);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_tag set ");
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 			{
 				char	*tag_esc;
 
-				tag_esc = DBdyn_escape_string(tag->tag);
+				tag_esc = zbx_db_dyn_escape_string(tag->tag);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stag='%s'", d, tag_esc);
 
 				d = ",";
-				zbx_audit_item_update_json_update_item_tag_tag(item->itemid, item->flags,
-						tag->tagid, tag->tag_orig, tag->tag);
+				zbx_audit_item_update_json_update_item_tag_tag(audit_context_mode, item->itemid,
+						item->flags, tag->tagid, tag->tag_orig, tag->tag);
 				zbx_free(tag_esc);
 
 			}
@@ -1757,10 +1807,10 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			{
 				char	*value_esc;
 
-				value_esc = DBdyn_escape_string(tag->value);
+				value_esc = zbx_db_dyn_escape_string(tag->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
-				zbx_audit_item_update_json_update_item_tag_value(item->itemid, item->flags,
-						tag->tagid, tag->value_orig, tag->value);
+				zbx_audit_item_update_json_update_item_tag_value(audit_context_mode, item->itemid,
+						item->flags, tag->tagid, tag->value_orig, tag->value);
 
 				zbx_free(value_esc);
 			}
@@ -1768,17 +1818,17 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemtagid=" ZBX_FS_UI64 ";\n",
 					tag->tagid);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 	}
 
 	if (0 != update_tag_num)
 	{
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 	}
 
 	if (0 != new_tag_num)
@@ -1793,9 +1843,9 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_tag where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemtagid", deleteids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemtagid", deleteids.values,
 				deleteids.values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 		delete_tag_num = deleteids.values_num;
 	}
@@ -1808,12 +1858,14 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template item script parameters                              *
+ * Purpose: copies template item script parameters                            *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters:                                                                *
+ *             items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
+static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int audit_context_mode)
 {
 	int				i, j, new_param_num = 0, update_param_num = 0, delete_param_num = 0;
 	char				*sql = NULL;
@@ -1839,7 +1891,8 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, param->item_parameterid);
-				zbx_audit_item_delete_params(item->itemid, item->flags, param->item_parameterid);
+				zbx_audit_item_delete_params(audit_context_mode, item->itemid, item->flags,
+						param->item_parameterid);
 				continue;
 			}
 
@@ -1857,13 +1910,13 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_param_num)
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_param_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_parameter", "item_parameterid", "itemid", "name", "value",
-				NULL);
-		item_parameter_id = DBget_maxid_num("item_parameter", new_param_num);
+				(char *)NULL);
+		item_parameter_id = zbx_db_get_maxid_num("item_parameter", new_param_num);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1880,7 +1933,8 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 			{
 				zbx_db_insert_add_values(&db_insert, item_parameter_id, item->itemid, param->name,
 						param->value);
-				zbx_audit_item_update_json_add_params(item->itemid, item->flags, item_parameter_id,
+				zbx_audit_item_update_json_add_params(audit_context_mode, item->itemid, item->flags,
+						item_parameter_id,
 						param->name, param->value);
 				item_parameter_id++;
 				continue;
@@ -1889,8 +1943,8 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 			if (0 == (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
-			zbx_audit_item_update_json_update_params_create_entry(item->itemid, item->flags,
-					param->item_parameterid);
+			zbx_audit_item_update_json_update_params_create_entry(audit_context_mode, item->itemid,
+					item->flags, param->item_parameterid);
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_parameter set ");
 
@@ -1898,43 +1952,43 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 			{
 				char	*name_esc;
 
-				name_esc = DBdyn_escape_string(param->name);
+				name_esc = zbx_db_dyn_escape_string(param->name);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sname='%s'", d, name_esc);
 
 				zbx_free(name_esc);
 				d = ",";
 
-				zbx_audit_item_update_json_update_params_name(item->itemid, item->flags,
-						param->item_parameterid, param->name_orig, param->name);
+				zbx_audit_item_update_json_update_params_name(audit_context_mode, item->itemid,
+						item->flags, param->item_parameterid, param->name_orig, param->name);
 			}
 
 			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
 			{
 				char	*value_esc;
 
-				value_esc = DBdyn_escape_string(param->value);
+				value_esc = zbx_db_dyn_escape_string(param->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 
 				zbx_free(value_esc);
 
-				zbx_audit_item_update_json_update_params_value(item->itemid, item->flags,
-						param->item_parameterid, param->value_orig, param->value);
+				zbx_audit_item_update_json_update_params_value(audit_context_mode, item->itemid,
+						item->flags, param->item_parameterid, param->value_orig, param->value);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_parameterid=" ZBX_FS_UI64 ";\n",
 					param->item_parameterid);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 	}
 
 	if (0 != update_param_num)
 	{
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 	}
 
 	if (0 != new_param_num)
@@ -1947,9 +2001,9 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_parameter where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_parameterid", deleteids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_parameterid", deleteids.values,
 				deleteids.values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 		delete_param_num = deleteids.values_num;
 	}
@@ -1962,12 +2016,14 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template discovery item lld macro paths                      *
+ * Purpose: copies template discovery item lld macro paths                    *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters:                                                                *
+ *             items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
+static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int audit_context_mode)
 {
 	int				i, j, new_lld_macro_num = 0, update_lld_macro_num = 0, delete_lld_macro_num = 0;
 	char				*sql = NULL;
@@ -1993,8 +2049,8 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			if (0 != (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, lld_macro->lld_macro_pathid);
-				zbx_audit_discovery_rule_update_json_delete_lld_macro_path(item->itemid,
-						lld_macro->lld_macro_pathid);
+				zbx_audit_discovery_rule_update_json_delete_lld_macro_path(audit_context_mode,
+						item->itemid, lld_macro->lld_macro_pathid);
 				continue;
 			}
 
@@ -2014,23 +2070,23 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 	if (0 != deleteids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_macro_path where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_macro_pathid", deleteids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_macro_pathid", deleteids.values,
 				deleteids.values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 		delete_lld_macro_num = deleteids.values_num;
 		sql_offset = 0;
 	}
 
 	if (0 != update_lld_macro_num)
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_lld_macro_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path",
-				NULL);
+				(char *)NULL);
 
-		new_lld_macro_pathid = DBget_maxid_num("lld_macro_path", new_lld_macro_num);
+		new_lld_macro_pathid = zbx_db_get_maxid_num("lld_macro_path", new_lld_macro_num);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -2047,8 +2103,9 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 				zbx_db_insert_add_values(&db_insert, new_lld_macro_pathid, item->itemid,
 						lld_macro->lld_macro, lld_macro->path);
 
-				zbx_audit_discovery_rule_update_json_add_lld_macro_path(item->itemid,
-						new_lld_macro_pathid, lld_macro->lld_macro, lld_macro->path);
+				zbx_audit_discovery_rule_update_json_add_lld_macro_path(audit_context_mode,
+						item->itemid, new_lld_macro_pathid, lld_macro->lld_macro,
+						lld_macro->path);
 
 				new_lld_macro_pathid++;
 				continue;
@@ -2057,8 +2114,8 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			if (0 == (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE))
 				continue;
 
-			zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(item->itemid,
-					lld_macro->lld_macro_pathid);
+			zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(audit_context_mode,
+					item->itemid, lld_macro->lld_macro_pathid);
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro_path set ");
 
@@ -2066,14 +2123,14 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			{
 				char	*lld_macro_esc;
 
-				lld_macro_esc = DBdyn_escape_string(lld_macro->lld_macro);
+				lld_macro_esc = zbx_db_dyn_escape_string(lld_macro->lld_macro);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%slld_macro='%s'", d, lld_macro_esc);
 
 				zbx_free(lld_macro_esc);
 				d = ",";
 
-				zbx_audit_discovery_rule_update_json_update_lld_macro_path_lld_macro(item->itemid,
-						lld_macro->lld_macro_pathid, lld_macro->lld_macro_orig,
+				zbx_audit_discovery_rule_update_json_update_lld_macro_path_lld_macro(audit_context_mode,
+						item->itemid, lld_macro->lld_macro_pathid, lld_macro->lld_macro_orig,
 						lld_macro->lld_macro);
 			}
 
@@ -2081,29 +2138,30 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			{
 				char	*path_esc;
 
-				path_esc = DBdyn_escape_string(lld_macro->path);
+				path_esc = zbx_db_dyn_escape_string(lld_macro->path);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spath='%s'", d, path_esc);
 
 				zbx_free(path_esc);
 
-				zbx_audit_discovery_rule_update_json_update_lld_macro_path_path(item->itemid,
-						lld_macro->lld_macro_pathid, lld_macro->path_orig, lld_macro->path);
+				zbx_audit_discovery_rule_update_json_update_lld_macro_path_path(audit_context_mode,
+						item->itemid, lld_macro->lld_macro_pathid, lld_macro->path_orig,
+						lld_macro->path);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macro_pathid=" ZBX_FS_UI64 ";\n",
 					lld_macro->lld_macro_pathid);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 	}
 
 	if (0 != update_lld_macro_num)
 	{
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 	}
 
 	if (0 != new_lld_macro_num)
@@ -2130,8 +2188,8 @@ static void	lld_override_free(lld_override_t *override)
 {
 	zbx_vector_ptr_clear_ext(&override->override_conditions, (zbx_clean_func_t)lld_override_condition_free);
 	zbx_vector_ptr_destroy(&override->override_conditions);
-	zbx_vector_ptr_clear_ext(&override->override_operations, (zbx_clean_func_t)zbx_lld_override_operation_free);
-	zbx_vector_ptr_destroy(&override->override_operations);
+	zbx_vector_lld_override_operation_clear_ext(&override->override_operations, zbx_lld_override_operation_free);
+	zbx_vector_lld_override_operation_destroy(&override->override_operations);
 	zbx_free(override->name);
 	zbx_free(override->formula);
 	zbx_free(override);
@@ -2141,8 +2199,8 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 		char **sql, size_t *sql_alloc)
 {
 	size_t			sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		overrideid;
 	int			i;
 	lld_override_t		*override;
@@ -2152,11 +2210,11 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 		"select lld_overrideid,lld_override_conditionid,operator,macro,value"
 			" from lld_override_condition"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "lld_overrideid", overrideids->values,
+	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "lld_overrideid", overrideids->values,
 			overrideids->values_num);
 
-	result = DBselect("%s", *sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", *sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(overrideid, row[0]);
 
@@ -2176,26 +2234,26 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 
 		zbx_vector_ptr_append(&override->override_conditions, override_condition);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
 {
-	lld_override_t			*override;
-	zbx_lld_override_operation_t	*op;
-	zbx_vector_ptr_t		ops;
-	int				i, index;
+	zbx_vector_lld_override_operation_t	ops;
+	int					i, index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&ops);
+	zbx_vector_lld_override_operation_create(&ops);
 
 	zbx_load_lld_override_operations(overrideids, sql, sql_alloc, &ops);
 
 	for (i = 0; i < ops.values_num; i++)
 	{
-		op = (zbx_lld_override_operation_t *)ops.values[i];
+		lld_override_t			*override;
+		zbx_lld_override_operation_t	*op = ops.values[i];
+
 		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &op->overrideid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2203,16 +2261,17 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		override = (lld_override_t *)overrides->values[index];
-		zbx_vector_ptr_append(&override->override_operations, op);
+		override = overrides->values[index];
+		zbx_vector_lld_override_operation_append(&override->override_operations, op);
 	}
 
-	zbx_vector_ptr_destroy(&ops);
+	zbx_vector_lld_override_operation_destroy(&ops);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset_t *lld_items)
+static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset_t *lld_items,
+		int audit_context_mode)
 {
 	zbx_uint64_t			overrideid, override_operationid = 0, override_conditionid = 0;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
@@ -2228,13 +2287,13 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != overrides->values_num)
-		overrideid = DBget_maxid_num("lld_override", overrides->values_num);
+		overrideid = zbx_db_get_maxid_num("lld_override", overrides->values_num);
 
 	zbx_db_insert_prepare(&db_insert, "lld_override", "lld_overrideid", "itemid", "name", "step", "evaltype",
-			"formula", "stop", NULL);
+			"formula", "stop", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_oconditions, "lld_override_condition", "lld_override_conditionid",
-			"lld_overrideid", "operator", "macro", "value", NULL);
+			"lld_overrideid", "operator", "macro", "value", (char *)NULL);
 
 	for (i = 0, operations_num = 0, conditions_num = 0; i < overrides->values_num; i++)
 	{
@@ -2244,35 +2303,36 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 	}
 
 	if (0 != operations_num)
-		override_operationid = DBget_maxid_num("lld_override_operation", operations_num);
+		override_operationid = zbx_db_get_maxid_num("lld_override_operation", operations_num);
 
 	if (0 != conditions_num)
-		override_conditionid = DBget_maxid_num("lld_override_condition", conditions_num);
+		override_conditionid = zbx_db_get_maxid_num("lld_override_condition", conditions_num);
 
 	zbx_db_insert_prepare(&db_insert_ooperations, "lld_override_operation", "lld_override_operationid",
-				"lld_overrideid", "operationobject", "operator", "value", NULL);
+				"lld_overrideid", "operationobject", "operator", "value", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status", NULL);
+	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status",
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_opdiscover, "lld_override_opdiscover", "lld_override_operationid", "discover",
-			NULL);
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_opperiod, "lld_override_opperiod", "lld_override_operationid", "delay",
-			NULL);
+			(char *)NULL);
 	zbx_db_insert_prepare(&db_insert_ophistory, "lld_override_ophistory", "lld_override_operationid", "history",
-			NULL);
+			(char *)NULL);
 	zbx_db_insert_prepare(&db_insert_optrends, "lld_override_optrends", "lld_override_operationid", "trends",
-			NULL);
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_opseverity, "lld_override_opseverity", "lld_override_operationid", "severity",
-			NULL);
+			(char *)NULL);
 	zbx_db_insert_prepare(&db_insert_optag, "lld_override_optag", "lld_override_optagid",
-			"lld_override_operationid", "tag", "value", NULL);
+			"lld_override_operationid", "tag", "value", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_optemplate, "lld_override_optemplate", "lld_override_optemplateid",
-				"lld_override_operationid", "templateid", NULL);
+				"lld_override_operationid", "templateid", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_opinventory, "lld_override_opinventory", "lld_override_operationid",
-			"inventory_mode", NULL);
+			"inventory_mode", (char *)NULL);
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
@@ -2295,7 +2355,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 					(int)override_condition->operator, override_condition->macro,
 					override_condition->value);
 
-			zbx_audit_discovery_rule_update_json_add_lld_override_condition((*pitem)->itemid, overrideid,
+			zbx_audit_discovery_rule_update_json_add_lld_override_condition(audit_context_mode, (*pitem)->itemid,
+					overrideid,
 				override_conditionid, (int)override_condition->operator, override_condition->macro,
 				override_condition->value);
 
@@ -2312,11 +2373,11 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 		zbx_db_insert_add_values(&db_insert, overrideid, (*pitem)->itemid, override->name, (int)override->step,
 				(int)override->evaltype, override->formula, (int)override->stop);
 
-		zbx_audit_discovery_rule_update_json_add_lld_override((*pitem)->itemid, overrideid, override->name,
-				(int)override->step, (int)override->stop);
+		zbx_audit_discovery_rule_update_json_add_lld_override(audit_context_mode, (*pitem)->itemid, overrideid,
+				override->name, (int)override->step, (int)override->stop);
 
-		zbx_audit_discovery_rule_update_json_add_lld_override_filter((*pitem)->itemid, overrideid,
-				(int)override->evaltype, override->formula);
+		zbx_audit_discovery_rule_update_json_add_lld_override_filter(audit_context_mode, (*pitem)->itemid,
+				overrideid, (int)override->evaltype, override->formula);
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
@@ -2326,17 +2387,18 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 					(int)override_operation->operationtype, (int)override_operation->operator,
 					override_operation->value);
 
-			zbx_audit_discovery_rule_update_json_add_lld_override_operation((*pitem)->itemid,
-					overrideid, override_operationid, (int)override_operation->operator,
-					override_operation->value);
+			zbx_audit_discovery_rule_update_json_add_lld_override_operation(audit_context_mode,
+					(*pitem)->itemid, overrideid, override_operationid,
+					(int)override_operation->operator, override_operation->value);
 
 			if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)
 			{
 				zbx_db_insert_add_values(&db_insert_opstatus, override_operationid,
 						(int)override_operation->status);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_opstatus((*pitem)->itemid,
-						overrideid, override_operationid, (int)override_operation->status);
+				zbx_audit_discovery_rule_update_json_add_lld_override_opstatus(audit_context_mode,
+						(*pitem)->itemid, overrideid, override_operationid,
+						(int)override_operation->status);
 			}
 
 			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
@@ -2344,8 +2406,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				zbx_db_insert_add_values(&db_insert_opdiscover, override_operationid,
 						(int)override_operation->discover);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_opdiscover((*pitem)->itemid,
-						overrideid,override_operationid, (int)override_operation->discover);
+				zbx_audit_discovery_rule_update_json_add_lld_override_opdiscover(audit_context_mode,
+						(*pitem)->itemid, overrideid,override_operationid,
+						(int)override_operation->discover);
 			}
 
 			if (NULL != override_operation->delay)
@@ -2353,8 +2416,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				zbx_db_insert_add_values(&db_insert_opperiod, override_operationid,
 						override_operation->delay);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_opperiod((*pitem)->itemid,
-						overrideid, override_operationid, override_operation->delay);
+				zbx_audit_discovery_rule_update_json_add_lld_override_opperiod(audit_context_mode,
+						(*pitem)->itemid, overrideid, override_operationid,
+						override_operation->delay);
 			}
 
 			if (NULL != override_operation->history)
@@ -2362,8 +2426,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				zbx_db_insert_add_values(&db_insert_ophistory, override_operationid,
 						override_operation->history);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_ophistory((*pitem)->itemid,
-						overrideid, override_operationid, override_operation->history);
+				zbx_audit_discovery_rule_update_json_add_lld_override_ophistory(audit_context_mode,
+						(*pitem)->itemid, overrideid, override_operationid,
+						override_operation->history);
 			}
 
 			if (NULL != override_operation->trends)
@@ -2371,8 +2436,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				zbx_db_insert_add_values(&db_insert_optrends, override_operationid,
 						override_operation->trends);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_optrends((*pitem)->itemid,
-						overrideid, override_operationid, override_operation->trends);
+				zbx_audit_discovery_rule_update_json_add_lld_override_optrends(audit_context_mode,
+						(*pitem)->itemid, overrideid, override_operationid,
+						override_operation->trends);
 			}
 
 			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
@@ -2380,15 +2446,16 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				zbx_db_insert_add_values(&db_insert_opseverity, override_operationid,
 						(int)override_operation->severity);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_opseverity((*pitem)->itemid,
-						overrideid, override_operationid, override_operation->severity);
+				zbx_audit_discovery_rule_update_json_add_lld_override_opseverity(audit_context_mode,
+						(*pitem)->itemid, overrideid, override_operationid,
+						override_operation->severity);
 			}
 
 			if (0 != override_operation->tags.values_num)
 			{
 				zbx_uint64_t	lld_override_optagid;
 
-				lld_override_optagid = DBget_maxid_num("lld_override_optag",
+				lld_override_optagid = zbx_db_get_maxid_num("lld_override_optag",
 						override_operation->tags.values_num);
 
 				for (k = 0; k < override_operation->tags.values_num; k++)
@@ -2398,8 +2465,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 					zbx_db_insert_add_values(&db_insert_optag, lld_override_optagid,
 							override_operationid, tag->tag, tag->value);
 
-					zbx_audit_discovery_rule_update_json_add_lld_override_optag((*pitem)->itemid,
-							overrideid, lld_override_optagid, tag->tag, tag->value);
+					zbx_audit_discovery_rule_update_json_add_lld_override_optag(audit_context_mode,
+							(*pitem)->itemid, overrideid, lld_override_optagid, tag->tag,
+							tag->value);
 
 					lld_override_optagid++;
 				}
@@ -2409,7 +2477,7 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 			{
 				zbx_uint64_t	lld_override_optemplateid;
 
-				lld_override_optemplateid = DBget_maxid_num("lld_override_optemplate",
+				lld_override_optemplateid = zbx_db_get_maxid_num("lld_override_optemplate",
 						override_operation->templateids.values_num);
 
 				for (k = 0; k < override_operation->templateids.values_num; k++)
@@ -2419,7 +2487,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 						override_operation->templateids.values[k]);
 
 					zbx_audit_discovery_rule_update_json_add_lld_override_optemplate(
-							(*pitem)->itemid, overrideid, lld_override_optemplateid,
+							audit_context_mode, (*pitem)->itemid, overrideid,
+							lld_override_optemplateid,
 							override_operation->templateids.values[k]);
 
 					lld_override_optemplateid++;
@@ -2431,8 +2500,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				zbx_db_insert_add_values(&db_insert_opinventory, override_operationid,
 						(int)override_operation->inventory_mode);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override_opinventory((*pitem)->itemid,
-						overrideid, override_operationid,
+				zbx_audit_discovery_rule_update_json_add_lld_override_opinventory(audit_context_mode,
+						(*pitem)->itemid, overrideid, override_operationid,
 						(int)override_operation->inventory_mode);
 			}
 
@@ -2482,12 +2551,12 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 }
 
 static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
-		const zbx_vector_uint64_t *lld_itemids, zbx_hashset_t *lld_items)
+		const zbx_vector_uint64_t *lld_itemids, zbx_hashset_t *lld_items, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	lld_override_t		*override;
 	zbx_vector_ptr_t	overrides;
 	zbx_vector_uint64_t	overrideids;
@@ -2501,27 +2570,27 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	if (0 != lld_itemids->values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_overrideid,itemid from lld_override where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
 				lld_itemids->values_num);
-		result = DBselect("%s", sql);
+		result = zbx_db_select("%s", sql);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_t	delete_lld_overrideid, delete_itemid;
 
 			ZBX_STR2UINT64(delete_lld_overrideid, row[0]);
 			ZBX_STR2UINT64(delete_itemid, row[1]);
-			zbx_audit_discovery_rule_update_json_delete_lld_override(delete_itemid,
+			zbx_audit_discovery_rule_update_json_delete_lld_override(audit_context_mode, delete_itemid,
 					delete_lld_overrideid);
 		}
 
 		sql_offset = 0;
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_override where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
 				lld_itemids->values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 		sql_offset = 0;
 	}
 
@@ -2531,11 +2600,12 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 			" from lld_override l,items i"
 			" where l.itemid=i.itemid"
 			" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+			templateids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by l.lld_overrideid");
 
-	result = DBselect("%s", sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		override = (lld_override_t *)zbx_malloc(NULL, sizeof(lld_override_t));
 		ZBX_STR2UINT64(override->overrideid, row[0]);
@@ -2546,18 +2616,18 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		override->formula = zbx_strdup(NULL, row[5]);
 		ZBX_STR2UCHAR(override->stop, row[6]);
 		zbx_vector_ptr_create(&override->override_conditions);
-		zbx_vector_ptr_create(&override->override_operations);
+		zbx_vector_lld_override_operation_create(&override->override_operations);
 
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 		zbx_vector_ptr_append(&overrides, override);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != overrides.values_num)
 	{
 		lld_override_conditions_load(&overrides, &overrideids, &sql, &sql_alloc);
 		lld_override_operations_load(&overrides, &overrideids, &sql, &sql_alloc);
-		save_template_lld_overrides(&overrides, lld_items);
+		save_template_lld_overrides(&overrides, lld_items, audit_context_mode);
 	}
 	zbx_free(sql);
 
@@ -2669,8 +2739,8 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2695,10 +2765,10 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 				" from item_preproc ip"
 				" where ");
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
-		result = DBselect("%s", sql);
-		while (NULL != (row = DBfetch(result)))
+		result = zbx_db_select("%s", sql);
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
@@ -2716,7 +2786,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			zbx_vector_item_preproc_ptr_append(&((zbx_template_item_t *)item)->item_preprocs, ppdst);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -2729,10 +2799,11 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 			" where ip.itemid=ti.itemid"
 			" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
-	result = DBselect("%s", sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
@@ -2747,7 +2818,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 		zbx_vector_item_preproc_ptr_append(&(*pitem)->template_preprocs, ppdst);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -2847,8 +2918,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2872,10 +2943,10 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 				" from item_tag it"
 				" where ");
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
-		result = DBselect("%s", sql);
-		while (NULL != (row = DBfetch(result)))
+		result = zbx_db_select("%s", sql);
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
@@ -2892,7 +2963,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -2904,10 +2975,11 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			" where it.itemid=ti.itemid"
 			" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
-	result = DBselect("%s", sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
@@ -2922,7 +2994,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		db_tag = zbx_db_tag_create(row[1], row[2]);
 		zbx_vector_db_tag_ptr_append(&(*pitem)->template_tags, db_tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -2954,8 +3026,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2979,10 +3051,10 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 				" from item_parameter ip"
 				" where ");
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
-		result = DBselect("%s", sql);
-		while (NULL != (row = DBfetch(result)))
+		result = zbx_db_select("%s", sql);
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
@@ -2999,7 +3071,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			ZBX_STR2UINT64(db_item_param->item_parameterid, row[0]);
 			zbx_vector_item_param_ptr_append(&item->item_params, db_item_param);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -3011,10 +3083,11 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			" where ip.itemid=ti.itemid"
 			" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
-	result = DBselect("%s", sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_template_item_t	item_local, *pitem_local = &item_local, **pitem;
 
@@ -3029,7 +3102,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 		zbx_vector_item_param_ptr_append(&(*pitem)->template_params, db_item_param);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -3062,8 +3135,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	zbx_uint64_t			itemid;
 	zbx_template_lld_macro_t	*plmpsrc, *plmpdst;
 	zbx_template_item_t		*item;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3074,11 +3147,11 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 				" from lld_macro_path l"
 				" where ");
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
 				lld_itemids->values_num);
 
-		result = DBselect("%s", sql);
-		while (NULL != (row = DBfetch(result)))
+		result = zbx_db_select("%s", sql);
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
@@ -3100,7 +3173,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 			zbx_vector_lld_macro_ptr_append(&item->item_lld_macros, plmpdst);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -3112,10 +3185,11 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 			" where l.itemid=i.itemid"
 			" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+			templateids->values_num);
 
-	result = DBselect("%s", sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_template_item_t	item_local, *pitem_local = &item_local, **pitem;
 
@@ -3134,7 +3208,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 		zbx_vector_lld_macro_ptr_append(&(*pitem)->template_lld_macros, plmpdst);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -3238,13 +3312,15 @@ static void	prepare_lld_items(const zbx_vector_ptr_t *items, zbx_vector_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template items to host                                       *
+ * Purpose: copies template items to host                                     *
  *                                                                            *
- * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN]                                      *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
+void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, int audit_context_mode)
 {
 	zbx_vector_ptr_t	items, lld_rules;
 	int			new_conditions = 0;
@@ -3270,12 +3346,12 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	link_template_items_preproc(templateids, &items);
 	link_template_items_tag(templateids, &items);
 	link_template_items_param(templateids, &items);
-	save_template_items(hostid, &items);
-	save_template_lld_rules(&items, &lld_rules, new_conditions);
+	save_template_items(hostid, &items, audit_context_mode);
+	save_template_lld_rules(&items, &lld_rules, new_conditions, audit_context_mode);
 	save_template_discovery_prototypes(hostid, &items);
-	copy_template_items_preproc(&items);
-	copy_template_item_script_params(&items);
-	copy_template_item_tags(&items);
+	copy_template_items_preproc(&items, audit_context_mode);
+	copy_template_item_script_params(&items, audit_context_mode);
+	copy_template_item_tags(&items, audit_context_mode);
 
 	zbx_vector_uint64_create(&lld_itemids);
 	zbx_hashset_create(&lld_items, (size_t)items.values_num, template_item_hash_func, template_item_compare_func);
@@ -3284,8 +3360,8 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	if (0 != lld_items.num_data)
 	{
 		link_template_lld_macro_paths(templateids, &lld_itemids, &lld_items, &items);
-		copy_template_lld_macro_paths(&items);
-		copy_template_lld_overrides(templateids, &lld_itemids, &lld_items);
+		copy_template_lld_macro_paths(&items, audit_context_mode);
+		copy_template_lld_overrides(templateids, &lld_itemids, &lld_items, audit_context_mode);
 	}
 
 	zbx_hashset_destroy(&lld_items);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,9 +53,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
-
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
-
 	}
 
 	// Returns create data.
@@ -74,7 +72,9 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 					'name' => 'testInheritanceDiscoveryRule5',
 					'key' => 'discovery-rule-inheritance5',
 					'errors' => [
-						'Discovery rule "discovery-rule-inheritance5" already exists on "Template inheritance test host", inherited from another template'
+						'Cannot inherit LLD rule with key "discovery-rule-inheritance5" of template "Inheritance '.
+								'test template" to host "Template inheritance test host", because an LLD rule with the '.
+								'same key is already inherited from template "Inheritance test template 2".'
 					]
 				]
 			],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,13 +39,11 @@ $table = (new CTable())
 		(new CTag('tfoot', true))->addItem(
 			(new CCol(
 				new CHorList([
-					(new CSimpleButton(_('Add user')))
+					(new CButtonLink(_('Add user')))
 						->addClass('js-add-user')
-						->addClass(ZBX_STYLE_BTN_LINK)
 						->setEnabled($data['allowed_edit']),
-					(new CSimpleButton(_('Add user group')))
+					(new CButtonLink(_('Add user group')))
 						->addClass('js-add-user-group')
-						->addClass(ZBX_STYLE_BTN_LINK)
 						->setEnabled($data['allowed_edit'])
 				])
 			))->setColSpan(4)

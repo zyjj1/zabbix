@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('mediatype_message_form')
 	->setName('mediatype_message_form')
 	->addVar('action', 'popup.mediatype.message')
@@ -92,9 +91,10 @@ $form_list->addRow(_('Message'),
 		->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'message'))
 );
 
-$form
-	->addItem($form_list)
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+$form->addItem($form_list);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['title'],

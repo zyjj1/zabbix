@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 class CControllerProblemView extends CControllerProblem {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -44,7 +44,8 @@ class CControllerProblemView extends CControllerProblem {
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'show_symptoms' =>			'in 0,1',
 			'show_suppressed' =>		'in 0,1',
-			'unacknowledged' =>			'in 0,1',
+			'acknowledgement_status' =>	'in '.ZBX_ACK_STATUS_ALL.','.ZBX_ACK_STATUS_UNACK.','.ZBX_ACK_STATUS_ACK,
+			'acknowledged_by_me' =>		'in 0,1',
 			'compact_view' =>			'in 0,1',
 			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
 			'details' =>				'in 0,1',
@@ -62,6 +63,7 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_set' =>				'in 1',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0'
 		];
@@ -86,6 +88,10 @@ class CControllerProblemView extends CControllerProblem {
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
+		}
+		elseif ($this->hasInput('filter_set')) {
+			$profile->setTabFilter(0, ['filter_name' => ''] + $this->cleanInput($this->getInputAll()));
+			$profile->update();
 		}
 		else {
 			$profile->setInput($this->cleanInput($this->getInputAll()));
@@ -114,6 +120,9 @@ class CControllerProblemView extends CControllerProblem {
 			$refresh_curl->removeArgument('page');
 		}
 
+		$timeselector_from = $filter['filter_custom_time'] == 1 ? $filter['from'] : $profile->from;
+		$timeselector_to = $filter['filter_custom_time'] == 1 ? $filter['to'] : $profile->to;
+
 		$data = [
 			'action' => $this->getAction(),
 			'tabfilter_idx' => static::FILTER_IDX,
@@ -126,11 +135,12 @@ class CControllerProblemView extends CControllerProblem {
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
-					'from' => $profile->from,
-					'to' => $profile->to,
+					'from' => $timeselector_from,
+					'to' => $timeselector_to,
 					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
-				] + getTimeselectorActions($profile->from, $profile->to)
+				] + getTimeselectorActions($timeselector_from, $timeselector_to)
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_url' => $refresh_curl->getUrl(),

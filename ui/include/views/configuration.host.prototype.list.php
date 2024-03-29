@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,13 +71,15 @@ $hostTable = (new CTableInfo())
 		_('Tags')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('host_prototypes.php');
+
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
 	$name = [];
 	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
 		$data['allowed_ui_conf_templates']
 	);
-	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
+	$name[] = new CLink($hostPrototype['name'],
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
@@ -98,13 +100,11 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
-				$caption[] = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))
+				$caption[] = (new CLink($template['name']))
+					->addClass('js-edit-template')
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
+					->addClass(ZBX_STYLE_GREY)
+					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
 				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -117,11 +117,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
 					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
-						$caption[] = (new CLink($tpl['name'],
-							(new CUrl('templates.php'))
-								->setArgument('form', 'update')
-								->setArgument('templateid', $tpl['templateid'])
-						))
+						$caption[] = (new CLink($tpl['name']))
+							->addClass('js-edit-template')
+							->setAttribute('data-templateid',  $tpl['templateid'])
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}
@@ -156,10 +154,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
-			->setArgumentSID()
 			->getUrl()
 	))
-		->addSID()
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
@@ -173,7 +170,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -193,14 +190,23 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
-			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?')
+			'hostprototype.massenable' => [
+				'name' => _('Create enabled'),
+				'confirm_singular' => _('Create hosts from selected prototype as enabled?'),
+				'confirm_plural' => _('Create hosts from selected prototypes as enabled?'),
+				'csrf_token' => $csrf_token
 			],
-			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?')
+			'hostprototype.massdisable' => [
+				'name' => _('Create disabled'),
+				'confirm_singular' => _('Create hosts from selected prototype as disabled?'),
+				'confirm_plural' => _('Create hosts from selected prototypes as disabled?'),
+				'csrf_token' => $csrf_token
 			],
-			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?')
+			'hostprototype.massdelete' => [
+				'name' => _('Delete'),
+				'confirm_singular' => _('Delete selected host prototype?'),
+				'confirm_plural' => _('Delete selected host prototypes?'),
+				'csrf_token' => $csrf_token
 			]
 		],
 		$data['discovery_rule']['itemid']
@@ -210,3 +216,12 @@ $itemForm->addItem([
 $html_page
 	->addItem($itemForm)
 	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context'],
+		'checkbox_hash' => $data['discovery_rule']['itemid']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();;

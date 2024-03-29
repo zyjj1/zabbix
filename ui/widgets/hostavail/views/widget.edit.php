@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,9 @@
  */
 
 (new CWidgetFormView($data))
-	->addField(
-		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+	->addField(array_key_exists('groupids', $data['fields'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldCheckBoxListView($data['fields']['interface_type'])
@@ -39,4 +40,9 @@
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
 	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['only_totals'])
+	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_host_availability_form.init();')
 	->show();

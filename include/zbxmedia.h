@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 #define ZBX_MEDIA_CONTENT_TYPE_HTML	1
 #define ZBX_MEDIA_CONTENT_TYPE_MULTI	2	/* multipart/mixed message with pre-formatted message body */
 
-extern char	*CONFIG_SOURCE_IP;
-
 typedef struct
 {
 	char		*addr;
@@ -39,7 +37,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, char *error, size_t max_error_len);
+		unsigned char content_type, int timeout, const char *config_source_ip,
+		const char *config_ssl_ca_location, char **error);
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
 char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,

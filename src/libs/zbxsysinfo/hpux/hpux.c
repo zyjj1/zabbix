@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+#include "../specsysinfo.h"
 
-ZBX_METRIC	parameters_specific[] =
+static zbx_metric_t	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"vfs.fs.size",		CF_HAVEPARAMS,	vfs_fs_size,		"/,free"},
@@ -47,3 +48,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{NULL}
 };
+
+zbx_metric_t	*get_parameters_specific(void)
+{
+	return parameters_specific;
+}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,20 +20,31 @@
 
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, EntitiesTags
+ * @dataSource TagFilter, EntitiesTags, WebScenarios
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
+	/**
+	 * Attach MessageBehavior, TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
 
-	use TagTrait;
-	use TableTrait;
+	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
 
 	public static function allTemplates() {
 		return CDBHelper::getRandomizedDataProvider(
@@ -42,17 +53,18 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_CheckLayout() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->templateName);
 
-		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web',
-				'Linked templates', 'Linked to templates', 'Tags'
+		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
+				'Version', 'Linked templates', 'Linked to templates', 'Tags'
 		];
 		$this->assertSame($headers, $table->getHeadersText());
 
@@ -76,7 +88,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = CDBHelper::getHash($sqlTemplate);
 		$sqlHosts =
-				'SELECT hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'SELECT hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 				'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,'.
 				'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
@@ -87,22 +99,20 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 
 		// Filter necessary Template name.
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+		$this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('link', $name)->one()->click();
 
-		$this->zbxTestCheckHeader('Templates');
-		$this->zbxTestTextPresent('All templates');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of templates');
-		$this->zbxTestCheckHeader('Templates');
-		$this->zbxTestTextPresent('Template updated');
+		$modal = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('Template', $modal->getTitle());
+		$modal->query('button:Update')->WaitUntilClickable()->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Template updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashTemplate, CDBHelper::getHash($sqlTemplate));
@@ -112,17 +122,17 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterTemplateByName() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableDataColumn([$this->templateName]);
+		$this->assertTableStats(1);
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Linked templates')->fill([
@@ -131,26 +141,27 @@ class testPageTemplates extends CLegacyWebTest {
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template ZBX6663 Second']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableDataColumn(['Template ZBX6663 First']);
+		$this->assertTableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
+		$this->assertTableStats(1);
 	}
 
 	public function testPageTemplates_FilterNone() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->fill([
 			'Template groups' => 'Templates',
 			'Name' => '123template!@#$%^&*()_"='
 		]);
 		$filter->submit();
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->assertTableStats(0);
 	}
 
 	public function testPageTemplates_FilterReset() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
@@ -389,7 +400,7 @@ class testPageTemplates extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageTemplates_FilterByTags($data) {
-		$this->page->login()->open('templates.php?filter_name=template+for+tags&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
+		$this->page->login()->open('zabbix.php?action=template.list&filter_name=template+for+tags&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
 				'&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D=&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
@@ -425,12 +436,11 @@ class testPageTemplates extends CLegacyWebTest {
 	 * Test opening Hosts filtered by corresponding Template.
 	 */
 	public function testPageTemplates_CheckHostsColumn() {
-		$template = 'Form test template';
+		$template = 'Template for web scenario testing';
 		$hosts = ['Simple form test host'];
 
-		$this->page->login()->open('templates.php?groupid=0');
-		// Reset Templates filter from possible previous scenario.
-		$this->resetFilter();
+		$this->page->login()->open('zabbix.php?action=template.list&page=3');
+
 		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();

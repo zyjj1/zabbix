@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,14 +24,17 @@
  * @var array $data
  */
 
+$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('authentication')))->removeId())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+	->addVar('mfa_removed_mfaids', $data['mfa_removed_mfaids'])
 	->setId('authentication-form')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->disablePasswordAutofill();
 
 // Authentication general fields.
@@ -191,7 +194,7 @@ $http_tab = (new CFormGrid())
 	]);
 
 // LDAP authentication fields.
-$ldap_auth_enabled = $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED;
+$ldap_auth_enabled = $data['ldap_error'] === '' && $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED;
 $form->addVar('ldap_default_row_index', $data['ldap_default_row_index']);
 $ldap_tab = (new CFormGrid())
 	->addItem([
@@ -199,7 +202,7 @@ $ldap_tab = (new CFormGrid())
 		new CFormField($data['ldap_error']
 			? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
 			: (new CCheckBox('ldap_auth_enabled', ZBX_AUTH_LDAP_ENABLED))
-				->setChecked($ldap_auth_enabled)
+				->setChecked($data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 		)
 	])
@@ -209,7 +212,7 @@ $ldap_tab = (new CFormGrid())
 			(new CCheckBox('ldap_jit_status', JIT_PROVISIONING_ENABLED))
 				->setChecked($data['ldap_jit_status'] == JIT_PROVISIONING_ENABLED)
 				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
-				->setReadonly(!$ldap_auth_enabled)
+				->setEnabled($ldap_auth_enabled)
 		)
 	])
 	->addItem([
@@ -232,9 +235,7 @@ $ldap_tab = (new CFormGrid())
 						(new CTag('tfoot', true))
 							->addItem(
 								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
+									(new CButtonLink(_('Add')))->addClass('js-add')
 								))->setColSpan(5)
 							)
 					)->addStyle('width: 100%;')
@@ -249,7 +250,7 @@ $ldap_tab = (new CFormGrid())
 			(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
 				->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-				->setReadonly(!$ldap_auth_enabled)
+				->setEnabled($ldap_auth_enabled)
 		)
 	])
 	->addItem([
@@ -257,7 +258,7 @@ $ldap_tab = (new CFormGrid())
 		new CFormField(
 			(new CTextBox('jit_provision_interval', $data['jit_provision_interval']))
 				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
-				->setReadonly(!$ldap_auth_enabled || $data['ldap_jit_status'] == JIT_PROVISIONING_DISABLED)
+				->setEnabled($ldap_auth_enabled && $data['ldap_jit_status'] == JIT_PROVISIONING_ENABLED)
 		)
 	]);
 
@@ -491,11 +492,10 @@ $saml_tab = (new CFormGrid())
 					->addItem(
 						(new CTag('tfoot', true))->addItem(
 							(new CCol(
-								(new CSimpleButton(_('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Add')))
 									->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
-									->setEnabled($data['saml_enabled'])
 									->addClass('js-add')
+									->setEnabled($data['saml_enabled'])
 							))->setColSpan(5)
 						)
 					)
@@ -528,11 +528,10 @@ $saml_tab = (new CFormGrid())
 					->addItem(
 						(new CTag('tfoot', true))->addItem(
 							(new CCol(
-								(new CSimpleButton(_('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Add')))
 									->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
-									->setEnabled($data['saml_enabled'])
 									->addClass('js-add')
+									->setEnabled($data['saml_enabled'])
 							))->setColSpan(5)
 						)
 					)
@@ -559,12 +558,52 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-provision-status')
 	]);
 
+$form->addVar('mfa_default_row_index', $data['mfa_default_row_index']);
+$mfa_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Enable multi-factor authentication'), 'mfa_status'),
+		new CFormField(
+			(new CCheckBox('mfa_status', MFA_ENABLED))
+				->setChecked($data['mfa_status'] == MFA_ENABLED)
+				->setUncheckedValue(MFA_DISABLED)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Methods')))->setAsteriskMark(),
+		new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('mfa-methods')
+					->setHeader(
+						(new CRowHeader([
+							new CColHeader(_('Name')),
+							new CColHeader(_('Type')),
+							(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
+							_('Default'),
+							_('Action')
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CButtonLink(_('Add')))->addClass('js-add')
+								))->setColSpan(5)
+							)
+					)->addStyle('width: 100%')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	]);
+
 	$form->addItem((new CTabView())
 		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)
 		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
 		->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
+		->addTab('mfa', _('MFA settings'), $mfa_tab, TAB_INDICATOR_AUTH_MFA)
 		->setFooter(makeFormFooter(
 			(new CSubmit('update', _('Update')))
 		))
@@ -587,9 +626,7 @@ $templates['saml_provisioning_group_row'] = (string) (new CRow([
 	],
 	(new CCol('#{user_group_names}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CCol('#{role_name}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 // SAML provisioning medias row template.
 $templates['saml_provisioning_media_row'] = (string) (new CRow([
@@ -603,9 +640,7 @@ $templates['saml_provisioning_media_row'] = (string) (new CRow([
 	],
 	(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 // LDAP servers list row.
 $templates['ldap_servers_row'] = (string) (new CRow([
@@ -642,9 +677,32 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 			->setId('ldap_default_row_index_#{row_index}'),
 		(new CLabel(new CSpan(), 'ldap_default_row_index_#{row_index}'))->addClass(ZBX_STYLE_WORDWRAP)
 	],
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
+]))->setAttribute('data-row_index', '#{row_index}');
+
+$templates['mfa_methods_row'] = (string) (new CRow([
+	[
+		(new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass('js-edit'),
+		(new CVar('mfa_methods[#{row_index}][mfaid]', '#{mfaid}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][type]', '#{type}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][name]', '#{name}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][hash_function]', '#{hash_function}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][code_length]', '#{code_length}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][api_hostname]', '#{api_hostname}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][clientid]', '#{clientid}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][client_secret]', '#{client_secret}'))->removeId()
+	],
+	(new CCol('#{type_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CCol('#{usrgrps}'))->addClass('js-mfa-usergroups'),
+	[
+		(new CInput('radio', 'mfa_default_row_index', '#{row_index}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setId('mfa_default_row_index_#{row_index}'),
+		(new CLabel(new CSpan(), 'mfa_default_row_index_#{row_index}'))->addClass(ZBX_STYLE_WORDWRAP)
+	],
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 
 (new CScriptTag(
@@ -654,7 +712,9 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		'db_authentication_type' => $data['db_authentication_type'],
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media'],
-		'templates' => $templates
+		'templates' => $templates,
+		'mfa_methods' => $data['mfa_methods'],
+		'mfa_default_row_index' => $data['mfa_default_row_index']
 	]).');'
 ))
 	->setOnDocumentReady()

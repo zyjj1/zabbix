@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class CColorPickerElement extends CElement {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
-		$overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 
 		return $this;
 	}
@@ -89,7 +89,7 @@ class CColorPickerElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+		$this->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 	}
 
 	/**

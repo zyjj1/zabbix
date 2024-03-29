@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,13 @@ class CCheckBoxList extends CList {
 
 	private const ZBX_STYLE_CLASS = 'checkbox-list';
 
+	private const ZBX_STYLE_LAYOUT_FIXED = 'fixed';
 	private const ZBX_STYLE_VERTICAL = 'vertical';
 
 	/**
 	 * @var array $values
 	 */
-	protected $values;
+	protected array $values = [];
 
 	/**
 	 * @var string $name
@@ -36,14 +37,19 @@ class CCheckBoxList extends CList {
 	protected $name;
 
 	/**
+	 * Checkboxes id unique suffix.
+	 */
+	protected $uniqid = '';
+
+	/**
 	 * @var bool $enabled
 	 */
 	protected $enabled = true;
 
 	/**
-	 * Checkboxes id unique suffix.
+	 * @var bool $layout_fixed
 	 */
-	protected $uniqid = '';
+	protected $layout_fixed = false;
 
 	/**
 	 * @var bool $vertical
@@ -53,7 +59,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @var int $columns
 	 */
-	protected $columns;
+	protected int $columns = 1;
 
 	/**
 	 * @param string $name
@@ -63,8 +69,6 @@ class CCheckBoxList extends CList {
 
 		$this->addClass(self::ZBX_STYLE_CLASS);
 		$this->name = $name;
-		$this->values = [];
-		$this->columns = 1;
 	}
 
 	/**
@@ -136,13 +140,26 @@ class CCheckBoxList extends CList {
 	}
 
 	/**
+	 * Make columns the same size.
+	 *
+	 * @param bool $layout_fixed
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setLayoutFixed(bool $layout_fixed = true): CCheckBoxList {
+		$this->layout_fixed = $layout_fixed;
+
+		return $this;
+	}
+
+	/**
 	 * Display checkboxes in vertical order.
 	 *
 	 * @param bool $vertical
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setVertical(bool $vertical = true): CCheckBoxList {
+	public function setVertical(bool $vertical = true): self {
 		$this->vertical = $vertical;
 
 		return $this;
@@ -155,7 +172,7 @@ class CCheckBoxList extends CList {
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setColumns(int $columns): CCheckBoxList {
+	public function setColumns(int $columns): self {
 		$this->columns = $columns;
 
 		return $this;
@@ -169,9 +186,12 @@ class CCheckBoxList extends CList {
 	public function toString($destroy = true) {
 		$this->addStyle('--columns: '.$this->columns.';');
 
+		if ($this->layout_fixed) {
+			$this->addClass(self::ZBX_STYLE_LAYOUT_FIXED);
+		}
+
 		if ($this->vertical) {
-			$values_count = count($this->values);
-			$max_rows = (int) ceil($values_count / $this->columns);
+			$max_rows = (int) ceil(count($this->values) / $this->columns);
 
 			$this->addClass(self::ZBX_STYLE_VERTICAL);
 			$this->addStyle('--rows: '.$max_rows.';');

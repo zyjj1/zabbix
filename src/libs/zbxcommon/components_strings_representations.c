@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,9 @@ const char	*get_process_type_string(unsigned char proc_type)
 		case ZBX_PROCESS_TYPE_HISTSYNCER:
 			return "history syncer";
 		case ZBX_PROCESS_TYPE_DISCOVERER:
-			return "discoverer";
+			return "discovery worker";
+		case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
+			return "discovery manager";
 		case ZBX_PROCESS_TYPE_ALERTER:
 			return "alerter";
 		case ZBX_PROCESS_TYPE_TIMER:
@@ -109,8 +111,22 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "ha manager";
 		case ZBX_PROCESS_TYPE_ODBCPOLLER:
 			return "odbc poller";
+		case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
+			return "connector manager";
+		case ZBX_PROCESS_TYPE_CONNECTORWORKER:
+			return "connector worker";
 		case ZBX_PROCESS_TYPE_MAIN:
 			return "main";
+		case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+			return "http agent poller";
+		case ZBX_PROCESS_TYPE_AGENT_POLLER:
+			return "agent poller";
+		case ZBX_PROCESS_TYPE_SNMP_POLLER:
+			return "snmp poller";
+		case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
+			return "internal poller";
+		case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
+			return "configuration syncer worker";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -170,6 +186,10 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Numeric (unsigned)";
 		case ITEM_VALUE_TYPE_TEXT:
 			return "Text";
+		case ITEM_VALUE_TYPE_BIN:
+			return "Binary";
+		case ITEM_VALUE_TYPE_NONE:
+			return "None";
 		default:
 			return "unknown";
 	}

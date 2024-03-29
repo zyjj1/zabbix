@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@
 
 #include "zabbix_stats.h"
 
+#include "../lld/lld_protocol.h"
+#include "../ha/ha.h"
+
 #include "zbxcacheconfig.h"
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
-#include "log.h"
 #include "zbxtrends.h"
-#include "zbxha.h"
+#include "zbxconnector.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get program type (server) specific internal statistics            *
+ * Purpose: gets program type (server) specific internal statistics           *
  *                                                                            *
  * Parameters: json         - [IN/OUT]                                        *
  *             arg          - [IN] anonymous argument provided by register    *
@@ -40,7 +41,7 @@
 void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 {
 	zbx_vc_stats_t			vc_stats;
-	zbx_uint64_t			queue_size;
+	zbx_uint64_t			queue_size, connector_queue_size;
 	char				*value, *error = NULL;
 	zbx_tfc_stats_t			tcache_stats;
 
@@ -57,8 +58,19 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zbx_free(error);
 	}
 
+	/* zabbix[connector_queue] */
+	if (SUCCEED == zbx_connector_get_queue_size(&connector_queue_size, &error))
+	{
+		zbx_json_adduint64(json, "connector_queue", queue_size);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get connector queue size: %s", error);
+		zbx_free(error);
+	}
+
 	/* zabbix[triggers] */
-	zbx_json_adduint64(json, "triggers", DCget_trigger_count());
+	zbx_json_adduint64(json, "triggers", zbx_dc_get_trigger_count());
 
 	/* zabbix[vcache,...] */
 	if (SUCCEED == zbx_vc_get_statistics(&vc_stats))
@@ -126,6 +138,25 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
 		zbx_free(error);
+	}
+
+	zbx_vps_monitor_stats_t	vps_stats;
+
+	zbx_vps_monitor_get_stats(&vps_stats);
+
+	zbx_json_addobject(json, "vps");
+	zbx_json_adduint64(json, "status", (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0));
+	zbx_json_adduint64(json, "written_total", vps_stats.written_num);
+	zbx_json_adduint64(json, "limit", vps_stats.values_limit);
+
+	if (0 != vps_stats.values_limit)
+	{
+		zbx_json_addobject(json, "overcommit");
+		zbx_json_adduint64(json, "limit", vps_stats.overcommit_limit);
+		zbx_json_adduint64(json, "available", vps_stats.overcommit_limit - vps_stats.overcommit);
+		zbx_json_addfloat(json, "pavailable", (double)(vps_stats.overcommit_limit - vps_stats.overcommit) *
+				100 / vps_stats.overcommit_limit);
+		zbx_json_close(json);
 	}
 
 	zbx_json_close(json);

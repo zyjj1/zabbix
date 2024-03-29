@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array $data
  */
 
 $header = (new CDiv())
@@ -28,26 +29,26 @@ $header = (new CDiv())
 	->addItem(
 		(new CLink(
 			[
-				makeLogo(LOGO_TYPE_SIDEBAR)->addClass('sidebar-logo'),
-				makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)->addClass('sidebar-logo-compact')
+				makeLogo(LOGO_TYPE_SIDEBAR),
+				makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)
 			],
 			CMenuHelper::getFirstUrl()
 		))->addClass(ZBX_STYLE_LOGO)
 	)
 	->addItem(
 		(new CDiv([
-			(new CButton(null, _('Collapse sidebar')))
-				->addClass('button-compact js-sidebar-mode')
-				->setAttribute('title', _('Collapse sidebar')),
-			(new CButton(null, _('Expand sidebar')))
-				->addClass('button-expand js-sidebar-mode')
-				->setAttribute('title', _('Expand sidebar')),
-			(new CButton(null, _('Hide sidebar')))
-				->addClass('button-hide js-sidebar-mode')
-				->setAttribute('title', _('Hide sidebar')),
-			(new CButton(null, _('Show sidebar')))
-				->addClass('button-show js-sidebar-mode')
-				->setAttribute('title', _('Show sidebar'))
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_LEFT, _('Collapse sidebar')))
+				->addClass('js-sidebar-mode')
+				->addClass('button-compact'),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_RIGHT, _('Expand sidebar')))
+				->addClass('js-sidebar-mode')
+				->addClass('button-expand'),
+			(new CButtonIcon(ZBX_ICON_COLLAPSE, _('Hide sidebar')))
+				->addClass('js-sidebar-mode')
+				->addClass('button-hide'),
+			(new CButtonIcon(ZBX_ICON_EXPAND, _('Show sidebar')))
+				->addClass('js-sidebar-mode')
+				->addClass('button-show')
 		]))->addClass('sidebar-header-buttons')
 	);
 
@@ -55,16 +56,15 @@ $server_name = ($data['server_name'] !== '')
 	? (new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
 	: null;
 
-$search_icon = (new CSubmitButton(null))
-	->addClass('search-icon')
-	->setTitle(_('Search'));
+$search_icon = (new CButtonIcon(ZBX_ICON_SEARCH, _('Search')))
+	->addClass('js-search')
+	->setAttribute('type', 'submit');
 
 if (getRequest('search', '') === '') {
 	$search_icon->setAttribute('disabled', '');
 }
 
 $search = (new CForm('get', 'zabbix.php'))
-	->cleanItems()
 	->addClass(ZBX_STYLE_FORM_SEARCH)
 	->setAttribute('role', 'search')
 	->addItem([

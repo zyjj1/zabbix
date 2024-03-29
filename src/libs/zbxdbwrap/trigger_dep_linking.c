@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 **/
 
 #include "trigger_dep_linking.h"
-#include "zbxdbwrap.h"
 
-#include "log.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 typedef struct
 {
@@ -131,8 +132,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	char				*sql = NULL;
 	int				i, res = SUCCEED;
 	size_t				sql_alloc = 512, sql_offset;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_vector_uint64_pair_t	dep_list_ids, map_ids;
 	zbx_vector_uint64_t		all_templ_ids;
 
@@ -150,15 +151,15 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 			"select distinct td.triggerid_down,td.triggerid_up"
 			" from triggers t,trigger_depends td"
 			" where t.templateid in (td.triggerid_up,td.triggerid_down) and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values, trids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values, trids->values_num);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		res = FAIL;
 		goto clean;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_pair_t	dep_list_id;
 
@@ -169,7 +170,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == dep_list_ids.values_num)	/* not all trigger templates have a dependency trigger */
 		goto clean;
@@ -189,19 +190,19 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 				" and i.hostid=" ZBX_FS_UI64
 				" and",
 				hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.templateid", all_templ_ids.values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.templateid", all_templ_ids.values,
 			all_templ_ids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values,
 			trids->values_num);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		res = FAIL;
 		goto clean;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_pair_t			map_id;
 		resolve_dependencies_triggers_flags_t	temp_t;
@@ -223,7 +224,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_pair_append(&map_ids, map_id);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
@@ -271,14 +272,17 @@ clean:
 
 /**********************************************************************************************************
  *                                                                                                        *
- * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
- *          already present on the target host to generate a new list (links_processed). Also, prepare    *
+ * Purpose: Takes a list of pending trigger dependencies (links) and excludes entries that are            *
+ *          already present on the target host to generate a new list (links_processed). Also, prepares   *
  *          the list of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the     *
  *          target host, since they are not present on the template trigger.                              *
  *                                                                                                        *
- * Parameters: trids               - [IN] vector of trigger identifiers from database                     *
- *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
- *                                         links that we want to be present on the target host            *
+ * Parameters:                                                                                            *
+ *             trids               - [IN] vector of host trigger ids, whose descriptions match at least   *
+ *                                        one of triggers from templates                                  *
+ *             audit_context_mode  - [IN]                                                                 *
+ *             links               - [OUT] Pairs of template trigger dependencies, list of links_up and   *
+ *                                         links_down, links that we want to be present on target host.   *
  *             links_processed     - [OUT] processed links with entries that are already present excluded *
  *             trigger_dep_ids_del - [OUT] list of triggers dependencies that need to be deleted          *
  *                                                                                                        *
@@ -286,14 +290,14 @@ clean:
  *                                                                                                        *
  *********************************************************************************************************/
 static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
-		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
+		int audit_context_mode, zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
 	char			*sql = NULL;
 	int			i, res = SUCCEED;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_hashset_t		h;
 	zbx_hashset_iter_t	iter;
 	zbx_trigger_dep_entry_t	*found;
@@ -308,15 +312,17 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			" from trigger_depends td,triggers t "
 			" where t.triggerid=td.triggerid_down"
 			" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values, trids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values,
+			trids->values_num);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		res = FAIL;
 		goto clean;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	/* create a list of target host trigger dependencies */
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int				flags;
 		zbx_uint64_t			trigger_dep_id, trigger_id_down, trigger_id_up;
@@ -352,8 +358,11 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
+	/* Go through the list of template trigger dependencies and if there is match between host triggers up and  */
+	/* down then mark host pair dependency with "preserve status". If target host does not have this dependency */
+	/* pair - then add the source trigger dependency (from template) list of dependencies.                      */
 	for (i = 0; i < links->values_num; i++)
 	{
 		zbx_trigger_dep_entry_t	temp_t;
@@ -406,8 +415,8 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			{
 				zbx_vector_uint64_append(trigger_dep_ids_del,
 						found->v.values[i]->trigger_dep_id);
-				zbx_audit_trigger_update_json_remove_dependency(found->v.values[i]->flags,
-						found->v.values[i]->trigger_dep_id,
+				zbx_audit_trigger_update_json_remove_dependency(audit_context_mode,
+						found->v.values[i]->flags, found->v.values[i]->trigger_dep_id,
 						found->v.values[i]->trigger_down_id);
 			}
 		}
@@ -421,7 +430,8 @@ clean:
 	return res;
 }
 
-static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
+static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags,
+		int audit_context_mode)
 {
 	int	res = SUCCEED;
 
@@ -433,10 +443,10 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 		zbx_uint64_t	triggerdepid;
 		zbx_db_insert_t	db_insert;
 
-		triggerdepid = DBget_maxid_num("trigger_depends", links->values_num);
+		triggerdepid = zbx_db_get_maxid_num("trigger_depends", links->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "trigger_depends", "triggerdepid", "triggerid_down", "triggerid_up",
-				NULL);
+				(char *)NULL);
 
 		for (i = 0; i < links->values_num; i++)
 		{
@@ -450,8 +460,8 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
 					triggers_flags, &temp_t)))
 			{
-				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid,
-						links->values[i].first, links->values[i].second);
+				zbx_audit_trigger_update_json_add_dependency(audit_context_mode, found->flags,
+						triggerdepid, links->values[i].first, links->values[i].second);
 			}
 			else
 			{
@@ -475,7 +485,7 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 }
 
 static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links,
-		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
+		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags, int audit_context_mode)
 {
 	int				res;
 	char				*sql = NULL;
@@ -488,8 +498,8 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 	zbx_vector_uint64_create(&trigger_dep_ids_del);
 	zbx_vector_uint64_pair_create(&links_processed);
 
-	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, links, &links_processed,
-			&trigger_dep_ids_del)))
+	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, audit_context_mode, links,
+			&links_processed, &trigger_dep_ids_del)))
 	{
 		goto clean;
 	}
@@ -497,17 +507,17 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 	if (0 < trigger_dep_ids_del.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_depends where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerdepid",
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerdepid",
 				trigger_dep_ids_del.values, trigger_dep_ids_del.values_num);
 
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 		{
 			res = FAIL;
 			goto clean;
 		}
 	}
 
-	res = DBadd_trigger_dependencies(&links_processed, triggers_flags);
+	res = DBadd_trigger_dependencies(&links_processed, triggers_flags, audit_context_mode);
 clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&trigger_dep_ids_del);
@@ -520,23 +530,26 @@ clean:
 
 /********************************************************************************
  *                                                                              *
- * Purpose: update trigger dependencies for specified host                      *
+ * Purpose: updates trigger dependencies for specified host                     *
  *                                                                              *
  * Parameters: hostid    - [IN] host identifier from database                   *
- *             trids     - [IN] vector of trigger identifiers from database     *
+ *             trids     - [IN] vector of host trigger ids, which descriptions  *
+ *                              match at least one of triggers from templates   *
  *             is_update - [IN] flag. Values:                                   *
  *                              TRIGGER_DEP_SYNC_INSERT_OP - 'trids' contains   *
  *                               identifiers of new triggers,                   *
  *                              TRIGGER_DEP_SYNC_UPDATE_OP - 'trids' contains   *
  *                               identifiers of already present triggers which  *
  *                               need to be updated                             *
+ *    audit_context_mode - [IN]                                                 *
  *                                                                              *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
  *                                                                              *
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids, int is_update)
+int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids, int is_update,
+		int audit_context_mode)
 {
 	int				res = SUCCEED;
 	zbx_vector_uint64_pair_t	links;
@@ -557,12 +570,12 @@ int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vec
 
 	if (TRIGGER_DEP_SYNC_INSERT_OP == is_update)
 	{
-		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags)))
+		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags, audit_context_mode)))
 			goto clean;
 	}
 	else if (TRIGGER_DEP_SYNC_UPDATE_OP == is_update)
 	{
-		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags);
+		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags, audit_context_mode);
 	}
 clean:
 	zbx_vector_uint64_pair_destroy(&links);

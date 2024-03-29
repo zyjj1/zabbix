@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,10 +27,10 @@
 <script type="text/x-jquery-tmpl" id="exec_params_row">
 	<tr class="form_row">
 		<td>
-			<input type="text" id="exec_params_#{rowNum}_exec_param" name="exec_params[#{rowNum}][exec_param]" maxlength="255" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
+			<input type="text" id="parameters_exec_#{rowNum}_value" name="parameters_exec[#{rowNum}][value]" maxlength="255" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
 		</td>
 		<td>
-			<button type="button" id="exec_params_#{rowNum}_remove" name="exec_params[#{rowNum}][remove]" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove"><?= _('Remove') ?></button>
+			<button type="button" id="parameters_exec_#{rowNum}_remove" name="parameters_exec[#{rowNum}][remove]" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
@@ -47,12 +47,8 @@
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
 			(new CHorList([
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-action', 'edit'),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("removeMessageTemplate('#{message_type}');")
+				(new CButtonLink(_('Edit')))->setAttribute('data-action', 'edit'),
+				(new CButtonLink(_('Remove')))->onClick("removeMessageTemplate('#{message_type}');")
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setAttribute('data-message-type', '#{message_type}')
@@ -238,13 +234,6 @@
 			showFormByProvider(provider);
 		});
 
-		$('#smtp_email').change(function() {
-			if ($('#type').val() == <?= json_encode(MEDIA_TYPE_EMAIL) ?>
-					&& $('#provider').val() == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
-				generateOffice365RelaySmtpServer();
-			}
-		});
-
 		// clone button
 		$('#clone').click(function() {
 			$('#mediatypeid, #delete, #clone').remove();
@@ -255,7 +244,7 @@
 			$('#name').focus();
 		});
 
-		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
+		// Trim spaces on submit. Spaces for script parameters should not be trimmed.
 		$('#media-type-form').submit(function() {
 			var maxattempts = $('#maxattempts'),
 				maxsessions_type = $('#maxsessions_type :radio:checked').val(),
@@ -299,13 +288,13 @@
 			$('#event_menu_url, #event_menu_name').prop('disabled', !$(this).is(':checked'));
 		});
 
-		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
+		$('#parameters_table').dynamicRows({template: '#parameters_row', allow_empty: true});
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.
 		 */
 		function toggleSecurityOptions() {
-			if ($('input[name=smtp_security]:checked').val() == <?= SMTP_CONNECTION_SECURITY_NONE ?>) {
+			if ($('input[name=smtp_security]:checked').val() == <?= SMTP_SECURITY_NONE ?>) {
 				$('#smtp_verify_peer, #smtp_verify_host').prop('checked', false).closest('li').hide();
 			}
 			else {
@@ -420,7 +409,7 @@
 			$('input[name=content_type][value=' + providers[provider]['content_type'] + ']').prop("checked", true);
 		}
 
-		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
+		$('#exec_params_table').dynamicRows({template: '#exec_params_row', allow_empty: true});
 
 		$('#chPass_btn').on('click', function() {
 			$(this).hide();

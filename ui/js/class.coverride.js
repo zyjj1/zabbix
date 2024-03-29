@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ jQuery(function ($) {
 					e.stopPropagation();
 					e.preventDefault();
 				})
-				.addClass('subfilter-disable-btn'),
+				.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALLER, 'js-remove']),
 			opt = $override.data('options'),
 			field_name = opt.makeName(option, opt.getId($override));
 

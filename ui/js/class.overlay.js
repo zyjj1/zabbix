@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 function Overlay(type, dialogueid) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
-	this.headerid = 'dashboard-widget-head-title-' + this.dialogueid;
+	this.headerid =  'overlay-dialogue-header-title-' + this.dialogueid;
 	this.$backdrop = jQuery('<div>', {
 		'class': 'overlay-bg',
 		'data-dialogueid': this.dialogueid
@@ -49,7 +49,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
 
 	const $close_btn = jQuery('<button>', {
-		class: 'overlay-close-btn',
+		class: 'btn-overlay-close',
 		title: t('S_CLOSE')
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
@@ -57,7 +57,7 @@ function Overlay(type, dialogueid) {
 	}.bind(this));
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
-	this.$dialogue.$head = jQuery('<div>', {class: 'dashboard-widget-head'});
+	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
@@ -70,8 +70,9 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.append(this.$dialogue.$footer);
 
 	this.$dialogue.$body.on('submit', 'form', function(e) {
-		if (this.$btn_submit) {
-			e.preventDefault();
+		e.preventDefault();
+
+		if (this.$btn_submit && this.$btn_submit.prop('disabled') === false) {
 			this.$btn_submit.trigger('click');
 		}
 	}.bind(this));
@@ -151,13 +152,13 @@ Overlay.prototype.recoverFocus = function() {
 	}
 
 	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue).first().focus();
+		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus();
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).first().focus();
+		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus();
 	}
 	else {
-		jQuery(':focusable:first', this.$dialogue).focus();
+		jQuery(':focusable:first', this.$dialogue)[0].focus();
 	}
 };
 
@@ -177,7 +178,7 @@ Overlay.prototype.containFocus = function() {
 			.on('keydown.containFocus', function(e) {
 				// TAB and SHIFT
 				if (e.which == 9 && e.shiftKey) {
-					last_focusable.focus();
+					last_focusable[0].focus();
 					return false;
 				}
 			});
@@ -186,7 +187,7 @@ Overlay.prototype.containFocus = function() {
 			.on('keydown.containFocus', function(e) {
 				// TAB and not SHIFT
 				if (e.which == 9 && !e.shiftKey) {
-					first_focusable.focus();
+					first_focusable[0].focus();
 					return false;
 				}
 			});
@@ -277,11 +278,16 @@ Overlay.prototype.unmount = function() {
 		cancelAnimationFrame(this.center_dialog_animation_frame);
 	}
 
-	var $wrapper = jQuery('.wrapper');
+	const $wrapper = jQuery('.wrapper');
 
 	if (!jQuery('[data-dialogueid]').length) {
 		$wrapper.css('overflow', $wrapper.data('overflow'));
 		$wrapper.removeData('overflow');
+
+		$wrapper[0].scrollTo($wrapper[0].dataset.scroll_x, $wrapper[0].dataset.scroll_y);
+
+		delete $wrapper[0].dataset.scroll_x;
+		delete $wrapper[0].dataset.scroll_y;
 	}
 };
 
@@ -289,7 +295,10 @@ Overlay.prototype.unmount = function() {
  * Appends associated nodes to document body.
  */
 Overlay.prototype.mount = function() {
-	var $wrapper = jQuery('.wrapper');
+	const $wrapper = jQuery('.wrapper');
+
+	$wrapper[0].dataset.scroll_x = $wrapper[0].scrollLeft;
+	$wrapper[0].dataset.scroll_y = $wrapper[0].scrollTop;
 
 	if (!jQuery('[data-dialogueid]').length) {
 		$wrapper.data('overflow', $wrapper.css('overflow'));
@@ -413,7 +422,7 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'doc_url':
-			const doc_link = this.$dialogue.$head[0].querySelector('.icon-doc-link');
+			const doc_link = this.$dialogue.$head[0].querySelector('.' + ZBX_ICON_HELP_SMALL);
 			if (doc_link !== null) {
 				doc_link.remove();
 			}
@@ -472,7 +481,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="icon-doc-link" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
 				`);
 				break;
 

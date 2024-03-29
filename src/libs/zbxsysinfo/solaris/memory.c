@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 	}													\
 
 #ifdef HAVE_VMINFO_T_UPDATES
-#include "stats.h"
+#include "../common/stats.h"
 #endif
 
 static int	vm_memory_total(AGENT_RESULT *result)

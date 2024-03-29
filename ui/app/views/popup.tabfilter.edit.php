@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ $form_list = (new CFormList())
 
 if ($data['support_custom_time']) {
 	$form_list
-		->addRow(_('Set custom time period'),
+		->addRow(_('Override time period selector'),
 			(new CCheckBox('filter_custom_time', 1))
 				->setChecked($data['filter_custom_time'])
 		)
@@ -54,13 +54,13 @@ if ($data['support_custom_time']) {
 }
 
 $form = (new CForm())
-	->cleanItems()
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tabfilter')))->removeId())
 	->setName('tabfilter_form')
 	->addVar('action', 'popup.tabfilter.update')
-	->addItem([
-		$form_list,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	]);
+	->addItem($form_list);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['title'],

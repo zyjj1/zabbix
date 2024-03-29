@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ class CControllerDashboardWidgetCheck extends CController {
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -53,12 +54,6 @@ class CControllerDashboardWidgetCheck extends CController {
 
 				$ret = false;
 			}
-		}
-
-		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
-			error(_('Widget type is not supported in this context.'));
-
-			$ret = false;
 		}
 
 		if (!$ret) {
@@ -91,6 +86,9 @@ class CControllerDashboardWidgetCheck extends CController {
 			}
 
 			$output['error']['messages'] = array_column(get_and_clear_messages(), 'message');
+		}
+		else {
+			$output['fields'] = $form->getFieldsValues();
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,12 +24,11 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('dashboard_properties_form')
 	->addItem(getMessages());
 
-// Submit button is needed to enable submit event on Enter on inputs.
-$form->addItem((new CInput('submit', 'dashboard_properties_submit'))->addStyle('display: none;'));
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_list = new CFormList();
 

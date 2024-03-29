@@ -4,11 +4,11 @@
 
 #ifdef HAVE_LIBEVENT
 #	include <event.h>
+#	include <event2/thread.h>
 #endif
 
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxstr.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
@@ -117,7 +117,8 @@ static size_t		ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_NONE)
  ******************************************************************************/
 static const char	*ipc_make_path(const char *service_name, char **error)
 {
-	size_t		path_len, offset;
+	size_t				path_len, offset;
+	static ZBX_THREAD_LOCAL char	ipc_path_full[ZBX_IPC_PATH_MAX];
 
 	path_len = strlen(service_name);
 
@@ -130,16 +131,17 @@ static const char	*ipc_make_path(const char *service_name, char **error)
 		return NULL;
 	}
 
+	memcpy(ipc_path_full, ipc_path, ipc_path_root_len);
 	offset = ipc_path_root_len;
-	memcpy(ipc_path + offset , ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
+	memcpy(ipc_path_full + offset, ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
 	offset += ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX);
-	memcpy(ipc_path + offset, ipc_path_prefix, ipc_path_prefix_len);
+	memcpy(ipc_path_full + offset, ipc_path_prefix, ipc_path_prefix_len);
 	offset += ipc_path_prefix_len;
-	memcpy(ipc_path + offset, service_name, path_len);
+	memcpy(ipc_path_full + offset, service_name, path_len);
 	offset += path_len;
-	memcpy(ipc_path + offset, ZBX_IPC_SOCKET_SUFFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + 1);
+	memcpy(ipc_path_full + offset, ZBX_IPC_SOCKET_SUFFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + 1);
 
-	return ipc_path;
+	return ipc_path_full;
 }
 
 /******************************************************************************
@@ -1325,6 +1327,7 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 	(*data)[data_offset] = '\0';
 }
 
+#ifdef HAVE_OPENIPMI
 /******************************************************************************
  *                                                                            *
  * Purpose: copies ipc message                                                *
@@ -1339,6 +1342,14 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
 	dst->size = src->size;
 	dst->data = (unsigned char *)zbx_malloc(NULL, src->size);
 	memcpy(dst->data, src->data, src->size);
+}
+#endif /* HAVE_OPENIPMI */
+
+static void	ipc_service_user_cb(evutil_socket_t fd, short what, void *arg)
+{
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+	ZBX_UNUSED(arg);
 }
 
 /*
@@ -1402,6 +1413,12 @@ int	zbx_ipc_service_init_env(const char *path, char **error)
 		ipc_path[--ipc_path_root_len] = '\0';
 
 	ipc_service_init_libevent();
+
+	if (0 != evthread_use_pthreads())
+	{
+		*error = zbx_strdup(*error, "Cannot initialize libevent threading support");
+		goto out;
+	}
 
 	ret = SUCCEED;
 out:
@@ -1495,6 +1512,7 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	event_add(service->ev_listener, NULL);
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
+	service->ev_alert = event_new(service->ev, -1, 0, ipc_service_user_cb, NULL);
 
 	ret = SUCCEED;
 out:
@@ -1528,6 +1546,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	zbx_vector_ptr_destroy(&service->clients);
 	zbx_queue_ptr_destroy(&service->clients_recv);
 
+	event_free(service->ev_alert);
 	event_free(service->ev_timer);
 	event_free(service->ev_listener);
 	event_base_free(service->ev);
@@ -1617,6 +1636,16 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: interrupt IPC service recv loop from another thread               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ipc_service_alert(zbx_ipc_service_t *service)
+{
+	event_active(service->ev_alert, 0, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Sends IPC message to client                                       *
  *                                                                            *
  * Parameters: client - [IN] the IPC client                                   *
@@ -1684,6 +1713,11 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 	zbx_ipc_client_release(client);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+int	zbx_ipc_client_get_fd(zbx_ipc_client_t *client)
+{
+	return client->csocket.fd;
 }
 
 void	zbx_ipc_client_addref(zbx_ipc_client_t *client)

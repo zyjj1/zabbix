@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,13 @@ typedef struct
 {
 	zbx_config_vault_t	*config_vault;
 	int			config_timeout;
+	int			proxyconfig_frequency;
+	int			proxydata_frequency;
+	int			config_confsyncer_frequency;
+	const char		*config_source_ip;
+	const char		*config_ssl_ca_location;
+	const char		*config_ssl_cert_location;
+	const char		*config_ssl_key_location;
 }
 zbx_thread_dbconfig_args;
 

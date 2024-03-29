@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
 
 /******************************************************************************
  *                                                                            *
- * Return value:  SUCCEED - the char is allowed in the trigger function       *
- *                FAIL - otherwise                                            *
+ * Return value:  SUCCEED - char is allowed in trigger function               *
+ *                FAIL    - otherwise                                         *
  *                                                                            *
  * Comments: in trigger function allowed characters: 'a-z'                    *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -41,11 +41,10 @@ int	zbx_is_function_char(unsigned char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate parameters and give position of terminator if found and  *
- *          not quoted                                                        *
+ * Purpose: validates parameters and gives position of terminator if found    *
+ *          and not quoted                                                    *
  *                                                                            *
  * Parameters: expr       - [IN] string to parse that contains parameters     *
- *                                                                            *
  *             terminator - [IN] use ')' if parameters end with               *
  *                               parenthesis or '\0' if ends with NULL        *
  *                               terminator                                   *
@@ -53,12 +52,11 @@ int	zbx_is_function_char(unsigned char c)
  *             lpp_offset - [OUT] offset of the last parsed parameter         *
  *             lpp_len    - [OUT] length of the last parsed parameter         *
  *                                                                            *
- * Return value: SUCCEED -  closing parenthesis was found or other custom     *
+ * Return value: SUCCEED -  Closing parenthesis was found or other custom     *
  *                          terminator and not quoted and return info about a *
  *                          last processed parameter.                         *
- *               FAIL    -  does not look like a valid function parameter     *
- *                          list and return info about a last processed       *
- *                          parameter.                                        *
+ *               FAIL    -  Does not look like valid function parameter list  *
+ *                          and return info about a last processed parameter. *
  *                                                                            *
  ******************************************************************************/
 static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r, size_t *lpp_offset,
@@ -133,17 +131,17 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: given the position of opening function parenthesis find the       *
- *          position of a closing one                                         *
+ * Purpose: Given the position of opening function parenthesis finds the      *
+ *          position of a closing one.                                        *
  *                                                                            *
  * Parameters: expr       - [IN] string to parse                              *
- *             par_l      - [IN] position of the opening parenthesis          *
- *             par_r      - [OUT] position of the closing parenthesis         *
- *             lpp_offset - [OUT] offset of the last parsed parameter         *
- *             lpp_len    - [OUT] length of the last parsed parameter         *
+ *             par_l      - [IN] position of opening parenthesis              *
+ *             par_r      - [OUT] position of closing parenthesis             *
+ *             lpp_offset - [OUT] offset of last parsed parameter             *
+ *             lpp_len    - [OUT] length of last parsed parameter             *
  *                                                                            *
  * Return value: SUCCEED - closing parenthesis was found                      *
- *               FAIL    - string after par_l does not look like a valid      *
+ *               FAIL    - string after par_l does not look like valid        *
  *                         function parameter list                            *
  *                                                                            *
  ******************************************************************************/
@@ -162,13 +160,11 @@ static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *pa
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses function name                                              *
+ * Parameters: expr     - [IN] function expression: func(p1, p2,...)          *
+ *             length   - [OUT] function name length or amount of characters  *
+ *                              that can be safely skipped                    *
  *                                                                            *
- * Parameters: expr     - [IN] the function expression: func(p1, p2,...)      *
- *             length   - [OUT] the function name length or the amount of     *
- *                              characters that can be safely skipped         *
- *                                                                            *
- * Return value: SUCCEED - the function name was successfully parsed          *
+ * Return value: SUCCEED - function name was successfully parsed              *
  *               FAIL    - failed to parse function name                      *
  *                                                                            *
  ******************************************************************************/
@@ -186,17 +182,17 @@ static int	function_parse_name(const char *expr, size_t *length)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check whether expression starts with a valid function             *
+ * Purpose: checks whether expression starts with valid function              *
  *                                                                            *
  * Parameters: expr          - [IN] string to parse                           *
- *             par_l         - [OUT] position of the opening parenthesis      *
- *                                   or the amount of characters to skip      *
- *             par_r         - [OUT] position of the closing parenthesis      *
+ *             par_l         - [OUT] position of opening parenthesis or       *
+ *                                   amount of characters to skip             *
+ *             par_r         - [OUT] position of closing parenthesis          *
  *             error         - [OUT] error message                            *
- *             max_error_len - [IN] error size                                *
+ *             max_error_len - [IN]  error size                               *
  *                                                                            *
- * Return value: SUCCEED - string starts with a valid function                *
- *               FAIL    - string does not start with a function and par_l    *
+ * Return value: SUCCEED - string starts with valid function                  *
+ *               FAIL    - string does not start with function and par_l      *
  *                         characters can be safely skipped                   *
  *                                                                            *
  ******************************************************************************/
@@ -229,7 +225,7 @@ int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate parameters that end with '\0'                            *
+ * Purpose: validates parameters that end with '\0'                           *
  *                                                                            *
  * Parameters: expr       - [IN] string to parse that contains parameters     *
  *             length     - [OUT] length of parameters                        *
@@ -249,8 +245,8 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: count calculated item (prototype) formula characters that can be  *
- *          skipped without the risk of missing a function                    *
+ * Purpose: Counts calculated item (prototype) formula characters that can be *
+ *          skipped without the risk of missing a function.                   *
  *                                                                            *
  ******************************************************************************/
 static size_t	zbx_no_function(const char *expr)
@@ -312,21 +308,20 @@ static size_t	zbx_no_function(const char *expr)
 	return ptr - expr;
 }
 
-
 /******************************************************************************
  *                                                                            *
- * Purpose: find the location of the next function and its parameters in      *
- *          calculated item (prototype) formula                               *
+ * Purpose: Finds the location of the next function and its parameters in     *
+ *          calculated item (prototype) formula.                              *
  *                                                                            *
  * Parameters: expr          - [IN] string to parse                           *
- *             func_pos      - [OUT] function position in the string          *
- *             par_l         - [OUT] position of the opening parenthesis      *
- *             par_r         - [OUT] position of the closing parenthesis      *
+ *             func_pos      - [OUT] function position in string              *
+ *             par_l         - [OUT] position of opening parenthesis          *
+ *             par_r         - [OUT] position of closing parenthesis          *
  *             error         - [OUT] error message                            *
  *             max_error_len - [IN] error size                                *
  *                                                                            *
  * Return value: SUCCEED - function was found at func_pos                     *
- *               FAIL    - there are no functions in the expression           *
+ *               FAIL    - there are no functions in expression               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
@@ -362,18 +357,38 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses function parameter                                         *
- *                                                                            *
  * Parameters: expr      - [IN] pre-validated function parameter list         *
- *             param_pos - [OUT] the parameter position, excluding leading    *
+ *             param_pos - [OUT] parameter position, excluding leading        *
  *                               whitespace                                   *
- *             length    - [OUT] the parameter length including trailing      *
+ *             length    - [OUT] parameter length including trailing          *
  *                               whitespace for unquoted parameter            *
- *             sep_pos   - [OUT] the parameter separator character            *
+ *             sep_pos   - [OUT] parameter separator character                *
  *                               (',' or '\0' or ')') position                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	zbx_function_param_parse_ext(expr, 0, 0, param_pos, length, sep_pos);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse function parameter                                          *
+ *                                                                            *
+ * Parameters: expr           - [IN] pre-validated function parameter list    *
+ *             allowed_macros - [IN] bitmask of macros allowed in function    *
+ *                                   parameters (seeZBX_TOKEN_* defines)      *
+ *             esc_bs         - [IN] 0 - don't escape backslashes in strings  *
+ *             param_pos      - [OUT] the parameter position, excluding       *
+ *                                    leading whitespace                      *
+ *             length         - [OUT] the parameter length including trailing *
+ *                                    whitespace for unquoted parameter       *
+ *             sep_pos        - [OUT] the parameter separator character       *
+ *                                    (',' or '\0' or ')') position           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos)
 {
 	const char	*ptr = expr;
 
@@ -385,8 +400,28 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 
 	if ('"' == *ptr)	/* quoted parameter */
 	{
-		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-			;
+		for (ptr++; '"' != *ptr; ptr++)
+		{
+			if ('\\' == *ptr)
+			{
+				if ('"' == ptr[1])
+				{
+					ptr++;
+					continue;
+				}
+
+				if (ZBX_BACKSLASH_ESC_OFF == esc_bs)
+					continue;
+
+				ptr++;
+			}
+
+			if ('\0' == *ptr)
+			{
+				*length = ptr - expr - *param_pos;
+				goto out;
+			}
+		}
 
 		*length = ++ptr - expr - *param_pos;
 
@@ -396,29 +431,96 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 	}
 	else	/* unquoted parameter */
 	{
-		for (ptr = expr; '\0' != *ptr && ')' != *ptr && ',' != *ptr; ptr++)
-			;
+		zbx_token_t	token;
 
-		*length = ptr - expr - *param_pos;
+		for (ptr = expr; ; ptr++)
+		{
+			switch (*ptr)
+			{
+				case '\0':
+				case ')':
+				case ',':
+					*length = ptr - expr - *param_pos;
+					goto out;
+				case '{':
+					if (SUCCEED == zbx_token_find(ptr, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+							0 == token.loc.l && 0 != (allowed_macros & token.type))
+					{
+						ptr += token.loc.r;
+					}
+					break;
+			}
+		}
 	}
-
+out:
 	*sep_pos = ptr - expr;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unquotes function parameter                                       *
+ * Purpose: parse trigger function parameter                                  *
  *                                                                            *
- * Parameters: param -  [IN] the parameter to unquote                         *
- *             len   -  [IN] the parameter length                             *
- *             quoted - [OUT] the flag that specifies whether parameter was   *
+ * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse trigger prototype function parameter                        *
+ *                                                                            *
+ * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO | ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
+			ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
+}
+
+int	zbx_function_param_parse_count(const char *expr)
+{
+	int		ret = 0;
+	size_t		param_pos, length, sep_pos, params_len = strlen(expr);
+	const char	*ptr;
+
+	for (ptr = expr; ptr < expr + params_len; ptr += sep_pos + 1, ret++)
+		zbx_function_param_parse_ext(ptr, 0, ZBX_BACKSLASH_ESC_ON, &param_pos, &length, &sep_pos);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
  *                            quoted before extraction                        *
+ *             esc_bs - [IN] 1 - unescape backslashes, turning 2 subsequent   *
+ *                               backslashes into 1                           *
+ *                           0 - do not unescape backslashes, backslashes     *
+ *                               are only used to escape double quotes        *
  *                                                                            *
  * Return value: The unquoted parameter. This value must be freed by the      *
  *               caller.                                                      *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
+static char	*function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs)
 {
 	char	*out;
 
@@ -438,7 +540,7 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
 
 		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
 		{
-			if ('\\' == pin[0] && '"' == pin[1])
+			if ('\\' == pin[0] && ('"' == pin[1] || (ZBX_BACKSLASH_ESC_ON == esc_bs && '\\' == pin[1])))
 				pin++;
 
 			*pout++ = *pin;
@@ -452,21 +554,56 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: quotes function parameter                                         *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
+ *                            quoted before extraction                        *
  *                                                                            *
- * Parameters: param   - [IN/OUT] function parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
- *                                contain any special characters              *
- *                            0 - do nothing if the parameter does not        *
- *                                contain any special characters              *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
+{
+	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_ON);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unquote history function parameter for versions <= 6.4            *
+ *                                                                            *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
+ *                            quoted before extraction                        *
+ *                                                                            *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted)
+{
+	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_OFF);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: param  - [IN/OUT] function parameter                           *
+ *             forced - [IN] 1 - Enclose parameter in " even if it does not   *
+ *                               contain any special characters.              *
+ *                           0 - Do nothing if the parameter does not contain *
+ *                               any special characters.                      *
+ *             esc_bs - [IN] 1 - escape backslashes, turns 1 backslash into 2 *
+ *                           0 - do not escape backslashes, the number of     *
+ *                               them remains the same                        *
  *                                                                            *
  * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
  *                         was not necessary                                  *
- *               FAIL    - if parameter needs to but cannot be quoted due to  *
- *                         backslash in the end                               *
+ *               FAIL    - if parameter needs, but cannot be quoted due to    *
+ *                         backslash in end                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_param_quote(char **param, int forced)
+int	zbx_function_param_quote(char **param, int forced, int esc_bs)
 {
 	size_t	sz_src, sz_dst;
 
@@ -476,10 +613,10 @@ int	zbx_function_param_quote(char **param, int forced)
 		return SUCCEED;
 	}
 
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
+	if (0 != (sz_src = strlen(*param)) && 0 == esc_bs && '\\' == (*param)[sz_src - 1])
 		return FAIL;
 
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
+	sz_dst = zbx_get_escape_string_len(*param, 0 == esc_bs ? "\"" : "\"\\") + 3;
 
 	*param = (char *)zbx_realloc(*param, sz_dst);
 
@@ -489,7 +626,7 @@ int	zbx_function_param_quote(char **param, int forced)
 	while (0 < sz_src)
 	{
 		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
+		if ('"' == (*param)[sz_src] || (1 == esc_bs &&'\\' == (*param)[sz_src]))
 			(*param)[--sz_dst] = '\\';
 	}
 	(*param)[--sz_dst] = '"';
@@ -499,11 +636,10 @@ int	zbx_function_param_quote(char **param, int forced)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return parameter by index (Nparam) from parameter list (params)   *
+ * Purpose: returns parameter by index (Nparam) from parameter list (params)  *
  *                                                                            *
- * Parameters:                                                                *
- *      params - [IN] parameter list                                          *
- *      Nparam - [IN] requested parameter index (from 1)                      *
+ * Parameters: params - [IN] parameter list                                   *
+ *             Nparam - [IN] requested parameter index (from 1)               *
  *                                                                            *
  * Return value:                                                              *
  *      NULL - requested parameter missing                                    *
@@ -535,9 +671,9 @@ char	*zbx_function_get_param_dyn(const char *params, int Nparam)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Returns function type based on its name                           *
+ * Purpose: returns function type based on its name                           *
  *                                                                            *
- * Return value:  Function type.                                              *
+ * Return value:  function type                                               *
  *                                                                            *
  ******************************************************************************/
 zbx_function_type_t	zbx_get_function_type(const char *func)

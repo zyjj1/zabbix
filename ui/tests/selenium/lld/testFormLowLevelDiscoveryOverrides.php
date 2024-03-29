@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public static function getCreateData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -81,6 +82,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -101,6 +103,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -121,6 +124,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -141,6 +145,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -161,6 +166,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -182,6 +188,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -205,6 +212,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -226,6 +234,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -249,6 +258,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -270,6 +280,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -293,6 +304,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -317,6 +329,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -341,6 +354,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -372,6 +386,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -403,6 +418,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -434,6 +450,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -464,6 +481,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -476,18 +494,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								[
 									'fields' => [
 										'Object' => 'Item prototype',
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "History storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "History": a time unit is expected.'
 						]
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -500,18 +519,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								[
 									'fields' => [
 										'Object' => 'Item prototype',
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "Trend storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "Trends": a time unit is expected.'
 						]
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -524,6 +544,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -566,12 +587,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Condition' => ['operator' => 'does not match', 'value' => 'item_pattern'],
 										'Create enabled' => 'No',
 										'Discover' => 'No',
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => '500d'
 										],
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => '200d'
 										]
 									],
@@ -640,7 +661,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							]
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			]
 		];
@@ -693,6 +715,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			}
 		}
 
+		// Take a screenshot to test draggable object position for overrides.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('class:lld-overrides-table')->one(), 'LLD override');
+		}
+
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 			// Submit LLD create.
 			$form->submit();
@@ -708,6 +736,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public static function getUpdateData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -723,6 +752,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -737,7 +767,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-						[
+			// #2.
+			[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -751,6 +782,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -771,6 +803,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -791,6 +824,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -811,6 +845,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -831,6 +866,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -846,8 +882,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Object' => 'Item prototype',
 										'Create enabled' => null,
 										'Discover' => null,
-										'History storage period' => null,
-										'Trend storage period' => null
+										'History' => null,
+										'Trends' => null
 									],
 									'Update interval' => null
 								]
@@ -857,6 +893,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -882,6 +919,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -904,6 +942,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -930,6 +969,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -959,6 +999,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -988,6 +1029,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1010,6 +1052,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1043,6 +1086,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1072,7 +1116,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-						[
+			// #16.
+			[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -1103,6 +1148,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1124,6 +1170,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1156,6 +1203,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1188,6 +1236,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1215,6 +1264,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1242,6 +1292,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1269,6 +1320,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1296,6 +1348,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1308,18 +1361,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
 									'fields' => [
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "History storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "History": a time unit is expected.'
 						]
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1332,18 +1386,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
 									'fields' => [
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "Trend storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "Trends": a time unit is expected.'
 						]
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1359,6 +1414,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1397,6 +1453,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1447,30 +1504,30 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'fields' => [
 										'Create enabled' => 'No',
 										'Discover' => 'No',
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => '500d'
 										],
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => '200d'
 										]
 									],
 									'Update interval' => [
-										'Delay' => '50m',
+										'Delay' => '1m',
 										'Custom intervals' => [
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 0,
-												'type' => 'Scheduling',
-												'delay' => 'wd1-3h10-17'
+												'type' => 'Flexible',
+												'delay' => '50s',
+												'period' => '1-7,00:00-24:00'
 											],
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 1,
-												'type' => 'Flexible',
-												'delay' => '60s',
-												'period' => '1-5,01:01-13:05'
+												'type' => 'Scheduling',
+												'delay' => 'wd1-5h9-18'
 											]
 										]
 									]
@@ -1514,6 +1571,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1607,16 +1665,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
 						'Create enabled' => 'Yes',
 						'Discover' => 'Yes',
-						// TODO: uncomment after fix DEV-1071 and it is possible to check this field.
-//						'Update interval' => [
-//							'Delay' => '1m',
-//							'Custom intervals' => [
-//								['type' => 'Flexible', 'delay' => '50s', 'period' => '1-7,00:00-24:00'],
-//								['type' => 'Scheduling', 'delay' => 'wd1-5h9-18']
-//							]
-//						],
-						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
-						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep trends']
+						'Update interval' => [
+							'Delay' => '1m',
+							'Custom intervals' => [
+								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+							]
+						],
+						'History' => ['ophistory_history_mode' => 'Do not store'],
+						'Trends' => ['optrends_trends_mode' => 'Do not store']
 					],
 					[
 						'Object' => 'Trigger prototype',
@@ -1794,8 +1851,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					break;
 
 				case USER_ACTION_REMOVE:
-					$override_container->findRow('Name', $override['name'])
-							->query('button:Remove')->one()->click();
+					$override_container->findRow('Name', $override['name'])->query('button:Remove')->one()->click();
 					break;
 
 				default:
@@ -1902,7 +1958,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 					$operation_overlay->submit();
 					$this->checkSubmittedOverlay($data['expected'], $operation_overlay,
-							CTestArrayHelper::get($override, 'error'));
+							CTestArrayHelper::get($override, 'error')
+					);
 
 					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 						// Check that Operation was added to Operations table.
@@ -1932,8 +1989,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$condition_text = $operation['fields']['Object'].' '.
 							$operation['fields']['Condition']['operator'].' '.
 							$operation['fields']['Condition']['value'];
-					$row = $operation_container->findRow('Condition', $condition_text)
-						->query('button:Remove')->one()->click();
+					$row = $operation_container->findRow('Condition', $condition_text)->query('button:Remove')->one()->click();
 					$row->waitUntilNotPresent();
 					break;
 			}

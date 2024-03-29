@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,8 +100,17 @@ class CPage {
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
 				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
-				'--disable-dev-shm-usage'
+				'--disable-dev-shm-usage',
+				'--autoplay-policy=no-user-gesture-required'
 			]);
+
+			if (defined('PHPUNIT_BROWSER_LOG_DIR')) {
+				$options->addArguments([
+					'--enable-logging',
+					'--log-file='.PHPUNIT_BROWSER_LOG_DIR.'/'.microtime(true).'.log',
+					'--log-level=0'
+				]);
+			}
 
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
@@ -113,6 +122,7 @@ class CPage {
 		}
 
 		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
+		$this->driver->setCommandExecutor(new CommandExecutor($this->driver->getCommandExecutor()));
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
@@ -195,11 +205,14 @@ class CPage {
 	 *
 	 * @return $this
 	 */
-	public function login($sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $userid = 1) {
+	public function login(string $sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $userid = 1) {
 		$session = CDBHelper::getRow('SELECT status FROM sessions WHERE sessionid='.zbx_dbstr($sessionid));
 
 		if (!$session) {
-			DBexecute('INSERT INTO sessions (sessionid,userid) VALUES ('.zbx_dbstr($sessionid).','.$userid.')');
+			$secret = bin2hex(random_bytes(16));
+			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,secret)'.
+				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.zbx_dbstr($secret).')'
+			);
 		}
 		elseif ($session['status'] != 0) {	/* ZBX_SESSION_ACTIVE */
 			DBexecute('UPDATE sessions SET status=0 WHERE sessionid='.zbx_dbstr($sessionid));
@@ -445,9 +458,11 @@ class CPage {
 
 	/**
 	 * Wait until page is ready.
+	 *
+	 * @param integer $timeout    timeout in seconds
 	 */
-	public function waitUntilReady() {
-		return (new CElementQuery(null))->waitUntilReady();
+	public function waitUntilReady($timeout = null) {
+		return (new CElementQuery(null))->waitUntilReady($timeout);
 	}
 
 	/**

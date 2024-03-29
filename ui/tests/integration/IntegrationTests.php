@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ require_once dirname(__FILE__).'/testInitialConfSync.php';
 require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
+require_once dirname(__FILE__).'/testBinaryValueTypeDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
@@ -43,6 +44,15 @@ require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
+require_once dirname(__FILE__).'/testDiscoveryRules.php';
+require_once dirname(__FILE__).'/testAutoregistration.php';
+require_once dirname(__FILE__).'/testHistoryPush.php';
+require_once dirname(__FILE__).'/testItemTimeouts.php';
+require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testScriptManualInput.php';
+require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
+require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
+require_once dirname(__FILE__).'/testPermissions.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -53,7 +63,10 @@ class IntegrationTests {
 		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
+		$suite->addTestSuite('testDiscoveryRules');
+		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testDataCollection');
+		$suite->addTestSuite('testBinaryValueTypeDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
@@ -77,6 +90,13 @@ class IntegrationTests {
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
+		$suite->addTestSuite('testHistoryPush');
+		$suite->addTestSuite('testItemTimeouts');
+		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testScriptManualInput');
+		$suite->addTestSuite('testAgentJsonProtocol');
+		$suite->addTestSuite('testSnmpTrapsInHa');
+		$suite->addTestSuite('testPermissions');
 
 		return $suite;
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 
 class CWidgetGeoMap extends CWidget {
+
 	static SEVERITY_NO_PROBLEMS = -1;
 	static SEVERITY_NOT_CLASSIFIED = 0;
 	static SEVERITY_INFORMATION = 1;
@@ -27,9 +28,7 @@ class CWidgetGeoMap extends CWidget {
 	static SEVERITY_HIGH = 4;
 	static SEVERITY_DISASTER = 5;
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._map = null;
 		this._icons = {};
 		this._initial_load = true;
@@ -37,28 +36,30 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels = new Map();
 	}
 
-	_getUpdateRequestData() {
+	promiseReady() {
+		if (this._map === null){
+			return super.promiseReady();
+		}
+
+		return new Promise(resolve => {
+			this._map.whenReady(() => {
+				super.promiseReady()
+					.then(() => setTimeout(resolve, 300));
+			});
+		});
+	}
+
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
+			...super.getUpdateRequestData(),
 			initial_load: this._initial_load ? 1 : 0,
 			unique_id: this._unique_id
 		};
 	}
 
-	_processUpdateResponse(response) {
+	setContents(response) {
 		if (this._initial_load) {
-			super._processUpdateResponse(response);
-		}
-		else {
-			let message_box = this._content_body.querySelector('output');
-
-			if (message_box !== null) {
-				message_box.remove();
-			}
-
-			if (response.messages !== undefined) {
-				this._content_body.prepend(makeMessageBox('bad', response.messages)[0]);
-			}
+			super.setContents(response);
 		}
 
 		if (response.geomap !== undefined) {
@@ -124,7 +125,7 @@ class CWidgetGeoMap extends CWidget {
 			position: 'topright',
 			checked: config.filter.severity,
 			severity_levels: this._severity_levels,
-			disabled: !this._widgetid
+			disabled: this.isEditMode()
 		}).addTo(this._map);
 
 		// Navigate home btn.
@@ -541,6 +542,13 @@ class CWidgetGeoMap extends CWidget {
 				shadowSize: [40, 40],
 				shadowAnchor: [13, 40]
 			});
+		}
+	}
+
+	onEdit() {
+		if (this._map !== null) {
+			this._map.severityFilterControl.close();
+			this._map.severityFilterControl.disable();
 		}
 	}
 }

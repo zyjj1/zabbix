@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,9 +28,23 @@ import (
 	"os"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/unix"
 )
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "VfsFs",
+		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
+		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
+		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 	allData, err := p.getFsInfo()
@@ -55,7 +69,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 			continue
 		}
 
-		fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
+		fsmap[*info.FsName+*info.FsType] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
 	}
 
 	allData, err = p.getFsInfo()
@@ -64,7 +78,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 	}
 
 	for _, info := range allData {
-		if fsInfo, ok := fsmap[*info.FsName]; ok {
+		if fsInfo, ok := fsmap[*info.FsName+*info.FsType]; ok {
 			data = append(data, fsInfo)
 		}
 	}
@@ -123,7 +137,7 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	total := fs.Blocks * uint64(fs.Bsize)
 	free := available * uint64(fs.Bsize)
 	used := (fs.Blocks - fs.Bfree) * uint64(fs.Bsize)
-	pfree := float64(fs.Blocks-fs.Bfree+fs.Bavail)
+	pfree := float64(fs.Blocks - fs.Bfree + fs.Bavail)
 
 	if pfree > 0 {
 		pfree = 100.00 * float64(available) / pfree
@@ -174,13 +188,4 @@ func getFsInode(path string) (stats *FsStats, err error) {
 	}
 
 	return
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "VfsFs",
-		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
-		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
-		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
-	)
 }

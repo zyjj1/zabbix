@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ abstract class CControllerProblem extends CController {
 		'show_tags' => SHOW_TAGS_3,
 		'show_symptoms' => 0,
 		'show_suppressed' => 0,
-		'unacknowledged' => 0,
+		'acknowledgement_status' => ZBX_ACK_STATUS_ALL,
+		'acknowledged_by_me' => 0,
 		'compact_view' => 0,
 		'show_timeline' => ZBX_TIMELINE_ON,
 		'details' => 0,

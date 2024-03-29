@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 class CSectionCollapsible extends CSection {
 
-	private const ZBX_STYLE_COLLAPSED = 'section-collapsed';
 	private const ZBX_STYLE_TOGGLE = 'section-toggle';
 
 	private bool $is_expanded = true;
@@ -40,11 +39,14 @@ class CSectionCollapsible extends CSection {
 	}
 
 	public function toString($destroy = true): string {
-		$this->addClass($this->is_expanded ? null : self::ZBX_STYLE_COLLAPSED);
+		$this->addClass($this->is_expanded ? null : ZBX_STYLE_COLLAPSED);
 
-		$toggle = (new CSimpleButton())
+		$toggle = $this->is_expanded
+			? new CButtonIcon(ZBX_ICON_CHEVRON_UP, _('Collapse'))
+			: new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand'));
+
+		$toggle
 			->addClass(self::ZBX_STYLE_TOGGLE)
-			->setTitle($this->is_expanded ? _('Collapse') : _('Expand'))
 			->onClick('toggleSection("'.$this->getId().'", "'.$this->profile_key.'");');
 
 		if ($this->header === null) {

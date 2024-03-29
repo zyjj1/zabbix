@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,9 @@ window.action_edit_popup = new class {
 				this._loadOperationTable();
 			});
 		}
+
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	_loadOperationTable(new_operation = {}) {
@@ -65,7 +68,7 @@ window.action_edit_popup = new class {
 
 		const fields = getFormFields(this.form);
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'popup.action.operations.list');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
@@ -283,7 +286,7 @@ window.action_edit_popup = new class {
 				input.label = num2letter(input.row_index);
 
 				switch(parseInt(input.conditiontype)) {
-					case <?= CONDITION_TYPE_SUPPRESSED ?>:
+					case <?= ZBX_CONDITION_TYPE_SUPPRESSED ?>:
 						input.condition_name = input.operator == <?= CONDITION_OPERATOR_YES ?>
 							? <?= json_encode(_('Problem is suppressed')) ?>
 							: <?= json_encode(_('Problem is not suppressed')) ?>;
@@ -291,7 +294,7 @@ window.action_edit_popup = new class {
 						template = new Template(document.getElementById('condition-suppressed-row-tmpl').innerHTML);
 						break;
 
-					case <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>:
+					case <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>:
 						input.operator_name = this.condition_operators[input.operator];
 
 						template = new Template(document.getElementById('condition-tag-value-row-tmpl').innerHTML);
@@ -327,7 +330,7 @@ window.action_edit_popup = new class {
 					? table_row.getElementsByTagName('input')[3].value
 					: null;
 
-				if (conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
+				if (conditiontype == <?= ZBX_CONDITION_TYPE_SUPPRESSED ?>) {
 					result.push(input.conditiontype === conditiontype);
 				}
 				else {
@@ -360,7 +363,7 @@ window.action_edit_popup = new class {
 			fields.esc_period = fields.esc_period.trim();
 		}
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
 
 		this._post(curl.getUrl(), fields);
@@ -429,16 +432,21 @@ window.action_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('action')) ?>
+		);
 
 		this._post(curl.getUrl(), {actionids: [this.actionid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

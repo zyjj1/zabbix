@@ -2,37 +2,49 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
+	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
+	zbxconnector \
+	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxconf \
+	zbxcfg \
 	zbxcrypto \
+	zbxcurl \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
 	zbxdbhigh \
+	zbxdiscoverer \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxdiscovery \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexec \
 	zbxexport \
 	zbxexpr \
+	zbxfile \
 	zbxgetopt \
-	zbxha \
 	zbxhash \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxipcservice \
+	zbxipmi \
 	zbxjson \
 	zbxkvs \
 	zbxlog \
@@ -41,129 +53,190 @@ DIST_SUBDIRS = \
 	zbxmutexs \
 	zbxnix \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
+	zbxpinger \
+	zbxpoller \
+	zbxagentget \
+	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
-	zbxserver \
+	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxthreads \
 	zbxtime \
+	zbxtimekeeper \
+	zbxtrapper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxprof \
 	zbxxml
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
+	zbxconnector \
+	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexport \
 	zbxexpr \
-	zbxha \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxkvs \
 	zbxmedia \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
+	zbxpinger \
+	zbxpoller \
+	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
-	zbxserver \
+	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
+if HAVE_IPMI
+SERVER_SUBDIRS += zbxipmi
+endif
 else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
+	zbxconnector \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexport \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxkvs \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
+	zbxpinger \
+	zbxpoller \
+	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxrtc \
 	zbxself \
 	zbxserialize \
-	zbxserver \
+	zbxexpression \
+	zbxscripts \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
+if HAVE_IPMI
+PROXY_SUBDIRS += zbxipmi
+endif
 endif
 endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
+	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxconf \
+	zbxcfg \
 	zbxcrypto \
+	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxexec \
 	zbxexpr \
+	zbxfile \
 	zbxgetopt \
 	zbxhash \
 	zbxhttp \
+	zbxhttppoller \
 	zbxip \
 	zbxipcservice \
 	zbxjson \
@@ -173,21 +246,26 @@ SUBDIRS = \
 	zbxprof \
 	zbxnix \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxregexp \
+	zbxscripts \
 	zbxsysinfo \
 	zbxstr \
 	zbxthreads \
 	zbxtime \
 	zbxvariant \
+	zbxtrapper \
 	zbxversion \
+	zbxvmware \
 	zbxxml \
+	zbxagentget \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
 
 EXTRA_DIST = \
-	zbxsymbols \
 	zbxwin32 \
 	zbxwinservice
 

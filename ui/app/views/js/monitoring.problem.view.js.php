@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@
 		opened_eventids: [],
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -189,7 +189,8 @@
 
 					[...rows].forEach((row) => row.classList.remove('hidden'));
 
-					btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+					btn.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+					btn.classList.add(ZBX_ICON_CHEVRON_UP);
 					btn.title = '<?= _('Collapse') ?>';
 				}
 			});
@@ -200,7 +201,7 @@
 			if (rows.length > 0) {
 				const row = [...rows].pop();
 				const btn = row.querySelector('button[data-action="show_symptoms"]');
-				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				const is_collapsed = btn !== null && btn.classList.contains(ZBX_STYLE_COLLAPSED);
 
 				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
@@ -215,7 +216,8 @@
 
 			// Show symptom rows for current cause. Sliding animations are not supported on table rows.
 			if (rows[0].classList.contains('hidden')) {
-				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+				btn.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+				btn.classList.add(ZBX_ICON_CHEVRON_UP);
 				btn.title = '<?= _('Collapse') ?>';
 
 				this.opened_eventids.push(btn.dataset.eventid);
@@ -223,7 +225,8 @@
 				[...rows].forEach((row) => row.classList.remove('hidden'));
 			}
 			else {
-				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>', '<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				btn.classList.remove(ZBX_ICON_CHEVRON_UP);
+				btn.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
 				btn.title = '<?= _('Expand') ?>';
 
 				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
@@ -236,7 +239,7 @@
 
 			if (rows.length > 0) {
 				const row = [...rows].pop();
-				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				const is_collapsed = btn.classList.contains(ZBX_STYLE_COLLAPSED);
 
 				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
@@ -355,7 +358,7 @@
 		 */
 		refreshResults() {
 			const url = new Curl();
-			const refresh_url = new Curl('zabbix.php', false);
+			const refresh_url = new Curl('zabbix.php');
 			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
 
 			// Modify filter data.
@@ -373,16 +376,6 @@
 			if (!data.filter_custom_time) {
 				data.from = this.global_timerange.from;
 				data.to = this.global_timerange.to;
-			}
-
-			// Close all opened hint boxes, otherwise their contents will not be updated after autorefresh.
-			for (let i = overlays_stack.length - 1; i >= 0; i--) {
-				const hintbox = overlays_stack.getById(overlays_stack.stack[i]);
-
-				if (hintbox.type === 'hintbox') {
-					hintBox.hideHint(hintbox.element, true);
-					removeFromOverlaysStack(overlays_stack.stack[i]);
-				}
 			}
 
 			Object.entries(data).forEach(([key, value]) => {
@@ -416,7 +409,7 @@
 					}
 				})
 				.catch(() => {
-					/**
+					/*
 					 * On error restart refresh timer.
 					 * If refresh interval is set to 0 (no refresh) schedule initialization request after 5 sec.
 					 */
@@ -430,6 +423,18 @@
 			this.openHostPopup({hostid});
 		},
 
+		editItem(target, data) {
+			clearMessages();
+
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		openHostPopup(host_data) {
 			clearMessages();
 
@@ -440,34 +445,36 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
 
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		events: {
-			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					addMessage(makeMessageBox('good', messages, title));
-				}
-
-				view.refreshResults();
-				view.refreshCounters();
-			},
-
-			hostDelete(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

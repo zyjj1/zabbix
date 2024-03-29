@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_LIST))
 	->setControls((new CList([
 		(new CForm('get'))
-			->cleanItems()
 			->setName('main_filter')
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CVar('action', 'user.list'))->removeId()),
@@ -142,6 +141,8 @@ $table = (new CTableInfo())
 		_('Info')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('user');
+
 foreach ($data['users'] as $user) {
 	$userid = $user['userid'];
 	$session = $data['sessions'][$userid];
@@ -169,7 +170,7 @@ foreach ($data['users'] as $user) {
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addSID()
+			->addCsrfToken($csrf_token)
 		: (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 
 	order_result($user['usrgrps'], 'name');
@@ -181,7 +182,7 @@ foreach ($data['users'] as $user) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$users_groups[] = ' &hellip;';
+			$users_groups[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -214,9 +215,18 @@ foreach ($data['users'] as $user) {
 			->setArgument('action', 'user.edit')
 			->setArgument('userid', $userid)
 	);
+	$btn_actions = [];
 
 	if ($user['userdirectoryid'] && $data['idp_names'][$user['userdirectoryid']]['idp_type'] == IDP_TYPE_LDAP) {
-		$checkbox->setAttribute('data-actions', 'ldap');
+		$btn_actions[] = 'ldap';
+	}
+
+	if (array_key_exists('totp_enabled', $user) && $user['totp_enabled']) {
+		$btn_actions[] = 'totp';
+	}
+
+	if ($btn_actions) {
+		$checkbox->setAttribute('data-actions', implode(' ', $btn_actions));
 	}
 
 	if ($user['userdirectoryid']) {
@@ -300,10 +310,29 @@ $form->addItem([
 		'user.provision' => [
 			'name' => _('Provision now'),
 			'attributes' => ['data-required' => 'ldap'],
-			'confirm' => _('Provision selected LDAP users?')
+			'confirm_singular' => _('Provision selected LDAP user?'),
+			'confirm_plural' => _('Provision selected LDAP users?'),
+			'csrf_token' => $csrf_token
 		],
-		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
-		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
+		'user.reset.totp' => [
+			'name' => _('Reset TOTP secret'),
+			'attributes' => ['data-required' => 'totp'],
+			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
+			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
+			'csrf_token' => $csrf_token
+		],
+		'user.unblock' => [
+			'name' => _('Unblock'),
+			'confirm_singular' => _('Unblock selected user?'),
+			'confirm_plural' => _('Unblock selected users?'),
+			'csrf_token' => $csrf_token
+		],
+		'user.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected user?'),
+			'confirm_plural' => _('Delete selected users?'),
+			'csrf_token' => $csrf_token
+		]
 	], 'user')
 ]);
 

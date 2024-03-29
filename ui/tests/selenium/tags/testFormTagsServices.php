@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ class testFormTagsServices extends testFormTags {
 	public $clone_name = 'Service with tags for cloning';
 	public $remove_name = 'Service for removing tags';
 	public $link = 'zabbix.php?action=service.list.edit';
-	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
 
 	/**
 	 * Test creating of Service with tags.
@@ -56,7 +55,7 @@ class testFormTagsServices extends testFormTags {
 	 * Test cloning of Service with tags.
 	 */
 	public function testFormTagsServices_Clone() {
-		$this->executeCloning('service', 'Clone');
+		$this->executeCloning('service');
 	}
 
 	/**

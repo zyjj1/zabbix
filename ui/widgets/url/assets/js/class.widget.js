@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,33 @@
 
 class CWidgetUrl extends CWidget {
 
-	_hasPadding() {
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		const iframe = this._target.querySelector('iframe');
+
+		if (iframe !== null) {
+			readiness.push(
+				new Promise(resolve => {
+					iframe.addEventListener('load', () => setTimeout(resolve, 200));
+				})
+			);
+		}
+
+		return Promise.all(readiness);
+	}
+
+	getUpdateRequestData() {
+		const use_dashboard_host = this._dashboard.templateid !== null
+			|| CWidgetBase.FOREIGN_REFERENCE_KEY in this.getFields().override_hostid;
+
+		return {
+			...super.getUpdateRequestData(),
+			use_dashboard_host: use_dashboard_host ? '1' : undefined
+		};
+	}
+
+	hasPadding() {
 		return false;
 	}
 }

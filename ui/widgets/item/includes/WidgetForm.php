@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@
 
 namespace Widgets\Item\Includes;
 
+use API,
+	CItemHelper,
+	CWidgetsData;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -32,11 +36,13 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
 	CWidgetFieldTextBox,
-	CWidgetFieldThresholds
+	CWidgetFieldThresholds,
+	CWidgetFieldTimePeriod
 };
 
 use Widgets\Item\Widget;
@@ -55,8 +61,53 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
 
+	public const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
+	public const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
+	public const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
+
+	private bool $is_binary_units = false;
+
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct($values, $templateid);
+
+		if (array_key_exists('units', $this->values) && $this->values['units'] !== '') {
+			$this->is_binary_units = isBinaryUnits($this->values['units']);
+		}
+		elseif (array_key_exists('itemid', $this->values)) {
+			$items = API::Item()->get([
+				'output' => ['units'],
+				'itemids' => $this->values['itemid'],
+				'webitems' => true
+			]);
+
+			$this->is_binary_units = $items && isBinaryUnits($items[0]['units']);
+		}
+	}
+
+	public function getFieldsValues(): array {
+		$fields_values = parent::getFieldsValues();
+
+		if ($fields_values['aggregate_function'] == AGGREGATE_NONE) {
+			unset($fields_values['time_period']);
+		}
+
+		return $fields_values;
+	}
+
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		$show = $this->getFieldValue('show');
+
+		if (!$show) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+
+			return $errors;
+		}
 
 		// Check if one of the objects (description, value or time) occupies same space.
 		$fields = [
@@ -66,7 +117,6 @@ class WidgetForm extends CWidgetForm {
 		];
 
 		$fields_count = count($fields);
-		$show = $this->getFieldValue('show');
 
 		for ($i = 0; $i < $fields_count - 1; $i++) {
 			if (!in_array($fields[$i]['show'], $show)) {
@@ -97,7 +147,7 @@ class WidgetForm extends CWidgetForm {
 	public function addFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 			)
@@ -112,9 +162,6 @@ class WidgetForm extends CWidgetForm {
 						Widget::SHOW_CHANGE_INDICATOR
 					])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			)
-			->addField(
-				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
@@ -146,7 +193,9 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('desc_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))->setDefault(2)
+				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))
+					->setDefault(2)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('decimal_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -180,7 +229,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(1)
 			)
 			->addField(
-				new CWidgetFieldTextBox('units', _('Units'))
+				(new CWidgetFieldTextBox('units', _('Units')))->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldSelect('units_pos', _('Position'), [
@@ -237,11 +286,39 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
+				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
+					AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+					AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+					AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+					AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+					AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+					AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+					AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
+					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
+				]))->setDefault(AGGREGATE_NONE)
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
-				: null
+			->addField(
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('history', _('History data'), [
+					self::ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
+					self::ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
+					self::ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(self::ITEM_VALUE_DATA_SOURCE_AUTO)
+			)
+			->addField(
+				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

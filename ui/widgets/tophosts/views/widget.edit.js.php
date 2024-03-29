@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,53 +22,18 @@
 
 window.widget_tophosts_form = new class {
 
-	init() {
+	init({templateid}) {
 		this._form = document.getElementById('widget-dialogue-form');
+		this._templateid = templateid;
 
 		this._list_columns = document.getElementById('list_columns');
-		this.initSortable(this._list_columns);
 
-		this._list_columns.addEventListener('click', (e) => this.processColumnsAction(e));
-	}
-
-	initSortable(element) {
-		const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
-
-		$(element).sortable({
-			disabled: is_disabled,
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			helper: function(e, ui) {
-				for (let td of ui.find('>td')) {
-					let $td = $(td);
-					$td.attr('width', $td.width())
-				}
-
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2) + 'px');
-				}
-
-				return ui;
-			},
-			stop: function(e, ui) {
-				ui.item.find('>td').removeAttr('width');
-				ui.item.removeAttr('style');
-			},
-			start: function(e, ui) {
-				$(ui.placeholder).height($(ui.helper).height());
-			}
+		new CSortable(this._list_columns.querySelector('tbody'), {
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 1
 		});
 
-		for (const drag_icon of element.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-			drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
-		}
+		this._list_columns.addEventListener('click', (e) => this.processColumnsAction(e));
 	}
 
 	processColumnsAction(e) {
@@ -80,9 +45,13 @@ window.widget_tophosts_form = new class {
 			case 'add':
 				this._column_index = this._list_columns.querySelectorAll('tr').length;
 
-				column_popup = PopUp('widget.tophosts.column.edit', {}).$dialogue[0];
+				column_popup = PopUp(
+					'widget.tophosts.column.edit',
+					{templateid: this._templateid},
+					{dialogue_class: 'modal-popup-generic'}
+				).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
-				column_popup.addEventListener('overlay.close', this.removeColorpicker);
+				column_popup.addEventListener('dialogue.close', this.removeColorpicker);
 				break;
 
 			case 'edit':
@@ -91,9 +60,9 @@ window.widget_tophosts_form = new class {
 				this._column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 
 				column_popup = PopUp('widget.tophosts.column.edit',
-					{...form_fields.columns[this._column_index], edit: 1}).$dialogue[0];
+					{...form_fields.columns[this._column_index], edit: 1, templateid: this._templateid}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
-				column_popup.addEventListener('overlay.close', this.removeColorpicker);
+				column_popup.addEventListener('dialogue.close', this.removeColorpicker);
 				break;
 
 			case 'remove':
@@ -132,6 +101,16 @@ window.widget_tophosts_form = new class {
 			}
 
 			delete data.thresholds;
+		}
+
+		if (data.time_period) {
+			for (const [key, value] of Object.entries(data.time_period)) {
+				input.setAttribute('name', `columns[${this._column_index}][time_period][${key}]`);
+				input.setAttribute('value', value);
+				this._form.appendChild(input.cloneNode());
+			}
+
+			delete data.time_period;
 		}
 
 		for (const [key, value] of Object.entries(data)) {

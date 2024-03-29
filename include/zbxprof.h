@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #ifndef ZABBIX_PROF_H
 #define ZABBIX_PROF_H
 
+#define ZBX_PROF_UNKNOWN	0x00
 #define ZBX_PROF_PROCESSING	0x01
 #define ZBX_PROF_RWLOCK		0x02
 #define ZBX_PROF_MUTEX		0x04

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,9 +65,12 @@ if ($data['ldap_config']['provision_status'] == JIT_PROVISIONING_ENABLED) {
 }
 
 $form = (new CForm('post', $form_action))
-	->addItem((new CInput('submit'))->addStyle('display: none;'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ldap')))->removeId())
 	->addItem($formgrid)
 	->addItem((new CScriptTag('ldap_test_edit_popup.init();'))->setOnDocumentReady());
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 foreach ($data['ldap_config'] as $field => $value) {
 	$form->addVar($field, $value);

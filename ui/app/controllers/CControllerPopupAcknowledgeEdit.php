@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -72,12 +72,11 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'object' => EVENT_OBJECT_TRIGGER
 		]);
 
-		return ($events == count($this->getInput('eventids')));
+		return $events == count($this->getInput('eventids'));
 	}
 
 	protected function doAction() {
 		$data = [
-			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
 			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
@@ -93,6 +92,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'problem_can_be_suppressed' => false,
 			'problem_can_be_unsuppressed' => false,
 			'problem_severity_can_be_changed' => false,
+			'problem_can_change_rank' => false,
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
 			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
@@ -104,8 +104,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		// Select events.
 		$events = API::Event()->get([
-			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid'],
-			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid', 'cause_eventid'],
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
 			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
@@ -148,6 +148,11 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			$can_be_closed = true;
 			$can_be_suppressed = true;
 			$can_be_unsuppressed = false;
+
+			// If only cause events are selected, rank change is not allowed.
+			if ($event['cause_eventid'] != 0) {
+				$data['problem_can_change_rank'] = true;
+			}
 
 			// Only manually suppressed problems can be unsuppressed.
 			if ($this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {

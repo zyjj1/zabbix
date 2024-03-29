@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldNumericBox extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldNumericBoxView::class;
 	public const DEFAULT_VALUE = '';
 
 	/**
@@ -36,7 +37,17 @@ class CWidgetFieldNumericBox extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
+			->setValidationRules(['type' => API_NUMERIC])
+			->setMaxLength(255);
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
+
+		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+		}
+
+		return $validation_rules;
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
  *
  * @backup items
  */
-class testFormTestItem extends testItemTest{
+class testFormTestItem extends testItemTest {
 
 	/**
 	 * Check Test item Button enabled/disabled state depending on item type for Host.

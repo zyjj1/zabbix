@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,10 +157,6 @@
 #	include <fcntl.h>
 #endif
 
-#ifdef HAVE_KNLIST_H
-#	include <knlist.h>
-#endif
-
 #ifdef HAVE_KSTAT_H
 #	include <kstat.h>
 #endif
@@ -184,11 +180,10 @@
 #	include <mach/mach_host.h>
 #endif
 
-#ifdef HAVE_MTENT_H
-#	include <mtent.h>
-#endif
-
 #ifdef HAVE_NETDB_H
+#if defined(_AIX)       /* AIX 5.1 needs this to get hstrerror() declaration */
+#define _USE_IRS
+#endif
 #	include <netdb.h>
 #endif
 
@@ -387,21 +382,6 @@
 
 #ifdef HAVE_LIBCURL
 #	include <curl/curl.h>
-#	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
-#		define curl_easy_escape(handle, string, length) curl_escape(string, length)
-#	endif
-#	if 0x071004 >= LIBCURL_VERSION_NUM	/* version 7.16.4 */
-#		define CURLOPT_KEYPASSWD	CURLOPT_SSLKEYPASSWD
-#	endif
-#	if 0x071400 <= LIBCURL_VERSION_NUM	/* version 7.20.0 */
-#		define HAVE_SMTP_AUTHENTICATION	1
-#	endif
-#	if 0x071501 <= LIBCURL_VERSION_NUM	/* version 7.21.6 */
-#		define ZBX_CURLOPT_ACCEPT_ENCODING	CURLOPT_ACCEPT_ENCODING
-#	else
-#		define ZBX_CURLOPT_ACCEPT_ENCODING	CURLOPT_ENCODING
-#	endif
-#	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
 /* Required for advanced sigaction */
@@ -444,6 +424,10 @@
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
+#endif
+
+#ifdef HAVE_POLL_H
+#	include <poll.h>
 #endif
 
 #endif

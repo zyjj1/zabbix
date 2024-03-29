@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,6 +141,13 @@ class API {
 	 */
 	public static function Configuration() {
 		return self::getApi('configuration');
+	}
+
+	/**
+	 * @return CConnector
+	 */
+	public static function Connector() {
+		return self::getApi('connector');
 	}
 
 	/**
@@ -323,6 +330,13 @@ class API {
 	 */
 	public static function MediaType() {
 		return self::getApi('mediatype');
+	}
+
+	/**
+	 * @return CMfa
+	 */
+	public static function Mfa() {
+		return self::getApi('mfa');
 	}
 
 	/**

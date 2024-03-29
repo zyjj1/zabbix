@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,10 +93,15 @@
 					this._delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup('popup.massupdate.service', {location_url: this.back_url}, {
-						dialogue_class: 'modal-popup-static',
-						trigger_element: e.target
-					});
+					openMassupdatePopup('popup.massupdate.service', {
+							location_url: this.back_url,
+							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> :
+								<?= json_encode(CCsrfTokenHelper::get('service')) ?>
+						}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: e.target
+						}
+					);
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
 					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -121,28 +126,22 @@
 			const dialogue = overlay.$dialogue[0];
 
 			dialogue.addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-
-			dialogue.addEventListener('dialogue.delete', (e) => {
 				uncheckTableRows(chkbxRange.prefix);
-
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
+				if ('action' in e.detail && e.detail.action === 'delete') {
+					location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
+				}
+				else {
+					location.href = location.href;
+				}
 			});
 
-			dialogue.addEventListener('overlay.close', () => this._resumeRefresh(), {once: true});
+			dialogue.addEventListener('dialogue.close', () => this._resumeRefresh(), {once: true});
 		}
 
 		_delete(target, serviceids) {
@@ -158,6 +157,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'service.delete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('service')) ?>
+			);
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',

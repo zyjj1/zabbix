@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('configuration.dashboard.list.js.php');
 
 $checkbox_hash = 'dashboard_'.$data['templateid'];
 
@@ -65,7 +68,9 @@ $form->addItem([
 	new CActionButtonList('action', 'dashboardids', [
 		'template.dashboard.delete' => [
 			'name' => _('Delete'),
-			'confirm' => _('Delete selected dashboards?')
+			'confirm_singular' => _('Delete selected dashboard?'),
+			'confirm_plural' => _('Delete selected dashboards?'),
+			'csrf_token' => CCsrfTokenHelper::get('template')
 		]
 	], $checkbox_hash)
 ]);
@@ -85,4 +90,12 @@ $form->addItem([
 	)
 	->setNavigation(getHostNavigation('dashboards', $data['templateid']))
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $checkbox_hash
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

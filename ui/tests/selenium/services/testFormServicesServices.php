@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @dataSource EntitiesTags
@@ -33,7 +33,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormServicesServices extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const UPDATE = true;
 	const EDIT_BUTTON_PATH = 'xpath:.//button[@title="Edit"]';
@@ -42,15 +52,6 @@ class testFormServicesServices extends CWebTest {
 	private static $update_service = 'Update service';
 	private static $delete_service = 'Service for delete';
 	private static $serviceids;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function prepareServicesData() {
 		self::$serviceids = CDataHelper::get('Services.serviceids');
@@ -86,19 +87,18 @@ class testFormServicesServices extends CWebTest {
 		// Check layout at Service tab.
 		$hidden_fields = [];
 		foreach ($service_labels as $label => $visible) {
-			$this->assertEquals($visible, $form->query("xpath://div[@id='service-tab']//label[text()=".
-					CXPathHelper::escapeQuotes($label)."]")->one(false)->isDisplayed()
-			);
+			$this->assertEquals($visible, $form->getField($label)->isDisplayed());
+
 			if (!$visible) {
 				$hidden_fields[] = $label;
 			}
 		}
 
-		// Check advanced configuration default value.
-		$this->assertFalse($form->query('id:advanced_configuration')->asCheckbox()->one()->isChecked());
+		// Check advanced configuration default closed state.
+		$form->checkValue(['Advanced configuration' => false]);
 
-		// Set "Advanced configuration" to true and check that corresponding fields are now visible.
-		$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+		// Open "Advanced configuration" block and check that corresponding fields are now visible.
+		$form->fill(['Advanced configuration' => true]);
 
 		foreach ($hidden_fields as $label) {
 			$this->assertTrue($form->getLabel($label)->isDisplayed());
@@ -259,7 +259,7 @@ class testFormServicesServices extends CWebTest {
 		$this->assertEquals($hintbox, $hint->one()->getText());
 
 		// Close the hint-box.
-		$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Check layout at Tags tab.
@@ -386,7 +386,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Non-numeric weight',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Weight' => 'abc'
 					],
 					'error' => 'Incorrect value "abc" for "weight" field.'
@@ -397,7 +397,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Negative weight',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Weight' => '-2'
 					],
 					'error' => 'Incorrect value for field "weight": value must be no less than "0".'
@@ -408,7 +408,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Excessive weight',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Weight' => '9999999'
 					],
 					'error' => 'Incorrect value for field "weight": value must be no greater than "1000000".'
@@ -419,7 +419,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Non-numeric N in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -437,7 +437,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Negative N in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -455,7 +455,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'N more than 100% in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -473,7 +473,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'W is equal to 0 in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -499,7 +499,7 @@ class testFormServicesServices extends CWebTest {
 					'fields' => [
 						'Name' => 'Max sort order, weight, etc',
 						'Sort order (0->999)' => '999',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Status propagation rule' => 'Increase by',
 						'id:propagation_value_number' => '5',
 						'Weight' => '1000000'
@@ -511,7 +511,7 @@ class testFormServicesServices extends CWebTest {
 					'fields' => [
 						'Name' => 'Intermediate values in sort order',
 						'Sort order (0->999)' => '10',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Status propagation rule' => 'Fixed status',
 						'id:propagation_value_status' => 'OK',
 						'Weight' => '5'
@@ -522,7 +522,7 @@ class testFormServicesServices extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Fixed status',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Status propagation rule' => 'Fixed status',
 						'id:propagation_value_status' => 'Not classified',
 						'Weight' => '0'
@@ -533,7 +533,7 @@ class testFormServicesServices extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Service with multiple additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -615,7 +615,7 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Service for duplitate check'
+						'Name' => 'Service for duplicate check'
 					],
 					'duplicate' => true
 				]
@@ -648,7 +648,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: Non-numeric N in additional rules'
+						'Name' => 'Update rule: Non-numeric N in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -666,7 +667,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: Negative N in additional rules'
+						'Name' => 'Update rule: Negative N in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -684,7 +686,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: N more than 100% in additional rules'
+						'Name' => 'Update rule: N more than 100% in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -702,7 +705,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: W is equal to 0 in additional rules'
+						'Name' => 'Update rule: W is equal to 0 in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -719,7 +723,8 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Update additional rule'
+						'Name' => 'Update additional rule',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -739,7 +744,8 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Remove additional rule'
+						'Name' => 'Remove additional rule',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'Disaster - If weight of child services with Warning status or below is less than 33%'
 				]
@@ -876,13 +882,20 @@ class testFormServicesServices extends CWebTest {
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
-				// There are 3 tables with class list-table, so it is specifified that is should be in the service list.
+				// There are 3 tables with class list-table, so it is specified that is should be in the service list.
 				$table = $this->query('xpath://form[@name="service_list"]//table')->asTable()->one()->waitUntilPresent();
 				$table->findRow('Name', $data['fields']['Name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 						->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
 			$form->invalidate();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$form->checkValue(['Advanced configuration' => false]);
+				$form->fill(['Advanced configuration' => true]);
+			}
 			$form->checkValue($data['fields']);
 
 			// Check that added/updated rules are present, and that removed rules are missing in configuration form.
@@ -1035,7 +1048,7 @@ class testFormServicesServices extends CWebTest {
 			'Name' => 'Updated name',
 			'Parent services' => 'Parent for deletion from row',
 			'Sort order (0->999)' => '85',
-			'id:advanced_configuration' => true,
+			'Advanced configuration' => true,
 			'Status propagation rule' => 'Increase by',
 			'id:propagation_value_number' => '4',
 			'Weight' => '9'
@@ -1202,8 +1215,8 @@ class testFormServicesServices extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 
-		$this->query('id:tab_info')->one()->waitUntilVisible()->query('xpath:.//button[contains(@class, "btn-edit")]')
-				->one()->waitUntilClickable()->click();
+		$this->query('id:tab_info')->one()->waitUntilVisible()->query("xpath:.//button[".
+				CXPathHelper::fromClass('js-edit-service')."]")->one()->waitUntilClickable()->click();
 
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$form->selectTab('Child services');
@@ -1241,7 +1254,7 @@ class testFormServicesServices extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]')
+		$table->findRow('Name', $child, true)->query("xpath:.//button[".CXPathHelper::fromClass('js-edit-service')."]")
 				->one()->waitUntilClickable()->click();
 
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();

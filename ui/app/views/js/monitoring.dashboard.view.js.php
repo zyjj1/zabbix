@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,21 +29,22 @@
 		is_busy: false,
 		is_busy_saving: false,
 
+		skip_time_selector_range_update: false,
+
 		init({
 			dashboard,
 			widget_defaults,
 			widget_last_type,
 			configuration_hash,
-			has_time_selector,
-			time_period,
-			dynamic,
+			broadcast_requirements,
+			dashboard_host,
+			dashboard_time_period,
 			web_layout_mode,
 			clone
 		}) {
 			this.dashboard = dashboard;
-			this.has_time_selector = has_time_selector;
-			this.time_period = time_period;
-			this.dynamic = dynamic;
+			this.broadcast_requirements = broadcast_requirements;
+			this.dashboard_time_period = dashboard_time_period;
 			this.clone = clone;
 
 			timeControl.refreshPage = false;
@@ -61,9 +62,9 @@
 						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
 					}
 					: {
-						previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
-						next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>'),
-						slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW ?>')
+						previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE ?>'),
+						next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE ?>'),
+						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW ?>')
 					},
 				data: {
 					dashboardid: dashboard.dashboardid,
@@ -75,7 +76,7 @@
 				},
 				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-				cell_height: 70,
+				cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
@@ -88,17 +89,31 @@
 				is_edit_mode: dashboard.dashboardid === null || clone,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				time_period,
-				dynamic_hostid: dynamic.host ? dynamic.host.id : null
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				},
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: dashboard_host !== null ? dashboard_host.id : null,
+				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
 
 			ZABBIX.Dashboard.activate();
 
@@ -106,8 +121,8 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
 
-				if (dynamic.has_dynamic_widgets) {
-					jQuery('#dynamic_hostid').on('change', this.events.dynamicHostChange);
+				if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
+					jQuery('#dashboard_hostid').on('change', this.events.dashboardHostChange);
 				}
 
 				if (dashboard.dashboardid === null || clone) {
@@ -124,11 +139,16 @@
 				}
 			}
 
+			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, this.events.feedback);
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
-			if (dynamic.has_dynamic_widgets) {
+			if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', this.events.popState);
+			}
+
+			if ('_timeperiod' in broadcast_requirements) {
+				jQuery.subscribe('timeselector.rangeupdate', this.events.timeSelectorRangeUpdate);
 			}
 
 			jqBlink.blink();
@@ -137,8 +157,8 @@
 		edit() {
 			timeControl.disableAllSBox();
 
-			if (this.dynamic.has_dynamic_widgets) {
-				jQuery('#dynamic_hostid').off('change', this.events.dynamicHostChange);
+			if ('_hostid' in this.broadcast_requirements) {
+				jQuery('#dashboard_hostid').off('change', this.events.dashboardHostChange);
 			}
 
 			document
@@ -200,6 +220,9 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.update');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -220,10 +243,18 @@
 
 					this.disableNavigationWarning();
 
-					const curl = new Curl('zabbix.php', false);
+					const curl = new Curl('zabbix.php');
 
 					curl.setArgument('action', 'dashboard.view');
 					curl.setArgument('dashboardid', response.dashboardid);
+
+					const dashboard_page_index = ZABBIX.Dashboard.getDashboardPageIndex(
+						ZABBIX.Dashboard.getSelectedDashboardPage()
+					);
+
+					if (dashboard_page_index > 0) {
+						curl.setArgument('page', dashboard_page_index + 1);
+					}
 
 					location.replace(curl.getUrl());
 				})
@@ -258,7 +289,9 @@
 		},
 
 		cancelEditing() {
-			const curl = new Curl('zabbix.php', false);
+			this.disableNavigationWarning();
+
+			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
 
@@ -280,6 +313,16 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		editHost(hostid) {
 			const host_data = {hostid};
 
@@ -295,12 +338,30 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
+		editTrigger(trigger_data) {
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		},
 
 		events: {
@@ -359,15 +420,18 @@
 			popState(e) {
 				const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
 
-				jQuery('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
+				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
+				ZABBIX.Dashboard.broadcast({
+					_hostid: host !== null ? host.id : null,
+					_hostids: host !== null ? [host.id] : null
+				});
 			},
 
-			dynamicHostChange() {
-				const hosts = jQuery('#dynamic_hostid').multiSelect('getData');
+			dashboardHostChange() {
+				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 
 				curl.setArgument('action', 'dashboard.view');
 
@@ -375,20 +439,23 @@
 					curl.setArgument('dashboardid', view.dashboard.dashboardid);
 				}
 
-				if (view.has_time_selector) {
-					curl.setArgument('from', view.time_period.from);
-					curl.setArgument('to', view.time_period.to);
+				if ('_timeperiod' in view.broadcast_requirements) {
+					curl.setArgument('from', view.dashboard_time_period.from);
+					curl.setArgument('to', view.dashboard_time_period.to);
 				}
 
 				if (host !== null) {
 					curl.setArgument('hostid', host.id);
 				}
 
-				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
-
 				history.pushState({host: host}, '', curl.getUrl());
 
-				updateUserProfile('web.dashboard.hostid', host ? host.id : 1);
+				ZABBIX.Dashboard.broadcast({
+					_hostid: host !== null ? host.id : null,
+					_hostids: host !== null ? [host.id] : null
+				});
+
+				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
 			},
 
 			applyProperties() {
@@ -412,7 +479,7 @@
 				view.updateBusy();
 			},
 
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -424,6 +491,36 @@
 				}
 
 				location.href = location.href;
+			},
+
+			timeSelectorRangeUpdate: (e, data) => {
+				view.dashboard_time_period = data;
+
+				if (view.skip_time_selector_range_update) {
+					view.skip_time_selector_range_update = false;
+
+					return;
+				}
+
+				ZABBIX.Dashboard.broadcast({
+					_timeperiod: {
+						from: data.from,
+						from_ts: data.from_ts,
+						to: data.to,
+						to_ts: data.to_ts
+					}
+				});
+			},
+
+			feedback(e) {
+				if (e.detail.type === '_timeperiod') {
+					view.skip_time_selector_range_update = true;
+
+					$.publish('timeselector.rangechange', {
+						from: e.detail.value.from,
+						to: e.detail.value.to
+					});
+				}
 			}
 		}
 	}

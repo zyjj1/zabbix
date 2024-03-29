@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ static int	dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-static ZBX_METRIC keys[] =
+static zbx_metric_t keys[] =
 /*	KEY			FLAG		FUNCTION	TEST PARAMETERS */
 {
 	{"dummy.ping",		0,		dummy_ping,	NULL},
@@ -75,7 +75,7 @@ void	zbx_module_item_timeout(int timeout)
  * Return value: list of item keys                                            *
  *                                                                            *
  ******************************************************************************/
-ZBX_METRIC	*zbx_module_item_list(void)
+zbx_metric_t	*zbx_module_item_list(void)
 {
 	return keys;
 }

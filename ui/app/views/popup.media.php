@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,32 +104,38 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('media_form')
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')
 	->addVar('media', $options['media'])
 	->addVar('dstfrm', $options['dstfrm'])
 	->setId('media_form')
-	->addItem([
-		$media_form,
-		(new CInput('submit', 'submit'))->addStyle('display: none;'),
-		(new CTag('script'))
-			->addItem((new CRow([
-				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
+	->addStyle('display: none;');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form->addItem([
+	$media_form,
+	(new CInput('submit', 'submit'))->addStyle('display: none;'),
+	(new CTag('script'))
+		->addItem((new CRow([
+			(new CCol(
+				(new CTextBox('sendto_emails[#{rowNum}]', ''))
 					->setAriaRequired()
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				)),
-				(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
+			)),
+			(new CCol(
+				(new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-				))
-			]))
-				->addClass('form_row')
-				->addClass('dynamic-row'))
-				->setAttribute('type', 'text/x-jquery-tmpl')
-				->setAttribute('id', 'email_send_to_table_row')
-	]);
+			))
+		]))
+			->addClass('form_row')
+			->addClass('dynamic-row'))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->setAttribute('id', 'email_send_to_table_row')
+]);
 
 $output = [
 	'header' => $data['title'],

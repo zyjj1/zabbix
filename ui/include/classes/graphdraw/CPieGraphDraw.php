@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,15 @@ class CPieGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
 
+	private $background;
+	private $sum;
+	private $exploderad;
+	private $exploderad3d;
+	private $graphheight3d;
+	private $shiftlegendright;
+	private $dataFrom;
+	private $shiftYLegend;
+
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
 		$this->background = false;
@@ -39,12 +48,18 @@ class CPieGraphDraw extends CGraphDraw {
 	/********************************************************************************************************/
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
-	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
+	public function addItem($itemid, bool $resolve_macros, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history', 'trends'],
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'key_', 'units', 'value_type',
+				'valuemapid', 'history', 'trends'
+			],
 			'itemids' => [$itemid],
 			'webitems' => true
 		]);
+
+		if ($resolve_macros) {
+			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+		}
 
 		if (!$items) {
 			$items = API::ItemPrototype()->get([
@@ -788,5 +803,30 @@ class CPieGraphDraw extends CGraphDraw {
 		unset($this->items, $this->data);
 
 		imageOut($this->im);
+	}
+
+	private function getShadow($color, $alpha = 0) {
+		if (isset($this->colorsrgb[$color])) {
+			$red = $this->colorsrgb[$color][0];
+			$green = $this->colorsrgb[$color][1];
+			$blue = $this->colorsrgb[$color][2];
+		}
+		else {
+			list($red, $green, $blue) = hex2rgb($color);
+		}
+
+		if ($this->sum > 0) {
+			$red = (int) ($red * 0.6);
+			$green = (int) ($green * 0.6);
+			$blue = (int) ($blue * 0.6);
+		}
+
+		$RGB = [$red, $green, $blue];
+
+		if ($alpha != 0) {
+			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alpha);
+		}
+
+		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,7 @@
 ?>
 
 jQuery(document).ready(function($) {
-	$('#email_send_to').dynamicRows({
-		template: '#email_send_to_table_row'
-	});
+	$('#email_send_to').dynamicRows({template: '#email_send_to_table_row', allow_empty: true});
 
 	// Show/hide multiple "Send to" inputs and single "Send to" input and populate hidden "type" field.
 	$('#mediatypeid')
@@ -49,7 +47,10 @@ jQuery(document).ready(function($) {
 		})
 		.trigger("change");
 
+	document.getElementById('media_form').style.display = '';
+
 	overlays_stack.end().centerDialog();
+	overlays_stack.end().recoverFocus();
 });
 
 /**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,14 @@ class CHttpRequest {
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
 	 */
-	public $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
+	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'Authorization', 'PATH-INFO'];
+
+	private $body;
+	private $method;
+	private $protocol;
+	private $request_method;
+	private $headers;
+	private $raw;
 
 	/**
 	 * Retrieve HTTP Body
@@ -59,10 +66,19 @@ class CHttpRequest {
 		$this->request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 
 		$this->headers = [];
+
+		if (function_exists('getallheaders')) {
+			$headers = getallheaders();
+
+			if (array_key_exists('Authorization', $headers)) {
+				$this->headers['AUTHORIZATION'] = $headers['Authorization'];
+			}
+		}
+
 		foreach ($_SERVER as $i => $val) {
 			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
 				$name = str_replace(['HTTP_', '_'], ['', '-'], $i);
-				$this->headers[$name] = $val;
+				$this->headers[strtoupper($name)] = $val;
 			}
 		}
 	}
@@ -107,11 +123,46 @@ class CHttpRequest {
 	public function getAuthBearerValue() {
 		$auth = $this->header('AUTHORIZATION');
 
-		if (is_string($auth) && substr($auth, 0, 7) === 'Bearer ') {
+		if (is_string($auth) && substr($auth, 0, 7) === ZBX_API_HEADER_AUTHENTICATE_PREFIX) {
 			return substr($auth, 7);
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get request PATH-INFO segment by index. Return empty string if non-existing index requested.
+	 *
+	 * @param int $index  PATH-INFO segment index.
+	 *
+	 * @return string
+	 */
+	public function getPathInfoSegment(int $index): string {
+		$pathinfo_segments = explode('/', substr($this->header('PATH-INFO'), 1));
+		return array_key_exists($index, $pathinfo_segments) ? $pathinfo_segments[$index] : '';
+	}
+
+	/**
+	 * Get argument passed in $_GET. Returns default value when argument not set.
+	 *
+	 * @param string $name     Argument's name.
+	 * @param mixed  $default  Default value to return when requested argument not set.
+	 *
+	 * @return mixed
+	 */
+	public function getUrlArgument(string $name, $default = null) {
+		return array_key_exists($name, $_GET) ? $_GET[$name] : $default;
+	}
+
+	/**
+	 * Checks if argument exists in $_GET request.
+	 *
+	 * @param string $name  Argument's name.
+	 *
+	 * @return bool
+	 */
+	public function hasUrlArgument(string $name): bool {
+		return array_key_exists($name, $_GET);
 	}
 
 	/**

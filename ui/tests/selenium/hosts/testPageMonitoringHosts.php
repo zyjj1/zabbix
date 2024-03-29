@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,19 +20,31 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup profiles
  *
- * @dataSource TagFilter
+ * @dataSource TagFilter, UserPermissions
  */
 class testPageMonitoringHosts extends CWebTest {
 
-	use TagTrait;
-	use TableTrait;
+	/**
+	 * Attach TableBehavior and TagBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_0'
+			]
+		];
+	}
 
 	/**
 	 * Id of host that was updated.
@@ -55,9 +67,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
-			$this->assertTrue($this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]//li[contains(@class, "selected")]')
-					->one()->isPresent($status)
-			);
+			$this->assertTrue($this->query('id:monitoring_hosts_filter')->asFilterElement()->one()->isExpanded($status));
 			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
 		}
 
@@ -789,7 +799,6 @@ class testPageMonitoringHosts extends CWebTest {
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('class:list-table')->waitUntilPresent()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
-		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
@@ -865,7 +874,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'link_name' => 'Dashboards',
-					'page_header' => 'Network interfaces'
+					'page_header' => 'Host dashboards'
 				]
 			],
 			[
@@ -1162,7 +1171,7 @@ class testPageMonitoringHosts extends CWebTest {
 						],
 						[
 							'column' => 'Problems',
-							'counter' => "1\n5"
+							'counter' => "15"
 						]
 					]
 				]

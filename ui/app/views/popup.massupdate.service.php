@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('massupdate-form')
 	->addVar('action', 'popup.massupdate.service')
 	->addVar('ids', $data['ids'])
@@ -33,7 +34,7 @@ $form = (new CForm())
 
 $tags_form_grid = (new CFormGrid())
 	->addItem([
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		new CFormField(
 			(new CDiv([
 				(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
@@ -48,7 +49,7 @@ $tags_form_grid = (new CFormGrid())
 				(new CTemplateTag('tag-row-tmpl'))
 					->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
 			]))
-				->setId('tags-div')
+				->setId('tags-field')
 				->addClass(ZBX_STYLE_TABLE_FORMS)
 		)
 	]);

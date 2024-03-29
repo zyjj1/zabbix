@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class CControllerUserList extends CController {
 	public const FILTERS_SOURCE_SAML = 3;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -126,6 +126,7 @@ class CControllerUserList extends CController {
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 				'surname' => ($filter['surname'] === '') ? null : $filter['surname']
 			],
+			'filter' => ['roleid' => ($filter['roles'] == []) ? null : $filter['roles']],
 			'usrgrpids' => ($filter['usrgrpids'] == []) ? null : $filter['usrgrpids'],
 			'getAccess' => true,
 			'limit' => $limit
@@ -146,6 +147,15 @@ class CControllerUserList extends CController {
 			$user['role_name'] = $user['role'] ? $user['role']['name'] : '';
 		}
 		unset($user);
+
+		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
+			$userids_with_totp = CUser::getUseridsWithMfaTotpSecrets();
+
+			foreach ($data['users'] as &$user) {
+				$user['totp_enabled'] = in_array($user['userid'], $userids_with_totp);
+			}
+			unset($user);
+		}
 
 		// data sort and pager
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);

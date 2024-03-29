@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,7 +159,6 @@ class ZBase {
 		require_once 'include/httptest.inc.php';
 		require_once 'include/images.inc.php';
 		require_once 'include/items.inc.php';
-		require_once 'include/maintenances.inc.php';
 		require_once 'include/maps.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
@@ -352,6 +351,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/html',
 			$this->root_dir.'/include/classes/html/svg',
 			$this->root_dir.'/include/classes/html/widgets',
+			$this->root_dir.'/include/classes/html/widgets/fields',
 			$this->root_dir.'/include/classes/html/interfaces',
 			$this->root_dir.'/include/classes/parsers',
 			$this->root_dir.'/include/classes/parsers/results',
@@ -382,6 +382,13 @@ class ZBase {
 			'hc-light' => _('High-contrast light'),
 			'hc-dark' => _('High-contrast dark')
 		];
+	}
+
+	public static function getColorScheme(string $theme): string {
+		return match ($theme) {
+			'dark-theme', 'hc-dark' => ZBX_COLOR_SCHEME_DARK,
+			default => ZBX_COLOR_SCHEME_LIGHT
+		};
 	}
 
 	/**
@@ -501,7 +508,7 @@ class ZBase {
 	 * @param string|null $language  Locale variant prefix like en_US, ru_RU etc.
 	 */
 	public function initLocales(?string $language): void {
-		if (!setupLocale($language, $error) && $error !== '') {
+		if (!setupLocale($language, $error)) {
 			error($error);
 		}
 
@@ -561,6 +568,10 @@ class ZBase {
 			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
 			'auth' => CWebUser::$data['sessionid']
 		];
+
+		if (CWebUser::isAutologinEnabled()) {
+			$session->lifetime = time() + SEC_PER_MONTH;
+		}
 
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
@@ -666,7 +677,7 @@ class ZBase {
 			CMessageHelper::addError('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
-				if ($key !== 'sid') {
+				if ($key !== CCsrfTokenHelper::CSRF_TOKEN_NAME) {
 					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
@@ -734,11 +745,11 @@ class ZBase {
 
 	private static function denyPageAccess(CRouter $router): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
-			->removeArgument('sid')
+			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)
 			->toString();
 
-		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
-				&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
+		if (CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+				&& CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
 				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
 			redirect(
 				(new CUrl('index_http.php'))
@@ -922,7 +933,9 @@ class ZBase {
 	private function setServerAddress(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
+		if ($ZBX_SERVER !== null) {
+			$ZBX_SERVER_PORT = $ZBX_SERVER_PORT !== null ? (int) $ZBX_SERVER_PORT : ZBX_SERVER_PORT_DEFAULT;
+
 			return;
 		}
 
@@ -949,6 +962,10 @@ class ZBase {
 		if ($active_node !== null) {
 			$ZBX_SERVER = $active_node['address'];
 			$ZBX_SERVER_PORT = $active_node['port'];
+		}
+
+		if ($ZBX_SERVER_PORT !== null) {
+			$ZBX_SERVER_PORT = (int) $ZBX_SERVER_PORT;
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,10 +40,10 @@ $fields = [
 	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,				DB_ID,	null],
-	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
-	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null]
+	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,				null,	null],
+	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,				null,	null],
+	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,				null,	null],
+	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,				null,	null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -189,7 +189,6 @@ else {
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')));
 
 	$html_page->setControls((new CForm('get'))
-		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
@@ -245,7 +244,7 @@ else {
 		$select_filter_hostid = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
 			->setFocusableElementId('filter-templateid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($templates as $templateid => $template) {
 			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
@@ -288,7 +287,7 @@ else {
 		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
 			->setFocusableElementId('tpl-triggerid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		$tpl_triggerids = [];
 
@@ -315,7 +314,7 @@ else {
 		$select_hostgroupid = (new CSelect('hostgroupid'))
 			->setValue($data['filter']['hostgroupid'])
 			->setFocusableElementId('hostgroupid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($host_groups as $groupid => $group) {
 			$select_hostgroupid->addOption(new CSelectOption($groupid, $group['name']));
@@ -372,7 +371,7 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($groups as $groupid => $group) {
 			$select_filter_groupid->addOption(new CSelectOption($groupid, $group['name']));
@@ -494,7 +493,8 @@ else {
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('mode', $report_mode))->removeId())
 			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true,
-				ZBX_DATE_TIME)
+				'web.avail_report.filter', ZBX_DATE_TIME
+			)
 			->addFilterTab(_('Filter'), [$filter_column])
 	);
 
@@ -522,7 +522,7 @@ else {
 				? new CLink($trigger['description'],
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
-						->setArgument('filter_name', '')
+						->setArgument('filter_set', '1')
 						->setArgument('triggerids', [$trigger['triggerid']])
 				)
 				: $trigger['description'],

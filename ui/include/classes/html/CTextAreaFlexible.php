@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,19 +58,6 @@ class CTextAreaFlexible extends CTextArea {
 		if ($this->options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
 		}
-	}
-
-	/**
-	 * Sets textarea maxlength.
-	 *
-	 * @param int $maxlength
-	 *
-	 * @return $this
-	 */
-	public function setMaxlength($maxlength) {
-		$this->setAttribute('maxlength', $maxlength);
-
-		return $this;
 	}
 
 	/**

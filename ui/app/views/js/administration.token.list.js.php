@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,8 +69,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.tokenSuccess, {once: true});
 		},
 
 		massDeleteToken(target, tokenids) {
@@ -86,6 +85,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'token.delete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('token')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -131,20 +133,6 @@
 
 		events: {
 			tokenSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			},
-
-			tokenDelete(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

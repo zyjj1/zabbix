@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,11 +40,11 @@
 		_popup_message_box: null,
 
 		init({filter_options, refresh_url, refresh_interval, applied_filter_groupids}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_interval = refresh_interval;
 			this.applied_filter_groupids = applied_filter_groupids;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'host.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -93,7 +93,7 @@
 		},
 
 		reloadPartialAndTabCounters() {
-			this.refresh_url = new Curl('', false);
+			this.refresh_url = new Curl('');
 
 			this.unscheduleRefresh();
 			this.refresh();
@@ -211,7 +211,7 @@
 
 			this.clearLoading();
 
-			const messages = $(jqXHR.responseText).find('.msg-global');
+			const messages = $(jqXHR.responseText).find('.<?= ZBX_STYLE_MSG_GLOBAL ?>');
 
 			if (messages.length) {
 				this.host_view_form.html(messages);
@@ -274,17 +274,25 @@
 
 			this.unscheduleRefresh();
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 				this.scheduleRefresh();
 			}, {once: true});
 		},
 
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		events: {
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

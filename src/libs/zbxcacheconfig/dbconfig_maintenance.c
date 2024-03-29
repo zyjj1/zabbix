@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 #include "dbconfig.h"
 #include "dbsync.h"
 
-#include "log.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbxeval.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -39,6 +41,13 @@ typedef struct
 	zbx_vector_ptr_t	maintenances;
 }
 zbx_host_event_maintenance_t;
+
+ZBX_PTR_VECTOR_IMPL(host_maintenance_diff_ptr, zbx_host_maintenance_diff_t*)
+
+void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd)
+{
+	zbx_free(hmd);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -67,7 +76,7 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -125,8 +134,8 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
 {
-	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)d1;
-	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)d2;
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t * const *)d1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t * const *)d2;
 
 	return strcmp(tag1->tag, tag2->tag);
 }
@@ -162,7 +171,7 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -267,7 +276,7 @@ void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE|ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -348,7 +357,7 @@ void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -422,7 +431,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -686,13 +695,15 @@ out:
  ******************************************************************************/
 void	zbx_dc_maintenance_set_update_flags(void)
 {
-	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
+	size_t	slots_num, timers_left;
+
+	slots_num = zbx_maintenance_update_flags_num();
 
 	WRLOCK_CACHE;
 
 	memset(config->maintenance_update_flags, 0xff, sizeof(zbx_uint64_t) * slots_num);
 
-	if (0 != (timers_left = ((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] % (sizeof(uint64_t) * 8))))
+	if (0 != (timers_left = ((size_t)cacheconfig_get_config_forks(ZBX_PROCESS_TYPE_TIMER) % (sizeof(uint64_t) * 8))))
 		config->maintenance_update_flags[slots_num - 1] >>= (sizeof(zbx_uint64_t) * 8 - timers_left);
 
 	UNLOCK_CACHE;
@@ -763,8 +774,10 @@ int	zbx_dc_maintenance_check_update_flag(int timer)
  ******************************************************************************/
 int	zbx_dc_maintenance_check_update_flags(void)
 {
-	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM();
+	size_t	slots_num;
 	int	ret = SUCCEED;
+
+	slots_num = zbx_maintenance_update_flags_num();
 
 	RDLOCK_CACHE;
 
@@ -786,6 +799,26 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks if there are change to maintenance that require immediate  *
+ *          update                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - a maintenance immediate update flag is set         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_maintenance_check_immediate_update(void)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = 0 != (ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD & config->maintenance_update) ? SUCCEED : FAIL;
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: update maintenance state depending on maintenance periods         *
  *                                                                            *
  * Return value: SUCCEED - maintenance status was changed, host/event update  *
@@ -797,7 +830,7 @@ out:
  *           and period start/end time.                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_update_maintenances(void)
+int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 {
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
@@ -812,10 +845,11 @@ int	zbx_dc_update_maintenances(void)
 
 	WRLOCK_CACHE;
 
-	if (ZBX_MAINTENANCE_UPDATE_TRUE == config->maintenance_update)
+	/* force recalculation on configuration changes only periodically when timer expires */
+	if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
 	{
-		ret = SUCCEED;
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_FALSE;
+		if (0 != (ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE & config->maintenance_update))
+			ret = SUCCEED;
 	}
 
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
@@ -888,6 +922,11 @@ int	zbx_dc_update_maintenances(void)
 			}
 		}
 	}
+
+	if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_NONE;
+	else
+		config->maintenance_update &= ~ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD;
 
 	UNLOCK_CACHE;
 
@@ -1025,11 +1064,12 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
  *                                                                            *
  * Purpose: gets maintenance updates for all hosts                            *
  *                                                                            *
- * Parameters: host_maintenances - [IN] the maintenances running on hosts     *
+ * Parameters: host_maintenances - [IN] maintenances running on hosts         *
  *             updates           - [OUT] updates to be applied                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zbx_vector_ptr_t *updates)
+static void	dc_get_host_maintenance_updates(const zbx_hashset_t *host_maintenances,
+		zbx_vector_host_maintenance_diff_ptr_t *updates)
 {
 	zbx_hashset_iter_t		iter;
 	ZBX_DC_HOST			*host;
@@ -1041,11 +1081,9 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 	const zbx_host_maintenance_t	*host_maintenance;
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
+
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
-			continue;
-
 		if (NULL != (host_maintenance = zbx_hashset_search(host_maintenances, &host->hostid)))
 		{
 			maintenance_status = HOST_MAINTENANCE_STATUS_ON;
@@ -1084,7 +1122,7 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 			diff->maintenance_status = maintenance_status;
 			diff->maintenance_from = maintenance_from;
 			diff->maintenance_type = maintenance_type;
-			zbx_vector_ptr_append(updates, diff);
+			zbx_vector_host_maintenance_diff_ptr_append(updates, diff);
 		}
 	}
 }
@@ -1093,25 +1131,20 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
  *                                                                            *
  * Purpose: flush host maintenance updates to configuration cache             *
  *                                                                            *
- * Parameters: updates - [IN] the updates to flush                            *
+ * Parameters: updates - [IN] updates to flush                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
+void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_host_maintenance_diff_ptr_t *updates)
 {
-	int					i;
-	const zbx_host_maintenance_diff_t	*diff;
-	ZBX_DC_HOST				*host;
-	int					now;
-
-	now = time(NULL);
+	int	now = time(NULL);
 
 	WRLOCK_CACHE;
 
-	for (i = 0; i < updates->values_num; i++)
+	for (int i = 0; i < updates->values_num; i++)
 	{
-		int	maintenance_without_data = 0;
-
-		diff = (zbx_host_maintenance_diff_t *)updates->values[i];
+		ZBX_DC_HOST				*host;
+		int					maintenance_without_data = 0;
+		const zbx_host_maintenance_diff_t	*diff = updates->values[i];
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &diff->hostid)))
 			continue;
@@ -1152,8 +1185,7 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
  * Purpose: calculates required host maintenance updates based on specified   *
  *          maintenances                                                      *
  *                                                                            *
- * Parameters: maintenanceids   - [IN] identifiers of the maintenances to     *
- *                                process                                     *
+ * Parameters: maintenanceids   - [IN] identifiers of maintenances to process *
  *             updates          - [OUT] pending updates                       *
  *                                                                            *
  * Comments: This function must be called after zbx_dc_update_maintenances()  *
@@ -1163,7 +1195,8 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
  *           before calling this function.                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates)
+void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids,
+		zbx_vector_host_maintenance_diff_ptr_t *updates)
 {
 	zbx_hashset_t	host_maintenances;
 
@@ -1219,7 +1252,7 @@ static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, co
  *               FAIL    - no matching tags found                             *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_ptr_t *etags,
+static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_tags_t *etags,
 		int *mt_pos, int *et_pos)
 {
 	const zbx_dc_maintenance_tag_t	*mtag;
@@ -1252,7 +1285,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 	for (i = et_start; i < etags->values_num; i++)
 	{
-		etag = (const zbx_tag_t *)etags->values[i];
+		etag = etags->values[i];
 		if (0 < (ret = strcmp(etag->tag, name)))
 		{
 			*et_pos = i;
@@ -1275,7 +1308,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 	for (; i < etags->values_num; i++)
 	{
-		etag = (const zbx_tag_t *)etags->values[i];
+		etag = etags->values[i];
 		if (0 != strcmp(etag->tag, name))
 			break;
 	}
@@ -1291,7 +1324,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 		for (j = et_start; j <= et_end; j++)
 		{
-			etag = (const zbx_tag_t *)etags->values[j];
+			etag = etags->values[j];
 			if (SUCCEED == dc_maintenance_tag_value_match(mtag, etag))
 				return SUCCEED;
 		}
@@ -1311,7 +1344,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -1335,7 +1368,7 @@ static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance,
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -1362,7 +1395,7 @@ static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenan
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
 {
 	switch (maintenance->tags_evaltype)
 	{
@@ -1386,19 +1419,6 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
 		return dc_maintenance_match_tags_or(maintenance, tags);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: compare maintenance tags by tag name for sorting                  *
- *                                                                            *
- ******************************************************************************/
-static int	dc_compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
-}
-
 static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_event_maintenance)
 {
 	zbx_vector_ptr_destroy(&host_event_maintenance->maintenances);
@@ -1416,7 +1436,8 @@ static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_even
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids)
+int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_queries,
+		const zbx_vector_uint64_t *maintenanceids)
 {
 	zbx_hashset_t			host_event_maintenances;
 	int				i, j, k, ret = FAIL;
@@ -1438,9 +1459,9 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	for (i = 0; i < event_queries->values_num; i++)
 	{
-		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+		query = event_queries->values[i];
 		if (0 != query->tags.values_num)
-			zbx_vector_ptr_sort(&query->tags, dc_compare_tags);
+			zbx_vector_tags_sort(&query->tags, zbx_compare_tags);
 	}
 
 	RDLOCK_CACHE;
@@ -1460,7 +1481,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	for (i = 0; i < event_queries->values_num; i++)
 	{
-		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+		query = event_queries->values[i];
 
 		/* find hostids of items used in event trigger expressions */
 
@@ -1473,6 +1494,14 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
 					&query->triggerid)))
 			{
+				continue;
+			}
+
+			if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot process event for trigger prototype"
+						" (triggerid:" ZBX_FS_UI64 ")", trigger->triggerid);
+				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
@@ -1570,8 +1599,8 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
 {
 	zbx_vector_uint64_destroy(&query->functionids);
 	zbx_vector_uint64_pair_destroy(&query->maintenances);
-	zbx_vector_ptr_clear_ext(&query->tags, (zbx_clean_func_t)zbx_free_tag);
-	zbx_vector_ptr_destroy(&query->tags);
+	zbx_vector_tags_clear_ext(&query->tags, zbx_free_tag);
+	zbx_vector_tags_destroy(&query->tags);
 	zbx_free(query);
 }
 

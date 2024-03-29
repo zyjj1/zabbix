@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,8 +36,11 @@ if ($data['regexid'] != 0) {
 	$action->setArgument('regexid', $data['regexid']);
 }
 
+$csrf_token = CCsrfTokenHelper::get('regex');
+
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('regex')
 	->setAction($action->getUrl())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -119,7 +122,9 @@ $expr_tab = (new CFormList('exprTab'))
 
 $test_tab = (new CFormList())
 	->addRow(_('Test string'),
-		(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('test_string', $data['test_string']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	)
 	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT))
 	->addRow(_('Result'),
@@ -151,7 +156,7 @@ if ($data['regexid'] != 0) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'regex.delete')
 						->setArgument('regexids', (array) $data['regexid'])
-						->setArgumentSID(),
+						->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete regular expression?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,20 +21,19 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 class testSlaReport extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -161,6 +160,7 @@ class testSlaReport extends CWebTest {
 					'fields' => [
 						'SLA' => 'SLA Daily'
 					],
+					'check_sorting' => true,
 					'reporting_period' => 'Daily',
 					'expected' => [
 						'SLO' => '11.111',
@@ -267,8 +267,11 @@ class testSlaReport extends CWebTest {
 
 				case 'Weekly':
 					for ($i = 1; $i <= 20; $i++) {
-						$period_values[$i]['start'] = strtotime('next Sunday '.-$i.' week');
-						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 6 days');
+						// Next Sunday should be taken as period start date in case if today is Sunday (0 represents Sunday).
+						$start_string = (date('w', time()) == 0) ? 'Sunday next week ' : 'next Sunday ';
+
+						$period_values[$i]['start'] = strtotime($start_string.-$i.' week');
+						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 7 days - 1 second');
 
 						$period_values[$i]['value'] = date('Y-m-d', $period_values[$i]['start']).' – '.
 								date('m-d', $period_values[$i]['end']);
@@ -368,9 +371,7 @@ class testSlaReport extends CWebTest {
 		);
 
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
-			foreach ($table->getHeaders() as $header) {
-				$this->assertFalse($header->query('tag:a')->one(false)->isValid());
-			}
+			$this->assertEquals([], $table->getSortableHeaders()->asText());
 		}
 
 		// This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
@@ -458,19 +459,24 @@ class testSlaReport extends CWebTest {
 			if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$actual_creation_time) {
 				$this->assertEquals($data['expected']['SLI'], $row->getColumn('SLI')->getText());
 
-				// Check Uptime and Error budget values. These values are calcullated only from the actual SLA creation time.
+				// Check Uptime and Error budget values. These values are calculated only from the actual SLA creation time.
 				$uptime = $row->getColumn('Uptime')->getText();
 				if ($period['end'] > $load_time) {
 					$reference_uptime = [];
 					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
 					$start_time = max($period['start'], min(self::$actual_creation_time, self::$service_creation_time));
 
-					// Get array of Utime possible values and check that the correct one is there.
-					for ($i = 0; $i <= 3; $i++) {
+					/**
+					 * Get array of Uptime possible values and check that the correct one is there.
+					 * Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
+					 */
+					for ($i = -1; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
 
-					$this->assertTrue(in_array($uptime, $reference_uptime));
+					$this->assertTrue(in_array($uptime, $reference_uptime), 'Uptime '.$uptime.' is not among values '.
+							implode(', ', $reference_uptime)
+					);
 
 					// Calculate the error budet based on the actual uptime and compare with actual error budget.
 					$uptime_seconds = 0;
@@ -478,19 +484,28 @@ class testSlaReport extends CWebTest {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);
 					}
 
-					$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-						- $uptime_seconds
-					);
+					// In rare cases expected and actual error budget can slightly differ due to calculation precision.
+					foreach([-1, 0, 1] as $delta) {
+						$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
+							- $uptime_seconds + $delta
+						);
+					}
 
-					$this->assertTrue(in_array($row->getColumn('Error budget')->getText(), $error_budget));
+					$this->assertTrue(in_array($actual_budget = $row->getColumn('Error budget')->getText(), $error_budget),
+							'Error budget '.$actual_budget.' is not present among values '.implode(', ', $error_budget)
+					);
 				}
 				else {
 					$reference_uptime = [];
 					$uptime_start = min(self::$actual_creation_time, self::$service_creation_time);
-					for ($i = 0; $i <= 3; $i++) {
+
+					// Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
+					for ($i = -1; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($period['end'] - $uptime_start + $i);
 					}
-					$this->assertTrue(in_array($uptime, $reference_uptime));
+					$this->assertTrue(in_array($uptime, $reference_uptime), 'Uptime '.$uptime.' is not among values '.
+							implode(', ', $reference_uptime)
+					);
 
 					// Error budget is always 0 for periods that have already passed.
 					$this->assertEquals('0', $row->getColumn('Error budget')->getText());
@@ -541,12 +556,8 @@ class testSlaReport extends CWebTest {
 		$this->assertEquals($headers, $table->getHeadersText());
 
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
-			foreach ($table->getHeaders() as $header) {
-				// Only "Service" column is sortable.
-				if ($header->getText() !== 'Service' || $widget) {
-					$this->assertFalse($header->query('tag:a')->one(false)->isValid());
-				}
-			}
+			// Only "Service" column is sortable.
+			$this->assertEquals($widget ? [] : ['Service'], $table->getSortableHeaders()->asText());
 		}
 
 		foreach ($data['expected']['services'] as $service) {
@@ -585,7 +596,7 @@ class testSlaReport extends CWebTest {
 				}
 			}
 
-			$this->assertTrue($match_found);
+			$this->assertTrue($match_found, 'Downtime "'.$downtime.'" is not present in downtime reference array');
 		}
 	}
 

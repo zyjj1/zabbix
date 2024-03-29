@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ $filter_column1 = (new CFormList())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -116,7 +116,7 @@ $filter_type_visibility = [];
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setFocusableElementId('label-type')
-	->addOption(new CSelectOption(-1, _('all')))
+	->addOption(new CSelectOption(-1, _('All')))
 	->setValue($data['filter']['type']);
 
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
@@ -147,35 +147,61 @@ $filter_column2 = (new CFormList())
 		(new CTextBox('filter_delay', $data['filter']['delay']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
 	)
-	->addRow(_('Keep lost resources period'),
-		(new CTextBox('filter_lifetime', $data['filter']['lifetime']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	->addRow(
+		new CLabel(_('Delete lost resources'), 'filter_lifetime'),
+		new CFormField([
+			(new CRadioButtonList('filter_lifetime_type', (int) $data['filter']['lifetime_type']))
+				->addValue(_('All'), -1)
+				->addValue(_('Never'), ZBX_LLD_DELETE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DELETE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DELETE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('filter_lifetime', $data['filter']['lifetime']))
+				->setAttribute('disabled', $data['filter']['lifetime_type'] != ZBX_LLD_DELETE_AFTER)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		])
+	)
+	->addRow(
+		new CLabel(_('Disable lost resources'), 'filter_enabled_lifetime'),
+		new CFormField([
+			(new CRadioButtonList('filter_enabled_lifetime_type', (int) $data['filter']['enabled_lifetime_type']))
+				->addValue(_('All'), -1)
+				->addValue(_('Never'), ZBX_LLD_DISABLE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DISABLE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DISABLE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('filter_enabled_lifetime', $data['filter']['enabled_lifetime']))
+				->setAttribute('disabled', $data['filter']['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		])
 	)
 	->addRow(_('SNMP OID'),
 		(new CTextBox('filter_snmp_oid', $data['filter']['snmp_oid']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
 
-$filter_column3 = (new CFormList());
-
 if ($data['context'] === 'host') {
-	$filter_column3->addRow(_('State'),
+	$filter_column2->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter']['state']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Normal'), ITEM_STATE_NORMAL)
 			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 			->setModern(true)
 	);
 }
 
-$filter_column3->addRow(_('Status'),
+$filter_column2->addRow(_('Status'),
 	(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+		->setEnabled($data['context'] !== 'host' || $data['filter']['state'] == -1)
 		->setModern(true)
 );
 
-$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
+$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $html_page->addItem($filter);
 
@@ -210,6 +236,7 @@ $discoveryTable = (new CTableInfo())
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('host_discovery.php');
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -220,25 +247,22 @@ foreach ($data['discoveries'] as $discovery) {
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($discovery['master_item']['name']);
+			$description[] = $discovery['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name']),
-				(new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $discovery['master_item']['itemid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			))
+			$description[] = (new CLink($discovery['master_item']['name']))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL);
+				->addClass(ZBX_STYLE_TEAL)
+				->addClass('js-update-item')
+				->setAttribute('data-itemid', $discovery['master_item']['itemid'])
+				->setAttribute('data-context', $data['context']);
 		}
 
 		$description[] = NAME_DELIMITER;
 	}
 
 	$description[] = new CLink(
-		CHtml::encode($discovery['name']),
+		$discovery['name'],
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
 			->setArgument('itemid', $discovery['itemid'])
@@ -258,14 +282,14 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
-			->addSID();
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
 			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
@@ -295,7 +319,8 @@ foreach ($data['discoveries'] as $discovery) {
 		$description,
 		[
 			new CLink(_('Item prototypes'),
-				(new CUrl('disc_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
@@ -303,7 +328,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Trigger prototypes'),
-				(new CUrl('trigger_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
@@ -327,7 +353,7 @@ foreach ($data['discoveries'] as $discovery) {
 				CViewHelper::showNum($discovery['hostPrototypes'])
 			]
 			: '',
-		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
@@ -336,24 +362,39 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $button_list = [
-	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?')],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')]
+	'discoveryrule.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected discovery rule?'),
+		'confirm_plural' => _('Enable selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	],
+	'discoveryrule.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected discovery rule?'),
+		'confirm_plural' => _('Disable selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$button_list += [
 		'discoveryrule.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
+				->addClass('js-massexecute-item')
+				->addClass('js-no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		]
 	];
 }
 
 $button_list += [
-	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?')]
+	'discoveryrule.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected discovery rule?'),
+		'confirm_plural' => _('Delete selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.
@@ -367,8 +408,11 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'context' => $data['context'],
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'g_hostdruleid'
+		'checkbox_object' => 'g_hostdruleid',
+		'form_name' => $discoveryForm->getName(),
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

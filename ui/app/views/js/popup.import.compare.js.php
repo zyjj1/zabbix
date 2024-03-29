@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,24 +24,47 @@
  */
 ?>
 
-jQuery(function($) {
-	$(document).on('click', '.import-compare .<?= ZBX_STYLE_TOC_ARROW ?>', function() {
-		$(this).parent().siblings('.<?= ZBX_STYLE_TOC_SUBLIST ?>').toggle();
-		$('span', $(this)).toggleClass('<?= ZBX_STYLE_ARROW_DOWN ?> <?= ZBX_STYLE_ARROW_UP ?>');
 
-		return false;
-	});
-});
+window.popup_import_compare = new class {
 
-function submitImportComparePopup(compare_overlay) {
-	const form = document.querySelector('.import-compare');
-	const import_overlayid = form.querySelector('#import_overlayid').value;
-	const import_overlay = overlays_stack.getById(import_overlayid);
+	/**
+	 * @var {Overlay}
+	 */
+	#overlay;
 
-	if (isDeleteMissingChecked(import_overlay)) {
-		return confirmSubmit(import_overlay, compare_overlay);
+	/**
+	 * @var {HTMLFormElement}
+	 */
+	#form;
+
+	init() {
+		this.#overlay = overlays_stack.getById('popup_import_compare');
+		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
+
+		this.#addEventListeners();
 	}
 
-	overlayDialogueDestroy(compare_overlay.dialogueid);
-	return submitImportPopup(import_overlay);
+	submitImportComparePopup() {
+		if (window.popup_import.isDeleteMissingChecked()) {
+			return window.popup_import.confirmSubmit(this.#overlay);
+		}
+
+		overlayDialogueDestroy(this.#overlay.dialogueid);
+		return window.popup_import.submitImportPopup();
+	}
+
+	#addEventListeners() {
+		this.#form.addEventListener('click', (e) => {
+			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')
+					|| e.target.parentNode.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
+				const btn = e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>') ? e.target : e.target.parentNode;
+				const arrow = btn.querySelector('span');
+				const is_expanded = arrow.classList.contains('<?= ZBX_STYLE_ARROW_DOWN ?>');
+
+				btn.parentNode.nextSibling.style.display = is_expanded ? 'none' : '';
+				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
+				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_RIGHT ?>');
+			}
+		});
+	}
 }
